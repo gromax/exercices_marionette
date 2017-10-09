@@ -1,0 +1,23 @@
+{
+  "name": "skeleton init",
+  "version": "1.0.0",
+  "dependencies": {
+    "jquery": "latest",
+    "json2": "latest",
+    "jquery-validation": "latest",
+    "jquery-ui": "latest",
+    "underscore": "latest",
+    "backbone.marionette": "latest",
+    "backbone.syphon": "latest",
+    "backbone.radio": "latest",
+    "bootstrap": "latest",
+    "tether":"^1.4",
+    "jsxgraph": "latest",
+    "handlebars": "latest",
+    "noty": "latest",
+    "md5":"latest",
+    "requirejs":"latest",
+    "requirejs-text":"latest",
+    "requirejs-underscore-tpl":"latest"
+  }
+}

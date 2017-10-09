@@ -1,0 +1,16 @@
+{
+  "name": "exercices",
+  "version": "0.0.1",
+  "description": "Site for mathematics exercices",
+  "devDependencies": {
+    "grunt": "latest",
+    "grunt-contrib-less": "latest",
+    "grunt-contrib-watch": "latest",
+    "grunt-contrib-handlebars": "latest",
+    "grunt-contrib-coffee": "latest",
+    "grunt-contrib-uglify": "latest",
+    "grunt-contrib-concat": "latest",
+    "grunt-contrib-cssmin": "latest",
+    "grunt-contrib-jst": "latest"
+  }
+}
