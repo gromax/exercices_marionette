@@ -9,6 +9,11 @@ define(["jst","marionette"], function(JST,Marionette){
 		tagName: "a",
 		className: "list-group-item",
 		template: window.JST["exercices/list/exercice-list-item"],
+
+		triggers: {
+			"click": "exercice:show"
+		},
+
 	});
 
 	var Liste = Marionette.CollectionView.extend({

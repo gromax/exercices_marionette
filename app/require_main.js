@@ -15,12 +15,13 @@ requirejs.config({
 		tpl : "../vendor/requirejs-underscore-tpl/underscore-tpl",
 		underscore: "../vendor/underscore/underscore",
 		md5: "../vendor/md5/src/md5",
-		//tether:["https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min","../vendor/tether"],
-		tether:"../vendor/tether/dist/js/tether.min",
-		"tether.rustine":"./tether.rustine",
-		//bootstrap:["https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min","../vendor/bootstrap4/js/bootstrap.min"],
-		bootstrap:"../vendor/bootstrap4/js/bootstrap.min",
-		jst:"../dist/templates.underscore"
+		"tether.original":"https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min",
+		//tether:"../vendor/tether/dist/js/tether.min",
+		tether:"./tether.rustine",
+		bootstrap:"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min",
+		//bootstrap:"../vendor/bootstrap4/js/bootstrap.min",
+		jst:"../dist/templates.underscore",
+		mathjax: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"
 	},
 
 	shim: {
@@ -37,10 +38,18 @@ requirejs.config({
 			deps: ["backbone"],
 			exports: "Marionette"
 		},
-		bootstrap: ["tether.rustine","jquery"],
+		bootstrap: ["tether","jquery"],
 		"jquery-ui": ["jquery"], // il faut bootstrap avant jquery-ui
 		"spin.jquery": ["spin", "jquery"],
 		tpl: ["text"],
+		mathjax: {
+			exports: "MathJax",
+			init: function () {
+				MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+				MathJax.Hub.Startup.onload();
+				return MathJax;
+			}
+		}
 
 	}
 });

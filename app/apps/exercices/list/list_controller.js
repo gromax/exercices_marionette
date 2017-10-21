@@ -13,6 +13,11 @@ define(["app", "apps/common/loading_view", "apps/exercices/list/list_view"], fun
 					collection: collection
 				});
 
+				listView.on("childview:exercice:show",function(childView, args){
+					var model = childView.model;
+					app.trigger("exercice:show", model.get("id"));
+				});
+
 				app.regions.getRegion('main').show(listView);
 			});
 		}

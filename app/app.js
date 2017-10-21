@@ -1,5 +1,5 @@
-//define(["marionette","jquery-ui","bootstrap"], function(Marionette){
-define(["marionette","jquery-ui"], function(Marionette){
+define(["marionette","jquery-ui","bootstrap"], function(Marionette){
+//define(["marionette","jquery-ui"], function(Marionette){
 	var Manager = new Marionette.Application();
 
 	Manager.navigate = function(route, options){

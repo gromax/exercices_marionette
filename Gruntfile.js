@@ -19,6 +19,7 @@ module.exports = function(grunt) {
         }
       }
     },
+
     coffee: {
       exercices: {
         options: {
@@ -26,10 +27,41 @@ module.exports = function(grunt) {
           join:true
         },
         files: {
-          'app/entities/exercices/exercices_controller.js': 'dev/coffee/entities/exercices/exercices_controller.coffee',
+          'app/entities/exercices/exercices_catalog.js' : 'dev/coffee/entities/exercices/exercices_catalog.coffee',
+          'app/entities/exercice.js' : 'dev/coffee/entities/exercice.coffee',
+          'app/entities/exercices.js' : 'dev/coffee/entities/exercices.coffee',
+          'app/utils/help.js' : 'dev/coffee/utils/help.coffee',
+          'app/entities/exercices/exo0002.js' : 'dev/coffee/entities/exercices/exo0002.coffee'
+        }
+      },
+
+      math: {
+        options: {
+          bare:false,
+          join:true
+        },
+        files: {
+          'app/utils/math.js': [
+            'dev/coffee/math/header.coffee',
+            'dev/coffee/math/functions.coffee',
+            'dev/coffee/math/math.coffee',
+            'dev/coffee/math/ensembleObject.coffee',
+            'dev/coffee/math/tokens.coffee',
+            'dev/coffee/math/parser.coffee',
+            'dev/coffee/math/polynome.coffee',
+            'dev/coffee/math/geometrie.coffee',
+            'dev/coffee/math/proba.coffee',
+            'dev/coffee/math/Stats.coffee',
+            'dev/coffee/math/suite.coffee',
+            'dev/coffee/math/trigo.coffee',
+            'dev/coffee/math/erreur.coffee',
+            'dev/coffee/math/myMath.coffee',
+            'dev/coffee/math/footer.coffee',
+          ]
         }
       }
     },
+
     watch: {
         jst: {
             // Watch all .tpl files from the template directory)

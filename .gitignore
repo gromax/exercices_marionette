@@ -1,0 +1,8 @@
+node_modules
+dist
+config/bddConfig.php
+vendor
+php/meekrodb
+app.old
+*.gz
+*.old
