@@ -1,43 +1,25 @@
-define(["app", "apps/common/loading_view", "apps/common/list_layout","apps/users/list/list_panel", "apps/users/list/list_view", "apps/users/new/new_view", "apps/users/edit/edit_view", "apps/users/edit/editpwd_view"], function(app, LoadingView, Layout, Panel, UsersView, NewView, EditView,EditPwdView){
+define(["app", "marionette", "apps/common/loading_view", "apps/common/list_layout","apps/users/list/list_panel", "apps/users/list/list_view", "apps/users/new/new_view", "apps/users/edit/edit_view", "apps/users/edit/editpwd_view"], function(app, Marionette, LoadingView, Layout, Panel, UsersView, NewView, EditView,EditPwdView){
 
-	var Controller ={
+	var Controller = Marionette.Object.extend({
+		channelName: 'users',
+
 		listUsers: function(criterion){
 			var loadingView = new LoadingView();
 			app.regions.getRegion('main').show(loadingView);
 			var usersListLayout = new Layout();
-			var usersListPanel = new Panel();
+			var usersListPanel = new Panel({filterCriterion:criterion});
+			var channel = this.getChannel();
 
-			require(["backbone.radio", "entities/filtered_collection", "entities/user","entities/users"], function(Radio, FilteredCollection, User){
-				var channel=Radio.channel('users');
+			require(["entities/user","entities/users"], function(User){
 				var fetchingUsers = channel.request("user:entities");
 				$.when(fetchingUsers).done(function(users){
-					var filteredUsers = FilteredCollection({
-						collection: users,
-						filterFunction: function(filterCriterion){
-							var criterion = filterCriterion.toLowerCase();
-							return function(user){
-								if(user.get("prenom").toLowerCase().indexOf(criterion) !== -1
-								|| user.get("nom").toLowerCase().indexOf(criterion) !== -1
-								|| user.get("nomClasse").toLowerCase().indexOf(criterion) !== -1){
-									return user;
-								}
-							};
-						}
-					});
-
-					if(criterion){
-						filteredUsers.filter(criterion);
-						usersListPanel.once("show", function(){
-							usersListPanel.triggerMethod("set:filter:criterion", criterion);
-						});
-					}
-
 					var usersListView = new UsersView({
-						collection: filteredUsers
+						collection: users,
+						filterCriterion: criterion
 					});
 
 					usersListPanel.on("users:filter", function(filterCriterion){
-						filteredUsers.filter(filterCriterion);
+						usersListView.triggerMethod("set:filter:criterion", filterCriterion, { preventRender:false });
 						app.trigger("users:filter", filterCriterion);
 					});
 
@@ -81,12 +63,12 @@ define(["app", "apps/common/loading_view", "apps/common/list_layout","apps/users
 						app.regions.getRegion('dialog').show(view);
 					});
 
-					usersListView.on("childview:user:show",function(childView, args){
+					usersListView.on("item:show",function(childView, args){
 						var model = childView.model;
 						app.trigger("user:show", model.get("id"));
 					});
 
-					usersListView.on("childview:user:edit",function(childView, args){
+					usersListView.on("item:edit",function(childView, args){
 						var model = childView.model;
 						var view = new EditView({
 							model:model
@@ -114,7 +96,7 @@ define(["app", "apps/common/loading_view", "apps/common/list_layout","apps/users
 						app.regions.getRegion('dialog').show(view);
 					});
 
-					usersListView.on("childview:user:editPwd",function(childView, args){
+					usersListView.on("item:editPwd",function(childView, args){
 						var model = childView.model;
 						var view = new EditPwdView({
 							model:model
@@ -147,23 +129,15 @@ define(["app", "apps/common/loading_view", "apps/common/list_layout","apps/users
 						app.regions.getRegion('dialog').show(view);
 					});
 
-					usersListView.on("childview:user:delete", function(childView,e){
-						childView.model.destroy();
+					usersListView.on("item:delete", function(childView,e){
+						childView.remove();
 					});
 
 					app.regions.getRegion('main').show(usersListLayout);
 				});
-
-
-
-
-
 			});
-
-
-
 		}
-	};
+	});
 
-	return Controller;
+	return new Controller();
 });

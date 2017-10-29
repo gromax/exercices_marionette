@@ -14,6 +14,14 @@ define(["jst","marionette"], function(JST,Marionette){
 			criterion: "input.js-filter-criterion"
 		},
 
+		serializeData:function(){
+			if (this.options.filterCriterion) {
+				return { filterCriterion:this.options.filterCriterion };
+			} else {
+				return {};
+			}
+		},
+
 		filterUsers: function(e){
 			e.preventDefault();
 			var criterion = this.$(".js-filter-criterion").val();
@@ -21,6 +29,8 @@ define(["jst","marionette"], function(JST,Marionette){
 		},
 
 		onSetFilterCriterion: function(criterion){
+			console.log("lalal");
+			console.log(criterion);
 			this.ui.criterion.val(criterion);
 		}
 	});

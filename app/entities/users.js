@@ -2,7 +2,7 @@ define(["backbone.radio","entities/user"], function(Radio,User){
 	var ItemsCollection = Backbone.Collection.extend({
 		url: "api/users",
 		model: User,
-		comparator: "nomComplet"
+		comparator: "nomComplet",
 	});
 
 	var API = {

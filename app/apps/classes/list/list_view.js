@@ -24,20 +24,60 @@ define(["jst","marionette"], function(JST,Marionette){
 		remove: function(){
 			var self = this;
 			this.$el.fadeOut(function(){
-				//self.model.destroy();
+				self.model.destroy();
 				Marionette.View.prototype.remove.call(self);
 			});
 		}
 
 	});
 
-	var Liste = Marionette.CompositeView.extend({
+	var CollectionView = Marionette.CollectionView.extend({
+		tagName:'tbody',
+		childView:Item,
+		emptyView:noView,
+	});
+
+	var Liste = Marionette.View.extend({
 		tagName: "table",
 		className:"table table-hover",
 		template: window.JST["classes/list/classe-list"],
-		emptyView: noView,
-		childView: Item,
-		childViewContainer: "tbody"
+		regions:{
+			body:{
+				el:'tbody',
+				replaceElement:true
+			}
+		},
+
+		onRender:function(){
+			this.subCollection = new CollectionView({
+				collection:this.collection
+			});
+			this.listenTo(this.subCollection,"childview:item:show", this.showItem);
+			this.listenTo(this.subCollection,"childview:item:edit", this.editItem);
+			this.listenTo(this.subCollection,"childview:item:delete", this.deleteItem);
+			this.showChildView('body', this.subCollection);
+		},
+
+		showItem:function(childView){
+			this.trigger("item:show",childView);
+		},
+
+		editItem:function(childView){
+			this.trigger("item:edit",childView);
+		},
+
+		deleteItem:function(childView){
+			this.trigger("item:delete",childView);
+		},
+
+		flash: function(itemModel){
+			var newItemView = this.subCollection.children.findByModel(itemModel);
+			// check whether the new user view is displayed (it could be
+			// invisible due to the current filter criterion)
+			if(newItemView){
+				newItemView.flash("success");
+			}
+		},
 	});
 
 	return Liste;
