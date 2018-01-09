@@ -1,7 +1,7 @@
 define(["app", "marionette", "apps/common/loading_view", "apps/common/list_layout","apps/classes/list/list_panel", "apps/classes/list/list_view", "apps/classes/new/new_view", "apps/classes/edit/edit_view"], function(app, Marionette, LoadingView, Layout, Panel, ListView, NewView, EditView){
 
 	var Controller = Marionette.Object.extend({
-		channelName: 'classes',
+		channelName: 'entities',
 
 		list: function(){
 			var loadingView = new LoadingView();
@@ -11,7 +11,7 @@ define(["app", "marionette", "apps/common/loading_view", "apps/common/list_layou
 			var channel = this.getChannel();
 
 			require(["entities/classe","entities/classes"], function(Classe){
-				var fetching = channel.request("classe:entities");
+				var fetching = channel.request("classes:entities");
 				$.when(fetching).done(function(items){
 					var listItemsView = new ListView({
 						collection: items

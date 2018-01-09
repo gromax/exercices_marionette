@@ -10,7 +10,7 @@ define(["backbone.radio","entities/user"], function(Radio,User){
 		lastTime:null,
 		getEntities: function(){
 			t= Date.now();
-			if ((API.storedCollection) && (t-API.lastTime<20000))
+			if ((API.storedCollection) && (t-API.lastTime<1500000))
 			{
 				var defer = $.Deferred();
 				defer.resolve(API.storedCollection);
@@ -35,8 +35,8 @@ define(["backbone.radio","entities/user"], function(Radio,User){
 		}
 	};
 
-	var channel = Radio.channel('users');
-	channel.reply('user:entities', API.getEntities );
+	var channel = Radio.channel('entities');
+	channel.reply('users:entities', API.getEntities );
 
 	return;
 });

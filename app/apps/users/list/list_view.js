@@ -119,19 +119,4 @@ define(["jst","marionette"], function(JST,Marionette){
 	});
 
 	return Liste;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 });

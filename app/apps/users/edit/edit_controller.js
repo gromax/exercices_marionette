@@ -1,5 +1,7 @@
-define(["app","apps/common/loading_view","apps/common/missing_item_view","apps/users/edit/edit_view","apps/users/edit/editpwd_view"], function(app, LoadingView, MissingView, EditView, EditPwdView){
-	var Controller = {
+define(["app", "marionette", "apps/common/loading_view","apps/common/missing_item_view","apps/users/edit/edit_view","apps/users/edit/editpwd_view"], function(app, Marionette, LoadingView, MissingView, EditView, EditPwdView){
+	var Controller = Marionette.Object.extend({
+		channelName: "entities",
+
 		editUser: function(id){
 			var loadingView = new LoadingView({
 				title: "Modification d'un utilisateur",
@@ -7,9 +9,8 @@ define(["app","apps/common/loading_view","apps/common/missing_item_view","apps/u
 			});
 
 			app.regions.getRegion('main').show(loadingView);
-
-			require(["backbone.radio", "entities/user"], function(Radio,User){
-				var channel = Radio.channel('users');
+			var channel = this.getChannel();
+			require(["entities/user"], function(User){
 				var fetchingUser = channel.request("user:entity", id);
 				$.when(fetchingUser).done(function(user){
 					var view;
@@ -53,9 +54,9 @@ define(["app","apps/common/loading_view","apps/common/missing_item_view","apps/u
 			});
 
 			app.regions.getRegion('main').show(loadingView);
+			var channel = this.getChannel();
 
-			require(["backbone.radio", "entities/user"], function(Radio,User){
-				var channel = Radio.channel('users');
+			require(["entities/user"], function(User){
 				var fetchingUser = channel.request("user:entity", id);
 				$.when(fetchingUser).done(function(user){
 					var view;
@@ -100,5 +101,5 @@ define(["app","apps/common/loading_view","apps/common/missing_item_view","apps/u
 		}
 	}
 
-	return Controller;
+	return new Controller();
 });

@@ -4,7 +4,8 @@ define(["backbone.radio", "entities/exercices/exercices_catalog"], function(Radi
     defaults: {
       title: "Titre de l'exercice",
       description: "Description de l'exercice",
-      keywords: ""
+      keywords: "",
+      options: {}
     }
   });
   ItemsCollection = Backbone.Collection.extend({
@@ -18,6 +19,6 @@ define(["backbone.radio", "entities/exercices/exercices_catalog"], function(Radi
       return collection;
     }
   };
-  channel = Radio.channel('exercices');
+  channel = Radio.channel('entities');
   channel.reply('exercices:entities', API.getEntities);
 });

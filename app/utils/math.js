@@ -1,7 +1,8 @@
 (function() {
   var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
     extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    hasProp = {}.hasOwnProperty;
+    hasProp = {}.hasOwnProperty,
+    slice = [].slice;
 
   define([], function() {
     var Collection, ComplexeNumber, DECIMAL_MAX_PRECISION, DECIMAL_SEPARATOR, Droite2D, ERROR_MIN, Ensemble, EnsembleObject, Equation, FloatNumber, FunctionNumber, InftyNumber, Intersection, MODULO_LETTER, MObject, Monome, MultiplyNumber, NumberObject, ParseInfo, ParseManager, PlusNumber, Polynome, PolynomeMaker, PowerNumber, Proba, RadicalNumber, RationalNumber, RealNumber, SOLVE_MAX_PRECISION, SimpleNumber, Suite, SymbolManager, TokenEnsembleDelimiter, TokenFunction, TokenNumber, TokenObject, TokenOperator, TokenParenthesis, TokenVariable, Trigo, Union, Vector, arrayIntersect, erreurManager, extractSquarePart, fixNumber, grecques, in_array, isArray, isInfty, isInteger, mM, mergeObj, numToStr, signatures_comparaison, union_arrays;
@@ -5875,7 +5876,7 @@
 
       TokenVariable.getRegex = function(type) {
         if (type === "number") {
-          return "[#πa-zA-Z_\\x7f-\\xff][a-zA-Z0-9_\\x7f-\\xff]*";
+          return "[#∞πa-zA-Z_\\x7f-\\xff][a-zA-Z0-9_\\x7f-\\xff]*";
         } else {
           return "[#π∅ℝ∞a-zA-Z_\\x7f-\\xff][a-zA-Z0-9_\\x7f-\\xff]*";
         }
@@ -8837,6 +8838,17 @@
       }
     };
     mM = {
+      misc: {
+        numToStr: function(num, decimals) {
+          var out;
+          if (decimals != null) {
+            out = num.toFixed(decimals);
+          } else {
+            out = String(num);
+          }
+          return out.replace('.', ",");
+        }
+      },
       alea: {
         poly: function(params) {
           var aa, ab, coeff, coeffs, config, degre, degres, i, len, results;
@@ -9247,6 +9259,17 @@
       },
       parse: function(expression, params) {
         return (new ParseInfo(expression, params)).object;
+      },
+      equals: function(a, b) {
+        var dif;
+        if (!a instanceof NumberObject) {
+          a = this.toNumber(a);
+        }
+        if (!b instanceof NumberObject) {
+          b = this.toNumber(b);
+        }
+        dif = Math.abs(a.toClone().minus(b).floatify().float());
+        return dif < ERROR_MIN;
       },
       toNumber: function(value) {
         var aa, item, len, liste, m, out, results;
@@ -9813,65 +9836,75 @@
       },
       verif: {
         number: function(userInfo, goodObject, params) {
-          var approx, config, erreur, output;
-          config = mergeObj({
+          var approx, config, default_config, erreur, errors, note, ref;
+          if (typeof goodObject === "number") {
+            goodObject = new RealNumber(goodObject);
+          }
+          default_config = {
             formes: null,
-            p_forme: 0.5,
+            p_forme: 0.75,
             tolerance: 0,
             approx: 0.1,
             p_approx: 0.5,
             arrondi: null,
             p_arrondi: 0.5,
             p_modulo: 0.5,
-            symbols: null
-          }, params);
-          erreur = erreurManager.main(goodObject, userInfo.object, config.symbols);
-          output = {
-            arrondi: false,
-            ponderation: 0,
-            ok: false,
-            moduloError: erreur.moduloError,
-            formeOk: userInfo.forme(config.formes)
+            symbols: null,
+            custom: false
           };
+          params = _.pick.apply(_, [params].concat(slice.call(_.keys(default_config))));
+          config = _.extend(default_config, params);
+          erreur = erreurManager.main(goodObject, userInfo.object, config.symbols);
+          note = 0;
+          errors = [];
           switch (false) {
             case typeof config.arrondi !== "number":
               approx = Math.pow(10, config.arrondi);
-              output.arrondi = {
-                resolution: numToStr(approx),
-                good: numToStr(mM.float(goodObject), -config.arrondi)
-              };
-              approx = approx / 2;
-              if ((erreur.exact || erreur.float && erreur.approx_ok && ((erreur.ordre <= config.arrondi) || (erreur.p_user <= config.arrondi))) && !erreur.moduloError) {
-                if (!erreur.float || erreur.troncature || (erreur.p_user < config.arrondi)) {
-                  output.arrondi.bad = true;
-                  output.ponderation = config.p_arrondi;
-                } else {
-                  output.ponderation = 1;
+              if ((erreur.exact || erreur.float && ((erreur.ordre <= config.arrondi) || (erreur.p_user <= config.arrondi))) && !erreur.moduloError) {
+                if (!erreur.float) {
+                  errors.push("Approximation sous forme décimale attendue.");
                 }
-                output.ok = true;
+                if (!(erreur.approx_ok || erreur.exact)) {
+                  errors.push("Il faut arrondir au " + approx + " le plus proche.");
+                }
+                if (erreur.p_user < config.arrondi) {
+                  errors.push("Vous donnez trop de décimales.");
+                }
+                if (errors.length > 0) {
+                  note = config.p_arrondi;
+                  errors.push("La bonne réponse était " + (numToStr(mM.float(goodObject), -config.arrondi)) + ".");
+                } else {
+                  note = 1;
+                }
+              } else {
+                if (!erreur.float) {
+                  errors.push("Approximation sous forme décimale attendue.");
+                }
+                errors.push("La bonne réponse était " + (numToStr(mM.float(goodObject), -config.arrondi)) + ".");
               }
               break;
             case !(erreur.exact || erreur.float && (erreur.ecart <= config.tolerance)):
-              output.ponderation = 1;
-              if (!output.formeOk) {
-                output.ponderation *= config.p_forme;
+              note = 1;
+              if (!userInfo.forme(config.formes)) {
+                note *= config.p_forme;
+                errors.push("Vous devez simplifier votre résultat.");
               }
               if (erreur.moduloError) {
-                output.ponderation *= config.p_modulo;
+                note *= config.p_modulo;
+                output.errors.push("Le bon modulo était &nbsp; $k\\cdot " + erreur.moduloError + "$");
               }
-              output.ok = true;
               break;
             case !(erreur.float && erreur.approx_ok && (erreur.ecart <= config.approx) && !erreur.moduloError):
-              output.approximation = true;
-              output.ponderation = config.p_approx;
-              output.ok = true;
+              errors.push("Vous avez donné une approximation. Il faut donner une valeur exacte.");
+              note = config.p_approx;
               break;
             default:
-              if (typeof config.custom === "function") {
-                config.custom(userInfo.object, goodObject, output);
-              }
+              errors.push("La bonne réponse était &nbsp; $" + ((ref = config.goodTex) != null ? ref : goodObject.tex()) + "$");
           }
-          return output;
+          return {
+            note: note,
+            errors: errors
+          };
         },
         ensemble: function(userInfo, goodObject, params) {
           var config, ok;
@@ -9880,7 +9913,7 @@
           }, params);
           ok = goodObject.isEqual(userInfo.object, config.tolerance);
           return {
-            ponderation: ok ? 1 : 0,
+            note: ok ? 1 : 0,
             ok: ok,
             formeOk: true
           };
@@ -9889,14 +9922,14 @@
           var ok;
           ok = goodObject.isEqual(userInfo.object);
           return {
-            ponderation: ok ? 1 : 0,
+            note: ok ? 1 : 0,
             ok: ok,
             formeOk: true
           };
         },
         def: function(user, goodObject, params) {
           return {
-            ponderation: 0,
+            note: 0,
             ok: false,
             formeOk: false
           };

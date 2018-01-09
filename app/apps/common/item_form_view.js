@@ -22,9 +22,9 @@ define(["jst","marionette", "backbone.syphon"], function(JST,Marionette){
 					$(this).removeClass("has-error");
 				});
 			}
-
+			var itemMarkup = this.itemMarkup;
 			var markErrors = function(value, key){
-				var $controlGroup = $view.find("#"+this.itemMarkup+"-" + key).closest(".form-group");
+				var $controlGroup = $view.find("#"+itemMarkup+"-" + key).closest(".form-group");
 				$controlGroup.addClass("has-error");
 				if ($.isArray(value)) {
 					value.forEach(function(el){

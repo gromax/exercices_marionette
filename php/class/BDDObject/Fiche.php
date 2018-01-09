@@ -39,12 +39,12 @@ final class Fiche
 		require_once BDD_CONFIG;
 		try {
 			if (isset($params["owner"])) {
-				$bdd_result=DB::query("SELECT id, nom, date, description, visible, actif FROM ".PREFIX_BDD."fiches WHERE idOwner=%s ORDER BY date",$params["owner"]);
+				$bdd_result=DB::query("SELECT id, idOwner, nom, date, description, visible, actif FROM ".PREFIX_BDD."fiches WHERE idOwner=%s ORDER BY date",$params["owner"]);
 			} elseif (isset($params["eleve"])) {
-				$bdd_result=DB::query("SELECT DISTINCT f.id, f.nom, f.date, f.description, f.visible, f.actif FROM ".PREFIX_BDD."fiches f JOIN ".PREFIX_BDD."assocUF a ON f.id = a.idFiche WHERE a.idUser=%i AND f.visible=1 ORDER BY date",$params["eleve"]);
+				$bdd_result=DB::query("SELECT DISTINCT f.id, f.idOwner, f.nom, f.date, f.description, f.visible, f.actif FROM ".PREFIX_BDD."fiches f JOIN ".PREFIX_BDD."assocUF a ON f.id = a.idFiche WHERE a.idUser=%i AND f.visible=1 ORDER BY date",$params["eleve"]);
 				// Un même élève pourrait être attaché plusieurs fois à une même fiche
 			} else {
-				$bdd_result=DB::query("SELECT f.id, f.idOwner, f.nom, f.date, f.description, f.visible, f.actif FROM (".PREFIX_BDD."fiches f) ORDER BY f.date");
+				$bdd_result=DB::query("SELECT f.id, f.idOwner, u.nom nomOwner, f.nom, f.date, f.description, f.visible, f.actif FROM (".PREFIX_BDD."fiches f JOIN ".PREFIX_BDD."users u ON f.idOwner = u.id) ORDER BY f.date");
 			}
 		} catch(MeekroDBException $e) {
 			EC::addBDDError($e->getMessage(), "Fiche/getList");
@@ -183,6 +183,11 @@ final class Fiche
 	public function getOwnerId()
 	{
 		return $this->idOwner;
+	}
+
+	public function getOwner()
+	{
+		return User::getObject($this->idOwner);
 	}
 
 	public function isOwnedBy($user)

@@ -1,9 +1,10 @@
 define(["app", "marionette", "apps/common/loading_view", "apps/common/list_layout","apps/users/list/list_panel", "apps/users/list/list_view", "apps/users/new/new_view", "apps/users/edit/edit_view", "apps/users/edit/editpwd_view"], function(app, Marionette, LoadingView, Layout, Panel, UsersView, NewView, EditView,EditPwdView){
 
 	var Controller = Marionette.Object.extend({
-		channelName: 'users',
+		channelName: 'entities',
 
 		listUsers: function(criterion){
+			criterion = criterion || "";
 			var loadingView = new LoadingView();
 			app.regions.getRegion('main').show(loadingView);
 			var usersListLayout = new Layout();
@@ -11,7 +12,7 @@ define(["app", "marionette", "apps/common/loading_view", "apps/common/list_layou
 			var channel = this.getChannel();
 
 			require(["entities/user","entities/users"], function(User){
-				var fetchingUsers = channel.request("user:entities");
+				var fetchingUsers = channel.request("users:entities");
 				$.when(fetchingUsers).done(function(users){
 					var usersListView = new UsersView({
 						collection: users,

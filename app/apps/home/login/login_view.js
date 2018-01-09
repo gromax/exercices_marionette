@@ -16,19 +16,20 @@ define(["marionette","app","jst", "backbone.syphon"], function(Marionette,app,JS
 			var $view = this.$el;
 			var clearFormErrors = function(){
 				var $form = $view.find("form");
-				$form.find("div.alert.alert-danger").each(function(){
+				$form.find("div.alert").each(function(){
 					$(this).remove();
-				});
-				$form.find(".input-group.has-error").each(function(){
-					$(this).removeClass("has-error");
 				});
 			}
 
-			var markErrors = function(value, key){
-				var $controlGroup = $view.find("#user-" + key).parent();
-				$controlGroup.addClass("has-error");
-				var $errorEl = $("<div>", { class: "alert alert-danger", role:"alert", text: value });
-				$controlGroup.after($errorEl);
+			var $container = $view.find("#messages");
+			var markErrors = function(value){
+				var $errorEl;
+				if (value.success) {
+					$errorEl = $("<div>", { class: "alert alert-success", role:"alert", text: value.message });
+				} else {
+					$errorEl = $("<div>", { class: "alert alert-danger", role:"alert", text: value.message });
+				}
+				$container.append($errorEl);
 			}
 
 			clearFormErrors();

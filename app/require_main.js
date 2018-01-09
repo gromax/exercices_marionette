@@ -21,7 +21,9 @@ requirejs.config({
 		bootstrap:"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min",
 		//bootstrap:"../vendor/bootstrap4/js/bootstrap.min",
 		jst:"../dist/templates.underscore",
-		mathjax: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"
+		mathjax: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML",
+		BBcache: "../node_modules/backbone-fetch-cache/backbone.fetch-cache.min",
+		jsxgraph: "https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.6/jsxgraphcore",
 	},
 
 	shim: {

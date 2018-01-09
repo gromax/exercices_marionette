@@ -1,5 +1,6 @@
-define(["app","apps/common/loading_view","apps/common/missing_item_view","apps/classes/edit/edit_view"], function(app, LoadingView, MissingView, EditView){
-	var Controller = {
+define(["app","marionette","apps/common/loading_view","apps/common/missing_item_view","apps/classes/edit/edit_view"], function(app, Marionette, LoadingView, MissingView, EditView){
+	var Controller = Marionette.Object.extend({
+		channelName: "entities",
 		edit: function(id){
 			var loadingView = new LoadingView({
 				title: "Modification d'une classe",
@@ -7,9 +8,9 @@ define(["app","apps/common/loading_view","apps/common/missing_item_view","apps/c
 			});
 
 			app.regions.getRegion('main').show(loadingView);
+			var channel = this.getChannel();
+			require(["entities/classe"], function(Item){
 
-			require(["backbone.radio", "entities/classe"], function(Radio,Item){
-				var channel = Radio.channel('classes');
 				var fetchingItem = channel.request("classe:entity", id);
 				$.when(fetchingItem).done(function(item){
 					var view;
@@ -46,7 +47,7 @@ define(["app","apps/common/loading_view","apps/common/missing_item_view","apps/c
 				});
 			});
 		}
-	}
+	});
 
-	return Controller;
+	return new Controller();
 });

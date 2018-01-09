@@ -6,6 +6,8 @@ use BDDObject\Fiche;
 use BDDObject\User;
 use BDDObject\AssoUF;
 use BDDObject\Logged;
+use BDDObject\ExoFiche;
+use BDDObject\Note;
 
 class assosUF
 {
@@ -25,6 +27,74 @@ class assosUF
      * renvoie les infos sur l'objet d'identifiant id
      * @return array
      */
+
+    public function fetchList()
+    {
+        $uLog =Logged::getConnectedUser();
+        if (!$uLog->connexionOk())
+        {
+            EC::set_error_code(401);
+            return false;
+        }
+        # Seul un élève est susceptible de charger directement sa liste d'assoc
+        if ($uLog->isEleve())
+        {
+            return array(
+                "exofiches" => ExoFiche::getList(array("idUser"=>$uLog->getId())),
+                "assocs" => AssoUF::getList(array("idUser"=> $uLog->getId() )),
+                "faits" => Note::getList(array("idUser"=>$uLog->getId()))
+            );
+        } else {
+            EC::set_error_code(403);
+            return false;
+        }
+
+        EC::set_error_code(501);
+        return false;
+    }
+
+    /*public function fetchItem()
+    {
+        $id = (integer) $this->params['id'];
+        $uLog =Logged::getConnectedUser();
+        if (!$uLog->connexionOk())
+        {
+            EC::set_error_code(401);
+            return false;
+        }
+        # Seul un élève est susceptible de charger directement sa liste d'assoc
+        if ($uLog->isEleve())
+        {
+            $exofiche = ExoFiche::get($id);
+            if ( ($exofiche == null) || (((integer)$exofiche["idUser"]) != $uLog->getId()) ) {
+                EC::set_error_code(404);
+                return false;
+            }
+            // La fiche est bien associée à l'élève
+            $fiche = Fiche::get($exofiche["idFiche"]);
+            if ($fiche==null) {
+                EC::set_error_code(501);
+                return false;
+            }
+            if (!$fiche["visible"]) {
+                EC::set_error_code(404);
+                return false;
+            }
+
+
+            return array(
+                "exofiche" => ExoFiche::get($id),
+                "fiche" => AssoUF::getList(array("idUser"=> $uLog->getId() )),
+                "faits" => Note::getList(array("idUser"=>$uLog->getId()))
+            );
+        } else {
+            EC::set_error_code(403);
+            return false;
+        }
+
+        EC::set_error_code(501);
+        return false;
+    }*/
 
     public function delete()
     {

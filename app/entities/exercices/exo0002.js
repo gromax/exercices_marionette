@@ -15,52 +15,41 @@ define(["utils/math", "utils/help"], function(mM, help) {
       gM = A.milieu(B, "M");
       return {
         inputs: inputs,
-        options: false,
         briques: [
           {
-            type: "base",
-            zones: [
-              {
-                type: "plain",
-                ps: ["On se place dans un repère $(O;I,J)$", "On donne deux points $" + (A.texLine()) + "$ et $" + (B.texLine()) + "$.", "Il faut déterminer les coordonnées de $M$, milieu de $[AB]$."]
-              }
-            ]
-          }, {
-            type: "liste",
             bareme: 100,
             title: "Coordonnées de $M$",
-            liste: [
+            items: [
               {
+                type: "text",
+                rank: 1,
+                ps: ["On se place dans un repère $(O;I,J)$", "On donne deux points $" + (A.texLine()) + "$ et $" + (B.texLine()) + "$.", "Il faut déterminer les coordonnées de $M$, milieu de $[AB]$."]
+              }, {
+                type: "input",
+                rank: 2,
                 tag: "$x_M$",
                 name: "xM",
                 description: "Abscisse de M",
                 good: gM.x,
-                waited: "number",
-                answerPreprocess: function(user) {
-                  var pattern;
-                  pattern = /^(.+)=0$/i;
-                  if (user.match(pattern)) {
-                    return {
-                      processed: user,
-                      error: false
-                    };
-                  } else {
-                    return {
-                      processed: user,
-                      error: "Manque le =0"
-                    };
-                  }
-                }
+                waited: "number"
               }, {
+                type: "input",
+                rank: 3,
                 tag: "$y_M$",
                 name: "yM",
                 description: "Ordonnée de M",
                 good: gM.y,
                 waited: "number"
+              }, {
+                type: "validation",
+                rank: 4,
+                clavier: ["aide"]
+              }, {
+                type: "aide",
+                rank: 5,
+                list: help.geometrie.analytique.milieu
               }
-            ],
-            clavier: ["aide"],
-            aide: help.geometrie.analytique.milieu
+            ]
           }
         ]
       };

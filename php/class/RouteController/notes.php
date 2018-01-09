@@ -23,89 +23,6 @@ class notes
         $this->params = $params;
     }
 
-    public function fetchUserNotes()
-    {
-        $uLog =Logged::getConnectedUser();
-        // Attention, dans ce cas il s'agit de l'id du User !
-        $id = (integer) $this->params['id'];
-        // Dans ce cas la connexion est impérative
-        if (!$uLog->connexionOk())
-        {
-            EC::set_error_code(401);
-            return false;
-        }
-        $user = User::getObject($id);
-        if ($user===null)
-        {
-            EC::set_error_code(404);
-            return false;
-        }
-        if ($uLog->isAdmin() || $user->isMyTeacher($uLog))
-        {
-            $exosFiches = ExoFiche::getList(array("idUser"=>$id));
-            $faits = Note::getList(array("idUser"=>$id));
-            $fichesAssoc = $user->fichesAssoc();
-            return array(
-                'exosfiches' => $exosFiches,
-                'faits' => $faits,
-                'fichesAssoc' => $fichesAssoc
-            );
-        }
-        else
-        {
-            EC::set_error_code(403);
-            return false;
-        }
-        EC::set_error_code(501);
-        return false;
-    }
-
-    /*public function fetchListUserNotes()
-    {
-        // Ne sert pas !!!!
-        $uLog=Logged::getConnectedUser();
-        if (!$uLog->connexionOk())
-        {
-            EC::set_error_code(401);
-            return false;
-        }
-        if ($uLog->isEleve())
-        {
-            EC::set_error_code(403);
-            return false;
-        }
-        if (isset($_GET['liste']))
-        {
-            $strListe = $_GET_['liste'];
-        }
-        else
-        {
-            $strListe="";
-        }
-        $arrListe = explode(";",getGET("strListe"));
-        $idUs = array();
-        foreach ($arrListe as $idUser) {
-            $user = User::getObject($idUser);
-            if ($user===null) {
-                EC::addError("Élève ($idUser) introuvable.");
-            } elseif (!$user->isEleve()) {
-                EC::addError("L'utilisateur ($idUser)'est pas un élève.");
-            } elseif ($uLog->isAdmin() || $user->isMyTeacher($uLog)) {
-                $idUs[] = (integer) $idU;
-            } else {
-                EC::addError("Vous n'êtes pas autorisé à voir les notes de ($idUser).");
-            }
-        }
-        if (count($idUs)>0)
-        {
-            return Note::getList(array("usersList"=>$idUs));
-        }
-        else
-        {
-            return array();
-        }
-    }*/
-
     public function delete()
     {
         $uLog=Logged::getConnectedUser();
@@ -147,8 +64,8 @@ class notes
         }
 
         $data = json_decode(file_get_contents("php://input"),true);
-        $aEF = integer($data['aEF']);
-        $aUF = integer($data['aUF']);
+        $aEF = (integer) $data['aEF'];
+        $aUF = (integer) $data['aUF'];
         $exoFiche = ExoFiche::getObject($aEF);
 
         // Recherche des items parents

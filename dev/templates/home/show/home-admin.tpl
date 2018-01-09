@@ -12,6 +12,6 @@
 
 	<a type="button" class="list-group-item list-group-item-action js-exercices" href="#exercices"><i class="fa fa-files-o" aria-hidden="true"></i> Voir les exercices</a>
 
-	<a type="button" class="list-group-item list-group-item-action disabled" href="#Devoirs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Voir les devoirs</a>
+	<a type="button" class="list-group-item list-group-item-action js-devoirs" href="#Devoirs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Voir les devoirs</a>
 	</div>
 </div>

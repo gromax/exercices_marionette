@@ -1,5 +1,4 @@
 define(["marionette","jquery-ui","bootstrap"], function(Marionette){
-//define(["marionette","jquery-ui"], function(Marionette){
 	var Manager = new Marionette.Application();
 
 	Manager.navigate = function(route, options){
@@ -44,7 +43,7 @@ define(["marionette","jquery-ui","bootstrap"], function(Marionette){
 
 	Manager.on("start", function(){
 		var historyStart = function() {
-			require(["apps/home/home_app", "apps/header/header_app", "apps/users/users_app", "apps/classes/classes_app", "apps/exercices/exercices_app"], function(){
+			require(["apps/header/header_app", "apps/apps"], function(){
 				Manager.trigger("header:show");
 				if(Backbone.history){
 					Backbone.history.start();
@@ -56,7 +55,7 @@ define(["marionette","jquery-ui","bootstrap"], function(Marionette){
 		}
 
 		require(["backbone.radio","entities/session"], function(Radio){
-			var channel = Radio.channel('session');
+			var channel = Radio.channel('entities');
 			Manager.Auth = channel.request("session:entity", historyStart);
 		});
 	});

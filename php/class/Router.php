@@ -120,11 +120,11 @@ class Router
                         // $this->params       = $params;
                         // fin de la modification
                         break;
+                    } else {
                     }
                 }
             }
         }
-
 
         $this->controller   = (!empty($this->controller)) ? $this->controller : $this->defaultController;
         $this->action       = (!empty($this->action)) ? $this->action : $this->defaultAction;

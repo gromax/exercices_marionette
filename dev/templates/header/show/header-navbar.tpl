@@ -25,5 +25,20 @@
 				</li>
 			</ul>
 		<%}%>
+		<% if (isEleve) { %>
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item"></li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" >
+					<%- nomComplet %>
+					</a>
+					<div class="dropdown-menu">
+						<a class="dropdown-item js-logout" href="#logout"><i class="fa fa-sign-out" aria-hidden="true"></i> Déconnexion</a>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item js-edit-me" href="#edit-me"><i class="fa fa-user" aria-hidden="true"></i> Mon compte</a>
+					</div>
+				</li>
+			</ul>
+		<%}%>
 	</div>
 </nav>

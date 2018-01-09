@@ -5,6 +5,7 @@ define(["marionette","app","jst"], function(Marionette,app,JST){
 			"click a.js-users": "users:list",
 			"click a.js-classes": "classes:list",
 			"click a.js-exercices": "exercices:list",
+			"click a.js-devoirs": "devoirs:list",
 		},
 
 		onUsersList: function(e){
@@ -17,6 +18,10 @@ define(["marionette","app","jst"], function(Marionette,app,JST){
 
 		onExercicesList: function(e){
 			app.trigger("exercices:list");
+		},
+
+		onDevoirsList: function(e){
+			app.trigger("devoirs:list");
 		},
 	});
 

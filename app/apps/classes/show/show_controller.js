@@ -1,5 +1,8 @@
-define(["app","apps/common/loading_view","apps/classes/show/show_view","apps/common/missing_item_view"], function(app, LoadingView, ShowView, MissingView){
-	var Controller = {
+define(["app","marionette", "apps/common/loading_view","apps/classes/show/show_view","apps/common/missing_item_view"], function(app, Marionette, LoadingView, ShowView, MissingView){
+
+	var Controller = Marionette.Object.extend({
+		channelName: 'entities',
+
 		show: function(id){
 			var loadingView = new LoadingView({
 				title: "Affichage d'une classe",
@@ -7,9 +10,8 @@ define(["app","apps/common/loading_view","apps/classes/show/show_view","apps/com
 			});
 
 			app.regions.getRegion('main').show(loadingView);
-
-			require(["backbone.radio", "entities/classe"], function(Radio,Classe){
-				var channel = Radio.channel('classes');
+			var channel = this.getChannel();
+			require(["entities/classe"], function(Classe){
 				var fetchingItem = channel.request("classe:entity", id);
 				$.when(fetchingItem).done(function(item){
 					var view;
@@ -27,8 +29,8 @@ define(["app","apps/common/loading_view","apps/classes/show/show_view","apps/com
 					app.regions.getRegion('main').show(view);
 				});
 			});
-		}
-	}
+		},
+	})
 
-	return Controller;
+	return new Controller();
 });

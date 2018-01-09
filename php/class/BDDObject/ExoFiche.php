@@ -84,9 +84,9 @@ final class ExoFiche
 				$idUser = (integer) $params['idUser'];
 				return DB::query("SELECT DISTINCT f.id, f.idE, f.num, f.coeff, f.options, f.idFiche FROM ".PREFIX_BDD."assocEF f INNER JOIN ".PREFIX_BDD."assocUF u ON f.idFiche = u.idFiche WHERE u.idUser=%i",$idUser);
 				// Cherche dans les noeuds liant l'utilisateur à une fiche. En admettant qu'il y ait plusieurs lien d'un même utilisateur à une fiche, on ne doit renvoyer ici qu'une mention (ou pas ?)
-			} elseif (isset($params['idProf'])) {
-				$idProf = (integer) $params['idProf'];
-				return DB::query("SELECT f.id, f.idE, f.num, f.coeff, f.options, f.idFiche FROM ".PREFIX_BDD."assocEF f INNER JOIN ".PREFIX_BDD."fiches u ON f.idFiche = u.id WHERE u.idOwner=%i",$idProf);
+			} elseif (isset($params['idOwner'])) {
+				$idOwner = (integer) $params['idOwner'];
+				return DB::query("SELECT f.id, f.idE, f.num, f.coeff, f.options, f.idFiche FROM ".PREFIX_BDD."assocEF f INNER JOIN ".PREFIX_BDD."fiches u ON f.idFiche = u.id WHERE u.idOwner=%i",$idOwner);
 			} elseif (isset($params['idClasse'])) {
 				$Classe = (integer) $params['iClasse'];
 				return DB::query("SELECT f.id, f.idE, f.num, f.coeff, f.options, f.idFiche, f.idUser FROM ".PREFIX_BDD."assocEF f INNER JOIN ".PREFIX_BDD."users u ON f.idUser = u.id WHERE u.idClasse=%i",$idClasse);

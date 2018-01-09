@@ -4,6 +4,7 @@ namespace RouteController;
 use ErrorController as EC;
 use BDDObject\User;
 use BDDObject\Logged;
+use BDDObject\Classe;
 
 class users
 {
@@ -105,8 +106,59 @@ class users
         $uLog=Logged::getConnectedUser();
         if (!$uLog->connexionOk())
         {
-            EC::set_error_code(401);
-            return false;
+            $data = json_decode(file_get_contents("php://input"),true);
+            // S'il y a un code pour rejoindre la classe on accepte l'insertion
+            if (isset($data["idClasse"]) && isset($data["classeMdp"]))
+            {
+                // Il s'agit d'une inscription
+                $idClasse = (integer) $data['idClasse'];
+                $classe = Classe::getObject($idClasse);
+                if ($classe === null)
+                {
+                    EC::set_error_code(404);
+                    return false;
+                }
+                if (!$classe->isOpen())
+                {
+                    EC::addError("Classe fermée.");
+                    EC::set_error_code(403);
+                    return false;
+                }
+
+                $pwdClasse = $data["classeMdp"];
+
+                if (!$classe->testPwd($pwdClasse))
+                {
+                    EC::addError("Mot de passe invalide.");
+                    EC::set_error_code(422);
+                    return false;
+                }
+
+                // On procède à l'inscription
+                $data['rank'] = User::RANK_ELEVE;
+                $user=new User($data);
+                $validation = $user->insertion_validation();
+                if ($validation === true)
+                {
+                    $id = $user->insertion();
+                    if ($id!==null)
+                    {
+                        return $user->toArray();
+                    }
+                }
+                else
+                {
+                    EC::set_error_code(422);
+                    return array('errors'=>$validation);
+                }
+                EC::set_error_code(501);
+                return false;
+            }
+            else
+            {
+                EC::set_error_code(401);
+                return false;
+            }
         }
         if ($uLog->isAdmin()) {
             $data = json_decode(file_get_contents("php://input"),true);

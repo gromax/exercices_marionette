@@ -44,21 +44,22 @@ final class Note
 				$idFiche = (integer) $params['idFiche'];
 				if (isset($params['idUser'])) {
 					$idUser = (integer) $params['idUser'];
-					return DB::query("SELECT ue.id, uf.idUser, ue.aUF, ue.date, ue.note, ue.inputs, ue.answers, ue.finished, ue.aEF FROM ".PREFIX_BDD."assocUE ue INNER JOIN ".PREFIX_BDD."assocUF uf ON ue.aUF = uf.id WHERE uf.idFiche=%i AND uf.idUser=%i ORDER BY ue.date",$idFiche,$idUser);
-				} else return DB::query("SELECT ue.id, uf.idUser, ue.aUF, ue.date, ue.note, ue.inputs, ue.answers, ue.finished, ue.aEF FROM ".PREFIX_BDD."assocUE ue INNER JOIN ".PREFIX_BDD."assocUF uf ON ue.aUF = uf.id WHERE uf.idFiche=%i ORDER BY uf.idUser, ue.date",$idFiche);
+					return DB::query("SELECT ue.id, ue.aUF, ue.date, ue.note, ue.inputs, ue.answers, ue.finished, ue.aEF FROM ".PREFIX_BDD."assocUE ue INNER JOIN ".PREFIX_BDD."assocUF uf ON ue.aUF = uf.id WHERE uf.idFiche=%i AND uf.idUser=%i ORDER BY ue.date",$idFiche,$idUser);
+				} else return DB::query("SELECT ue.aUF, ue.aEF, ue.note FROM ".PREFIX_BDD."assocUE ue INNER JOIN ".PREFIX_BDD."assocUF uf ON ue.aUF = uf.id WHERE uf.idFiche=%i ORDER BY ue.aUF, ue.aEF, ue.date",$idFiche);
+				//return DB::query("SELECT ue.id, ue.aUF, ue.date, ue.note, ue.inputs, ue.answers, ue.finished, ue.aEF FROM ".PREFIX_BDD."assocUE ue INNER JOIN ".PREFIX_BDD."assocUF uf ON ue.aUF = uf.id WHERE uf.idFiche=%i ORDER BY uf.idUser, ue.date",$idFiche);
 			} elseif (isset($params['idUser'])) {
 				$idUser = (integer) $params['idUser'];
-				return DB::query("SELECT ue.id, uf.idUser, ue.aUF, ue.date, ue.note, ue.inputs, ue.answers, ue.finished, ue.aEF FROM ".PREFIX_BDD."assocUE ue INNER JOIN ".PREFIX_BDD."assocUF uf ON ue.aUF = uf.id WHERE uf.idUser=%i ORDER BY ue.date",$idUser);
+				return DB::query("SELECT ue.id, ue.aUF, ue.date, ue.note, ue.inputs, ue.answers, ue.finished, ue.aEF FROM ".PREFIX_BDD."assocUE ue INNER JOIN ".PREFIX_BDD."assocUF uf ON ue.aUF = uf.id WHERE uf.idUser=%i ORDER BY ue.date",$idUser);
 			} elseif (isset($params['usersList'])) {
-				return DB::query("SELECT ue.id, uf.idUser, ue.aUF, ue.date, ue.note, ue.inputs, ue.answers, ue.finished, ue.aEF FROM ".PREFIX_BDD."assocUE ue INNER JOIN ".PREFIX_BDD."assocUF uf ON ue.aUF = uf.id WHERE uf.idUser IN %li ORDER BY uf.idUser, ue.date",$params['usersList']);
-			} elseif (isset($params['idProf'])) {
-				$idProf = (integer) $params['idProf'];
-				return DB::query("SELECT ue.id, uf.idUser, ue.aUF, ue.date, ue.note, ue.inputs, ue.answers, ue.finished, ue.aEF FROM ((".PREFIX_BDD."assocUE ue INNER JOIN ".PREFIX_BDD."assocUF uf ON ue.aUF = uf.id) INNER JOIN ".PREFIX_BDD."fiches f ON f.id = uf.idFiche) WHERE f.idOwner=%i ORDER BY uf.idUser, ue.date",$idProf);
+				return DB::query("SELECT ue.id, ue.aUF, ue.date, ue.note, ue.inputs, ue.answers, ue.finished, ue.aEF FROM ".PREFIX_BDD."assocUE ue INNER JOIN ".PREFIX_BDD."assocUF uf ON ue.aUF = uf.id WHERE uf.idUser IN %li ORDER BY ue.date",$params['usersList']);
+			} elseif (isset($params['idOwner'])) {
+				$idOwner = (integer) $params['idOwner'];
+				return DB::query("SELECT ue.id, ue.aUF, ue.date, ue.note, ue.inputs, ue.answers, ue.finished, ue.aEF FROM ((".PREFIX_BDD."assocUE ue INNER JOIN ".PREFIX_BDD."assocUF uf ON ue.aUF = uf.id) INNER JOIN ".PREFIX_BDD."fiches f ON f.id = uf.idFiche) WHERE f.idOwner=%i ORDER BY ue.date",$idOwner);
 			} elseif (isset($params['idClasse'])) {
 				$idClasse = (integer) $params['idClasse'];
-				return DB::query("SELECT ue.id, uf.idUser, ue.aUF, ue.date, ue.note, ue.inputs, ue.answers, ue.finished, ue.aEF FROM ((".PREFIX_BDD."assocUE ue INNER JOIN ".PREFIX_BDD."assocUF uf ON ue.aUF = uf.id) INNER JOIN ".PREFIX_BDD."users u ON u.id = uf.idUser) WHERE u.idClasse=%i ORDER BY uf.idUser, ue.date",$idClasse);
+				return DB::query("SELECT ue.id, ue.aUF, ue.date, ue.note, ue.inputs, ue.answers, ue.finished, ue.aEF FROM ((".PREFIX_BDD."assocUE ue INNER JOIN ".PREFIX_BDD."assocUF uf ON ue.aUF = uf.id) INNER JOIN ".PREFIX_BDD."users u ON u.id = uf.idUser) WHERE u.idClasse=%i ORDER BY ue.date",$idClasse);
 			} else {
-				return DB::query("SELECT ue.id, uf.idUser, ue.aUF, ue.date, ue.note, ue.inputs, ue.answers, ue.finished, ue.aEF FROM ".PREFIX_BDD."assocUE ue INNER JOIN ".PREFIX_BDD."assocUF uf ON ue.aUF = uf.id ORDER BY uf.idUser, ue.date");
+				return DB::query("SELECT ue.id, ue.aUF, ue.date, ue.note, ue.inputs, ue.answers, ue.finished, ue.aEF FROM ".PREFIX_BDD."assocUE ue ORDER BY ue.date");
 			}
 		} catch(MeekroDBException $e) {
 			EC::addBDDError($e->getMessage(), 'Note/getList');
@@ -150,7 +151,6 @@ final class Note
 				'aEF' => $this->aEF,
 				'aUF' => $this->aUF,
 				'date' => $this->date
-				//'idUser' => $this->idUser Ceci n'est plus requis
 				));
 		} catch(MeekroDBException $e) {
 			EC::addBDDError($e->getMessage(),'Note/insertion');
@@ -215,7 +215,7 @@ final class Note
 		return array(
 			'id'=>$this->id,
 			'aEF'=>$this->aEF,
-			'idUser'=>$this->idUser,
+			'aUF'=>$this->aUF,
 			'note'=>$this->note,
 			'inputs'=>$this->inputs,
 			'answers'=>$this->answers,

@@ -40,15 +40,12 @@ $router->addRule('api/classes', 'classes', 'fetch', 'GET');
 $router->addRule('api/classes/:id', 'classes', 'delete', 'DELETE');
 $router->addRule('api/classes/:id', 'classes', 'update', 'PUT');
 $router->addRule('api/classes', 'classes', 'insert', 'POST');
-$router->addRule('api/classes/:id/join', 'classes', 'join', 'POST');
 $router->addRule('api/classes/:id/test', 'classes', 'testMDP', 'GET');
 
-// fiches
-$router->addRule('api/fiches', 'fiches', 'fetch', 'GET');
-$router->addRule('api/fiches/:id', 'fiches', 'delete', 'DELETE');
-$router->addRule('api/fiches/:id', 'fiches', 'update', 'PUT');
-$router->addRule('api/fiches', 'fiches', 'insert', 'POST');
-$router->addRule('api/fiches/:id/full', 'fiches', 'fetchFullInfos', 'GET');
+// devoirs
+$router->addRule('api/devoirs/:id', 'fiches', 'delete', 'DELETE');
+$router->addRule('api/devoirs/:id', 'fiches', 'update', 'PUT');
+$router->addRule('api/devoirs', 'fiches', 'insert', 'POST');
 
 // exosfiche
 $router->addRule('api/exosfiche/:id', 'exosfiche', 'delete', 'DELETE');
@@ -69,15 +66,19 @@ $router->addRule('api/assosUF', 'assosUF', 'insert', 'POST');
 $router->addRule('api/notes/:id', 'notes', 'delete', 'DELETE');
 $router->addRule('api/notes/:id', 'notes', 'update', 'PUT');
 $router->addRule('api/notes', 'notes', 'insert', 'POST');
-$router->addRule('api/users/:id/notes', 'notes', 'fetchUserNotes', 'GET');
-//$router->addRule('api/notes/liste', 'notes', 'fetchListUserNotes', 'GET'); // abandonné ?
 
 // Connexions
 $router->addRule('api/cons', 'cons', 'fetch', 'GET');
 $router->addRule('api/cons/:id', 'cons', 'delete', 'DELETE');
 $router->addRule('api/cons', 'cons', 'purge', 'DELETE');
 
+// data
+$router->addRule('api/eleveData', 'data', 'eleveFetch', 'GET');
+$router->addRule('api/profData', 'data', 'profFetch', 'GET');
+
+
 $response = $router->load();
+EC::header(); // Doit être en premier !
 if ($response === false) {
 	echo json_encode(array("messages"=>EC::messages()));
 } else {
@@ -86,5 +87,5 @@ if ($response === false) {
 	}
 	echo json_encode($response);
 }
-EC::header();
+
 ?>

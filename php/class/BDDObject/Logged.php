@@ -42,7 +42,7 @@ class Logged extends User
 	{
 		if ($identifiant !== ''){
 			if ($pwd === "") {
-				EC::addError("Vous avez envoyé un mot de passe vide ! Essayez de réactualiser la page (F5)");
+				EC::addError("Vous avez envoyé un mot de passe vide ! Essayez de réactualiser la page (CTRL+F5)");
 				EC::set_error_code(422);
 				return null;
 			}
@@ -51,6 +51,7 @@ class Logged extends User
 			try {
 				$bdd_result = DB::queryFirstRow("SELECT id, idClasse, nom, prenom, email, rank, hash FROM ".PREFIX_BDD."users WHERE email=%s", $identifiant);
 			} catch(MeekroDBException $e) {
+				EC::set_error_code(501);
 				EC::addBDDError($e->getMessage(), 'Logged/tryConnexion');
 				return null;
 			}

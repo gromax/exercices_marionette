@@ -11,28 +11,23 @@ define ["utils/math","utils/help"], (mM, help) ->
 
 			return {
 				inputs: inputs
-				options: false
 				briques: [
 					{
-						type:"base"
-						#title:"Énoncé" Pas besoin d'écrire un titre sur l'énoncé
-						zones:[
+						bareme:100
+						title:"Coordonnées de $M$"
+						items:[
 							{
-								type:"plain"
+								type:"text"
+								rank: 1
 								ps:[
 									"On se place dans un repère $(O;I,J)$"
 									"On donne deux points $#{A.texLine()}$ et $#{B.texLine()}$."
 									"Il faut déterminer les coordonnées de $M$, milieu de $[AB]$."
 								]
 							}
-						]
-					}
-					{
-						type:"liste"
-						bareme:100
-						title:"Coordonnées de $M$"
-						liste:[
 							{
+								type:"input"
+								rank: 2
 								tag:"$x_M$"
 								name:"xM"
 								description:"Abscisse de M"
@@ -40,15 +35,25 @@ define ["utils/math","utils/help"], (mM, help) ->
 								waited:"number"
 							}
 							{
+								type:"input"
+								rank: 3
 								tag:"$y_M$"
 								name:"yM"
 								description:"Ordonnée de M"
 								good:gM.y
 								waited:"number"
 							}
+							{
+								type:"validation"
+								rank: 4
+								clavier:["aide"]
+							}
+							{
+								type:"aide"
+								rank: 5
+								list: help.geometrie.analytique.milieu
+							}
 						]
-						clavier:["aide"]
-						aide: help.geometrie.analytique.milieu
 					}
 				]
 			}

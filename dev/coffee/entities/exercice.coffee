@@ -6,309 +6,454 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 			title: "Titre de l'exercice"
 			description: "Description de l'exercice"
 			keywords: ""
-		go: ->
+			options:{}
+
+		getBriquesUntilFocus:()->
+			# Renvoie un tableau de toutes les briques qui ne sont pas done jusqu'à celle qui a le focus
+			output = []
 			briques = @get("briquesCollection").models
-			for b in briques
-				if !b.go()
-					b.set("focused",true)
-					return false
-			return true
+			for b in briques when b.get("done") is false
+				output.push(b)
+				if b.isFocusPoint() is true
+					return output
+			# Si aucun focus n'a été trouvé, on termine avec false
+			output.push(false)
+			return output
 
-
-
-
+		baremeTotal: () ->
+			briques = @get("briquesCollection").models
+			baremes = _.map(briques, (it)-> it.get("bareme"));
+			iteratee = (memo,it) ->
+				if typeof it is "number" then memo + it
+				else memo
+			_.reduce(baremes, iteratee, 0)
 	}
 
-	formatListeItem = (item) ->
-		# Crée un objet pour BListe qui s'assure de l'intégrité des informations fournies
-		# et qui donne aussi les fonctions de correction (verif), de validation (go)
-		# Les paramètres sont les suivants :
-		# - tag : le tag à afficher à gauche du input correspondant
-		# - postTag : tag après le champ
-		# - name : le nom pour le node html correspondant et aussi le nom pour l'objet answers stocké en bdd
-		# - description : ce qui apparaît dans le champ vide
-		# - text : Un message à placer avant le input
-		# - moduloKey : une lettre de variable pour le modulo, comme k dans 2kpi
-		# - un choix entre plusieurs options pour la bonne solution :
-		# -- good : Solution unique qui peut être number, ensemble, équation
-		# -- equations : objets équations, séparées de ; ou ∅ pour rien
-		# -- solutions : objets numbers multiples, séparées de ; ou ∅ pour rien
-		# - customTemplate : Une fonction qui renvoie un tableau de string à ajouter dans un template
-		# - Des paramètres concernant le parse :
-		# -- simplify : true/false
-		# -- alias : { key:[v1, v2] }, chaque occurence de v1, v2... est remplacée par key
-		# -- developp : true/false
-		# -- toLowerCase : true/false
-
-		output = {
-			name: item.name
-			description : item.description ? ""	# Dans le input, s'il est vide (placeholder)
-			tag: item.tag ? false			# Étiquette, devant le input
-			text:item.text ? false			# texte à placer avant le input
-			answerPreprocess: item.answerPreprocess ? false
-			answer:false					# réponse utilisateur
-		}
-
-		###
-
-		output.verifParams = {
-			arrondi : item.arrondi ? false
-			formes : item.formes ? null
-			custom: if typeof item.customVerif is "function" then item.customVerif else null
-			tolerance : item.tolerance ? false
-		}
-
-		output.templateParams = {
-			name:item.name					# nécessaire pour les inputs
-			arrondi:item.arrondi ? false	# Si on demande un arrondi, on précise ici une puissance (-2 pour 0.01 par ex.)
-			cor_prefix:item.cor_prefix ? ""	# Permet d'ajouter un préfixe à la valeur correction. Différent de goodTex car permet de préfixer également le userTex
-
-			custom: if typeof item.customTemplate is "function" then item.customTemplate else () -> false
-		}
-
-
-		output.parseParams = {
-			type:item.type ? ""
-			developp:item.developp is true
-			toLowerCase:item.toLowerCase is true
-			alias : item.alias ? false
-		}
-
-		if typeof item.moduloKey is "string" then output.moduloKey = item.moduloKey
-		else output.moduloKey = false
-		fct_go = (answers) ->
-			user = answers[@name]
+	BriqueItem = Backbone.Model.extend {
+		initialize: (modelData) ->
 			switch
-				when (typeof user isnt "string")
-					# Dans ce cas, le champ n'est pas invalide car il n'a rien reçu
-					@templateParams.invalid = false
-					false
-				when user is "∅"
-					@templateParams.user = "∅"
-					@info = []
-					@templateParams.invalid = false
-					true
+				when typeof modelData.verification is "function"
+					@verification = modelData.verification
+				when modelData.type is "input"
+					@verification = Functions_helpers.inputVerification
+				when modelData.type is "radio"
+					@verification = Functions_helpers.radioVerification
+				when modelData.type is "color-choice"
+					@verification = Functions_helpers.color_choiceVerification
+				when modelData.type is "validation"
+					@verification = () -> { toTrash:@ }
+				when modelData.type is "aide"
+					@verification = () -> { toTrash:@ }
 				else
-					@templateParams.user = user
-					if @moduloKey then user = user.replace(new RegExp(@moduloKey,"g"), "#")
-					users = ( mM.p.userAnswer(str, @parseParams) for str in user.split ";" when str.trim() isnt "")
-					@info = (usItem for usItem in users when usItem.valid is true)
-					@templateParams.invalid = (users.length>@info.length) or (users.length is 0)
-					if (@templateParams.invalid) then @templateParams.parseMessages = "Vérifiez : #{ (infoItem.expression for infoItem in users when infoItem.valid is false).join(' ; ') }"
-					not(@templateParams.invalid)
-
-		fct_verif = ->
-			# fonction servant pour les équations et les solutions
-			# Si l'utilisateur a répondu ensemble vide...
-			if @info.length is 0
-				@templateParams[key] = value for key, value of {
-					users:false
-					goods:null
-					bads:null
-					lefts: (l.tex() for l in @solutions).join(" ; ")
-					goodIsEmpty:@solutions.length is 0
-				}
-				if @solutions.length is 0 then 1 else 0
-			else
-				# On considère que l'on a une série de valeurs
-				N = Math.max @solutions.length, @info.length
-				sorted = mM.tri @info, @solutions
-				list=[]
-				goods = []
-				bads = []
-				for sol,i in sorted.closests
-					list.push sol.user.tex()
-					if sol.good?
-						verif = mM.verif[@parseParams.type](sol.info, sol.good, @verifParams)
-						if verif.ok
-							verif.userTex = sol.info.tex
-							verif.goodTex = sol.good.tex()
-							goods.push verif
-						else
-							bads.push sol.info.tex
-							sorted.lefts.push sol.good
-					else bads.push sol.info.tex
-				@templateParams[key] = value for key, value of {
-					users:list.join(" ; ")
-					goods:goods
-					bads:bads.join(" ; ")
-					lefts:(l.tex() for l in sorted.lefts).join(" ; ")
-					goodIsEmpty:@solutions.length is 0
-				}
-				goods.length/N
-
-		switch
-			when item.solutions?
-				output.templateParams.corTemplateName = "cor_solutions"
-				unless output.templateParams.text? then output.templateParams.text = "Donnez les solutions séparées par ; ou $\\varnothing$ s'il n'y en a pas"
-				output.solutions = ( mM.toNumber(it) for it in item.solutions )
-				output.parseParams.type = "number"
-				output.go = fct_go
-				output.verif = ->fct_verif
-			when item.equations?
-				output.templateParams.corTemplateName = "cor_solutions"
-				unless output.templateParams.text? then output.templateParams.text = "Donnez les solutions séparées par ; ou $\\varnothing$ s'il n'y en a pas"
-				output.solutions = item.equations
-				output.parseParams.type = "equation"
-				@go = fct_go
-				@verif = fct_verif
-			else # par défaut, ce sera un item avec good
-				goodArray = null
-				goodValue = null
-				switch
-					when Array.isArray(item.good)
-						switch item.good.length
-							when 0 then goodValue = 0
-							when 1 then goodValue = item.good[0]
-							else
-								goodArray = item.good
-								goodValue  = item.good[0]
-					when typeof item.good is "undefined" then goodValue = 0
-					else goodValue = item.good
-				output.parseParams = mM.p.type goodValue, output.parseParams
-				if goodArray isnt null
-					if (output.parseParams.type is "number") then output.good = ( mM.toNumber(it) for it in goodArray )
-					else output.good = goodArray
+					@verification = () -> null
+			switch
+				when typeof modelData.answerProcessing is "function"
+					@answerProcessing = modelData.answerProcessing
+				when modelData.type is "input"
+					@answerProcessing = Functions_helpers.inputAnswerProcessing
+				when modelData.type is "radio"
+					@answerProcessing = Functions_helpers.radioAnswerProcessing
+				when modelData.type is "color-choice"
+					@answerProcessing = Functions_helpers.color_choiceAnswerProcessing
 				else
-					if (output.parseParams.type is "number") then output.good = mM.toNumber(goodValue)
-					else output.good = goodValue
-				output.templateParams.corTemplateName = "cor_number"
-				if typeof item.goodTex is "string" then output.templateParams.goodTex = item.goodTex
-				else output.templateParams.goodTex = output.good.tex()
-				output.go = (answers) ->
-					user = answers[@name]
-					if (typeof user isnt "string")
-						# Dans ce cas, le champ n'est pas invalide car il n'a rien reçu
-						@templateParams.invalid = false
-						false
-					else
-						@templateParams.user = user
-						@info = mM.p.userAnswer user, @parseParams
-						@templateParams.userTex = @info.tex
-						@templateParams.invalid = not(@info.valid)
-						@templateParams.parseMessages = @info.messages.join(" ; ")
-						@info.valid
-				output.verif = () ->
-					if isArray(@good)
-						verif_result = ( mM.verif[@parseParams.type](@info, it,@verifParams) for it in @good)
-						verif_result.sort (a,b) ->
-							if b.ponderation>a.ponderation then -1
-							else 1
-						verif_result = verif_result.pop()
-					else verif_result = mM.verif[@parseParams.type](@info, @good,@verifParams)
-					@templateParams.customItems = @templateParams.custom(verif_result)
-					@templateParams[key] = value for key,value of verif_result
-					verif_result.ponderation
-		###
-		output
+					@answerProcessing = Functions_helpers.defaultAnswerProcess
+			if typeof modelData.answerPreprocessing is "function"
+				@answerPreprocessing = modelData.answerPreprocessing
 
-	BPlain = Backbone.Model.extend {
-		parse: (data) ->
-			if typeof data.title isnt "string" then data.title=false
-			data.focused = false
-			data.done = true
-			return data
-		go: -> true
-		validation: -> false
+		parse:(data)->
+			switch data.type
+				when "input"
+					parsedData = _.extend({
+						description : ""
+						waited: "number"
+						arrondi : false
+						formes : null
+						custom: if typeof data.customVerif is "function" then data.customVerif else null
+						tolerance : false
+					}, data)
+				else
+					parsedData = data
+			parsedData
 	}
 
-	BListe = Backbone.Model.extend {
+	BriqueItemsCollection = Backbone.Collection.extend {
+		model: BriqueItem
+		comparator: "rank"
+	}
+
+	Brique = Backbone.Model.extend {
+		defaults: {
+			done: false
+			title: false
+		}
+
 		parse: (data) ->
-			if not(Array.isArray(data.aide)) then data.aide = false
-			if typeof data.title isnt "string" then data.title=false
-			if data.liste?
-				items = ( formatListeItem(it) for it in data.liste )
-				data.liste = items
-			data.focused = false
-			data.done = false
+			data.items = new BriqueItemsCollection data.items, { parse:true }
 			return data
-		validation: (data) ->
-			liste = @get "liste"
-			if _.isEmpty(liste) then return false
-			errors = {}
-			data = data ? {}
-			validated_data = {}
-			for it in liste
-				name = it.name
-				waited = it.waited
-				if data[name]?
-					userValue = data[name]
-					if userValue is "" then errors[name] = "Ne doit pas être vide"
-					else
-						error_found = false
-						if it.answerPreprocess isnt false
-							{ processed, error } = it.answerPreprocess(userValue)
-							if error is false then userValue = processed
-							else
-								error_found = true
-								errors[name] = error
-						if error_found is false
-							{ info, error } = mM.p.validate userValue, waited
-							if error is false then validated_data[name] = info
-							else errors[name] = error
+
+		verification: (data)->
+			verif_processing = (model)->
+				verif = model.verification(data)
+				if typeof (post = verif?.post) is "function"
+					verif.post = { item: model, post:post }
+				verif
+
+			verif = _.map(@get("items").models, verif_processing )
+
+			customBriqueVerifFunction = @get("custom_verification_message")
+			if (typeof customBriqueVerifFunction is "function") && (customAdd = customBriqueVerifFunction(data))
+				verif.push customAdd
+
+			# Le verif produit de simple items json, comme le font les exercices
+			add_json = _.flatten(_.compact(_.pluck(verif, "add")))
+
+			# posts : fonctions à éxécuter après le render (a priori pour une fonction déjà traitée)
+			posts = _.compact(_.pluck(verif, "post"))
+			# On convertit ces json en BriqueItems
+			add_models = _.map(add_json, (item)-> new BriqueItem(item, {parse:true}))
+			notes = _.filter(_.pluck(verif,"note"), (item)-> typeof item is "number" )
+			sum = (it,memo) -> it+memo
+			note = _.reduce(notes, sum) / notes.length
+			{ toTrash: _.compact(_.pluck(verif, "toTrash")), add:add_models, posts:posts, note:note }
+
+		checkIfNeedValidation: () -> @get("items").where({type:"validation"}).length > 0
+
+		validation:(data) ->
+			reduce_fct = (memo,item) ->
+				if item isnt null
+					_.extend(memo, item)
 				else
-					errors[name] = "Indéfini"
-			if _.isEmpty errors
-				# Tout est bon, on peut mettre à jour les answer des différents items
-				it.answer = validated_data[it.name] for it in liste
-				return false
-			errors
-		go: ->
-			if !@get("done")
-				liste = @get("liste")
-				ok = true
-				if (it for it in liste when it.answer is false).length is 0
-					@set("done", true)
-					@set("focused", false)
-			@get("done")
+					memo
+			list = _.map(@get("items").models, (model)-> model.answerProcessing(data))
+			# On produit un objet avec { clé objet erreur }
+			_.reduce(list, reduce_fct, {})
+
+
+		# La fonction go me crée du soucis :
+		# Si j'appelle go dans un contexte d'initialisation de l'exercice
+		# avec les answers déjà enregistrées, je veux que go parcours toutes les briques jusqu'à blocage
+		# et donc fasse les vérifications et toutes les transformations nécessaires à liste d'item (par exemple de remplacer les briques par les messages de correction)
+
+		# En revanche, si j'appelle go suite à une validation, je veux faire une validation, si la validation se passe bien, envoyer les answers au serveur,
+		# et seulement si le serveur répond, modifier la liste
+		# et encore, nouveau problème : l'envoi au serveur ne pourra pas se faire si on n'a pas calculé la nouvelle note et donc si la vérification n'a pas eu lieu...
+
+
+		isFocusPoint: () ->
+			# Cette fonction recherche le prochain point de focus
+			# Si la brique requiert des réponses, c'est le point de focus et on retourne true
+			if @get("done") then return false
+			if @checkIfNeedValidation() then return true
+			@set("done", true)
+			false
 	}
 
 	BriquesCollection = Backbone.Collection.extend {
-		model: (data) ->
-			switch data.type
-				when "liste"
-					return new BListe data, { parse:true }
-				else
-					return new BPlain data, { parse:true }
+		model: Brique
 	}
 
-# Il faut définir une collection de briques avec pour model une fonction
-# type model:(attr,options)->
-# qui fait un new de brique différente suivant le cas
-# et définir des briques adhoc pour chaque élément de l'exercice
+	Functions_helpers =
+		defaultAnswerProcess: (answers_data)->
+			name = @get("name")
+			if (name?)
+				out = {}
+				answers_data = answers_data ? {}
+				if typeof name is "string"
+					if answers_data[name]?
+						out[name] = answers_data[name]
+					else
+						out[name] = { error:"Vous devez donner une réponse" }
+				else if _.isArray(name)
+					for n in name
+						if answers_data[n]?
+							out[n] = answers_data[n]
+						else
+							out[n] = { error:"Vous devez donner une réponse" }
+				if _.isEmpty(out) then return null
+				out
+			else
+				null
+		radioAnswerProcessing: (data) ->
+			# renvoie null si pas concerné
+			# sinon un objet contenant { name:string, answer:string, tout autre attribut utile pour le modèle }
+			# ou { name:string , error: string } en cas d'erreur
+			data = data ? {}
+			name = @get("name")
+			out = {}
+			if (userValue = data[name])?
+				# Il suffit de vérifier que userValue est dans liste
+				userValue = Number userValue
+				radioItems = @get "radio"
+				if userValue < radioItems.length
+					# C'est bon
+					out[name] = {
+						processedAnswer: userValue
+						answer : userValue
+					}
+				else
+					out[name] = {
+						error: "La réponse n'est pas dans la liste."
+					}
+			else
+				out[name] = {
+					error: "Vous devez donner une réponse"
+				}
+			out
+
+		inputAnswerProcessing: (data) ->
+			# renvoie null si pas concerné
+			# sinon un objet contenant { name:string, answer:string, tout autre attribut utile pour le modèle }
+			# ou { name:string , error: string } en cas d'erreur
+			data = data ? {}
+			name = @get("name")
+			out = {}
+			if (userValue = data[name])?
+				waited = @get("waited")
+				error = false
+				processedAnswer = false
+				if userValue is "" then error = "Ne doit pas être vide"
+				else
+					if typeof @answerPreprocessing is "function"
+						{ processed, error } = @answerPreprocessing(userValue)
+						if error is false then userValue = processed
+					if error is false
+						{ info, error } = mM.p.validate userValue, waited
+						if error is false then processedAnswer = info
+				if error is false
+					out[name] = {
+						processedAnswer: processedAnswer
+						answer: data[name]
+					}
+				else
+					out[name] = {
+						error: error
+					}
+			else
+				out[name] = {
+					name: name
+					error: "Vous devez donner une réponse"
+				}
+			out
+
+		color_choiceAnswerProcessing: (data) ->
+			data = data ? {}
+			name = @get("name")
+			nVal = @get("list").length
+			out = {}
+			values = []
+			for i in [0..nVal-1]
+				userValue = Number(data[name+i])
+				if userValue is -1
+					out[name] = {
+						error : "Vous devez attribuer toutes les couleurs."
+					}
+					return out
+				else
+					values[i] = userValue
+			out[name] = values.join(";")
+			out
+
+		radioVerification: (answers_data) ->
+			note = 0
+			model_data=@attributes
+			answer_data = answers_data[model_data.name]
+
+			title = model_data.corectionTag || model_data.tag || model_data.name
+			items = [{
+				type:"normal"
+				text:"<b>#{title} &nbsp; \:</b>&emsp; Vous avez répondu &nbsp; #{model_data.radio[answer_data.processedAnswer]}"
+			}]
+
+			if answer_data.processedAnswer is model_data.good
+				note = 1
+				items.push {
+					type:"success"
+					text:"C'est la bonne réponse."
+				}
+			else
+				note = 0
+				items.push {
+					type:"error"
+					text:"La bonne réponse était &nbsp; #{model_data.radio[model_data.good]}."
+				}
+
+			{
+				toTrash:@
+				note:note
+				add: {
+					type:"ul"
+					rank: @get("rank")
+					list:items
+				}
+			}
+
+		inputVerification: (answers_data) ->
+			note = 0
+			model_data=@attributes
+			answer_data = answers_data[model_data.name]
+
+			title = model_data.corectionTag || model_data.tag || model_data.name
+			items = [{
+				type:"normal"
+				text:"<b>#{title} &nbsp; \:</b>&emsp; Vous avez répondu &nbsp; <i>#{answer_data.answer}</i>"
+			}]
+
+			if Array.isArray(answer_data.processedAnswer)
+				# On attendait une liste de valeurs
+				if answer_data.processedAnswer.length is 0
+					# L'utilisateur a répondu ensemble vide
+					if (model_data.good.length is 0)
+						# La réponse était ensemble vide, c'est donc une bonne réponse
+						items.push { type:"success", text:"Bonne réponse" }
+						note = 1
+					else
+						# La bonne réponse n'était pas vide
+						stringAnswer = ( "$#{it.tex()}$" for it in model_data.good).join(" ; ")
+						items.push { type:"error", text:"Vous auriez dû donner #{stringAnswer}" }
+				else
+					# L'utilisateur a donné plusieurs réponses
+					if (model_data.good.length is 0)
+						# La réponse était ensemble vide, L'utilisateur s'est donc trompé
+						items.push { type:"error", text:"La bonne réponse était $\\varnothing$." }
+					else
+						# Il faut faire le tri pour associer deux à deux user et good
+						{ closests, lefts } = mM.tri answer_data.processedAnswer, model_data.good
+						bads = []
+						N = model_data.good.length
+						for sol in closests
+							if sol.good?
+								# Un objet good a été associé à cette réponse utilisateur
+								{ item_note, errors } = mM.verif[sol.info.type](sol.info, sol.good, model_data)
+								note += item_note/N
+								switch
+									when item_note is 1
+										items.push { type:"success", text:"<i>#{sol.info.expression}</i> &nbsp; est une bonne réponse." }
+									when item_note > 0
+										if errors.length>0
+											items.push { type:"warning", text:"<i>#{sol.info.expression}</i> &nbsp; est accepté, mais :" }
+											items.push({ type:"warning", text:errorItem }) for errorItem in errors
+										else
+											items.push { type:"warning", text:"<i>#{sol.info.expression}</i> &nbsp; est accepté mais la réponse peut être améliorée." }
+									else
+										bads.push sol.info.expression
+										lefts.push sol.good
+							else
+								bads.push sol.info.expression
+						if bads.length>0 then items.push { type:"error", text:"Ces solutions que vous donnez sont fausses : #{bads.join(" ; ")}" }
+						if lefts.length>0 then items.push { type:"error",text:"Vous n'avez pas donné ces solutions : #{ ("$it.tex()$" for it in lefts).join(" ; ") }" }
+			else
+				# On attend une réponse simple
+				# mais on peut avoir proposé plusieurs réponses possibles
+				type = answer_data.processedAnswer.type
+				if Array.isArray(model_data.good)
+					# Dans ce cas, on teste tous les cas et on prend la meilleure pondération
+					verif_results = ( mM.verif[type](answer_data.processedAnswer, it_good, model_data ) for it_good in model_data.good)
+					# On trie pour extraire le résultat donnant la pondération la plus haute
+					{ note, errors } = _.max(verif_results, (item)-> item.note )
+				else
+					# C'est une réponse simple
+					{ note, errors } = mM.verif[type](answer_data.processedAnswer, model_data.good, model_data)
+				switch
+					when note is 1
+						items.push { type:"success", text:"<i>#{answer_data.answer}</i> &nbsp; est une bonne réponse."}
+					when note>0
+						if errors.length>0
+							items.push { type:"warning", text:"<i>#{answer_data.answer}</i> &nbsp; est accepté, mais :" }
+							items.push({ type:"warning", text:errorItem }) for errorItem in errors
+						else
+							items.push { type:"warning", text:"<i>#{answer_data.answer}</i> &nbsp; est accepté mais la réponse peut être améliorée." }
+					else
+						items.push { type:"error", text:"Mauvaise réponse." }
+						if errors.length>0
+							items.push({ type:"warning", text:errorItem }) for errorItem in errors
+				customMessageFunction = @get("custom_verification_message")
+				if (typeof customMessageFunction is "function") && (customMessage = customMessageFunction(answers_data))
+					if customMessage.note then note += customMessage.note
+					items.push customMessage
+			{
+				toTrash:@
+				note:note
+				add: {
+					type:"ul"
+					rank: @get("rank")
+					list:items
+				}
+			}
+		color_choiceVerification: (answers_data)->
+			name = @get("name")
+			answers = answers_data[name].split(";")
+			list = @get("list")
+			note = 0
+			colors = require("utils/colors")
+			fct = (it)->
+				rank = it.rank
+				answer = Number(answers[rank])
+				if answer is rank
+					# C'est la bonne réponse
+					return { text:it.text, type:"success", color:colors.html(rank), note:1 }
+				else
+					# mauvaise réponse
+					return { text:it.text, type:"error", color:colors.html(answer), secondColor:colors.html(rank), note:0 }
+			correcList = ( fct(it) for it in list )
+			note = _.reduce(
+				correcList,
+				(memo,it)-> return memo+it.note,
+				0
+			)/list.length
+			{
+				toTrash:@
+				note:note
+				add: {
+					type: "color-list"
+					rank: @get("rank")
+					list: correcList
+				}
+			}
 
 
 	API =
-		getEntity: (id, data) ->
-			inputs = data?.inputs ? { }
-			options = data?.options ? { }
+		getEntity: (id, options_for_this_instance, inputs) ->
+			inputs = inputs ? { }
+			options_for_this_instance = options_for_this_instance ? { }
 			itemData = Catalog.get id
 			defer = $.Deferred()
 			if itemData?
 				filename = itemData.filename
 				exo = new Exo itemData
 
+				# Ici on dispose de deux objets options d'origine différentes :
+				# Le options_for_this_instance contenant les valeurs pour l'exécution de cette occurence de l'exercice
+				# Le itemData.options contenant les config de l'exerice
+				iteratee = (val, key)->
+					value = options_for_this_instance[key]
+					if value? then val.value = value
+					else val.value = 0
+					val
+				options = _.mapObject(itemData.options,iteratee)
+
 				successCB = (exoController) ->
 					exoData = exoController.init(inputs, options)
-					collection = new BriquesCollection exoData.briques
+					# inputs et options peuvent être changés par le init
+					collection = new BriquesCollection exoData.briques, { parse:true }
 					collection.parent = exo
-					exo.set("briquesCollection", collection)
-					exo.set("inputs", inputs)
-					exo.set("options", options)
-					exo.go() # place le curseur sur la première brique pas encore faite
+					exo.set {
+						"briquesCollection": collection
+						"inputs": exoData.inputs
+						"options": options
+					}
 					defer.resolve exo
 
 				failedCB = () ->
-					defer.reject()
+					defer.reject({ message: "Fichier #{filename} introuvable."})
 
 				require ["entities/exercices/#{filename}"], successCB, failedCB
 			else
-				defer.reject()
+				defer.reject({ message: "Exercice ##{id} introuvable dans le catalogue."})
 
 			promise = defer.promise()
 			return promise
 
-	channel = Radio.channel 'exercices'
+	channel = Radio.channel 'entities'
 	channel.reply 'exercice:entity', API.getEntity
 
 	return null

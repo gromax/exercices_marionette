@@ -1,14 +1,14 @@
-define(["app", "apps/common/loading_view", "apps/exercices/list/list_view"], function(app, LoadingView, ListView){
+define(["app", "marionette", "apps/common/loading_view", "apps/exercices/list/list_view"], function(app, Marionette, LoadingView, ListView){
 
-	var Controller ={
+	var Controller = Marionette.Object.extend({
+		channelName: "entities",
 		list: function(){
 			var loadingView = new LoadingView();
 			app.regions.getRegion('main').show(loadingView);
+			var channel = this.getChannel();
 
-			require(["backbone.radio", "entities/exercice","entities/exercices"], function(Radio, Item){
-				var channel=Radio.channel('exercices');
+			require(["entities/exercices"], function(){
 				var collection = channel.request("exercices:entities");
-
 				var listView = new ListView({
 					collection: collection
 				});
@@ -21,7 +21,7 @@ define(["app", "apps/common/loading_view", "apps/exercices/list/list_view"], fun
 				app.regions.getRegion('main').show(listView);
 			});
 		}
-	};
+	});
 
-	return Controller;
+	return new Controller();
 });

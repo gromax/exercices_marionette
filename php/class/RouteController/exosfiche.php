@@ -25,6 +25,35 @@ class exosfiche
      * @return array
      */
 
+    public function fetch()
+    {
+        $uLog =Logged::getConnectedUser();
+        if (!$uLog->connexionOk())
+        {
+            EC::set_error_code(401);
+            return false;
+        }
+
+        $id = (integer) $this->params['id'];
+        $exoFiche = ExoFiche::getObject($id);
+        if ($exoFiche===null)
+        {
+            EC::set_error_code(404);
+            return false;
+        }
+        $fiche = $exoFiche->getFiche();
+         if ( $uLog->isAdmin() || ($uLog->isProf() && $fiche->isOwnedBy($uLog)) )
+        {
+            return $exoFiche->toArray();
+        }
+        else
+        {
+            EC::set_error_code(403);
+            return false;
+        }
+    }
+
+
     public function delete()
     {
         $uLog=Logged::getConnectedUser();

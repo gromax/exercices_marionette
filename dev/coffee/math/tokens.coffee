@@ -35,7 +35,7 @@
 		constructor: (@name) ->
 		toString: -> @name
 		@getRegex: (type) ->
-			if type is "number" then "[#πa-zA-Z_\\x7f-\\xff][a-zA-Z0-9_\\x7f-\\xff]*" # les chiffres sont-ils souhaitables ?
+			if type is "number" then "[#∞πa-zA-Z_\\x7f-\\xff][a-zA-Z0-9_\\x7f-\\xff]*" # les chiffres sont-ils souhaitables ?
 			else "[#π∅ℝ∞a-zA-Z_\\x7f-\\xff][a-zA-Z0-9_\\x7f-\\xff]*"
 		acceptOperOnLeft: -> true
 		acceptOperOnRight: -> true

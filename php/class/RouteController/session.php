@@ -39,6 +39,7 @@ class session
     public function insert()
     {
         $data = json_decode(file_get_contents("php://input"),true);
+
         if (isset($data['identifiant']) && isset($data['pwd']))
         {
             $identifiant=$data['identifiant'];
@@ -50,16 +51,16 @@ class session
             return false;
         }
 
-        Logged::tryConnexion($identifiant, $pwd);
-        $uLog = Logged::getConnectedUser();
-        $success = $uLog->connexionOk();
+        $logged = Logged::tryConnexion($identifiant, $pwd);
 
-        if ($success)
+        if ($logged == null)
         {
-            return $uLog->toArray();
+            return false;
         }
-        EC::set_error_code(401);
-        return false;
+        else
+        {
+            return $logged->toArray();
+        }
     }
 
     public function logged()
@@ -79,38 +80,38 @@ class session
             if($uLog->isRoot()) {
                 return array(
                     "logged"=>$uLog->toArray(),
-                    "users" => User::getList(array('ranks'=>array(User::RANK_ADMIN, User::RANK_ELEVE, User::RANK_PROF))),
-                    "classes" => Classe::getList(),
-                    "fiches" => Fiche::getList(),
+                    //"users" => User::getList(array('ranks'=>array(User::RANK_ADMIN, User::RANK_ELEVE, User::RANK_PROF))),
+                    //"classes" => Classe::getList(),
+                    //"fiches" => Fiche::getList(),
                     "messages"=>EC::messages()
                 );
             } elseif ($uLog->isAdmin()) {
                 return array(
                     "logged"=>$uLog->toArray(),
-                    "users" => User::getList(array('ranks'=>array(User::RANK_ELEVE, User::RANK_PROF))),
-                    "classes" => Classe::getList(),
-                    "fiches" => Fiche::getList(),
+                    //"users" => User::getList(array('ranks'=>array(User::RANK_ELEVE, User::RANK_PROF))),
+                    //"classes" => Classe::getList(),
+                    //"fiches" => Fiche::getList(),
                     "messages"=>EC::messages()
                 );
             } elseif ($uLog->isProf()) {
                 return array(
                     "logged"=>$uLog->toArray(),
-                    "users" => User::getList(array('classes'=>array_keys( $uLog->ownerOf() ))),
-                    "classes" => Classe::getList(array('ownerIs'=> $uLog->getId() )),
-                    "fiches" => Fiche::getList(array("owner"=> $uLog->getId() )),
+                    //"users" => User::getList(array('classes'=>array_keys( $uLog->ownerOf() ))),
+                    //"classes" => Classe::getList(array('ownerIs'=> $uLog->getId() )),
+                    //"fiches" => Fiche::getList(array("owner"=> $uLog->getId() )),
                     "messages"=>EC::messages()
                 );
             } else {
                 return array(
                     "logged"=>$uLog->toArray(),
-                    "users" => array(),
-                    "classes" => Classe::getList(array('forEleve'=> $uLog->getId() )),
-                    "fiches" => Fiche::getList(array("eleve"=> $uLog->getId() )),
+                    //"users" => array(),
+                    //"classes" => Classe::getList(array('forEleve'=> $uLog->getId() )),
+                    //"fiches" => Fiche::getList(array("eleve"=> $uLog->getId() )),
                     // Dans le cas d'un élève, on charge d'emblée l'ensemble des notes
                     // et la structure des fiches
-                    "exosfiches" => ExoFiche::getList(array("idUser"=>$uLog->getId())),
-                    "faits" => Note::getList(array("idUser"=>$uLog->getId())),
-                    "fichesAssoc" => $uLog->fichesAssoc(),
+                    //"exosfiches" => ExoFiche::getList(array("idUser"=>$uLog->getId())),
+                    //"faits" => Note::getList(array("idUser"=>$uLog->getId())),
+                    //"fichesAssoc" => $uLog->fichesAssoc(),
                     "messages"=>EC::messages()
                 );
             }

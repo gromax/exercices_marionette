@@ -47,7 +47,7 @@ final class AssoUF
 
 		require_once BDD_CONFIG;
 		try {
-			$bdd_result=DB::queryFirstRow("SELECT id, idUser, idFiche FROM ".PREFIX_BDD."assocUF WHERE id=%s", $id);
+			$bdd_result=DB::queryFirstRow("SELECT id, idUser, idFiche, actif, date FROM ".PREFIX_BDD."assocUF WHERE id=%i", $id);
 			if ($bdd_result === null) {
 				EC::addError("Association Utilisateur-Fiche introuvable.");
 				return null;
@@ -65,24 +65,24 @@ final class AssoUF
 		}
 	}
 
-	public static function getList($params)
+	public static function getList($params = array())
 	{
-		if (isset($params["idUser"])) $idUser = (integer) $params["idUser"];
+		if (isset($params["idUser"])) $idUser = (integer) $params["idUser"]; # Sert à récupérer les associations visibles d'un élèves
 		else $idUser = null;
 		if (isset($params["idFiche"])) $idFiche = (integer) $params["idFiche"];
 		else $idFiche = null;
+		if (isset($params["idOwner"])) $idOwner = (integer) $params["idOwner"];
+		else $idOwner = null;
 		require_once BDD_CONFIG;
 		try {
 			if ($idUser!==null) {
-				if ($idFiche!==null) {
-					$bdd_result=DB::query("SELECT id, idUser, idFiche, actif, date FROM ".PREFIX_BDD."assocUF WHERE idUser=%i AND idFiche=%i ORDER BY date",$idUser, $idFiche);
-				} else {
-					$bdd_result=DB::query("SELECT id, idUser, idFiche, actif, date FROM ".PREFIX_BDD."assocUF WHERE idUser=%i ORDER BY date",$idUser);
-				}
+				$bdd_result=DB::query("SELECT a.id, a.idUser, a.idFiche, a.actif, f.actif as ficheActive, f.nom as nomFiche, f.description, a.date FROM (".PREFIX_BDD."assocUF a JOIN ".PREFIX_BDD."fiches f ON f.id = a.idFiche ) WHERE a.idUser=%i AND f.visible=1 ORDER BY date",$idUser);
+			} elseif ($idOwner!==null){
+				$bdd_result=DB::query("SELECT a.id, a.idUser, u.nom as nomUser, u.prenom as prenomUser,  a.idFiche, a.actif, a.date FROM ((".PREFIX_BDD."assocUF a JOIN ".PREFIX_BDD."users u ON u.id = a.idUser) JOIN ".PREFIX_BDD."fiches f ON f.id = a.idFiche) WHERE f.idOwner=%i ORDER BY date",$idOwner);
 			} elseif ($idFiche!==null) {
-				$bdd_result=DB::query("SELECT id, idUser, idFiche, actif, date FROM ".PREFIX_BDD."assocUF WHERE idFiche=%i ORDER BY date",$idFiche);
+				$bdd_result=DB::query("SELECT a.id, a.idUser, u.nom as nomUser, u.prenom as prenomUser,  a.idFiche, a.actif, a.date FROM (".PREFIX_BDD."assocUF a JOIN ".PREFIX_BDD."users u ON u.id = a.idUser) WHERE idFiche=%i ORDER BY date",$idFiche);
 			} else {
-				$bdd_result=DB::query("SELECT id, idUser, idFiche, actif, date FROM ".PREFIX_BDD."assocUF ORDER BY date");
+				$bdd_result=DB::query("SELECT a.id, a.idUser, u.nom as nomUser, u.prenom as prenomUser, a.idFiche, a.actif, a.date FROM (".PREFIX_BDD."assocUF a JOIN ".PREFIX_BDD."users u ON u.id = a.idUser) ORDER BY date");
 			}
 		} catch(MeekroDBException $e) {
 			EC::addBDDError($e->getMessage(), "AssoUF/getList");

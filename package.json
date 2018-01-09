@@ -11,6 +11,7 @@
     "grunt-contrib-uglify": "latest",
     "grunt-contrib-concat": "latest",
     "grunt-contrib-cssmin": "latest",
-    "grunt-contrib-jst": "latest"
+    "grunt-contrib-jst": "latest",
+    "backbone-fetch-cache": "latest",
   }
 }

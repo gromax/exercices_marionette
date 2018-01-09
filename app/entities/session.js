@@ -28,6 +28,13 @@ define(["backbone.radio"], function(Radio){
 			}
 		},
 
+		toJSON: function(){
+			return {
+				identifiant: this.get("identifiant"),
+				pwd: this.get("pwd")
+			}
+		},
+
 		parse: function(data){
 			if (data.logged) {
 				var logged = data.logged;
@@ -60,7 +67,53 @@ define(["backbone.radio"], function(Radio){
 			this.fetch({
 				success: callback
 			});
+		},
+
+		mapItem: function(itemsList) {
+			itemsList = itemsList || {};
+			var rank = this.get("rank");
+			switch (rank) {
+				case "Root":
+					if (_.has(itemsList,"Root")) {
+						return itemsList["Root"];
+					} else if (_.has(itemsList,"Admin")) {
+						return itemsList["Admin"];
+					} else {
+						return itemsList.def;
+					}
+					break;
+				case "Admin":
+					if (_.has(itemsList,"Admin")) {
+						return itemsList["Admin"];
+					} else {
+						return itemsList.def;
+					}
+					break;
+				case "Prof":
+					if (_.has(itemsList,"Prof")) {
+						return itemsList["Prof"];
+					} else {
+						return itemsList.def;
+					}
+					break;
+				case "Élève":
+					if (_.has(itemsList,"Eleve")) {
+						return itemsList["Eleve"];
+					} else {
+						return itemsList.def;
+					}
+					break;
+				default:
+					if (_.has(itemsList,"Off")) {
+						return itemsList["Off"];
+					} else {
+						return itemsList.def;
+					}
+					break;
+			}
 		}
+
+
 	});
 
 	var API = {
@@ -74,7 +127,7 @@ define(["backbone.radio"], function(Radio){
 		}
 	};
 
-	var channel = Radio.channel('session');
+	var channel = Radio.channel('entities');
 	channel.reply('session:entity', API.getSession );
 
 	return ; // Pas nécessaire de retourner l'objet Session

@@ -5,6 +5,7 @@ define ["backbone.radio","entities/exercices/exercices_catalog"], (Radio, Catalo
 			title: "Titre de l'exercice",
 			description: "Description de l'exercice",
 			keywords: ""
+			options:{}
 		},
 	}
 
@@ -18,7 +19,7 @@ define ["backbone.radio","entities/exercices/exercices_catalog"], (Radio, Catalo
 			collection = new ItemsCollection itemsData
 			return collection
 
-	channel = Radio.channel 'exercices'
+	channel = Radio.channel 'entities'
 	channel.reply 'exercices:entities', API.getEntities
 
 	return

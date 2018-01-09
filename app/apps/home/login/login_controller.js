@@ -10,7 +10,7 @@ define(["app","apps/home/login/login_view"], function(app, LoginView){
 						app.trigger("home:show");
 					}).fail(function(response){
 						if(response.status == 422){
-							view.triggerMethod("form:data:invalid", response.errors);
+							view.triggerMethod("form:data:invalid", response.responseJSON.messages);
 						}
 						else{
 							alert("An unprocessed error happened. Please try again!");

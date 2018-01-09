@@ -12,6 +12,13 @@ define(["backbone.radio"], function(Radio){
 			date:"2000-01-01"
 		},
 
+		parse: function(data) {
+			if( typeof data.ouverte == "string" ) {
+				data.ouverte = (Number(data.ouverte)==1);
+			}
+			return data;
+		},
+
 		validate: function(attrs, options){
 			var errors = {};
 			if (! attrs.nom){
@@ -43,7 +50,7 @@ define(["backbone.radio"], function(Radio){
 		}
 	};
 
-	var channel = Radio.channel('classes');
+	var channel = Radio.channel('entities');
 	channel.reply('classe:entity', API.getClasseEntity );
 
 	return Classe;
