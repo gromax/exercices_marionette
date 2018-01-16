@@ -9,12 +9,15 @@ define(["app","marionette","apps/common/loading_view","apps/common/missing_item_
 
 			app.regions.getRegion('main').show(loadingView);
 			var channel = this.getChannel();
-			require(["entities/classe"], function(Item){
-
-				var fetchingItem = channel.request("classe:entity", id);
-				$.when(fetchingItem).done(function(item){
+			require(["entities/dataManager"], function(){
+				var fetchingClasse = channel.request("classe:entity",id);
+				$.when(fetchingClasse).done(function(item){
 					var view;
 					if(item !== undefined){
+						app.Ariane.add([
+							{ text:item.get("nom"), e:"classe:show", data:id, link:"classe:"+id},
+							{ text:"Modification", e:"classe:edit", data:id, link:"classe:"+id+"/edit"},
+						]);
 						view = new EditView({
 							model: item,
 							generateTitle: true

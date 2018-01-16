@@ -10,7 +10,7 @@ define(["app", "marionette", "apps/common/loading_view", "apps/common/list_layou
 			var listItemsPanel = new Panel();
 			var channel = this.getChannel();
 
-			require(["entities/classe","entities/classes"], function(Classe){
+			require(["entities/classe", "entities/dataManager"], function(Classe){
 				var fetching = channel.request("classes:entities");
 				$.when(fetching).done(function(items){
 					var listItemsView = new ListView({

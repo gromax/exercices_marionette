@@ -2,7 +2,7 @@ define(["app", "marionette", "apps/common/loading_view","apps/common/missing_ite
 	var Controller = Marionette.Object.extend({
 		channelName: "entities",
 
-		editUser: function(id){
+		editUser: function(id, isMe){
 			var loadingView = new LoadingView({
 				title: "Modification d'un utilisateur",
 				message: "Chargement des données."
@@ -10,11 +10,24 @@ define(["app", "marionette", "apps/common/loading_view","apps/common/missing_ite
 
 			app.regions.getRegion('main').show(loadingView);
 			var channel = this.getChannel();
-			require(["entities/user"], function(User){
+			require(["entities/dataManager"], function(){
 				var fetchingUser = channel.request("user:entity", id);
 				$.when(fetchingUser).done(function(user){
 					var view;
 					if(user !== undefined){
+
+						if (isMe) {
+							app.Ariane.add([
+								{ text:"Mon compte", e:"user:show", data:user.get("id"), link:"user:"+user.get("id") },
+								{ text:"Modification", e:"user:edit", data:user.get("id"), link:"user:"+user.get("id")+"/edit" }
+							]);
+						} else {
+							app.Ariane.add([
+								{ text:user.get("nomComplet"), e:"user:show", data:user.get("id"), link:"user:"+user.get("id") },
+								{ text:"Modification", e:"user:edit", data:user.get("id"), link:"user:"+user.get("id")+"/edit" }
+							]);
+						}
+
 						view = new EditView({
 							model: user,
 							generateTitle: true
@@ -41,13 +54,31 @@ define(["app", "marionette", "apps/common/loading_view","apps/common/missing_ite
 					}
 					else
 					{
+
+						if (isMe) {
+							app.Ariane.add([
+								{ text:"Mon compte", e:"user:show", data:id, link:"user:"+id },
+								{ text:"Modification", e:"user:edit", data:id, link:"user:"+id+"/edit" }
+							]);
+						} else {
+							app.Ariane.add([
+								{ text:"Utilisateur inconnu", e:"user:show", data:id, link:"user:"+id },
+								{ text:"Modification", e:"user:edit", data:id, link:"user:"+id+"/edit" }
+							]);
+						}
+
+						view = new EditView({
+							model: user,
+							generateTitle: true
+						});
+
 						view = new MissingView({message:"Cet utilisateur n'existe pas !"});
 					}
 					app.regions.getRegion('main').show(view);
 				});
 			});
 		},
-		editUserPwd: function(id){
+		editUserPwd: function(id, isMe){
 			var loadingView = new LoadingView({
 				title: "Modification du mot de passe utilisateur",
 				message: "Chargement des données."
@@ -56,11 +87,23 @@ define(["app", "marionette", "apps/common/loading_view","apps/common/missing_ite
 			app.regions.getRegion('main').show(loadingView);
 			var channel = this.getChannel();
 
-			require(["entities/user"], function(User){
+			require(["entities/dataManager"], function(){
 				var fetchingUser = channel.request("user:entity", id);
 				$.when(fetchingUser).done(function(user){
 					var view;
 					if(user !== undefined){
+						if (isMe){
+							app.Ariane.add([
+								{ text:"Mon compte", e:"user:show", data:id), link:"user:"+id },
+								{ text:"Modification du mot de passe", e:"user:editPwd", data:id, link:"user:"+id+"/password" }
+							]);
+						} else {
+							app.Ariane.add([
+								{ text:user.get("nomComplet"), e:"user:show", data:id, link:"user:"+id },
+								{ text:"Modification du mot de passe", e:"user:editPwd", data:id, link:"user:"+id+"/password" }
+							]);
+						}
+
 						view = new EditPwdView({
 							model: user,
 							generateTitle: true
@@ -93,13 +136,25 @@ define(["app", "marionette", "apps/common/loading_view","apps/common/missing_ite
 					}
 					else
 					{
+						if (isMe){
+							app.Ariane.add([
+								{ text:"Mon compte", e:"user:show", data:id), link:"user:"+id },
+								{ text:"Modification du mot de passe", e:"user:editPwd", data:id, link:"user:"+id+"/password" }
+							]);
+						} else {
+							app.Ariane.add([
+								{ text:"Utilisateur inconnu", e:"user:show", data:id, link:"user:"+id },
+								{ text:"Modification du mot de passe", e:"user:editPwd", data:id, link:"user:"+id+"/password" }
+							]);
+						}
+
 						view = new ExosManager.UsersApp.Show.MissingUser();
 					}
 					app.regions.getRegion('main').show(view);
 				});
 			});
 		}
-	}
+	});
 
 	return new Controller();
 });

@@ -6,7 +6,7 @@ define(["app", "marionette", "apps/home/signin/signin_view", "apps/common/loadin
 			var loadingView = new LoadingView();
 			app.regions.getRegion('main').show(loadingView);
 			var channel = this.getChannel();
-			require(["entities/classes"], function(){
+			require(["entities/dataManager"], function(){
 				var fetching = channel.request("classes:entities");
 				$.when(fetching).done(function(items){
 					var listClassesView = new SigninView({

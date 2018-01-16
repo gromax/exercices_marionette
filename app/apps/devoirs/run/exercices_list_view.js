@@ -18,6 +18,7 @@ define(["jst","marionette"], function(JST,Marionette){
 			var data = _.clone(this.model.attributes);
 			data.note = this.model.calcNote(this.faits);
 			data.n_faits = this.faits.length;
+			data.numero = this.options.numero;
 			return data;
 		},
 
@@ -45,7 +46,8 @@ define(["jst","marionette"], function(JST,Marionette){
 
 		childViewOptions: function(model, index) {
 			return {
-				faits: this.faits
+				faits: this.faits,
+				numero: index+1
 			}
 		}
 	});

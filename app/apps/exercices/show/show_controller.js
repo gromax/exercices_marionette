@@ -123,7 +123,15 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 				var fetchingData = channel.request("eleve:entities");
 				$.when(fetchingData).done(function(userfiches, exofiches, faits){
 					var exofiche = exofiches.get(idEF);
-					if (exofiche){
+					var userfiche = userfiches.get(idUF);
+					if (exofiche && userfiche){
+						// Il faut récupérer le numéro de l'exercice dans le devoir
+						var liste = exofiches.where({"idFiche":userfiche.get("idFiche")});
+						var index = _.findIndex(liste, function(item){ return item.get("id") == idEF; });
+						app.Ariane.add([
+							{ text:userfiche.get("nomFiche"), e:"devoir:show", data:idUF, link:"devoir:"+idUF},
+							{ text:"Exercice "+(index+1)+"/"+liste.length, e:"exercice-fiche:run", data:[idEF, idUF], link:"user-fiche:"+idUF+"/exercice-fiche:" + idEF },
+						]);
 						var idE = exofiche.get("idE");
 						// On ne doit transmettre que des options brutes
 						var exoficheOptions = _.mapObject(exofiche.get("options"), function(val,key){

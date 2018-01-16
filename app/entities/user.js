@@ -1,4 +1,4 @@
-define(["backbone.radio"], function(Radio){
+define([], function(){
 	var User = Backbone.Model.extend({
 		urlRoot: "api/users",
 
@@ -61,24 +61,6 @@ define(["backbone.radio"], function(Radio){
 		},
 
 	});
-
-	var API = {
-		getUserEntity: function(userId){
-			var user = new User({id: userId});
-			var defer = $.Deferred();
-			var response = user.fetch();
-			response.done(function(){
-				defer.resolveWith(response,[user]);
-			});
-			response.fail(function(){
-				defer.rejectWith(response, arguments)
-			});
-			return defer.promise();
-		}
-	};
-
-	var channel = Radio.channel('entities');
-	channel.reply('user:entity', API.getUserEntity );
 
 	return User;
 });

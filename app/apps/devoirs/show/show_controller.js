@@ -333,7 +333,7 @@ define([
 			app.regions.getRegion('main').show(layout);
 			var channel = this.getChannel();
 
-			require(["entities/dataManager", "entities/users"], function(){
+			require(["entities/dataManager"], function(){
 				var fetchingData = channel.request("prof:entities");
 				$.when(fetchingData).done(function(fiches, userfiches, exofiches, faits){
 					var fiche = fiches.get(id);

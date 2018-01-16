@@ -1,4 +1,4 @@
-define(["jst","marionette"], function(JST,Marionette){
+define(["jst", "marionette", "mathjax"], function(JST, Marionette, Mathjax){
 	var noView = Marionette.View.extend({
 		template:  window.JST["devoirs/show/exercice-list-none"],
 		tagName: "a",
@@ -76,6 +76,10 @@ define(["jst","marionette"], function(JST,Marionette){
 			console.log(errors);
 		},
 
+		onRender: function(){
+			MathJax.Hub.Queue(["Typeset",MathJax.Hub,this.$el[0]]);
+		},
+
 	});
 
 	var Liste = Marionette.CollectionView.extend({
@@ -91,6 +95,7 @@ define(["jst","marionette"], function(JST,Marionette){
 			// On affiche que les exofiches qui ont sont dans la bonne fiche
 			return child.get("idFiche") == this.idFiche;
 		},
+
 	});
 
 	return Liste;

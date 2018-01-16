@@ -15,6 +15,7 @@ define(["marionette","jquery-ui","bootstrap"], function(Marionette){
 			el: "#app-container",
 			regions: {
 				header: "#header-region",
+				ariane: "#ariane-region",
 				main: "#main-region",
 				dialog: "#dialog-region"
 			}
@@ -43,7 +44,17 @@ define(["marionette","jquery-ui","bootstrap"], function(Marionette){
 
 	Manager.on("start", function(){
 		var historyStart = function() {
-			require(["apps/header/header_app", "apps/apps"], function(){
+			require([
+				"apps/header/header_app",
+				"apps/ariane/ariane_app",
+				"apps/common/apps",
+				"apps/users/apps",
+				"apps/classes/apps",
+				"apps/devoirs/apps",
+				"apps/exercices/apps",
+				"apps/home/apps"
+			], function(){
+				Manager.trigger("ariane:show");
 				Manager.trigger("header:show");
 				if(Backbone.history){
 					Backbone.history.start();
@@ -54,8 +65,9 @@ define(["marionette","jquery-ui","bootstrap"], function(Marionette){
 			});
 		}
 
-		require(["backbone.radio","entities/session"], function(Radio){
+		require(["entities/ariane", "backbone.radio","entities/session"], function(ArianeController, Radio){
 			var channel = Radio.channel('entities');
+			Manager.Ariane = ArianeController;
 			Manager.Auth = channel.request("session:entity", historyStart);
 		});
 	});

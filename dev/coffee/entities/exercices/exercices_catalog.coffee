@@ -91,7 +91,7 @@ define [], () ->
 			{
 				id:10
 				filename:"exo0010"
-				title: "*Équation du second degré"
+				title: "Équation du second degré"
 				description: "Résoudre une équation du second degré."
 				keyWords : ["Analyse","Trinome","Équation","Racines","Première"]
 				options: {

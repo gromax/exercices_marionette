@@ -11,7 +11,7 @@ define(["app", "marionette", "apps/common/loading_view", "apps/common/list_layou
 			var usersListPanel = new Panel({filterCriterion:criterion});
 			var channel = this.getChannel();
 
-			require(["entities/user","entities/users"], function(User){
+			require(["entities/user","entities/dataManager"], function(User){
 				var fetchingUsers = channel.request("users:entities");
 				$.when(fetchingUsers).done(function(users){
 					var usersListView = new UsersView({

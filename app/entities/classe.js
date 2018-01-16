@@ -1,4 +1,4 @@
-define(["backbone.radio"], function(Radio){
+define([], function(){
 	var Classe = Backbone.Model.extend({
 		urlRoot: "api/classes",
 
@@ -34,24 +34,6 @@ define(["backbone.radio"], function(Radio){
 			}
 		}
 	});
-
-	var API = {
-		getClasseEntity: function(classeId){
-			var classe = new Classe({id: classeId});
-			var defer = $.Deferred();
-			var response = classe.fetch();
-			response.done(function(){
-				defer.resolveWith(response,[classe]);
-			});
-			response.fail(function(){
-				defer.rejectWith(response, arguments)
-			});
-			return defer.promise();
-		}
-	};
-
-	var channel = Radio.channel('entities');
-	channel.reply('classe:entity', API.getClasseEntity );
 
 	return Classe;
 });

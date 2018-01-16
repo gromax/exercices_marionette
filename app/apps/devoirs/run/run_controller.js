@@ -35,6 +35,8 @@ define([
 					if(userfiche !== undefined){
 						// On envoie toute la collection partant du principe que seule les exofiches de userfiche seront affichés
 
+						app.Ariane.add({ text:userfiche.get("nomFiche"), e:"devoir:show", data:id, link:"devoir:"+id});
+
 						var layout = new Layout();
 						var devoirPanel = new DevoirPanel({ model: userfiche });
 						var notePanel = new NotePanel({ model: userfiche, exofiches:exofiches, faits:faits });

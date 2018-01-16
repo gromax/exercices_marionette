@@ -35,16 +35,20 @@ define(["backbone.radio"], function(Radio){
 
 
 	var API = {
+		timeout:1500000,
 		lastTime:null,
+		lastTimeClasses:null,
+		lastTimeUsers:null,
 		stored_userfiches:null,
 		stored_exofiches:null,
 		stored_faits:null,
 		stored_devoirs:null,
+		stored_users:null,
 		getEleveEntities: function(){
 			t= Date.now();
 			var defer = $.Deferred();
 
-			if ((API.stored_userfiches!==null) && (API.stored_exofiches!==null) && (API.stored_faits!==null) && (t-API.lastTime<1500000)){
+			if ((API.stored_userfiches!==null) && (API.stored_exofiches!==null) && (API.stored_faits!==null) && (t-API.lastTime<API.timeout)){
 				defer.resolve(API.stored_userfiches, API.stored_exofiches, API.stored_faits);
 			} else {
 				var request = $.ajax("api/eleveData",{
@@ -74,7 +78,7 @@ define(["backbone.radio"], function(Radio){
 			t= Date.now();
 			var defer = $.Deferred();
 
-			if ((API.stored_devoirs!==null) && (API.stored_userfiches!==null) && (API.stored_exofiches!==null) && (API.stored_faits!==null) && (t-API.lastTime<1500000)){
+			if ((API.stored_devoirs!==null) && (API.stored_userfiches!==null) && (API.stored_exofiches!==null) && (API.stored_faits!==null) && (t-API.lastTime<API.timeout)){
 				defer.resolve(API.stored_devoirs, API.stored_userfiches, API.stored_exofiches, API.stored_faits);
 			} else {
 				var request = $.ajax("api/profData",{
@@ -101,14 +105,118 @@ define(["backbone.radio"], function(Radio){
 			var promise = defer.promise();
 			return promise;
 		},
+
+		getClasses: function(){
+			t= Date.now();
+			var defer = $.Deferred();
+
+			if ((API.stored_classes!==null) && (t-API.lastTimeClasses<API.timeout)){
+				defer.resolve(API.stored_classes);
+			} else {
+				require(["entities/classes"], function(classe_collec){
+					classes = new classe_collec();
+					classes.fetch({
+						success: function(data){
+							API.stored_classes = data;
+							API.lastTimeClasses = t;
+							defer.resolve(data);
+						},
+					});
+				});
+			}
+
+			var promise = defer.promise();
+			return promise;
+		},
+
+		getClasse: function(classeId){
+			t= Date.now();
+			var defer = $.Deferred();
+
+			if ((API.stored_classes!==null) && (t-API.lastTimeClasses<API.timeout)){
+				defer.resolve(API.stored_classes.get(classeId));
+			} else {
+				require(["entities/classes"], function(classe_collec){
+					classes = new classe_collec();
+					classes.fetch({
+						success: function(data){
+							API.stored_classes = data;
+							API.lastTimeClasses = t;
+							defer.resolve(data.get(classeId));
+						},
+					});
+				});
+			}
+
+			var promise = defer.promise();
+			return promise;
+		},
+
+		getUsers: function(){
+			t= Date.now();
+			var defer = $.Deferred();
+
+			if ((API.stored_users!==null) && (t-API.lastTimeUsers<API.timeout)){
+				defer.resolve(API.stored_users);
+			} else {
+				require(["entities/users"], function(user_collec){
+					var users = new user_collec();
+					users.fetch({
+						success: function(data){
+							API.stored_users = data;
+							API.lastTimeUsers = t;
+							defer.resolve(data);
+						}
+					});
+				});
+			}
+
+			var promise = defer.promise();
+			return promise;
+		},
+
+		getUser: function(userId){
+			t= Date.now();
+			var defer = $.Deferred();
+
+			if ((API.stored_users!==null) && (t-API.lastTimeUsers<API.timeout)){
+				defer.resolve(API.stored_users.get(userId));
+			} else {
+				require(["entities/users"], function(user_collec){
+					var users = new user_collec();
+					users.fetch({
+						success: function(data){
+							API.stored_users = data;
+							API.lastTimeUsers = t;
+							defer.resolve(data.get(userId));
+						}
+					});
+				});
+			}
+
+			var promise = defer.promise();
+			return promise;
+
+		},
+
+		purge: function(){
+			console.log("purge des données");
+			API.stored_devoirs = null;
+			API.stored_userfiches = null;
+			API.stored_exofiches = null;
+			API.stored_faits = null;
+			API.stored_classes = null;
+			API.stored_users = null;
+		},
+
 	};
-
-
-
 
 	var channel = Radio.channel('entities');
 	channel.reply('eleve:entities', API.getEleveEntities );
 	channel.reply('prof:entities', API.getProfEntities );
-
-
+	channel.reply('data:purge', API.purge );
+	channel.reply('classes:entities', API.getClasses );
+	channel.reply('classe:entity', API.getClasse );
+	channel.reply('users:entities', API.getUsers );
+	channel.reply('user:entity', API.getUser );
 });

@@ -69,6 +69,15 @@ define(["backbone.radio"], function(Radio){
 			});
 		},
 
+		isAdmin:function(){
+			var rank = this.get("rank");
+			return (rank == "Root")||(rank == "Admin");
+		},
+
+		isProf:function(){
+			return this.get("rank") == "Prof";
+		},
+
 		mapItem: function(itemsList) {
 			itemsList = itemsList || {};
 			var rank = this.get("rank");
@@ -121,6 +130,8 @@ define(["backbone.radio"], function(Radio){
 			Auth = new Session();
 			Auth.on("destroy", function(){
 				this.unset("id");
+				var channel = Radio.channel('entities');
+				channel.request("data:purge");
 			});
 			Auth.getAuth(callback);
 			return Auth;
