@@ -5,58 +5,60 @@ define ["utils/math", "utils/help"], (mM, help) ->
 	# description:"Pour $x$ donné, on donne $f(x)$ et $f'(x)$. Il faut en déduire l'équation de la tangente à la courbe à l'abscisse $x$."
 	# keyWords:["Dérivation","Tangente","Équation","Première"]
 
-	Controller =
-		init: (inputs, options) ->
+	return {
+		init: (inputs) ->
 			A = mM.alea.vector({ name:"A", def:inputs }).save(inputs)
 			B = mM.alea.vector({ name:"B", def:inputs, forbidden:[ {axe:"x", coords:A} ] }).save(inputs)
-			droite = mM.droite.par2pts A,B
-			goodEq = droite.reduiteTex()
+			[
+				A
+				B
+				mM.droite.par2pts A,B
+			]
+
+		getBriques: (inputs, options) ->
+			[A, B, doite] = @init(inputs)
 			xAtex = A.x.tex()
 			yAtex = A.y.tex()
-			der = droite.m().tex()
 
-			{
-				inputs: inputs
-				briques: [
-					{
-						bareme: 100
-						items: [
-							{
-								type: "text"
-								rank: 1
-								ps: [
-									"On considère une fonction une fonction &nbsp; $f$ &nbsp; dérivable sur $\\mathbb{R}$."
-									"$\\mathcal{C}$ &nbsp; est sa courbe représentative dans un repère."
-									"On sait que &nbsp; $f\\left(#{xAtex}\\right) = #{yAtex}$ &nbsp; et &nbsp; $f'\\left(#{xAtex}\\right) = #{der}$."
-									"Donnez l'équation de la tangente &nbsp; $\\mathcal{T}$ &nbsp; à la courbe &nbsp; $\\mathcal{C}$ &nbsp; en l'abscisse &nbsp; $#{xAtex}$."
-								]
-							}
-							{
-								type: "input"
-								rank: 2
-								waited: "number"
-								tag:"$y=$"
-								name:"e"
-								description:"Équation de la tangente"
-								good:droite.reduiteObject()
-								developp:true
-								cor_prefix: "y="
-								formes:"FRACTION"
-							}
-							{
-								type: "validation"
-								rank: 3
-								clavier: ["aide"]
-							}
-							{
-								type: "aide"
-								rank: 4
-								list: help.derivee.tangente
-							}
-						]
-					}
-				]
-			}
+			[
+				{
+					bareme: 100
+					items: [
+						{
+							type: "text"
+							rank: 1
+							ps: [
+								"On considère une fonction une fonction &nbsp; $f$ &nbsp; dérivable sur $\\mathbb{R}$."
+								"$\\mathcal{C}$ &nbsp; est sa courbe représentative dans un repère."
+								"On sait que &nbsp; $f\\left(#{xAtex}\\right) = #{yAtex}$ &nbsp; et &nbsp; $f'\\left(#{xAtex}\\right) = #{droite.m().tex()}$."
+								"Donnez l'équation de la tangente &nbsp; $\\mathcal{T}$ &nbsp; à la courbe &nbsp; $\\mathcal{C}$ &nbsp; en l'abscisse &nbsp; $#{xAtex}$."
+							]
+						}
+						{
+							type: "input"
+							rank: 2
+							waited: "number"
+							tag:"$y=$"
+							name:"e"
+							description:"Équation de la tangente"
+							good:droite.reduiteObject()
+							developp:true
+							cor_prefix: "y="
+							formes:"FRACTION"
+						}
+						{
+							type: "validation"
+							rank: 3
+							clavier: ["aide"]
+						}
+						{
+							type: "aide"
+							rank: 4
+							list: help.derivee.tangente
+						}
+					]
+				}
+			]
 
 		tex: (data) ->
 			# en chantier
@@ -69,5 +71,4 @@ define ["utils/math", "utils/help"], (mM, help) ->
 					large:false
 				}
 			}
-
-	return Controller
+	}

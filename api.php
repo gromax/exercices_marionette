@@ -74,7 +74,7 @@ $router->addRule('api/cons', 'cons', 'purge', 'DELETE');
 
 // data
 $router->addRule('api/eleveData', 'data', 'eleveFetch', 'GET');
-$router->addRule('api/profData', 'data', 'profFetch', 'GET');
+$router->addRule('api/customData/:asks', 'data', 'customFetch', 'GET');
 
 
 $response = $router->load();

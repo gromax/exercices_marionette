@@ -14,4 +14,4 @@
 	</div>
 </div>
 
-<% if (!actif) { %><small><i class="fa fa-exclamation-circle"></i> Ce devoir est vérouillé.</small><% } %>
+<% if (!actif) { %><small><i class="fa fa-exclamation-circle fa-lg"></i> Ce devoir est verrouillé. Vous pouvez continuer à faire des exercices mais ils ne seront pas enregistrés.</small><% } %>

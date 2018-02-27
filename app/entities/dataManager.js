@@ -36,68 +36,65 @@ define(["backbone.radio"], function(Radio){
 
 	var API = {
 		timeout:1500000,
-		lastTime:null,
-		lastTimeClasses:null,
-		lastTimeUsers:null,
-		stored_userfiches:null,
-		stored_exofiches:null,
-		stored_faits:null,
-		stored_devoirs:null,
-		stored_users:null,
-		getEleveEntities: function(){
+		stored_data:{},
+		stored_time:{},
+
+		getCustomEntities: function(ask){
 			t= Date.now();
 			var defer = $.Deferred();
-
-			if ((API.stored_userfiches!==null) && (API.stored_exofiches!==null) && (API.stored_faits!==null) && (t-API.lastTime<API.timeout)){
-				defer.resolve(API.stored_userfiches, API.stored_exofiches, API.stored_faits);
+			toFetch = _.filter(ask,function(item){
+				return (typeof API.stored_data[item] == "undefined") || (typeof API.stored_time[item] == "undefined") || (t-API.stored_time[item]>API.timeout);
+			});
+			if (toFetch.length==0) {
+				// Pas de fetch requis => on renvoie les résultats
+				defer.resolve.apply(null,_.map(ask, function(item){ return API.stored_data[item]; }));
 			} else {
-				var request = $.ajax("api/eleveData",{
+				var request = $.ajax("api/customData/"+toFetch.join("&"),{
 					method:'GET',
 					dataType:'json'
 				});
 
 				request.done(function(data){
-					require(["entities/userfiches", "entities/exofiches", "entities/aUEs"], function(UF_collec, EF_collec, UE_collec){
-						var userfiches = new UF_collec(data.aUFs, { parse:true });
-						var exofiches = new EF_collec(data.aEFs, { parse:true });
-						var faits = new UE_collec(data.aUEs, { parse:true });
-						API.stored_userfiches = userfiches;
-						API.stored_exofiches = exofiches;
-						API.stored_faits = faits;
-						API.lastTime = t;
-						defer.resolve(userfiches, exofiches, faits);
-					});
-				});
-			}
-
-			var promise = defer.promise();
-			return promise;
-		},
-
-		getProfEntities: function(){
-			t= Date.now();
-			var defer = $.Deferred();
-
-			if ((API.stored_devoirs!==null) && (API.stored_userfiches!==null) && (API.stored_exofiches!==null) && (API.stored_faits!==null) && (t-API.lastTime<API.timeout)){
-				defer.resolve(API.stored_devoirs, API.stored_userfiches, API.stored_exofiches, API.stored_faits);
-			} else {
-				var request = $.ajax("api/profData",{
-					method:'GET',
-					dataType:'json'
-				});
-
-				request.done(function(data){
-					require(["entities/devoirs", "entities/userfiches", "entities/exofiches", "entities/aUEs"], function(devoir_collec, UF_collec, EF_collec, UE_collec){
-						var devoirs = new devoir_collec(data.fiches, { parse:true });
-						var userfiches = new UF_collec(data.aUFs, { parse:true });
-						var exofiches = new EF_collec(data.aEFs, { parse:true });
-						var faits = new UE_collec(data.aUEs, { parse:true });
-						API.stored_devoirs = devoirs;
-						API.stored_userfiches = userfiches;
-						API.stored_exofiches = exofiches;
-						API.stored_faits = faits;
-						API.lastTime = t;
-						defer.resolve(devoirs, userfiches, exofiches, faits);
+					require([
+						"entities/devoirs",
+						"entities/userfiches",
+						"entities/exofiches",
+						"entities/aUEs",
+						"entities/users",
+						"entities/exams"
+					], function(
+						devoir_collec,
+						UF_collec,
+						EF_collec,
+						UE_collec,
+						U_collec,
+						Ex_collec
+					){
+						if(data.fiches) {
+							API.stored_data.fiches = new devoir_collec(data.fiches, { parse:true });
+							API.stored_time.fiches = t;
+						}
+						if(data.userfiches) {
+							API.stored_data.userfiches = new UF_collec(data.userfiches, { parse:true });
+							API.stored_time.userfiches = t;
+						}
+						if(data.exofiches) {
+							API.stored_data.exofiches = new EF_collec(data.exofiches, { parse:true });
+							API.stored_time.exofiches = t;
+						}
+						if(data.faits) {
+							API.stored_data.faits = new UE_collec(data.faits, { parse:true });
+							API.stored_time.faits = t;
+						}
+						if(data.users) {
+							API.stored_data.users = new U_collec(data.users, { parse:true });
+							API.stored_time.users = t;
+						}
+						if(data.exams) {
+							API.stored_data.exams = new Ex_collec(data.exams, { parse:true });
+							API.stored_time.exams = t;
+						}
+						defer.resolve.apply(null,_.map(ask, function(item){ return API.stored_data[item]; }));
 					});
 				});
 			}
@@ -110,15 +107,15 @@ define(["backbone.radio"], function(Radio){
 			t= Date.now();
 			var defer = $.Deferred();
 
-			if ((API.stored_classes!==null) && (t-API.lastTimeClasses<API.timeout)){
-				defer.resolve(API.stored_classes);
+			if ((typeof API.stored_data.classes!=="undefined") && (typeof API.stored_time.classes!="undefined") && (t-API.stored_time.classes<API.timeout)){
+				defer.resolve(API.stored_data.classes);
 			} else {
 				require(["entities/classes"], function(classe_collec){
 					classes = new classe_collec();
 					classes.fetch({
 						success: function(data){
-							API.stored_classes = data;
-							API.lastTimeClasses = t;
+							API.stored_data.classes = data;
+							API.stored_time.classes = t;
 							defer.resolve(data);
 						},
 					});
@@ -130,23 +127,14 @@ define(["backbone.radio"], function(Radio){
 		},
 
 		getClasse: function(classeId){
-			t= Date.now();
 			var defer = $.Deferred();
+			var fetchingClasses = API.getClasses();
+			$.when(fetchingClasses).done(function(classes){
+				defer.resolve(classes.get(classeId));
+			});
 
-			if ((API.stored_classes!==null) && (t-API.lastTimeClasses<API.timeout)){
-				defer.resolve(API.stored_classes.get(classeId));
-			} else {
-				require(["entities/classes"], function(classe_collec){
-					classes = new classe_collec();
-					classes.fetch({
-						success: function(data){
-							API.stored_classes = data;
-							API.lastTimeClasses = t;
-							defer.resolve(data.get(classeId));
-						},
-					});
-				});
-			}
+			var promise = defer.promise();
+			return promise;
 
 			var promise = defer.promise();
 			return promise;
@@ -156,15 +144,15 @@ define(["backbone.radio"], function(Radio){
 			t= Date.now();
 			var defer = $.Deferred();
 
-			if ((API.stored_users!==null) && (t-API.lastTimeUsers<API.timeout)){
-				defer.resolve(API.stored_users);
+			if ((typeof API.stored_data.users!=="undefined") && (typeof API.stored_time.users !=="undefined") && (t-API.stored_time.users<API.timeout)){
+				defer.resolve(API.stored_data.users);
 			} else {
 				require(["entities/users"], function(user_collec){
 					var users = new user_collec();
 					users.fetch({
 						success: function(data){
-							API.stored_users = data;
-							API.lastTimeUsers = t;
+							API.stored_data.users = data;
+							API.stored_time.users = t;
 							defer.resolve(data);
 						}
 					});
@@ -176,44 +164,25 @@ define(["backbone.radio"], function(Radio){
 		},
 
 		getUser: function(userId){
-			t= Date.now();
 			var defer = $.Deferred();
-
-			if ((API.stored_users!==null) && (t-API.lastTimeUsers<API.timeout)){
-				defer.resolve(API.stored_users.get(userId));
-			} else {
-				require(["entities/users"], function(user_collec){
-					var users = new user_collec();
-					users.fetch({
-						success: function(data){
-							API.stored_users = data;
-							API.lastTimeUsers = t;
-							defer.resolve(data.get(userId));
-						}
-					});
-				});
-			}
+			var fetchingUsers = API.getUsers();
+			$.when(fetchingUsers).done(function(users){
+				defer.resolve(users.get(userId));
+			});
 
 			var promise = defer.promise();
 			return promise;
-
 		},
 
 		purge: function(){
 			console.log("purge des données");
-			API.stored_devoirs = null;
-			API.stored_userfiches = null;
-			API.stored_exofiches = null;
-			API.stored_faits = null;
-			API.stored_classes = null;
-			API.stored_users = null;
+			API.stored_data = {};
 		},
 
 	};
 
 	var channel = Radio.channel('entities');
-	channel.reply('eleve:entities', API.getEleveEntities );
-	channel.reply('prof:entities', API.getProfEntities );
+	channel.reply('custom:entities', API.getCustomEntities );
 	channel.reply('data:purge', API.purge );
 	channel.reply('classes:entities', API.getClasses );
 	channel.reply('classe:entity', API.getClasse );

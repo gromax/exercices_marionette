@@ -1,8 +1,7 @@
 define(["utils/math"], function(mM) {
-  var Controller;
-  Controller = {
-    init: function(inputs, options) {
-      var antecedents, decimals, fctGraph, initGraph, max, points, poly, str_antecedents, x, xa, xi, ya, yi;
+  return {
+    init: function(inputs) {
+      var antecedents, decimals, max, points, poly, x, xa, xi, ya, yi;
       max = 10;
       decimals = 2;
       poly = null;
@@ -74,6 +73,11 @@ define(["utils/math"], function(mM) {
         decimals: decimals,
         y: ya
       });
+      return [poly, xi, yi, xa, ya, antecedents];
+    },
+    getBriques: function(inputs, options) {
+      var antecedents, fctGraph, initGraph, poly, ref, str_antecedents, x, xa, xi, ya, yi;
+      ref = this.init(inputs), poly = ref[0], xi = ref[1], yi = ref[2], xa = ref[3], ya = ref[4], antecedents = ref[5];
       str_antecedents = (function() {
         var j, len, results;
         results = [];
@@ -111,127 +115,124 @@ define(["utils/math"], function(mM) {
           name: 'M'
         });
       };
-      return {
-        inputs: inputs,
-        briques: [
-          {
-            bareme: 100,
-            items: [
-              {
-                type: "text",
-                rank: 1,
-                ps: ["On considère la fonction &nbsp; $f$ &nbsp; définie sur &nbsp; $[" + (-max) + ";" + max + "]$ &nbsp; dont la courbe est donnée ci-dessous.", "Vous pouvez déplacer le point M sur la courbe afin d'obtenir une meilleure lecture des coordonnées."]
-              }, {
-                type: "jsxgraph",
-                rank: 2,
-                divId: "jsx" + (Math.random()),
-                params: {
-                  axis: true,
-                  grid: true,
-                  boundingbox: [-max, max, max, -max],
-                  keepaspectratio: true
-                },
-                renderingFunctions: [initGraph],
-                verification: function() {
-                  return {
-                    add: {
-                      type: "ul",
-                      rank: 3,
-                      list: [
-                        {
-                          type: "warning",
-                          text: "La construction pour l'image est en orange. La construction pour les antécédents est en vert."
-                        }
-                      ]
-                    },
-                    post: function(graph) {
-                      var anchorX, anchorY, i, j, len;
-                      graph.create('line', [[0, ya], [1, ya]], {
+      return [
+        {
+          bareme: 100,
+          items: [
+            {
+              type: "text",
+              rank: 1,
+              ps: ["On considère la fonction &nbsp; $f$ &nbsp; définie sur &nbsp; $[" + (-max) + ";" + max + "]$ &nbsp; dont la courbe est donnée ci-dessous.", "Vous pouvez déplacer le point M sur la courbe afin d'obtenir une meilleure lecture des coordonnées."]
+            }, {
+              type: "jsxgraph",
+              rank: 2,
+              divId: "jsx" + (Math.random()),
+              params: {
+                axis: true,
+                grid: true,
+                boundingbox: [-max, max, max, -max],
+                keepaspectratio: true
+              },
+              renderingFunctions: [initGraph],
+              verification: function() {
+                return {
+                  add: {
+                    type: "ul",
+                    rank: 3,
+                    list: [
+                      {
+                        type: "warning",
+                        text: "La construction pour l'image est en orange. La construction pour les antécédents est en vert."
+                      }
+                    ]
+                  },
+                  post: function(graph) {
+                    var anchorX, anchorY, i, j, len;
+                    graph.create('line', [[0, ya], [1, ya]], {
+                      color: 'green',
+                      strokeWidth: 2,
+                      fixed: true
+                    });
+                    if (ya > 0) {
+                      anchorY = 'top';
+                    } else {
+                      anchorY = 'bottom';
+                    }
+                    for (i = j = 0, len = antecedents.length; j < len; i = ++j) {
+                      x = antecedents[i];
+                      graph.create('line', [[x, ya], [x, 0]], {
                         color: 'green',
-                        strokeWidth: 2,
-                        fixed: true
-                      });
-                      if (ya > 0) {
-                        anchorY = 'top';
-                      } else {
-                        anchorY = 'bottom';
-                      }
-                      for (i = j = 0, len = antecedents.length; j < len; i = ++j) {
-                        x = antecedents[i];
-                        graph.create('line', [[x, ya], [x, 0]], {
-                          color: 'green',
-                          straightFirst: false,
-                          straightLast: false,
-                          strokeWidth: 2,
-                          dash: 2,
-                          fixed: true
-                        });
-                        graph.create('text', [x, 0, str_antecedents[i]], {
-                          color: 'green',
-                          anchorX: 'middle',
-                          anchorY: anchorY
-                        });
-                      }
-                      graph.create('line', [[xi, 0], [xi, yi]], {
-                        color: 'orange',
                         straightFirst: false,
                         straightLast: false,
                         strokeWidth: 2,
                         dash: 2,
                         fixed: true
                       });
-                      graph.create('line', [[xi, yi], [0, yi]], {
-                        color: 'orange',
-                        straightFirst: false,
-                        straightLast: false,
-                        strokeWidth: 2,
-                        dash: 2,
-                        fixed: true
-                      });
-                      if (xi > 0) {
-                        anchorX = 'right';
-                      } else {
-                        anchorX = 'left';
-                      }
-                      return graph.create('text', [0, yi, mM.misc.numToStr(yi)], {
-                        color: 'orange',
-                        anchorX: anchorX,
-                        anchorY: 'middle'
+                      graph.create('text', [x, 0, str_antecedents[i]], {
+                        color: 'green',
+                        anchorX: 'middle',
+                        anchorY: anchorY
                       });
                     }
-                  };
-                }
-              }, {
-                type: "text",
-                rank: 4,
-                ps: ["Donnez l'image de " + (mM.misc.numToStr(xi)) + " à 0,2 près."]
-              }, {
-                type: "input",
-                rank: 5,
-                name: "i",
-                tag: "Image",
-                good: yi,
-                tolerance: .2
-              }, {
-                type: "text",
-                rank: 6,
-                ps: ["Donnez un antécédent (un seul !) de " + (mM.misc.numToStr(ya)) + " à 0,2 près."]
-              }, {
-                type: "input",
-                rank: 7,
-                name: "a",
-                tag: "Antécédent",
-                good: antecedents,
-                tolerance: .2
-              }, {
-                type: "validation",
-                rank: 8,
-                clavier: []
+                    graph.create('line', [[xi, 0], [xi, yi]], {
+                      color: 'orange',
+                      straightFirst: false,
+                      straightLast: false,
+                      strokeWidth: 2,
+                      dash: 2,
+                      fixed: true
+                    });
+                    graph.create('line', [[xi, yi], [0, yi]], {
+                      color: 'orange',
+                      straightFirst: false,
+                      straightLast: false,
+                      strokeWidth: 2,
+                      dash: 2,
+                      fixed: true
+                    });
+                    if (xi > 0) {
+                      anchorX = 'right';
+                    } else {
+                      anchorX = 'left';
+                    }
+                    return graph.create('text', [0, yi, mM.misc.numToStr(yi)], {
+                      color: 'orange',
+                      anchorX: anchorX,
+                      anchorY: 'middle'
+                    });
+                  }
+                };
               }
-            ]
-          }
-        ]
-      };
+            }, {
+              type: "text",
+              rank: 4,
+              ps: ["Donnez l'image de " + (mM.misc.numToStr(xi)) + " à 0,2 près."]
+            }, {
+              type: "input",
+              rank: 5,
+              name: "i",
+              tag: "Image",
+              good: yi,
+              tolerance: .2
+            }, {
+              type: "text",
+              rank: 6,
+              ps: ["Donnez un antécédent (un seul !) de " + (mM.misc.numToStr(ya)) + " à 0,2 près."]
+            }, {
+              type: "input",
+              rank: 7,
+              name: "a",
+              tag: "Antécédent",
+              good: antecedents,
+              tolerance: .2
+            }, {
+              type: "validation",
+              rank: 8,
+              clavier: []
+            }
+          ]
+        }
+      ];
     },
     tex: function(data) {
       var courbe, graphique, i, itemData, j, len, out, questions, xi, ya;
@@ -264,5 +265,4 @@ define(["utils/math"], function(mM) {
       return out;
     }
   };
-  return Controller;
 });

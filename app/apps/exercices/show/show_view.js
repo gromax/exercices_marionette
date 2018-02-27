@@ -1,6 +1,6 @@
 define(["jst","marionette", "mathjax", "backbone.syphon"], function(JST, Marionette, MathJax){
 	var BriqueItemView = Marionette.View.extend({
-		className: "card-block",
+		className: "card-body",
 		template: window.JST["exercices/common/brique-item"],
 		triggers:{
 			"focusin input": "form:input:focusin",
@@ -42,7 +42,7 @@ define(["jst","marionette", "mathjax", "backbone.syphon"], function(JST, Marione
 	});
 
 	var ColorChoiceItemView = Marionette.View.extend({
-		className: "card-block",
+		className: "card-body",
 		template: window.JST["exercices/common/color-choice-item"],
 		triggers:{
 			"click a.list-group-item-action":"choice:click:item",
@@ -93,7 +93,7 @@ define(["jst","marionette", "mathjax", "backbone.syphon"], function(JST, Marione
 	});
 
 	var ColorListItemView = Marionette.View.extend({
-		className: "card-block",
+		className: "card-body",
 		template: window.JST["exercices/common/color-list-item"],
 
 		onRender: function(){
@@ -107,7 +107,7 @@ define(["jst","marionette", "mathjax", "backbone.syphon"], function(JST, Marione
 	});
 
 	var ValidationItemView = Marionette.View.extend({
-		className: "card-block",
+		className: "card-body",
 		template: window.JST["exercices/common/validation-item"],
 		triggers:{
 			"click button.js-submit" : "form:submit",
@@ -126,7 +126,7 @@ define(["jst","marionette", "mathjax", "backbone.syphon"], function(JST, Marione
 	});
 
 	var JsxgraphItemView = Marionette.View.extend({
-		className: "card-block text-center",
+		className: "card-body text-center",
 		template: window.JST["exercices/common/jsxgraph-item"],
 
 		onRender: function(){
@@ -428,7 +428,8 @@ define(["jst","marionette", "mathjax", "backbone.syphon"], function(JST, Marione
 
 		serializeData: function(){
 			var data = _.clone(this.model.attributes);
-			data.showOptions = this.options.showOptions;
+			data.showOptionsButton = this.options.showOptionsButton;
+			data.showReinitButton = this.options.showReinitButton;
 			return data;
 		},
 

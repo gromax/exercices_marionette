@@ -618,17 +618,19 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
           return val;
         };
         options = _.mapObject(itemData.options, iteratee);
+        exo.set({
+          "inputs": inputs,
+          "options": options
+        });
         successCB = function(exoController) {
-          var collection, exoData;
-          exoData = exoController.init(inputs, options);
-          collection = new BriquesCollection(exoData.briques, {
+          var briques, collection;
+          briques = exoController.getBriques(inputs, options);
+          collection = new BriquesCollection(briques, {
             parse: true
           });
           collection.parent = exo;
           exo.set({
-            "briquesCollection": collection,
-            "inputs": exoData.inputs,
-            "options": options
+            "briquesCollection": collection
           });
           return defer.resolve(exo);
         };

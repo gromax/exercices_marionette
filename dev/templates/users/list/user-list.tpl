@@ -1,13 +1,13 @@
 <thead>
 	<tr>
-		<th><a href="" sortBy="id">#</a></th>
-		<th><a href="" sortBy="nom">Nom</a></th>
-		<th><i class="fa fa-envelope" aria-hidden="true"></i></th>
-		<th><a href="" sortBy="nomClasse"><i class="fa fa-graduation-cap" aria-hidden="true"></a></th>
-		<th><a href="" sortBy="date"><i class="fa fa-clock-o" aria-hidden="true"></i></a></th>
-		<th><a href="" sortBy="rank">Rang</a></th>
-		<!-- boutons verrou|modification|suppression|lien notes -->
-		<th width="200"></th>
+		<th><a href="" class="js-sort" name="id">#</a></th>
+		<th><a href="" class="js-sort" name="nomComplet">Nom</a></th>
+		<th><i class="fa fa-envelope"></i></th>
+		<th><a href="" class="js-sort" name="nomClasse"><i class="fa fa-graduation-cap" aria-hidden="true"></a></th>
+		<th><a href="" class="js-sort" name="date"><i class="fa fa-clock-o" aria-hidden="true"></i></a></th>
+		<th><a href="" class="js-sort" name="rank">Rang</a></th>
+		<!-- boutons verrou|modification|suppression -->
+		<th width="160"></th>
 	</tr>
 </thead>
 <tbody>

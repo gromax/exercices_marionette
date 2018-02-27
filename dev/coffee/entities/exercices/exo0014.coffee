@@ -4,9 +4,10 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 	# description:"On donne cinq fonctions affines et cinq droites. Il faut associer chaque fonction affine avec la droite qui la représente."
 	# keyWords:["Analyse","Fonction","Courbe","Affine","Seconde"]
 
-	Controller =
+	return {
+		max: 6
 		init: (inputs,options) ->
-			max=6
+			max = @max
 			items = []
 			pts = []
 			for i in [0..4]
@@ -16,58 +17,60 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 				items.push { rank:i, text:"$"+ mM.droite.par2pts(A,B).affineTex("","x",true)+"$" }
 				pts.push [A, B, color]
 
+			[items, pts]
+
+		getBriques: (inputs, options) ->
+			max = @max
+			[items, pts] = @init(inputs)
+
 			initGraph = (graph) ->
 				graph.create('line',[AB[0].toJSXcoords(),AB[1].toJSXcoords()], {strokeColor:AB[2],strokeWidth:4, fixed:true}) for AB in pts
 
-			{
-				inputs: inputs
-				briques: [
-					{
-						bareme: 100
-						items: [
-							{
-								type: "text"
-								rank: 1
-								ps: [
-									"On vous donne 5 courbes et 5 fonctions affines."
-									"Vous devez dire à quelle fonction correspond chaque courbe."
-									"Cliquez sur les rectangles pour choisir la couleur de la courbe correspondant à chaque fonction, puis validez"
-								]
+			[
+				{
+					bareme: 100
+					items: [
+						{
+							type: "text"
+							rank: 1
+							ps: [
+								"On vous donne 5 courbes et 5 fonctions affines."
+								"Vous devez dire à quelle fonction correspond chaque courbe."
+								"Cliquez sur les rectangles pour choisir la couleur de la courbe correspondant à chaque fonction, puis validez"
+							]
+						}
+						{
+							type:"jsxgraph"
+							rank: 2
+							divId: "jsx#{Math.random()}"
+							params: {
+								axis:true
+								grid:true
+								boundingbox:[-max,max,max,-max]
+								keepaspectratio: true
 							}
-							{
-								type:"jsxgraph"
-								rank: 2
-								divId: "jsx#{Math.random()}"
-								params: {
-									axis:true
-									grid:true
-									boundingbox:[-max,max,max,-max]
-									keepaspectratio: true
-								}
-								renderingFunctions:[
-									initGraph
-								]
+							renderingFunctions:[
+								initGraph
+							]
 
-							}
-							{
-								type:"color-choice"
-								rank: 3
-								name:"it"
-								list: _.shuffle(items)
-							}
-							{
-								type: "validation"
-								rank: 4
-								clavier: ["aide"]
-							}
-							{
-								type: "aide"
-								rank: 5
-								list: help.fonction.affine.courbe
-							}
-						]
-					}
-				]
-			}
-
-	return Controller
+						}
+						{
+							type:"color-choice"
+							rank: 3
+							name:"it"
+							list: _.shuffle(items)
+						}
+						{
+							type: "validation"
+							rank: 4
+							clavier: ["aide"]
+						}
+						{
+							type: "aide"
+							rank: 5
+							list: help.fonction.affine.courbe
+						}
+					]
+				}
+			]
+	}

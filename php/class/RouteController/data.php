@@ -7,6 +7,8 @@ use BDDObject\AssoUF;
 use BDDObject\ExoFiche;
 use BDDObject\Note;
 use BDDObject\Fiche;
+use BDDObject\User;
+use BDDObject\Exam;
 
 class data
 {
@@ -53,38 +55,99 @@ class data
         return false;
     }
 
-    public function profFetch()
+    public function customFetch()
     {
-        // Renvoie l'ensemble des données pour un prof ou admin, concernant les devoirs
+        // Renvoie les données demandées
+
         $uLog =Logged::getConnectedUser();
         if (!$uLog->connexionOk())
         {
             EC::set_error_code(401);
             return false;
         }
+        $asks = explode("&",$this->params['asks']);
+
+        if ($uLog->isEleve())
+        {
+            $output = array();
+            if (in_array("exofiches", $asks)){
+                $output["exofiches"] = ExoFiche::getList(array("idUser"=>$uLog->getId()));
+            }
+
+            if (in_array("userfiches", $asks)){
+                $output["userfiches"] = AssoUF::getList(array("idUser"=> $uLog->getId() ));
+            }
+
+            if (in_array("faits", $asks)){
+                $output["faits"] = Note::getList(array("idUser"=>$uLog->getId()));
+            }
+
+            return $output;
+        }
 
         if ($uLog->isProf())
         {
-            return array(
-                "fiches" => Fiche::getList(array("owner"=> $uLog->getId() )),
-                "aUFs" => AssoUF::getList(array("idOwner"=> $uLog->getId() )),
-                "aEFs" => ExoFiche::getList(array("idOwner"=>$uLog->getId())),
-                "aUEs" => Note::getList(array("idOwner"=>$uLog->getId()))
-            );
-        } elseif ($uLog->isAdmin()) {
-            return array(
-                "fiches" => Fiche::getList(),
-                "aUFs" => AssoUF::getList(),
-                "aEFs" => ExoFiche::getList(),
-                "aUEs" => Note::getList(),
-                "messages" => EC::messages()
-            );
-        } else {
-            EC::set_error_code(403);
-            return false;
+            $output = array();
+            if (in_array("fiches", $asks)){
+                $output["fiches"] = Fiche::getList(array("owner"=> $uLog->getId() ));
+            }
+
+            if (in_array("userfiches", $asks)){
+                $output["userfiches"] = AssoUF::getList(array("idOwner"=> $uLog->getId() ));
+            }
+
+            if (in_array("exofiches", $asks)){
+                $output["exofiches"] = ExoFiche::getList(array("idOwner"=>$uLog->getId()));
+            }
+
+            if (in_array("faits", $asks)){
+                $output["faits"] = Note::getList(array("idOwner"=>$uLog->getId()));
+            }
+
+            if (in_array("users", $asks)){
+                $output["users"] = User::getList(array('classes'=>array_keys( $uLog->ownerOf() )));
+            }
+
+            if (in_array("exams", $asks)){
+                $output["exams"] = Exam::getList(array('idOwner'=>$uLog->getId()));
+            }
+
+            return $output;
+
         }
 
-        EC::set_error_code(501);
+        if ($uLog->isAdmin()) {
+            $output = array();
+            if (in_array("fiches", $asks)){
+                $output["fiches"] = Fiche::getList();
+            }
+
+            if (in_array("userfiches", $asks)){
+                $output["userfiches"] = AssoUF::getList();
+            }
+
+            if (in_array("exofiches", $asks)){
+                $output["exofiches"] = ExoFiche::getList();
+            }
+
+            if (in_array("faits", $asks)){
+                $output["faits"] = Note::getList();
+            }
+
+            if (in_array("users", $asks)){
+                if ($uLog->isRoot()) $output["users"] = User::getList(array('ranks'=>array(User::RANK_ADMIN, User::RANK_ELEVE, User::RANK_PROF)));
+                else $output["users"] = User::getList(array('ranks'=>array(User::RANK_ELEVE, User::RANK_PROF)));
+            }
+
+            if (in_array("exams", $asks)){
+                $output["exams"] = Exam::getList();
+            }
+
+            return $output;
+
+        }
+
+        EC::set_error_code(403);
         return false;
     }
 

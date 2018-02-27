@@ -1,9 +1,7 @@
 define(["utils/math", "utils/help"], function(mM, help) {
-  var Controller;
-  Controller = {
-    init: function(inputs, options) {
-      var a, al, b, c, d, dansR, item, poly, ref, x0;
-      dansR = options.d.value === 0;
+  return {
+    init: function(inputs, dansR) {
+      var a, al, b, c, d, item, ref, x0;
       if ((typeof inputs.a !== "undefined") && (typeof inputs.b !== "undefined") && (typeof inputs.c !== "undefined")) {
         ref = (function() {
           var i, len, ref, results;
@@ -46,69 +44,71 @@ define(["utils/math", "utils/help"], function(mM, help) {
         inputs.b = String(b);
         inputs.c = String(c);
       }
-      poly = mM.polynome.make({
+      return mM.polynome.make({
         coeffs: [c, b, a]
       });
-      return {
-        inputs: inputs,
-        briques: [
-          {
-            bareme: 20,
-            title: "Discriminant",
-            items: [
-              {
-                type: "text",
-                rank: 1,
-                ps: ["On considère le trinôme &nbsp; $P(x)=" + (poly.tex()) + "$.", "Donnez le discriminant &nbsp; $\\Delta$ &nbsp; de ce trinôme."]
-              }, {
-                type: "input",
-                rank: 2,
-                waited: "number",
-                tag: "$\\Delta =$",
-                name: "delta",
-                description: "Discriminant",
-                good: poly.discriminant()
-              }, {
-                type: "validation",
-                rank: 3,
-                clavier: ["aide"]
-              }, {
-                type: "aide",
-                rank: 4,
-                list: help.trinome.discriminant
-              }
-            ]
-          }, {
-            bareme: 80,
-            title: "Solutions",
-            items: [
-              {
-                type: "text",
-                rank: 1,
-                ps: ["Donnez les racines de &nbsp; $P(x)$ &nbsp; dans $\\mathbb{" + (dansR ? "R" : "C") + "}$.", "Autrement dit, donnez les solutions de &npsp; $" + (poly.tex()) + " = 0$", "Séparez les solutions par ;", "Si aucune solution, entrez ∅"]
-              }, {
-                type: "input",
-                rank: 2,
-                waited: "liste:number",
-                tag: "$\\mathcal{S}$",
-                name: "solutions",
-                good: mM.polynome.solve.exact(poly, {
-                  y: 0,
-                  imaginaire: !dansR
-                })
-              }, {
-                type: "validation",
-                rank: 3,
-                clavier: ["empty", "sqrt", "aide"]
-              }, {
-                type: "aide",
-                rank: 4,
-                list: help.trinome.racines
-              }
-            ]
-          }
-        ]
-      };
+    },
+    getBriques: function(inputs, options) {
+      var dansR, poly;
+      dansR = Number(options.d.value) === 0;
+      poly = this.init(inputs, dansR);
+      return [
+        {
+          bareme: 20,
+          title: "Discriminant",
+          items: [
+            {
+              type: "text",
+              rank: 1,
+              ps: ["On considère le trinôme &nbsp; $P(x)=" + (poly.tex()) + "$.", "Donnez le discriminant &nbsp; $\\Delta$ &nbsp; de ce trinôme."]
+            }, {
+              type: "input",
+              rank: 2,
+              waited: "number",
+              tag: "$\\Delta =$",
+              name: "delta",
+              description: "Discriminant",
+              good: poly.discriminant()
+            }, {
+              type: "validation",
+              rank: 3,
+              clavier: ["aide"]
+            }, {
+              type: "aide",
+              rank: 4,
+              list: help.trinome.discriminant
+            }
+          ]
+        }, {
+          bareme: 80,
+          title: "Solutions",
+          items: [
+            {
+              type: "text",
+              rank: 1,
+              ps: ["Donnez les racines de &nbsp; $P(x)$ &nbsp; dans $\\mathbb{" + (dansR ? "R" : "C") + "}$.", "Autrement dit, donnez les solutions de &npsp; $" + (poly.tex()) + " = 0$", "Séparez les solutions par ;", "Si aucune solution, entrez ∅"]
+            }, {
+              type: "input",
+              rank: 2,
+              waited: "liste:number",
+              tag: "$\\mathcal{S}$",
+              name: "solutions",
+              good: mM.polynome.solve.exact(poly, {
+                y: 0,
+                imaginaire: !dansR
+              })
+            }, {
+              type: "validation",
+              rank: 3,
+              clavier: ["empty", "sqrt", "aide"]
+            }, {
+              type: "aide",
+              rank: 4,
+              list: help.trinome.racines
+            }
+          ]
+        }
+      ];
     },
     tex: function(data) {
       var item, ref, title;
@@ -137,5 +137,4 @@ define(["utils/math", "utils/help"], function(mM, help) {
       };
     }
   };
-  return Controller;
 });

@@ -7,6 +7,7 @@ define([
 	"apps/common/not_found",
 	"apps/home/show/devoirs_list_eleve_view",
 	"apps/home/show/eleve_view_layout",
+	"apps/home/show/unfinished_message"
 ], function(
 	app,
 	Marionette,
@@ -16,6 +17,7 @@ define([
 	NotFound,
 	ListEleveView,
 	EleveViewLayout,
+	UnfinishedView,
 ){
 	var Controller = Marionette.Object.extend({
 		channelName: "entities",
@@ -55,7 +57,7 @@ define([
 
 			var channel = this.getChannel();
 			require(["entities/dataManager"], function(){
-				var fetchingData = channel.request("eleve:entities");
+				var fetchingData = channel.request("custom:entities", ["userfiches", "exofiches", "faits"]);
 				$.when(fetchingData).done(function(userfiches, exofiches, faits){
 					var listEleveView = new ListEleveView({
 						collection: userfiches,
@@ -68,8 +70,31 @@ define([
 						app.trigger("devoir:show", model.get("id"));
 					});
 
+					var unfinishedMessageView = null;
+					var listeUnfinished = _.filter(
+						faits.where({ finished: false }),
+						function(item){
+							var uf = userfiches.get(item.get("aUF"));
+							if (uf.get("actif") && uf.get("ficheActive")) {
+								return true;
+							}
+							return false;
+						}
+					);
+
+					var n = listeUnfinished.length;
+					if (n>0){
+						unfinishedMessageView = new UnfinishedView({ number:n });
+						unfinishedMessageView.on("devoir:unfinished:show", function(){
+							app.trigger("faits:unfinished");
+						});
+					}
+
 					layout.on("render", function(){
 						layout.getRegion('devoirsRegion').show(listEleveView);
+						if (unfinishedMessageView) {
+							layout.getRegion('unfinishedRegion').show(unfinishedMessageView);
+						}
 					});
 
 					app.regions.getRegion('main').show(layout);

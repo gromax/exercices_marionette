@@ -1,18 +1,8 @@
 define(["utils/math", "utils/help"], function(mM, help) {
-  var Controller;
-  Controller = {
-    init: function(inputs, options) {
-      var A, B, droite, lastStage, verticale;
-      A = mM.alea.vector({
-        name: "A",
-        def: inputs
-      }).save(inputs);
-      B = mM.alea.vector({
-        name: "B",
-        def: inputs,
-        forbidden: [A]
-      }).save(inputs);
-      droite = mM.droite.par2pts(A, B);
+  return {
+    getBriques: function(inputs, options) {
+      var A, B, droite, lastStage, ref, verticale;
+      ref = this.init(inputs), A = ref[0], B = ref[1], droite = ref[2];
       verticale = droite.verticale();
       if (verticale) {
         lastStage = {
@@ -89,46 +79,55 @@ define(["utils/math", "utils/help"], function(mM, help) {
           ]
         };
       }
-      return {
-        inputs: inputs,
-        briques: [
-          {
-            items: [
-              {
-                type: "text",
-                rank: 1,
-                ps: ["On se place dans un repère orthogonal $(O;I,J)$", "On donne deux points $" + (A.texLine()) + "$ et $" + (B.texLine()) + "$.", "Il faut déterminer l'équation réduite de la droite $(AB)$."]
-              }
-            ]
-          }, {
-            bareme: 20,
-            title: "Forme de l'équation réduite",
-            items: [
-              {
-                type: "text",
-                rank: 1,
-                ps: ["Quelle est la forme de l'équation réduite ?"]
-              }, {
-                type: "radio",
-                rank: 2,
-                tag: "Équation",
-                name: "v",
-                radio: ["$x=a$", "$y=mx+p$"],
-                good: verticale ? 0 : 1
-              }, {
-                type: "validation",
-                rank: 3,
-                clavier: ["aide"]
-              }, {
-                type: "aide",
-                rank: 4,
-                list: help.droite.equation_reduite.type
-              }
-            ]
-          }, lastStage
-        ]
-      };
+      return [
+        {
+          items: [
+            {
+              type: "text",
+              rank: 1,
+              ps: ["On se place dans un repère orthogonal $(O;I,J)$", "On donne deux points $" + (A.texLine()) + "$ et $" + (B.texLine()) + "$.", "Il faut déterminer l'équation réduite de la droite $(AB)$."]
+            }
+          ]
+        }, {
+          bareme: 20,
+          title: "Forme de l'équation réduite",
+          items: [
+            {
+              type: "text",
+              rank: 1,
+              ps: ["Quelle est la forme de l'équation réduite ?"]
+            }, {
+              type: "radio",
+              rank: 2,
+              tag: "Équation",
+              name: "v",
+              radio: ["$x=a$", "$y=mx+p$"],
+              good: verticale ? 0 : 1
+            }, {
+              type: "validation",
+              rank: 3,
+              clavier: ["aide"]
+            }, {
+              type: "aide",
+              rank: 4,
+              list: help.droite.equation_reduite.type
+            }
+          ]
+        }, lastStage
+      ];
+    },
+    init: function(inputs, options) {
+      var A, B;
+      A = mM.alea.vector({
+        name: "A",
+        def: inputs
+      }).save(inputs);
+      B = mM.alea.vector({
+        name: "B",
+        def: inputs,
+        forbidden: [A]
+      }).save(inputs);
+      return [A, B, mM.droite.par2pts(A, B)];
     }
   };
-  return Controller;
 });

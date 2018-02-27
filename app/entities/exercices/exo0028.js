@@ -1,8 +1,7 @@
 define(["utils/math", "utils/help"], function(mM, help) {
-  var Controller;
-  Controller = {
+  return {
     init: function(inputs, options) {
-      var a, aPol, b, briques, coeff, derivee, deriveeForTex, f2a, fa, fct, fct_tex, operands, optA, optD, optE, ref, ref1, ref2, t, x, xmax, xmin;
+      var a, aPol, b, coeff, derivee, deriveeForTex, f2a, fa, fct, operands, optA, optD, optE, ref, ref1, ref2, t, x, xmax, xmin;
       optA = Number((ref = options.a.value) != null ? ref : 0);
       optD = Number((ref1 = options.d.value) != null ? ref1 : 0);
       optE = Number((ref2 = options.e.value) != null ? ref2 : 0);
@@ -107,12 +106,45 @@ define(["utils/math", "utils/help"], function(mM, help) {
       } else {
         fct = mM.parse(inputs.fct);
       }
-      fct_tex = fct.tex();
       derivee = fct.derivate("x").simplify(null, true);
       deriveeForTex = mM.factorisation(derivee, /exp\(([x*+-\d]+)\)$/i, {
         simplify: true,
         developp: true
       });
+      if (optE === 1) {
+        if (typeof inputs.x !== "undefined") {
+          x = Number(inputs.x);
+        } else {
+          x = mM.alea.real({
+            min: xmin,
+            max: xmax
+          });
+          inputs.x = String(x);
+        }
+        fa = mM.float(fct, {
+          x: x,
+          decimals: 2
+        });
+        f2a = mM.float(derivee, {
+          x: x,
+          decimals: 2
+        });
+        t = mM.exec([f2a, "x", x, "-", "*", fa, "+"], {
+          simplify: true,
+          developp: true
+        });
+      } else {
+        x = false;
+        fa = false;
+        f2a = false;
+        t = false;
+      }
+      return [fct, derivee, deriveeForTex, x, fa, f2a, t];
+    },
+    getBriques: function(inputs, options) {
+      var briques, derivee, deriveeForTex, f2a, fa, fct, optE, ref, ref1, t, x;
+      optE = Number((ref = options.e.value) != null ? ref : 0);
+      ref1 = this.init(inputs, options), fct = ref1[0], derivee = ref1[1], deriveeForTex = ref1[2], x = ref1[3], fa = ref1[4], f2a = ref1[5], t = ref1[6];
       briques = [
         {
           title: "Expression de $f'$",
@@ -121,7 +153,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
             {
               type: "text",
               rank: 1,
-              ps: ["Soit $f(x) = " + fct_tex + "$", "Donnez l'expression de $f'$, fonction dérivée de $f$."]
+              ps: ["Soit $f(x) = " + (fct.tex()) + "$", "Donnez l'expression de $f'$, fonction dérivée de $f$."]
             }, {
               type: "input",
               rank: 2,
@@ -149,27 +181,6 @@ define(["utils/math", "utils/help"], function(mM, help) {
         }
       ];
       if (optE === 1) {
-        if (typeof inputs.x !== "undefined") {
-          x = Number(inputs.x);
-        } else {
-          x = mM.alea.real({
-            min: xmin,
-            max: xmax
-          });
-          inputs.x = String(x);
-        }
-        fa = mM.float(fct, {
-          x: x,
-          decimals: 2
-        });
-        f2a = mM.float(derivee, {
-          x: x,
-          decimals: 2
-        });
-        t = mM.exec([f2a, "x", x, "-", "*", fa, "+"], {
-          simplify: true,
-          developp: true
-        });
         briques.push({
           title: "Calcul de $f(a)$ et $f'(a)$ en $a=" + x + "$",
           bareme: 100,
@@ -226,10 +237,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
           ]
         });
       }
-      return {
-        inputs: inputs,
-        briques: briques
-      };
+      return briques;
     },
     tex: function(data) {
       var item, ref, ref1;
@@ -273,5 +281,4 @@ define(["utils/math", "utils/help"], function(mM, help) {
       }
     }
   };
-  return Controller;
 });

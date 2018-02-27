@@ -6,7 +6,10 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 	var Controller = Marionette.Object.extend({
 		channelName: "entities",
 
-		show: function(id, exoDataOptions, exoDataInputs){
+		show: function(id, params){
+			// Envoyé pour un test direct
+			// Ou bien pour l'exécution d'un exofiche
+
 			// Cette partie est-elle vraiment utile ? à voir
 			//var loadingView = new LoadingView({
 			//	title: "Exercice #"+id,
@@ -14,16 +17,60 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 			//});
 			//app.regions.getRegion('main').show(loadingView);
 
+
+			// id permet de trouver l'exercice
+			// d'éventuelles options permettent de paraméter l'exécution de l'exercices
+			// -> Elles sont fournies lors d'un test par l'interface adhoc ou si l'exercice est lancé par un exofiche
+			// Les inputs. sont forcément fournis par une entrée UE, ou bien sont nulls et initialisés par l'exercice
+			// Les liens de sauvegardes : Soit c'est un item de note déjà existant, soit ce sont des idEF et idUF pour en créer un, soit rien du tout=> pas de sauvegarde
+			// les answers = peuvent être fournis par le UE
+
+			// le paramètre save sera une fonction prenant (note, answers, inputs, finished) en argument
+			// créera la promesse savingUE
+			// ajoutera au savingUE le when -> faits.add() le cas échéant
+			// retournera le savingUE à l'exercice pour qu'il puisse y lier le when -> traitement_final()
+
+			// le paramètre save est une fonction qui se charge de l'éventuelle sauvegarde
+			// La gestion de optionsValues est un peu complexe :
+			// - on ne transmet à l'exercice que les valeurs.
+			// - L'exercice, en se chargeant, récupère toutes les infos sur les options avec les descriptions...
+			// - Et puis pour initialiser l'exercice on doit lui transmettre les valeurs
+			// - C'est donc l'exercice (exercice.js) qui se charge de mêler les infos et les valeurs des options et de le renvoyer à la vue
+			var exo_default_params = {
+				optionsValues:null,
+				showOptionsButton:false,
+				showReinitButton:false,
+				ue: false,
+				save:null,
+			};
+			var exo_params = _.extend( exo_default_params, params);
+			var answersData;
+			var inputs;
+			if (exo_params.ue) {
+				inputs = JSON.parse(exo_params.ue.get("inputs"));
+				answersData = JSON.parse(exo_params.ue.get("answers"));
+			} else {
+				inputs = {};
+				answersData = {};
+			}
+
 			var self = this;
 			var channel = this.getChannel();
 			require(["entities/exercice"], function(Exercice){
-				var fetchingExercice = channel.request("exercice:entity", id, exoDataOptions, exoDataInputs);
+				var fetchingExercice = channel.request("exercice:entity", id, exo_params.optionsValues, inputs);
 				$.when(fetchingExercice).done(function(exo){
 					var baremeTotal = exo.baremeTotal();
 					var pied = new Backbone.Model({ finished:false, note:0 });
-					var view = new View({ model: exo, pied:pied, showOptions:true });
+					var view = new View({
+						model: exo,
+						pied:pied,
+						showOptionsButton: exo_params.showOptionsButton,
+						showReinitButton: exo_params.showReinitButton,
+					});
 					var note = 0;
 
+					// Recherche la brique ayant le focus en activant/désactivant les flags en chemin
+					// renvoie la brique ayant le focus ce qui sera utile lorsqu'on lira un exercice sauvegardé
 					var MAJ_briques = function(exoview) {
 						var briques = exo.getBriquesUntilFocus();
 						for (b of briques) {
@@ -35,21 +82,54 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 						} else {
 							pied.set("finished",true);
 						}
-
+						return b; // renvoie la brique ayant le focus
 					}
 
-					view.on("button:reinit", function(){
-						self.show(id,exoDataOptions,exoDataInputs);
-					});
+					if (exo_params.showReinitButton) {
+						view.on("button:reinit", function(){
+							// exo_params contient des informations de sauvegarde avec la fonction save
+							// il contient aussi, s'il a déjà été enregistré, un objet UE
+							// UE contient les inputs
+							// En cas de réinit, la fonction de sauvegarde peut être conservée
+							// En revanche le ue doit être effacé
+							self.show(id, _.omit(exo_params,"ue"));
+						});
+					}
 
-					view.on("button:options", function(){
-						var modelOptions = new Backbone.Model(exo.get("options"));
-						view.showOptionsView(modelOptions);
-					});
+					if (exo_params.showOptionsButton) {
+						view.on("button:options", function(){
+							var modelOptions = new Backbone.Model(exo.get("options"));
+							view.showOptionsView(modelOptions);
+						});
 
-					view.on("options:form:submit", function(submitedDataOptions){
-						self.show(id,submitedDataOptions);
-					});
+						view.on("options:form:submit", function(submitedDataOptions){
+							var new_exo_params = _.extend(exo_params, { optionsValues:submitedDataOptions });
+							self.show(id,new_exo_params);
+						});
+					}
+
+					// Traitement après vérif
+					// Dans le but d'enchaîner le traitement initial d'un exercice sauvegardé
+					// la fonction renvoie le nouveau focus
+					var traitement_final = function(bv,m,v){
+						// bv = brique_view => La brique d'exercice dans laquelle s'effectue la vérif
+						// m = model => le model associé à la brique
+						// v = verifs => le résultats des vérifications menées selon les réponse utilisateur aux questions de cette brique
+
+						pied.set("note",Math.ceil(note));
+						// Suppression des items d'input
+						_.each(v.toTrash, function(item){ bv.removeItem(item); });
+						// Ajout des items de correction
+						m.get("items").add(v.add);
+						// La brique est marquée comme terminée
+						m.set({ done: true, focus: false });
+						bv.unsetFocus();
+						// recherche du prochain focus
+						var focusedBrique = MAJ_briques(view);
+						// Exécution de traitemens posts typiquement sur un graphique
+						bv.execPosts(v.posts);
+						return focusedBrique;
+					}
 
 					view.on("brique:form:submit", function(data,brique_view){
 						var model = brique_view.model;
@@ -58,27 +138,80 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 						var validation_error = _.some(model_validation, function(item){ return _.has(item, "error"); })
 						if (validation_error === false) {
 							var verifs = model.verification(model_validation);
-							// Il va falloir calculer la note
+							// calcul de la note
 							note = verifs.note*model.get("bareme")*100/baremeTotal + note;
-							pied.set("note",Math.ceil(note));
-							// Suppression des items d'input
-							_.each(verifs.toTrash, function(item){ brique_view.removeItem(item); });
-							// Ajout des items de correction
-							model.get("items").add(verifs.add);
-							// La brique est marquée comme terminée
-							model.set({ done:true, focuser:false });
-							brique_view.unsetFocus();
-							// recherche du prochain focus
-							MAJ_briques(view);
-							// Exécution de traitemens posts typiquement sur un graphique
-							brique_view.execPosts(verifs.posts);
+
+							answersData = _.extend(answersData, data);
+
+							if (exo_params.save) {
+								// on recherche tous les items de validation qui ne seraient pas éliminés par toTrash
+								// S'il n'y en a pas, c'est que l'exercice est terminé
+								var finished = _.difference(
+									_.flatten(
+										_.map(
+											exo.get("briquesCollection").models,
+											function(item){ return item.get("items").where({type:"validation"}); }
+										)
+									),
+									verifs.toTrash
+								).length ==0 ;
+
+								// le paramètre save sera une fonction prenant (note, answers, inputs, finished) en argument
+								// L'objet contient une clé ue qui sera accessible avec le bon contexte (d'où l'utilisation de apply)
+								// si c'est un exercice repris, le ue existe tout de suite, sinon il est false au début
+								// L'exécution de la function crée ue s'il n'existait déjà
+								// ce qui servira notamment pour un exercice en plus de 1 étape
+								// la fonction créera la promesse savingUE
+								// ajoutera au savingUE le when -> faits.add() le cas échéant
+								// retournera le savingUE à l'exercice pour qu'il puisse y lier le when -> traitement_final()
+								var savingUE = exo_params.save.apply(exo_params,[note, answersData, exo.get("inputs"), finished]);
+								$.when(savingUE).done(function(){
+									traitement_final(brique_view, model, verifs);
+								}).fail(function(response){
+									alert("An unprocessed error happened. Please try again!");
+								});
+							} else {
+								// On ne sauvegarde pas, on exécuter directement le traitement final
+								traitement_final(brique_view, model, verifs);
+							}
 						} else {
 							brique_view.onFormDataInvalid(model_validation);
 						}
 					});
 
 					// Quand la vue est dans le dom, on lance l'affichage des items
-					view.on("render", MAJ_briques);
+					// Ce traitement n'est fait qu'une fois au début
+					// Dans le cas d'un exercice sauvegardé, il y a des answers à traiter
+					// Alors on cherche le focus, on vérifie d'éventuelles réponses
+					// si les réponses sont valides, on les traite et on cherche le nouveau focus.
+					// Cela jusqu'à atteindre la fin de l'exercice ou un focus pour lequel answersData ne contient pas de réponses valides
+					view.on("render", function(v){
+						var model = MAJ_briques(v);
+						if ((model!==false) && !_.isEmpty(answersData)){
+							// Il s'agit de la lecture d'une sauvegarde d'exercice
+							// model est le focus. Normalement, l'exercice contenant au moins une question, model soit être !==false
+							var go_on = true;
+							while(go_on && (model!==false)){
+								// On s'arêtera si une validation renvoie false ou si on arrive à la fin de l'exercice
+								//var model = brique_view.model;
+								var brique_view = view.listView.children.findByModel(model);
+								console.log(brique_view);
+								console.log(model);
+								var model_validation = model.validation(answersData);
+								var validation_error = _.some(model_validation, function(item){ return _.has(item, "error"); })
+								if (validation_error === false) {
+									var verifs = model.verification(model_validation);
+									// calcul de la note
+									note = verifs.note*model.get("bareme")*100/baremeTotal + note;
+									model = traitement_final(brique_view, model, verifs);
+								} else {
+									// La validation n'ayant pas abouti, on ne va pas plus loin
+									go_on = false;
+								}
+
+							}
+						}
+					});
 
 					app.regions.getRegion('main').show(view);
 
@@ -89,22 +222,32 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 			});
 		},
 
-		execExoFicheForTest: function(id){
+		execExoForTest:function(id){
+			// Fonction pour éviter d'attaquer show depuis l'extérieur
+			this.show(id,{ showOptionsButton:true, showReinitButton:true });
+		},
+
+		execExoFicheForProf: function(id){
 			// Il faut charger le exofiche correspondant à id pour obtenir le idE et data.options
 			var channel = this.getChannel();
 			var that = this;
-			require(["entities/exofiche"], function(ExoFiche){
-				var fetchingExoFiche = channel.request("exofiche:entity", id);
-				$.when(fetchingExoFiche).done(function(exofiche){
-					var idE = exofiche.get("idE");
-					// On ne doit transmettre que des options brutes
-					var exoficheOptions = _.mapObject(exofiche.get("options"), function(val,key){
-						return val.value;
-					});
-					that.show(idE, exoficheOptions);
+			require(["entities/dataManager"], function(){
+				var fetchingExoFiches = channel.request("custom:entities", ["exofiches"]);
+				$.when(fetchingExoFiches).done(function(exofiches){
+					var exofiche = exofiches.get(id);
+					if (exofiche){
+						var idE = exofiche.get("idE");
+						// On ne doit transmettre que des options brutes
+						var exoficheOptions = _.mapObject(exofiche.get("options"), function(val,key){
+							return val.value;
+						});
+						that.show(idE, { optionsValues:exoficheOptions, showReinitButton:true });
+					} else {
+						var view = new MissingView({ message:"Cet exercice n'existe pas !" });
+						app.regions.getRegion('main').show(view);
+					}
 				}).fail(function(){
-					var view = new MissingView({ message:"Cet exercice n'existe pas !" });
-					app.regions.getRegion('main').show(view);
+					alert("Erreur inconnue !");
 				});
 			});
 		},
@@ -119,8 +262,8 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 
 			var self = this;
 			var channel = this.getChannel();
-			require(["entities/dataManager"], function(){
-				var fetchingData = channel.request("eleve:entities");
+			require(["entities/aUE", "entities/dataManager"], function(ItemUE){
+				var fetchingData = channel.request("custom:entities", ["userfiches", "exofiches", "faits"]);
 				$.when(fetchingData).done(function(userfiches, exofiches, faits){
 					var exofiche = exofiches.get(idEF);
 					var userfiche = userfiches.get(idUF);
@@ -137,7 +280,50 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 						var exoficheOptions = _.mapObject(exofiche.get("options"), function(val,key){
 							return val.value;
 						});
-						self.execExerciceForEleve(idE, idEF, idUF, faits, exoficheOptions);
+
+						// le paramètre save sera une fonction prenant (note, answers, inputs, finished) en argument
+						// L'objet contient une clé ue qui sera accessible avec le bon contexte (d'où l'utilisation de apply)
+						// si c'est un exercice repris, le ue existe tout de suite, sinon il est false au début
+						// L'exécution de la function crée ue s'il n'existait déjà
+						// ce qui servira notamment pour un exercice en plus de 1 étape
+						// la fonction créera la promesse savingUE
+						// ajoutera au savingUE le when -> faits.add() le cas échéant
+						// retournera le savingUE à l'exercice pour qu'il puisse y lier le when -> traitement_final()
+
+						var saveFunction = false;
+						if (userfiche.get("actif") && userfiche.get("ficheActive")){
+							// La fiche étant active, l'exercice sera sauvegardé
+							saveFunction = function(note, answers, inputs, finished){
+								var newUE = false;
+								var ue = this.ue; // cette commande nécessite que la fonction soit appelée dans le bon contexte
+								if (!ue) {
+									ue = new ItemUE({
+										aEF: Number(idEF),
+										aUF: Number(idUF),
+										inputs: JSON.stringify(inputs),
+									});
+									newUE = true;
+								}
+
+								var savingUE = ue.save({
+									note: Math.ceil(note),
+									answers: JSON.stringify(answers),
+									finished: finished
+								});
+
+								if (newUE) {
+									var thisObj = this;
+									$.when(savingUE).done(function(){
+										faits.add(ue);
+										thisObj.ue = ue;
+									});
+								}
+
+								return savingUE;
+							}
+						}
+
+						self.show(idE, { optionsValues:exoficheOptions, save:saveFunction, showReinitButton:true });
 					} else {
 						var view = new MissingView({ message:"Cet exercice n'existe pas !" });
 						app.regions.getRegion('main').show(view);
@@ -146,116 +332,71 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 			});
 		},
 
-		execExerciceForEleve: function(idE, idEF, idUF, faits, exoficheOptions, exoDataInputs){
-			// Ce qui fait une grande différence ici, c'est la gestion de l'item faits
-			// Un objet sauvegarde les données utilisateur au fur et à mesure
-			var answersData = {}
-			// Un objet pour la note en BDD qui sera initialisé lors de la première validation puis réutilisé plus tard
-			var itemUE = null
-
+		execUEForEleve:function(idUE){
 			var self = this;
 			var channel = this.getChannel();
-			require(["entities/exercice", "entities/aUE"], function(Exercice,ItemUE){
-				var fetchingExercice = channel.request("exercice:entity", idE, exoficheOptions, exoDataInputs);
-				$.when(fetchingExercice).done(function(exo){
-					var baremeTotal = exo.baremeTotal();
-					var pied = new Backbone.Model({ finished:false, note:0 });
-					var view = new View({ model: exo, pied:pied, showOptions:false });
-					var note = 0;
+			require(["entities/dataManager"], function(){
+				var fetchingData = channel.request("custom:entities", ["userfiches", "exofiches", "faits"]);
+				$.when(fetchingData).done(function(userfiches, exofiches, faits){
+					var ue = faits.get(idUE);
+					if (ue){
+						var idEF = ue.get("aEF");
+						var idUF = ue.get("aUF");
+						var userfiche = userfiches.get(idUF);
+						var exofiche = exofiches.get(idEF);
 
-					var MAJ_briques = function(exoview) {
-						var briques = exo.getBriquesUntilFocus();
-						for (b of briques) {
-							exoview.showItems(b);
-						}
-						var b=briques.pop();
-						if (b!==false) {
-							exoview.setFocus(b);
-						} else {
-							pied.set("finished",true);
-						}
+						// Il faut réfléchir au fil d'ariane
 
-					}
+						var idE = exofiche.get("idE");
+						// On ne doit transmettre que des options brutes
+						var exoficheOptions = _.mapObject(exofiche.get("options"), function(val,key){
+							return val.value;
+						});
 
-					view.on("button:reinit", function(){
-						self.execExerciceForEleve(idE, idEF, idUF, faits, exoficheOptions);
-					});
-
-					view.on("brique:form:submit", function(data,brique_view){
-						var model = brique_view.model;
-
-						// debug : Je n'appelle plus ici go mais le détail des fonctions validation et verification
-						var model_validation = model.validation(data);
-						var validation_error = _.some(model_validation, function(item){ return _.has(item, "error"); })
-						if (validation_error === false) {
-							var verifs = model.verification(model_validation);
-							note = verifs.note*model.get("bareme")*100/baremeTotal + note;
-							// On peut envisager la sauvegarde de la note
-							// On doit sauvegarder : inputs + note + answers
-							if (itemUE == null) {
-								var itemUE = new ItemUE();
-								var newUE = true; // flag permettant de savoir si on doit ajouter l'item à la liste
-							} else {
+						var saveFunction = false;
+						var showReinitButton = false;
+						if (userfiche.get("actif") && userfiche.get("ficheActive")){
+							// La fiche étant active, l'exercice sera sauvegardé
+							// Il parait aussi logique de permettre de poursuivre la fiche en relancçant l'exercice
+							showReinitButton = true
+							saveFunction = function(note, answers, inputs, finished){
 								var newUE = false;
-							}
-
-							answersData = _.extend(answersData, data);
-							// on recherche tous les items de validation qui ne seraient pas éliminés par toTrash
-							// S'il n'y en a pas, c'est que l'exercice est terminé
-							var finished = _.difference(
-								_.flatten(
-									_.map(
-										exo.get("briquesCollection").models,
-										function(item){ return item.get("items").where({type:"validation"}); }
-									)
-								),
-								verifs.toTrash
-							).length ==0 ;
-
-							var savingItemUE = itemUE.save({
-								aEF: Number(idEF),
-								aUF: Number(idUF),
-								note: Math.ceil(note),
-								answers: JSON.stringify(answersData),
-								inputs: JSON.stringify(exo.get("inputs")),
-								finished: finished
-							});
-
-							$.when(savingItemUE).done(function(){
-								// Il faut ajouter le nouvel item à la collection des faits
-								if (newUE) {
-									faits.add(itemUE);
+								var ue = this.ue; // cette commande nécessite que la fonction soit appelée dans le bon contexte
+								if (!ue) {
+									ue = new ItemUE({
+										aEF: Number(idEF),
+										aUF: Number(idUF),
+										inputs: JSON.stringify(inputs),
+									});
+									newUE = true;
 								}
-								pied.set("note",note);
-								// Suppression des items d'input
-								_.each(verifs.toTrash, function(item){ brique_view.removeItem(item); });
-								// Ajout des items de correction
-								model.get("items").add(verifs.add);
-								// La brique est marquée comme terminée
-								model.set({ done: true, focus: false });
-								brique_view.unsetFocus();
-								// recherche du prochain focus
-								MAJ_briques(view);
-							}).fail(function(response){
-								alert("An unprocessed error happened. Please try again!");
-							});
 
-						} else {
-							brique_view.onFormDataInvalid(model_validation);
+								var savingUE = ue.save({
+									note: Math.ceil(note),
+									answers: JSON.stringify(answers),
+									finished: finished
+								});
+
+								if (newUE) {
+									var thisObj = this;
+									$.when(savingUE).done(function(){
+										faits.add(ue);
+										thisObj.ue = ue;
+									});
+								}
+
+								return savingUE;
+							}
 						}
-					});
 
-					// Quand la vue est dans le dom, on lance l'affichage des items
-					view.on("render", MAJ_briques);
+						self.show(idE, { optionsValues:exoficheOptions, save:saveFunction, showReinitButton:showReinitButton, ue:ue });
 
-					app.regions.getRegion('main').show(view);
-
-				}).fail(function(response){
-					var view = new MissingView({ message:"Cet exercice n'existe pas !" });
-					app.regions.getRegion('main').show(view);
+					} else {
+						var view = new MissingView({ message:"Cette sauvegarde de votre travail n'existe pas !" });
+						app.regions.getRegion('main').show(view);
+					}
 				});
 			});
-
 		}
 
 	});

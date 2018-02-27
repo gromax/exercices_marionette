@@ -430,16 +430,18 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 					else val.value = 0
 					val
 				options = _.mapObject(itemData.options,iteratee)
+				exo.set {
+					"inputs": inputs
+					"options": options
+				}
 
 				successCB = (exoController) ->
-					exoData = exoController.init(inputs, options)
-					# inputs et options peuvent être changés par le init
-					collection = new BriquesCollection exoData.briques, { parse:true }
+					briques = exoController.getBriques(inputs, options)
+					# initBriques modifie inputs qui est un objet, donc pas de pb
+					collection = new BriquesCollection briques, { parse:true }
 					collection.parent = exo
 					exo.set {
 						"briquesCollection": collection
-						"inputs": exoData.inputs
-						"options": options
 					}
 					defer.resolve exo
 

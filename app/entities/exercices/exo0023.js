@@ -1,8 +1,7 @@
 define(["utils/math", "utils/help"], function(mM, help) {
-  var Controller;
-  Controller = {
-    init: function(inputs, options) {
-      var A, B, der, droite, goodEq, xAtex, yAtex;
+  return {
+    init: function(inputs) {
+      var A, B;
       A = mM.alea.vector({
         name: "A",
         def: inputs
@@ -17,45 +16,44 @@ define(["utils/math", "utils/help"], function(mM, help) {
           }
         ]
       }).save(inputs);
-      droite = mM.droite.par2pts(A, B);
-      goodEq = droite.reduiteTex();
+      return [A, B, mM.droite.par2pts(A, B)];
+    },
+    getBriques: function(inputs, options) {
+      var A, B, doite, ref, xAtex, yAtex;
+      ref = this.init(inputs), A = ref[0], B = ref[1], doite = ref[2];
       xAtex = A.x.tex();
       yAtex = A.y.tex();
-      der = droite.m().tex();
-      return {
-        inputs: inputs,
-        briques: [
-          {
-            bareme: 100,
-            items: [
-              {
-                type: "text",
-                rank: 1,
-                ps: ["On considère une fonction une fonction &nbsp; $f$ &nbsp; dérivable sur $\\mathbb{R}$.", "$\\mathcal{C}$ &nbsp; est sa courbe représentative dans un repère.", "On sait que &nbsp; $f\\left(" + xAtex + "\\right) = " + yAtex + "$ &nbsp; et &nbsp; $f'\\left(" + xAtex + "\\right) = " + der + "$.", "Donnez l'équation de la tangente &nbsp; $\\mathcal{T}$ &nbsp; à la courbe &nbsp; $\\mathcal{C}$ &nbsp; en l'abscisse &nbsp; $" + xAtex + "$."]
-              }, {
-                type: "input",
-                rank: 2,
-                waited: "number",
-                tag: "$y=$",
-                name: "e",
-                description: "Équation de la tangente",
-                good: droite.reduiteObject(),
-                developp: true,
-                cor_prefix: "y=",
-                formes: "FRACTION"
-              }, {
-                type: "validation",
-                rank: 3,
-                clavier: ["aide"]
-              }, {
-                type: "aide",
-                rank: 4,
-                list: help.derivee.tangente
-              }
-            ]
-          }
-        ]
-      };
+      return [
+        {
+          bareme: 100,
+          items: [
+            {
+              type: "text",
+              rank: 1,
+              ps: ["On considère une fonction une fonction &nbsp; $f$ &nbsp; dérivable sur $\\mathbb{R}$.", "$\\mathcal{C}$ &nbsp; est sa courbe représentative dans un repère.", "On sait que &nbsp; $f\\left(" + xAtex + "\\right) = " + yAtex + "$ &nbsp; et &nbsp; $f'\\left(" + xAtex + "\\right) = " + (droite.m().tex()) + "$.", "Donnez l'équation de la tangente &nbsp; $\\mathcal{T}$ &nbsp; à la courbe &nbsp; $\\mathcal{C}$ &nbsp; en l'abscisse &nbsp; $" + xAtex + "$."]
+            }, {
+              type: "input",
+              rank: 2,
+              waited: "number",
+              tag: "$y=$",
+              name: "e",
+              description: "Équation de la tangente",
+              good: droite.reduiteObject(),
+              developp: true,
+              cor_prefix: "y=",
+              formes: "FRACTION"
+            }, {
+              type: "validation",
+              rank: 3,
+              clavier: ["aide"]
+            }, {
+              type: "aide",
+              rank: 4,
+              list: help.derivee.tangente
+            }
+          ]
+        }
+      ];
     },
     tex: function(data) {
       var item;
@@ -80,5 +78,4 @@ define(["utils/math", "utils/help"], function(mM, help) {
       };
     }
   };
-  return Controller;
 });

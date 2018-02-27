@@ -1,8 +1,7 @@
 define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) {
-  var Controller;
-  Controller = {
-    init: function(inputs, options) {
-      var c, i, item, items, j, len, liste_choix, liste_fixe, o, q1, q2, u, u1, u2;
+  return {
+    init: function(inputs) {
+      var c, i, item, items, j, len, o, q1, q2, u, u1, u2;
       items = [];
       if (inputs.q1 != null) {
         q1 = Number(inputs.q1);
@@ -115,59 +114,61 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
         item = items[i];
         item.rank = o[i];
       }
-      liste_fixe = _.shuffle((function() {
-        var k, len1, results;
-        results = [];
-        for (k = 0, len1 = items.length; k < len1; k++) {
-          item = items[k];
-          results.push({
-            type: "normal",
-            text: "$" + item.a + "$",
-            color: colors.html(item.rank)
-          });
-        }
-        return results;
-      })());
-      liste_choix = _.shuffle((function() {
-        var k, len1, results;
-        results = [];
-        for (k = 0, len1 = items.length; k < len1; k++) {
-          item = items[k];
-          results.push({
-            text: "$" + item.b + "$ &nbsp; et &nbsp; $u_0=" + item.c + "$",
-            rank: item.rank
-          });
-        }
-        return results;
-      })());
-      return {
-        inputs: inputs,
-        briques: [
-          {
-            bareme: 100,
-            items: [
-              {
-                type: "text",
-                rank: 1,
-                ps: ["On vous donee d'abord des suites données explicitement.", "Ensuite on vous donne des suites données par récurence.", "Associez-les en utilisant les boutons de la deuxième liste"]
-              }, {
-                type: "color-list",
-                rank: 2,
-                list: liste_fixe
-              }, {
-                type: "color-choice",
-                rank: 3,
-                name: "it",
-                list: liste_choix
-              }, {
-                type: "validation",
-                rank: 4,
-                clavier: []
-              }
-            ]
+      return [
+        _.shuffle((function() {
+          var k, len1, results;
+          results = [];
+          for (k = 0, len1 = items.length; k < len1; k++) {
+            item = items[k];
+            results.push({
+              type: "normal",
+              text: "$" + item.a + "$",
+              color: colors.html(item.rank)
+            });
           }
-        ]
-      };
+          return results;
+        })()), _.shuffle((function() {
+          var k, len1, results;
+          results = [];
+          for (k = 0, len1 = items.length; k < len1; k++) {
+            item = items[k];
+            results.push({
+              text: "$" + item.b + "$ &nbsp; et &nbsp; $u_0=" + item.c + "$",
+              rank: item.rank
+            });
+          }
+          return results;
+        })())
+      ];
+    },
+    getBriques: function(inputs, options) {
+      var liste_choix, liste_fixe, ref;
+      ref = this.init(inputs), liste_fixe = ref[0], liste_choix = ref[1];
+      return [
+        {
+          bareme: 100,
+          items: [
+            {
+              type: "text",
+              rank: 1,
+              ps: ["On vous donee d'abord des suites données explicitement.", "Ensuite on vous donne des suites données par récurence.", "Associez-les en utilisant les boutons de la deuxième liste"]
+            }, {
+              type: "color-list",
+              rank: 2,
+              list: liste_fixe
+            }, {
+              type: "color-choice",
+              rank: 3,
+              name: "it",
+              list: liste_choix
+            }, {
+              type: "validation",
+              rank: 4,
+              clavier: []
+            }
+          ]
+        }
+      ];
     },
     tex: function(data) {
       var col1, col2, content, itData, j, len, out;
@@ -201,5 +202,4 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
       return out;
     }
   };
-  return Controller;
 });

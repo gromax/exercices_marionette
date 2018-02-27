@@ -1,8 +1,7 @@
 define(["utils/math", "utils/help"], function(mM, help) {
-  var Controller;
-  Controller = {
-    init: function(inputs, options) {
-      var Xmax, Xmin, a, b, ens, items, sa, sb, symbs;
+  return {
+    init: function(inputs) {
+      var Xmax, Xmin, a, b, ens, sa, sb, symbs;
       if (typeof inputs.Xmin === "undefined") {
         inputs.Xmin = mM.alea.real({
           min: -5,
@@ -55,6 +54,13 @@ define(["utils/math", "utils/help"], function(mM, help) {
         b = Number(inputs.b);
         ens = ens + " " + symbs[sb] + " " + b;
       }
+      return [Xmin, Xmax, a, b, ens];
+    },
+    getBriques: function(inputs, options) {
+      var Xmax, Xmin, a, b, calcE, calcStd, ens, items, ref, ref1, ref2;
+      calcE = Number((ref = options.a.value) != null ? ref : 0) === 0;
+      calcStd = Number((ref1 = options.b.value) != null ? ref1 : 0) === 0;
+      ref2 = this.init(inputs), Xmin = ref2[0], Xmax = ref2[1], a = ref2[2], b = ref2[3], ens = ref2[4];
       items = [
         {
           type: "text",
@@ -69,9 +75,17 @@ define(["utils/math", "utils/help"], function(mM, help) {
           description: "Valeur à 0,01 près",
           good: (b - a) / (Xmax - Xmin),
           arrondi: -2
+        }, {
+          type: "validation",
+          rank: 5,
+          clavier: ["aide"]
+        }, {
+          type: "aide",
+          rank: 6,
+          list: help.proba.binomiale.calculette
         }
       ];
-      if (options.a.value === 0) {
+      if (calcE) {
         items.push({
           type: "input",
           rank: 3,
@@ -83,7 +97,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
           arrondi: -2
         });
       }
-      if (options.b.value === 0) {
+      if (calcStd) {
         items.push({
           type: "input",
           rank: 4,
@@ -95,25 +109,12 @@ define(["utils/math", "utils/help"], function(mM, help) {
           arrondi: -2
         });
       }
-      items.push({
-        type: "validation",
-        rank: 5,
-        clavier: ["aide"]
-      });
-      items.push({
-        type: "aide",
-        rank: 6,
-        list: help.proba.binomiale.calculette
-      });
-      return {
-        inputs: inputs,
-        briques: [
-          {
-            bareme: 100,
-            items: items
-          }
-        ]
-      };
+      return [
+        {
+          bareme: 100,
+          items: items
+        }
+      ];
     },
     tex: function(data) {
       var a, b, ens, i, itData, its, itsQuest, len, sa, sb, symbs;
@@ -176,5 +177,4 @@ define(["utils/math", "utils/help"], function(mM, help) {
       }
     }
   };
-  return Controller;
 });

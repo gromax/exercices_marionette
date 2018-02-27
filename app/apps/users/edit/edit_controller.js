@@ -94,7 +94,7 @@ define(["app", "marionette", "apps/common/loading_view","apps/common/missing_ite
 					if(user !== undefined){
 						if (isMe){
 							app.Ariane.add([
-								{ text:"Mon compte", e:"user:show", data:id), link:"user:"+id },
+								{ text:"Mon compte", e:"user:show", data:id, link:"user:"+id },
 								{ text:"Modification du mot de passe", e:"user:editPwd", data:id, link:"user:"+id+"/password" }
 							]);
 						} else {
@@ -138,7 +138,7 @@ define(["app", "marionette", "apps/common/loading_view","apps/common/missing_ite
 					{
 						if (isMe){
 							app.Ariane.add([
-								{ text:"Mon compte", e:"user:show", data:id), link:"user:"+id },
+								{ text:"Mon compte", e:"user:show", data:id, link:"user:"+id },
 								{ text:"Modification du mot de passe", e:"user:editPwd", data:id, link:"user:"+id+"/password" }
 							]);
 						} else {

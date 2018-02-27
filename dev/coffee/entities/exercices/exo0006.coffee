@@ -7,17 +7,13 @@ define ["utils/math"], (mM) ->
 	#	a:{ tag:"complexes", options:["non", "oui"], def:0}
 	#}
 
-	Controller =
-		init: (inputs,options) ->
+	return {
+		getBriques: (inputs, options) ->
 			max = 11
-			optA = Number(options.a.value ? 0)
-
-			iPts = ( mM.alea.vector({ name:name, def:inputs, values:[{min:-max+1, max:max-1}]}).save(inputs) for name in ["A", "B", "C", "D", "E"] )
+			iPts = @init(inputs)
 			displayedPts = ( mM.alea.vector({ name:name, values:[{min:-max+1, max:max-1}]}) for name in ["A", "B", "C", "D", "E"] )
 
-			initGraph = (graph)->
-				graph.points = ( graph.create('point',mM.float([pt.x,pt.y]), {name:pt.name, fixed:false, size:4, snapToGrid:true, color:'blue', showInfoBox:false}) for pt in displayedPts )
-
+			optA = Number(options.a.value ? 0)
 			if optA is 0
 				strPts = ("$#{pt.texLine()}$" for pt in iPts).join(", &nbsp;")
 				briqueEnnonce = {
@@ -42,82 +38,85 @@ define ["utils/math"], (mM) ->
 					]
 				}
 
-			{
-				inputs: inputs
-				briques: [
-					{
-						bareme: 100
-						items: [
-							briqueEnnonce
-							{
-								type:"jsxgraph"
-								rank: 2
-								divId: "jsx#{Math.random()}"
-								name: ["xA", "yA", "xB", "yB", "xC", "yC", "xD", "yD", "xE", "yE"]
-								params: {
-									axis:true
-									grid:true
-									boundingbox:[-max, max, max, -max]
-									keepaspectratio: true
+			initGraph = (graph)->
+				graph.points = ( graph.create('point',mM.float([pt.x,pt.y]), {name:pt.name, fixed:false, size:4, snapToGrid:true, color:'blue', showInfoBox:false}) for pt in displayedPts )
+
+			[
+				{
+					bareme: 100
+					items: [
+						briqueEnnonce
+						{
+							type:"jsxgraph"
+							rank: 2
+							divId: "jsx#{Math.random()}"
+							name: ["xA", "yA", "xB", "yB", "xC", "yC", "xD", "yD", "xE", "yE"]
+							params: {
+								axis:true
+								grid:true
+								boundingbox:[-max, max, max, -max]
+								keepaspectratio: true
+							}
+							renderingFunctions:[
+								initGraph
+							]
+							getData: (graph) ->
+								out = {}
+								out["x"+p.name] = p.X() for p in graph.points
+								out["y"+p.name] = p.Y() for p in graph.points
+								out
+							verification: (answers_data) ->
+								note = 0
+								messages = []
+								for pt in iPts
+									g_x = mM.float(pt.x)
+									g_y = mM.float(pt.y)
+									a_x = Number answers_data["x"+pt.name]
+									a_y = Number answers_data["y"+pt.name]
+									d2 = (a_x-g_x)*(a_x-g_x)+(a_y-g_y)*(a_y-g_y)
+									if d2<0.2
+										# Le point est assez près
+										messages.push {
+											type: "success"
+											text: "Le point #{pt.name} est bien placé."
+										}
+										note += .2
+									else
+										# Le point est trop loin
+										messages.push {
+											type: "error"
+											text: "Le point #{pt.name} est mal placé."
+										}
+								{
+									note: note
+									add:[
+										{
+											type:"ul"
+											rank: 3
+											list: messages
+										}
+									]
+									post: (graph)->
+										for pt in graph.points
+											pt.setAttribute {fixed:true}
+										for pt in iPts
+											name=pt.name
+											g_x = mM.float(pt.x)
+											g_y = mM.float(pt.y)
+											graph.create 'point',[g_x,g_y], {name:name, fixed:true, size:4, color:'green'}
 								}
-								renderingFunctions:[
-									initGraph
-								]
-								getData: (graph) ->
-									out = {}
-									out["x"+p.name] = p.X() for p in graph.points
-									out["y"+p.name] = p.Y() for p in graph.points
-									out
-								verification: (answers_data) ->
-									note = 0
-									messages = []
-									for pt in iPts
-										g_x = mM.float(pt.x)
-										g_y = mM.float(pt.y)
-										a_x = Number answers_data["x"+pt.name]
-										a_y = Number answers_data["y"+pt.name]
-										d2 = (a_x-g_x)*(a_x-g_x)+(a_y-g_y)*(a_y-g_y)
-										if d2<0.2
-											# Le point est assez près
-											messages.push {
-												type: "success"
-												text: "Le point #{pt.name} est bien placé."
-											}
-											note += .2
-										else
-											# Le point est trop loin
-											messages.push {
-												type: "error"
-												text: "Le point #{pt.name} est mal placé."
-											}
-									{
-										note: note
-										add:[
-											{
-												type:"ul"
-												rank: 3
-												list: messages
-											}
-										]
-										post: (graph)->
-											for pt in graph.points
-												pt.setAttribute {fixed:true}
-											for pt in iPts
-												name=pt.name
-												g_x = mM.float(pt.x)
-												g_y = mM.float(pt.y)
-												graph.create 'point',[g_x,g_y], {name:name, fixed:true, size:4, color:'green'}
-									}
-							}
-							{
-								type: "validation"
-								rank: 3
-								clavier: []
-							}
-						]
-					}
-				]
-			}
+						}
+						{
+							type: "validation"
+							rank: 3
+							clavier: []
+						}
+					]
+				}
+			]
+
+		init: (inputs) ->
+			return ( mM.alea.vector({ name:name, def:inputs, values:[{min:-max+1, max:max-1}]}).save(inputs) for name in ["A", "B", "C", "D", "E"] )
 
 		tex: (data) ->
 			# en chantier
@@ -132,5 +131,4 @@ define ["utils/math"], (mM) ->
 					]
 				}
 			out
-
-	return Controller
+	}

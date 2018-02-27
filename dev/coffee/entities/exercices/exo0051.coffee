@@ -4,12 +4,12 @@ define ["utils/math","utils/help"], (mM, help) ->
 	# description:"Calculer des probabilités avec la loi uniforme."
 	# keyWords:["probabilités","uniforme","TSTL"]
 	# options: {
-	# 	a:{ tag:"Calcul $E(X)$" , options:["Oui", "Non"] , def:0 }
-	#	b:{ tag:"Calcul $\\sigma(X)$" , options:["Oui", "Non"] , def:0 }
+	# 	a:{ tag:"Calcul $E(X)$" , options:["Oui", "Non"] }
+	#	b:{ tag:"Calcul $\\sigma(X)$" , options:["Oui", "Non"] }
 	#}
 
-	Controller =
-		init: (inputs, options) ->
+	return {
+		init: (inputs) ->
 			if (typeof inputs.Xmin is "undefined") then inputs.Xmin = mM.alea.real({min:-5, max:20})
 			Xmin = Number inputs.Xmin
 			if (typeof inputs.Xmax is "undefined") then inputs.Xmax = mM.alea.real({min:Xmin+10, max:100})
@@ -34,6 +34,13 @@ define ["utils/math","utils/help"], (mM, help) ->
 				if (typeof inputs.b is "undefined") then inputs.b = mM.alea.real({min:a+1, max:Xmax})
 				b = Number inputs.b
 				ens = "#{ens} #{symbs[sb]} #{b}"
+			[Xmin, Xmax, a, b, ens]
+
+		getBriques: (inputs,options) ->
+			calcE = Number(options.a.value ? 0) is 0
+			calcStd = Number(options.b.value ? 0) is 0
+
+			[Xmin, Xmax, a, b, ens] = @init(inputs)
 
 			items = [
 				{
@@ -54,10 +61,19 @@ define ["utils/math","utils/help"], (mM, help) ->
 					good: (b-a)/(Xmax-Xmin)
 					arrondi: -2
 				}
+				{
+					type: "validation"
+					rank: 5
+					clavier: ["aide"]
+				}
+				{
+					type:"aide"
+					rank: 6
+					list: help.proba.binomiale.calculette
+				}
 			]
 
-
-			if options.a.value is 0 then items.push {
+			if calcE then items.push {
 				type: "input"
 				rank: 3
 				waited: "number"
@@ -68,7 +84,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 				arrondi: -2
 			}
 
-			if options.b.value is 0 then items.push {
+			if calcStd then items.push {
 				type: "input"
 				rank: 4
 				waited: "number"
@@ -79,28 +95,13 @@ define ["utils/math","utils/help"], (mM, help) ->
 				arrondi: -2
 			}
 
-			items.push {
-				type: "validation"
-				rank: 5
-				clavier: ["aide"]
-			}
+			[
+				{
+					bareme:100
+					items: items
+				}
+			]
 
-			items.push {
-				type:"aide"
-				rank: 6
-				list: help.proba.binomiale.calculette
-			}
-
-			{
-				inputs: inputs
-				briques: [
-					{
-						bareme:100
-						items: items
-					}
-				]
-
-			}
 		tex: (data) ->
 			# à faire
 			symbs = ["","<","\\leqslant"]
@@ -142,5 +143,4 @@ define ["utils/math","utils/help"], (mM, help) ->
 						large:false
 					}
 				}]
-
-	return Controller
+	}

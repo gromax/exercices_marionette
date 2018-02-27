@@ -1,5 +1,24 @@
-define(["app", "marionette", "apps/common/loading_view", "apps/common/list_layout","apps/users/list/list_panel", "apps/users/list/list_view", "apps/users/new/new_view", "apps/users/edit/edit_view", "apps/users/edit/editpwd_view"], function(app, Marionette, LoadingView, Layout, Panel, UsersView, NewView, EditView,EditPwdView){
-
+define([
+	"app",
+	"marionette",
+	"apps/common/loading_view",
+	"apps/common/list_layout",
+	"apps/users/list/list_panel",
+	"apps/users/list/list_view",
+	"apps/users/new/new_view",
+	"apps/users/edit/edit_view",
+	"apps/users/edit/editpwd_view"
+], function(
+	app,
+	Marionette,
+	LoadingView,
+	Layout,
+	Panel,
+	UsersView,
+	NewView,
+	EditView,
+	EditPwdView
+){
 	var Controller = Marionette.Object.extend({
 		channelName: 'entities',
 

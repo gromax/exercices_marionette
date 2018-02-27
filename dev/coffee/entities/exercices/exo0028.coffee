@@ -9,7 +9,7 @@
 	#	e:{ tag:"Tangente", options:["non", "oui"] }
 	# }
 
-	Controller =
+	return {
 		init: (inputs, options) ->
 			optA = Number(options.a.value ? 0)
 			optD = Number(options.d.value ? 0)
@@ -57,10 +57,30 @@
 				fct = mM.exec operands, { simplify:true }
 				inputs.fct = String fct
 			else fct = mM.parse(inputs.fct)
-			fct_tex = fct.tex()
+
 			derivee = fct.derivate("x").simplify(null,true)
 			# On produit une version factorisée pour avoir une version idéale du tex
 			deriveeForTex = mM.factorisation derivee, /// exp\(([x*+-\d]+)\)$ ///i, { simplify:true, developp:true }
+
+			if optE is 1
+				if (typeof inputs.x isnt "undefined") then x = Number inputs.x
+				else
+					x = mM.alea.real { min:xmin, max:xmax }
+					inputs.x = String x
+				fa = mM.float fct, { x:x, decimals:2 }
+				f2a = mM.float derivee, { x:x, decimals:2 }
+				t = mM.exec [f2a, "x", x, "-", "*", fa, "+"], {simplify:true, developp:true}
+			else
+				x = false
+				fa = false
+				f2a = false
+				t = false
+
+			[fct, derivee, deriveeForTex, x, fa, f2a, t]
+
+		getBriques: (inputs, options) ->
+			optE = Number(options.e.value ? 0)
+			[fct, derivee, deriveeForTex, x, fa, f2a, t] = @init(inputs,options)
 
 			briques = [
 				{
@@ -71,7 +91,7 @@
 							type: "text"
 							rank: 1
 							ps: [
-								"Soit $f(x) = #{fct_tex}$"
+								"Soit $f(x) = #{fct.tex()}$"
 								"Donnez l'expression de $f'$, fonction dérivée de $f$."
 							]
 						}
@@ -102,13 +122,6 @@
 			]
 
 			if optE is 1
-				if (typeof inputs.x isnt "undefined") then x = Number inputs.x
-				else
-					x = mM.alea.real { min:xmin, max:xmax }
-					inputs.x = String x
-				fa = mM.float fct, { x:x, decimals:2 }
-				f2a = mM.float derivee, { x:x, decimals:2 }
-				t = mM.exec [f2a, "x", x, "-", "*", fa, "+"], {simplify:true, developp:true}
 				briques.push {
 					title:"Calcul de $f(a)$ et $f'(a)$ en $a=#{x}$"
 					bareme:100
@@ -170,10 +183,7 @@
 					]
 				}
 
-			{
-				inputs: inputs
-				briques: briques
-			}
+			briques
 
 		tex: (data) ->
 			# en travaux
@@ -196,5 +206,4 @@
 						large:false
 					}
 			}
-
-	return Controller
+	}

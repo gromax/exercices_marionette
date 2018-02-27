@@ -1,7 +1,6 @@
 define(["utils/math", "utils/help"], function(mM, help) {
-  var Controller;
-  Controller = {
-    init: function(inputs, options) {
+  return {
+    init: function(inputs) {
       var Xa, Xb, a, b, ens, mu, sa, sb, std, symbs;
       if (typeof inputs.std === "undefined") {
         inputs.std = mM.alea.real({
@@ -59,46 +58,88 @@ define(["utils/math", "utils/help"], function(mM, help) {
         Xb = Math.floor(b * 2 * std) / 100 + mu;
         ens = ens + " " + symbs[sb] + " " + (mM.misc.numToStr(Xb, 2));
       }
+      return [
+        mu, std, ens, mM.repartition.gaussian({
+          min: Xa,
+          max: Xb
+        }, {
+          moy: mu,
+          std: std
+        })
+      ];
+    },
+    getBriques: function(inputs, options) {
+      var ens, mu, p, ref, std;
+      ref = this.init(inputs), mu = ref[0], std = ref[1], ens = ref[2], p = ref[3];
+      return [
+        {
+          bareme: 100,
+          title: "Calculs de probabilités",
+          items: [
+            {
+              type: "text",
+              rank: 1,
+              ps: ["La variable aléatoire &nbsp; $X$ &nbsp; suit la <b>loi normale</b> de moyenne &nbsp; $\\mu = " + mu + "$ &nbsp; et d'écart-type &nbsp; $\\sigma = " + std + "$.", "<b>Remarque :</b> on note &nbsp; $\\mathcal{N}(" + mu + ";" + std + ")$ &nbsp; cette loi."]
+            }, {
+              type: "input",
+              rank: 2,
+              tag: "$p(" + ens + ")$",
+              name: "pX",
+              description: "Valeur à 0,01 près",
+              good: p,
+              waited: "number",
+              arrondi: -2
+            }, {
+              type: "validation",
+              rank: 3,
+              clavier: ["aide"]
+            }, {
+              type: "aide",
+              rank: 4,
+              list: help.proba.binomiale.calculette
+            }
+          ]
+        }
+      ];
+    },
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var ens, mu, p, ref, std;
+        ref = that.init(inputs), mu = ref[0], std = ref[1], ens = ref[2], p = ref[3];
+        return "$\\mu = " + mu + "$ &nbsp; et &nbsp; $\\sigma = " + std + "$. Calculer &nbsp; $p(" + ens + ")$.";
+      };
       return {
-        inputs: inputs,
-        briques: [
+        children: [
           {
-            bareme: 100,
-            title: "Calculs de probabilités",
-            items: [
-              {
-                type: "text",
-                rank: 1,
-                ps: ["La variable aléatoire $X$ suit la <b>loi normale</b> de moyenne $\\mu = " + mu + "$ et d'écart-type $\\sigma = " + std + "$.", "<b>Remarque :</b> on note $\\mathcal{N}(" + mu + ";" + std + ")$ cette loi."]
-              }, {
-                type: "input",
-                rank: 2,
-                tag: "$p(" + ens + ")$",
-                name: "pX",
-                description: "Valeur à 0,01 près",
-                good: mM.repartition.gaussian({
-                  min: Xa,
-                  max: Xb
-                }, {
-                  moy: mu,
-                  std: std
-                }),
-                waited: "number",
-                arrondi: -2
-              }, {
-                type: "validation",
-                rank: 3,
-                clavier: ["aide"]
-              }, {
-                type: "aide",
-                rank: 4,
-                list: help.proba.binomiale.calculette
-              }
-            ]
+            type: "text",
+            children: ["La variable aléatoire &nbsp; $X$ &nbsp; suit la loi normale &nbsp; $\\mathcal{N}(\\mu;\\sigma)$.", "Dans les cas suivants, calculez les probabilités à 0,01 près."]
+          }, {
+            type: "enumerate",
+            refresh: true,
+            enumi: "1",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var ens, mu, p, ref, std;
+        ref = that.init(inputs), mu = ref[0], std = ref[1], ens = ref[2], p = ref[3];
+        return "$\\mu = " + mu + "$ &nbsp; et &nbsp; $\\sigma = " + std + "$. Calculer &nbsp; $p(" + ens + ")$.";
+      };
+      return {
+        children: [
+          "La variable aléatoire &nbsp; $X$ &nbsp; suit la loi normale &nbsp; $\\mathcal{N}(\\mu;\\sigma)$.", "Dans les cas suivants, calculez les probabilités à 0,01 près.", {
+            type: "enumerate",
+            children: _.map(inputs_list, fct_item)
           }
         ]
       };
     }
   };
-  return Controller;
 });

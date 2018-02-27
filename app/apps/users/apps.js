@@ -100,7 +100,6 @@ define(["marionette","app"], function(Marionette,app){
 		controller: API,
 		appRoutes: {
 			"users(/filter/criterion::criterion)": "listUsers",
-			"users": "listUsers",
 			"user::id": "showUser",
 			"user::id/edit": "editUser",
 			"user::id/password": "editUserPwd",

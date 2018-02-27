@@ -1,4 +1,4 @@
-define(["jst","marionette"], function(JST,Marionette){
+define(["jst","marionette", "mathjax"], function(JST,Marionette, MathJax){
 	var noView = Marionette.View.extend({
 		template:  window.JST["devoirs/run/exercice-list-none"],
 		tagName: "a",
@@ -7,8 +7,14 @@ define(["jst","marionette"], function(JST,Marionette){
 
 	var Item = Marionette.View.extend({
 		tagName: "a",
-		className: "list-group-item",
-		template: window.JST["devoirs/run/exercice-list-item"],
+		className: "list-group-item list-group-item-action",
+		getTemplate: function(){
+			if (this.options.profMode==true){
+				return window.JST["devoirs/run/exercice-list-item-prof"];
+			} else {
+				return window.JST["devoirs/run/exercice-list-item"];
+			}
+		},
 
 		initialize: function(options){
 			this.faits = _.where(options.faits, {aEF: options.model.get("id")});
@@ -19,11 +25,17 @@ define(["jst","marionette"], function(JST,Marionette){
 			data.note = this.model.calcNote(this.faits);
 			data.n_faits = this.faits.length;
 			data.numero = this.options.numero;
+			data.showFaitsButton = this.options.showFaitsButton;
 			return data;
 		},
 
+		onRender: function(){
+			MathJax.Hub.Queue(["Typeset",MathJax.Hub,this.$el[0]]);
+		},
+
 		triggers: {
-			"click": "exofiche:run"
+			"click": "exofiche:run",
+			"click a.js-faits": "exofiche:saved-list:show",
 		},
 
 	});
@@ -47,7 +59,9 @@ define(["jst","marionette"], function(JST,Marionette){
 		childViewOptions: function(model, index) {
 			return {
 				faits: this.faits,
-				numero: index+1
+				numero: index+1,
+				profMode: this.options.profMode == true,
+				showFaitsButton: this.options.showFaitsButton == true // bouton élève pour accéder aux exercices faits
 			}
 		}
 	});

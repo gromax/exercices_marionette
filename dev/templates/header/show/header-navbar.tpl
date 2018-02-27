@@ -1,17 +1,17 @@
-<nav class="navbar navbar-toggleable-md navbar-inverse bg-primary">
-	<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+<nav class="navbar navbar-dark bg-primary">
+	<a class="navbar-brand js-home" href="#Home">Exercices de maths</a>
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
 		<span class="navbar-toggler-icon"></span>
 	</button>
-	<a class="navbar-brand js-home" href="#Home">Exercices de maths</a>
 
 	<div class="collapse navbar-collapse" id="navbarSupportedContent">
 		<% if (isOff) { %>
-			<ul class="navbar-nav mr-auto">
+			<ul class="navbar-nav">
 				<li class="nav-item"><a class="nav-link js-login" href="#login"><i class="fa fa-sign-in" aria-hidden="true"></i> Connexion</a></li>
 			</ul>
 		<%}%>
 		<% if (isAdmin) { %>
-			<ul class="navbar-nav mr-auto">
+			<ul class="navbar-nav">
 				<li class="nav-item"><a class="nav-link js-logout" href="#logout"><i class="fa fa-sign-out" aria-hidden="true"></i> Déconnexion</a></li>
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" >
@@ -26,7 +26,7 @@
 			</ul>
 		<%}%>
 		<% if (isEleve) { %>
-			<ul class="navbar-nav mr-auto">
+			<ul class="navbar-nav">
 				<li class="nav-item"></li>
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" >

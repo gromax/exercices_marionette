@@ -1,11 +1,11 @@
 define(["utils/math", "utils/help"], function(mM, help) {
-  var Controller;
-  Controller = {
+  return {
     init: function(inputs, options) {
-      var a, aff1, aff2, b, eqTex, expr, expr1, expr2, goods, infos, p, p1, p2, r, r1, r2, racine, racine1, racine2, ref, ref1, ref10, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, sqrtYS, t, tm, u, v, w, xS, yS;
-      a = (ref = options.a.value) != null ? ref : 0;
-      b = (ref1 = options.b.value) != null ? ref1 : 0;
-      infos = [];
+      var a, aff1, aff2, b, domaine, eqTex, expr, expr1, expr2, goods, info_notation, p, p1, p2, r, r1, r2, racine, racine1, racine2, ref, ref1, ref10, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, sqrtYS, t, tm, u, v, w, xS, yS;
+      a = Number((ref = options.a.value) != null ? ref : 0);
+      b = Number((ref1 = options.b.value) != null ? ref1 : 0);
+      info_notation = false;
+      domaine = false;
       switch (false) {
         case typeof inputs.b === "undefined":
           expr = mM.toNumber(inputs.b);
@@ -21,10 +21,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
               y: 0
             });
             if (r.length > 0) {
-              infos.push({
-                type: "warning",
-                text: "L'équation est définie pour $x>" + (r.pop().tex()) + "$"
-              });
+              domaine = "L'équation est définie pour $x>" + (r.pop().tex()) + "$";
             }
           }
           ref5 = this.cas_b12(expr, expr1, expr2, a), goods = ref5.goods, eqTex = ref5.eqTex;
@@ -49,15 +46,9 @@ define(["utils/math", "utils/help"], function(mM, help) {
               y: 0
             })).pop();
             if (r1.float() > r2.float()) {
-              infos.push({
-                type: "warning",
-                text: "L'équation est définie pour $x>" + (r1.tex()) + "$"
-              });
+              domaine = "L'équation est définie pour &nbsp; $x>" + (r1.tex()) + "$";
             } else {
-              infos.push({
-                type: "warning",
-                text: "L'équation est définie pour $x>" + (r2.tex()) + "$"
-              });
+              domaine = "L'équation est définie pour &nbsp; $x>" + (r2.tex()) + "$";
             }
           }
           ref7 = this.cas_b0(expr1, expr2, a), goods = ref7.goods, eqTex = ref7.eqTex;
@@ -87,19 +78,13 @@ define(["utils/math", "utils/help"], function(mM, help) {
                     y: 0
                   });
                   if (r.length > 0) {
-                    infos.push({
-                      type: "warning",
-                      text: "L'équation est définie pour $x>" + (r.pop().tex()) + "$"
-                    });
+                    domaine = "L'équation est définie pour &nbsp; $x>" + (r.pop().tex()) + "$";
                   }
                 }
               } else {
                 expr = mM.exec(["x"]);
                 if (a === 0) {
-                  infos.push({
-                    type: "warning",
-                    text: "L'équation est définie pour $x>0$"
-                  });
+                  domaine = "L'équation est définie pour &nbsp; $x>0$";
                 }
               }
               if (a === 0) {
@@ -144,16 +129,10 @@ define(["utils/math", "utils/help"], function(mM, help) {
               inputs.c = String(expr1);
               ref8 = this.cas_b12(expr, expr1, expr2, a), goods = ref8.goods, eqTex = ref8.eqTex;
               if (a === 0) {
-                infos.push({
-                  type: "info",
-                  text: "La notation $\\ln^2(" + (expr.tex()) + ")$ est un racourci pour $\\left(\\ln(" + (expr.tex()) + ")\\right)^2$"
-                });
+                info_notation = "La notation &nbsp; $\\ln^2(" + (expr.tex()) + ")$ &nbsp; est un racourci pour &nbsp; $\\left(\\ln(" + (expr.tex()) + ")\\right)^2$";
               }
               if (a === 1) {
-                infos.push({
-                  type: "info",
-                  text: "La notation $\\exp^2(" + (expr.tex()) + ")$ est un racourci pour $\\left(\\exp(" + (expr.tex()) + ")\\right)^2$"
-                });
+                info_notation = "La notation &nbsp; $\\exp^2(" + (expr.tex()) + ")$ est un racourci pour &nbsp; $\\left(\\exp(" + (expr.tex()) + ")\\right)^2$";
               }
               break;
             case !((b === 1) || (b === 3)):
@@ -179,19 +158,13 @@ define(["utils/math", "utils/help"], function(mM, help) {
                     y: 0
                   });
                   if (r.length > 0) {
-                    infos.push({
-                      type: "warning",
-                      text: "L'équation est définie pour $x>" + (r.pop().tex()) + "$"
-                    });
+                    domaine = "L'équation est définie pour &nbsp; $x>" + (r.pop().tex()) + "$";
                   }
                 }
               } else {
                 expr = mM.exec(["x"]);
                 if (a === 0) {
-                  infos.push({
-                    type: "warning",
-                    text: "L'équation est définie pour $x>0$"
-                  });
+                  domaine = "L'équation est définie pour &nbsp; $x>0$";
                 }
               }
               u = mM.alea.real({
@@ -311,10 +284,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
                     });
                   }
                 }
-                infos.push({
-                  type: "warning",
-                  text: "L'équation est définie pour $x>" + (racine.tex()) + "$"
-                });
+                domaine = "L'équation est définie pour $x>" + (racine.tex()) + "$";
               } else {
                 v = mM.alea.real({
                   min: -5,
@@ -337,34 +307,94 @@ define(["utils/math", "utils/help"], function(mM, help) {
               ref10 = this.cas_b0(expr1, expr2, a), goods = ref10.goods, eqTex = ref10.eqTex;
           }
       }
+      return [eqTex, info_notation, goods, domaine];
+    },
+    getBriques: function(inputs, options) {
+      var domaine, eqTex, goods, info_notation, infos, ref;
+      ref = this.init(inputs, options), eqTex = ref[0], info_notation = ref[1], goods = ref[2], domaine = ref[3];
+      infos = [];
+      if (domaine) {
+        infos.push(domaine);
+      }
+      if (info_notation) {
+        infos.push(info_notation);
+      }
+      return [
+        {
+          bareme: 100,
+          items: [
+            {
+              type: "text",
+              rank: 1,
+              ps: ["On considère l'équation : $" + eqTex + "$.", "Vous devez donner la ou les solutions de cette équations, si elles existent.", "<i>S'il n'y a pas de solution, écrivez $\\varnothing$. s'il y a plusieurs solutions, séparez-les avec ;</i>"]
+            }, {
+              type: "ul",
+              rank: 2,
+              list: _.map(infos, function(item) {
+                return {
+                  type: "warning",
+                  text: item
+                };
+              })
+            }, {
+              type: "input",
+              rank: 3,
+              waited: "liste:number",
+              name: "solutions",
+              tag: "$\\mathcal{S}$",
+              good: goods
+            }, {
+              type: "validation",
+              rank: 4,
+              clavier: ["empty"]
+            }
+          ]
+        }
+      ];
+    },
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var domaine, eqTex, goods, info_notation, ref;
+        ref = that.init(inputs, options), eqTex = ref[0], info_notation = ref[1], goods = ref[2], domaine = ref[3];
+        if (domaine) {
+          return ("$" + eqTex + "$. ") + domaine;
+        } else {
+          return "$" + eqTex + "$";
+        }
+      };
       return {
-        inputs: inputs,
-        briques: [
+        children: [
           {
-            title: "Solutions",
-            bareme: 100,
-            items: [
-              {
-                type: "text",
-                rank: 1,
-                ps: ["On considère l'équation : $" + eqTex + "$.", "Vous devez donner la ou les solutions de cette équations, si elles existent.", "<i>S'il n'y a pas de solution, écrivez $\\varnothing$. s'il y a plusieurs solutions, séparez-les avec ;</i>"]
-              }, {
-                type: "ul",
-                rank: 2,
-                list: infos
-              }, {
-                type: "input",
-                rank: 3,
-                waited: "liste:number",
-                name: "solutions",
-                tag: "$\\mathcal{S}$",
-                good: goods
-              }, {
-                type: "validation",
-                rank: 4,
-                clavier: ["empty"]
-              }
-            ]
+            type: "text",
+            children: ["On considère les équations suivantes.", "Vous devez donner la ou les solutions de ces équations, si elles existent."]
+          }, {
+            type: "enumerate",
+            refresh: true,
+            enumi: "1",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var domaine, eqTex, goods, info_notation, ref;
+        ref = that.init(inputs, options), eqTex = ref[0], info_notation = ref[1], goods = ref[2], domaine = ref[3];
+        if (domaine) {
+          return ("$" + eqTex + "$. ") + domaine;
+        } else {
+          return "$" + eqTex + "$";
+        }
+      };
+      return {
+        children: [
+          "On considère les équations suivantes.", "Vous devez donner la ou les solutions de ces équations, si elles existent.", {
+            type: "enumerate",
+            children: _.map(inputs_list, fct_item)
           }
         ]
       };
@@ -476,5 +506,4 @@ define(["utils/math", "utils/help"], function(mM, help) {
       };
     }
   };
-  return Controller;
 });

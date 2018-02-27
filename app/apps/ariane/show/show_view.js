@@ -30,10 +30,10 @@ define(["marionette","app","jst"], function(Marionette,app,JST){
 
 		onArianeNavigate: function(){
 			var active = this.model.get("active");
-			var ev = this.model.get("e");
+			var event_name = this.model.get("e");
 			var data = this.model.get("data");
-			if (active && ev) {
-				app.trigger(ev, data);
+			if (active && event_name) {
+				app.trigger.apply(app,_.flatten([event_name,data]));
 			}
 		}
 	});

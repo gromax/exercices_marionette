@@ -1,9 +1,9 @@
 define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) {
-  var Controller;
-  Controller = {
+  return {
+    max: 6,
     init: function(inputs, options) {
-      var A, B, color, i, initGraph, items, j, max, pts;
-      max = 6;
+      var A, B, color, i, items, j, max, pts;
+      max = this.max;
       items = [];
       pts = [];
       for (i = j = 0; j <= 4; i = ++j) {
@@ -40,11 +40,17 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
         });
         pts.push([A, B, color]);
       }
+      return [items, pts];
+    },
+    getBriques: function(inputs, options) {
+      var initGraph, items, max, pts, ref;
+      max = this.max;
+      ref = this.init(inputs), items = ref[0], pts = ref[1];
       initGraph = function(graph) {
-        var AB, k, len, results;
+        var AB, j, len, results;
         results = [];
-        for (k = 0, len = pts.length; k < len; k++) {
-          AB = pts[k];
+        for (j = 0, len = pts.length; j < len; j++) {
+          AB = pts[j];
           results.push(graph.create('line', [AB[0].toJSXcoords(), AB[1].toJSXcoords()], {
             strokeColor: AB[2],
             strokeWidth: 4,
@@ -53,46 +59,42 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
         }
         return results;
       };
-      return {
-        inputs: inputs,
-        briques: [
-          {
-            bareme: 100,
-            items: [
-              {
-                type: "text",
-                rank: 1,
-                ps: ["On vous donne 5 courbes et 5 fonctions affines.", "Vous devez dire à quelle fonction correspond chaque courbe.", "Cliquez sur les rectangles pour choisir la couleur de la courbe correspondant à chaque fonction, puis validez"]
-              }, {
-                type: "jsxgraph",
-                rank: 2,
-                divId: "jsx" + (Math.random()),
-                params: {
-                  axis: true,
-                  grid: true,
-                  boundingbox: [-max, max, max, -max],
-                  keepaspectratio: true
-                },
-                renderingFunctions: [initGraph]
-              }, {
-                type: "color-choice",
-                rank: 3,
-                name: "it",
-                list: _.shuffle(items)
-              }, {
-                type: "validation",
-                rank: 4,
-                clavier: ["aide"]
-              }, {
-                type: "aide",
-                rank: 5,
-                list: help.fonction.affine.courbe
-              }
-            ]
-          }
-        ]
-      };
+      return [
+        {
+          bareme: 100,
+          items: [
+            {
+              type: "text",
+              rank: 1,
+              ps: ["On vous donne 5 courbes et 5 fonctions affines.", "Vous devez dire à quelle fonction correspond chaque courbe.", "Cliquez sur les rectangles pour choisir la couleur de la courbe correspondant à chaque fonction, puis validez"]
+            }, {
+              type: "jsxgraph",
+              rank: 2,
+              divId: "jsx" + (Math.random()),
+              params: {
+                axis: true,
+                grid: true,
+                boundingbox: [-max, max, max, -max],
+                keepaspectratio: true
+              },
+              renderingFunctions: [initGraph]
+            }, {
+              type: "color-choice",
+              rank: 3,
+              name: "it",
+              list: _.shuffle(items)
+            }, {
+              type: "validation",
+              rank: 4,
+              clavier: ["aide"]
+            }, {
+              type: "aide",
+              rank: 5,
+              list: help.fonction.affine.courbe
+            }
+          ]
+        }
+      ];
     }
   };
-  return Controller;
 });

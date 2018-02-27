@@ -72,16 +72,38 @@ define(["jst","marionette"], function(JST,Marionette){
 			}
 		},
 
+		triggers:{
+			"click a.js-sort":"sort",
+		},
+
+		onSort:function(view,e){
+			var name = $(e.currentTarget).attr("name");
+			if (name) {
+				if (this.collection.comparator==name) {
+					this.collection.comparator = function(a,b){
+						if (a.get(name)>b.get(name)) {
+							return -1;
+						} else {
+							return 1;
+						}
+					}
+				} else {
+					this.collection.comparator=name;
+				}
+				this.collection.sort();
+			}
+		},
+
 		onRender:function(){
-			this.subCollection = new CollectionView({
+			this.subCollectionView = new CollectionView({
 				collection:this.collection,
 				filterCriterion:this.options.filterCriterion
 			});
-			this.listenTo(this.subCollection,"childview:item:show", this.showItem);
-			this.listenTo(this.subCollection,"childview:item:edit", this.editItem);
-			this.listenTo(this.subCollection,"childview:item:editPwd", this.editItemPwd);
-			this.listenTo(this.subCollection,"childview:item:delete", this.deleteItem);
-			this.showChildView('body', this.subCollection);
+			this.listenTo(this.subCollectionView,"childview:item:show", this.showItem);
+			this.listenTo(this.subCollectionView,"childview:item:edit", this.editItem);
+			this.listenTo(this.subCollectionView,"childview:item:editPwd", this.editItemPwd);
+			this.listenTo(this.subCollectionView,"childview:item:delete", this.deleteItem);
+			this.showChildView('body', this.subCollectionView);
 		},
 
 		showItem:function(childView){
@@ -101,7 +123,7 @@ define(["jst","marionette"], function(JST,Marionette){
 		},
 
 		flash: function(itemModel){
-			var newItemView = this.subCollection.children.findByModel(itemModel);
+			var newItemView = this.subCollectionView.children.findByModel(itemModel);
 			// check whether the new user view is displayed (it could be
 			// invisible due to the current filter criterion)
 			if(newItemView){
@@ -110,10 +132,10 @@ define(["jst","marionette"], function(JST,Marionette){
 		},
 
 		onSetFilterCriterion: function(criterion, options){
-			this.subCollection.setFilterCriterion(criterion);
+			this.subCollectionView.setFilterCriterion(criterion);
 			options = options || {};
 			if (!options.preventRender) {
-				this.subCollection.render();
+				this.subCollectionView.render();
 			}
 		}
 	});

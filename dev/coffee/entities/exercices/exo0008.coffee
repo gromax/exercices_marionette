@@ -4,9 +4,8 @@ define ["utils/math"], (mM) ->
 	# description:"La courbe d'une fonction étant donnée, il faut déterminer un antécédent et une image."
 	# keyWords:["Fonctions","Antécédent","Image","Seconde"]
 
-	Controller =
-
-		init: (inputs,options) ->
+	return {
+		init: (inputs) ->
 			max = 10
 			decimals = 2
 			# Initialisation du polynome
@@ -33,6 +32,11 @@ define ["utils/math"], (mM) ->
 			yi = mM.float poly, { x:xi, decimals:decimals }
 			ya = mM.float poly, { x:xa, decimals:decimals }
 			antecedents = mM.polynome.solve.numeric poly, { bornes:{min:-max, max:max}, decimals:decimals, y:ya }
+
+			[ poly, xi, yi, xa, ya, antecedents ]
+
+		getBriques: (inputs, options) ->
+			[ poly, xi, yi, xa, ya, antecedents ] = @init(inputs)
 			str_antecedents = ( mM.misc.numToStr(x,1) for x in antecedents)
 
 			fctGraph = (x) -> mM.float(poly, {x:x})
@@ -42,97 +46,93 @@ define ["utils/math"], (mM) ->
 				graph.create('point',[ max, fctGraph(max) ],{fixed:true, fillColor:'blue', strokeColor:'blue', withlabel:false, size:4})
 				graph.create('glider',[-max/2,2,curve],{name:'M'})
 
-
-			{
-				inputs: inputs
-				briques:[
-					{
-						bareme:100
-						items: [
-							{
-								type: "text"
-								rank:1
-								ps:[
-									"On considère la fonction &nbsp; $f$ &nbsp; définie sur &nbsp; $[#{-max};#{max}]$ &nbsp; dont la courbe est donnée ci-dessous."
-									"Vous pouvez déplacer le point M sur la courbe afin d'obtenir une meilleure lecture des coordonnées."
-								]
+			[
+				{
+					bareme:100
+					items: [
+						{
+							type: "text"
+							rank:1
+							ps:[
+								"On considère la fonction &nbsp; $f$ &nbsp; définie sur &nbsp; $[#{-max};#{max}]$ &nbsp; dont la courbe est donnée ci-dessous."
+								"Vous pouvez déplacer le point M sur la courbe afin d'obtenir une meilleure lecture des coordonnées."
+							]
+						}
+						{
+							type: "jsxgraph"
+							rank: 2
+							divId: "jsx#{Math.random()}"
+							params: {
+								axis:true
+								grid:true
+								boundingbox:[-max,max,max,-max]
+								keepaspectratio: true
 							}
-							{
-								type: "jsxgraph"
-								rank: 2
-								divId: "jsx#{Math.random()}"
-								params: {
-									axis:true
-									grid:true
-									boundingbox:[-max,max,max,-max]
-									keepaspectratio: true
-								}
-								renderingFunctions:[
-									initGraph
-								]
-								verification: () ->
-									{
-										add: {
-											type:"ul"
-											rank: 3
-											list:[{
-												type:"warning"
-												text:"La construction pour l'image est en orange. La construction pour les antécédents est en vert."
-											}]
-										}
-										post: (graph)->
-											graph.create('line',[[0,ya],[1,ya]], {color:'green',strokeWidth:2, fixed:true})
-											if (ya>0) then anchorY = 'top'
-											else anchorY = 'bottom'
-											for x,i in antecedents
-												graph.create('line',[[x,ya],[x,0]], {color:'green', straightFirst:false, straightLast:false, strokeWidth:2, dash:2, fixed:true})
-												graph.create('text',[x,0,str_antecedents[i]], {color:'green', anchorX:'middle', anchorY:anchorY})
-											graph.create('line',[[xi,0],[xi,yi]], {color:'orange', straightFirst:false, straightLast:false, strokeWidth:2, dash:2, fixed:true})
-											graph.create('line',[[xi,yi],[0,yi]], {color:'orange', straightFirst:false, straightLast:false, strokeWidth:2, dash:2, fixed:true})
-											if (xi>0) then anchorX = 'right'
-											else anchorX = 'left'
-											graph.create('text',[0,yi,mM.misc.numToStr(yi)], {color:'orange', anchorX:anchorX, anchorY:'middle'})
+							renderingFunctions:[
+								initGraph
+							]
+							verification: () ->
+								{
+									add: {
+										type:"ul"
+										rank: 3
+										list:[{
+											type:"warning"
+											text:"La construction pour l'image est en orange. La construction pour les antécédents est en vert."
+										}]
 									}
-							}
-							{
-								type: "text"
-								rank: 4
-								ps:[
-									"Donnez l'image de #{mM.misc.numToStr(xi)} à 0,2 près."
-								]
-							}
-							{
-								type:"input"
-								rank: 5
-								name:"i"
-								tag:"Image"
-								good: yi
-								tolerance: .2
-							}
-							{
-								type: "text"
-								rank: 6
-								ps:[
-									"Donnez un antécédent (un seul !) de #{mM.misc.numToStr(ya)} à 0,2 près."
-								]
-							}
-							{
-								type:"input"
-								rank: 7
-								name:"a"
-								tag:"Antécédent"
-								good: antecedents
-								tolerance: .2
-							}
-							{
-								type:"validation"
-								rank: 8
-								clavier:[]
-							}
-						]
-					}
-				]
-			}
+									post: (graph)->
+										graph.create('line',[[0,ya],[1,ya]], {color:'green',strokeWidth:2, fixed:true})
+										if (ya>0) then anchorY = 'top'
+										else anchorY = 'bottom'
+										for x,i in antecedents
+											graph.create('line',[[x,ya],[x,0]], {color:'green', straightFirst:false, straightLast:false, strokeWidth:2, dash:2, fixed:true})
+											graph.create('text',[x,0,str_antecedents[i]], {color:'green', anchorX:'middle', anchorY:anchorY})
+										graph.create('line',[[xi,0],[xi,yi]], {color:'orange', straightFirst:false, straightLast:false, strokeWidth:2, dash:2, fixed:true})
+										graph.create('line',[[xi,yi],[0,yi]], {color:'orange', straightFirst:false, straightLast:false, strokeWidth:2, dash:2, fixed:true})
+										if (xi>0) then anchorX = 'right'
+										else anchorX = 'left'
+										graph.create('text',[0,yi,mM.misc.numToStr(yi)], {color:'orange', anchorX:anchorX, anchorY:'middle'})
+								}
+						}
+						{
+							type: "text"
+							rank: 4
+							ps:[
+								"Donnez l'image de #{mM.misc.numToStr(xi)} à 0,2 près."
+							]
+						}
+						{
+							type:"input"
+							rank: 5
+							name:"i"
+							tag:"Image"
+							good: yi
+							tolerance: .2
+						}
+						{
+							type: "text"
+							rank: 6
+							ps:[
+								"Donnez un antécédent (un seul !) de #{mM.misc.numToStr(ya)} à 0,2 près."
+							]
+						}
+						{
+							type:"input"
+							rank: 7
+							name:"a"
+							tag:"Antécédent"
+							good: antecedents
+							tolerance: .2
+						}
+						{
+							type:"validation"
+							rank: 8
+							clavier:[]
+						}
+					]
+				}
+			]
 
 		tex: (data) ->
 			# en chantier
@@ -150,5 +150,4 @@ define ["utils/math"], (mM) ->
 					contents: [graphique, questions]
 				}
 			out
-
-	return Controller
+	}

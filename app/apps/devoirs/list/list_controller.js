@@ -1,4 +1,20 @@
-define(["app", "marionette", "apps/common/loading_view", "apps/common/list_layout","apps/devoirs/list/list_panel", "apps/devoirs/list/list_view", "apps/devoirs/show/show_view"], function(app, Marionette, LoadingView, Layout, Panel, ListView, ShowView){
+define([
+	"app",
+	"marionette",
+	"apps/common/loading_view",
+	"apps/common/list_layout",
+	"apps/devoirs/list/list_panel",
+	"apps/devoirs/list/list_view",
+	"apps/devoirs/edit/edit_fiche_view"
+], function(
+	app,
+	Marionette,
+	LoadingView,
+	Layout,
+	Panel,
+	ListView,
+	ShowView
+){
 
 	var Controller = Marionette.Object.extend({
 		channelName: 'entities',
@@ -11,10 +27,10 @@ define(["app", "marionette", "apps/common/loading_view", "apps/common/list_layou
 			var channel = this.getChannel();
 
 			require(["entities/dataManager"], function(){
-				var fetching = channel.request("prof:entities");
-				$.when(fetching).done(function(devoirs, userfiches, exofiches, faits){
+				var fetching = channel.request("custom:entities",["fiches"]);
+				$.when(fetching).done(function(fiches){
 					var listItemsView = new ListView({
-						collection: devoirs
+						collection: fiches
 					});
 
 					listItemsLayout.on("render", function(){

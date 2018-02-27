@@ -13,7 +13,11 @@ define([], function(){
 			if (data.id) { data.id = Number(data.id); }
 			data.idUser = Number(data.idUser);
 			data.idFiche = Number(data.idFiche);
+			data.nomCompletUser = data.nomUser+" "+data.prenomUser;
 			data.actif = (data.actif == "1") || (data.actif==1) || (data.actif===true);
+			if (data.ficheActive) {
+				data.ficheActive = (data.ficheActive == "1") || (data.ficheActive==1) || (data.ficheActive===true);
+			}
 			return data;
 		},
 

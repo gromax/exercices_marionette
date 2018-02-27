@@ -11,10 +11,15 @@
 </div>
 
 <% break; case "radio": %>
-	<% _.each(radio,function(subItem,key){ %>
-<label class="radio-inline">
-	<input type="radio" name="<%- name %>" value="<%- key %>" <% if (key==0){ %>checked<% } %> > <%- subItem %>
-</label>
+	<% _.each(radio,function(subItem,key){
+		var radio_id = ""+Math.random()
+	%>
+<div class="form-check">
+	<input class="form-check-input" type="radio" id="radio<%- radio_id %>" name="<%- name %>" value="<%- key %>" <% if (key==0){ %>checked<% } %> >
+	<label class="form-check-label" for="radio<%- radio_id %>">
+		<%- subItem %>
+	</label>
+</div>
 	<% }) %>
 
 <% break; case "ul": %>
@@ -26,6 +31,8 @@
 	<li class="list-group-item list-group-item-danger"><%= item.text %></li>
 	<% break; case "warning": %>
 	<li class="list-group-item list-group-item-warning"><%= item.text %></li>
+	<% break; case "info": %>
+	<li class="list-group-item list-group-item-info"><%= item.text %></li>
 	<% break; default: %>
 	<li class="list-group-item list-group-item-primary"><%= item.text %></li>
 	<% } %>

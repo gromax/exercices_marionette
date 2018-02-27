@@ -121,6 +121,39 @@ define([], function() {
         keyWords: ["Analyse", "Fonction", "Courbe", "Affine", "Seconde"],
         options: {}
       }, {
+        id: 15,
+        filename: "exo0015",
+        title: "Associer droites et équations réduites",
+        description: "On donne des équations réduites et des droites. Il faut associer chaque équation avec la droite qui la représente.",
+        keyWords: ["Analyse", "Fonction", "Courbe", "Affine", "Seconde"],
+        options: {
+          n: {
+            tag: "Nombre de courbes",
+            options: ["3", "4", "5", "6", "7"]
+          }
+        }
+      }, {
+        id: 16,
+        filename: "exo0016",
+        title: "Associer courbes et fonctions du second degré",
+        description: "Cinq paraboles et cinq fonctions du second degré sont données. À chaque fonction, il faut attribuer la parabole qui la représente.",
+        keyWords: ["Analyse", "Fonction", "Courbe", "Second degré", "Seconde"],
+        options: {}
+      }, {
+        id: 17,
+        filename: "exo0017",
+        title: "Associer courbes et fonctions du second degré",
+        description: "Cinq paraboles sont données. On propose cinq fonctions du second degré dont on ne connait que le discriminant et le coefficient du terme de second degré. À chaque fonction, il faut attribuer la parabole qui la représente.",
+        keyWords: ["Analyse", "Fonction", "Courbe", "Affine", "Seconde"],
+        options: {}
+      }, {
+        id: 18,
+        filename: "exo0018",
+        title: "Tracer la courbe d'une fonction $x\\mapsto |ax+b|$",
+        description: "On donne l'expression d'une fonction affine avec une valeur absolue. Il faut tracer sa courbe représentative.",
+        keyWords: ["Analyse", "Fonction", "Courbe", "Affine", "Seconde"],
+        options: {}
+      }, {
         id: 23,
         filename: "exo0023",
         title: "Équation de la tangente à une courbe",
@@ -169,12 +202,155 @@ define([], function() {
         keyWords: ["Géométrie", "Trigonométrie", "Seconde"],
         options: {}
       }, {
+        id: 32,
+        filename: "exo0032",
+        title: "Mesure principale d'un angle",
+        description: "La mesure d'un angle est donnée en radians. Il faut donner sa mesure principale.",
+        keyWords: ["Géométrie", "Trigonométrie", "Seconde"],
+        options: {}
+      }, {
+        id: 33,
+        filename: "exo0033",
+        title: "Équation modulo &nbsp; $2\\pi$",
+        description: "Résoudre une équation portant sur des mesures angulaires en radians, avec un terme $2k\\pi$.",
+        keyWords: ["Trigonométrie", "Algèbre", "Équation", "Première"],
+        options: {}
+      }, {
+        id: 34,
+        filename: "exo0034",
+        title: "Équation de type &nbsp; $\\cos x = \\cos \\alpha$",
+        description: "Résoudre une équation de la forme $\\cos x = \\cos \\alpha$ $\\sin x = \\sin \\alpha$.",
+        keyWords: ["Trigonométrie", "Algèbre", "Équation", "Première"],
+        options: {}
+      }, {
+        id: 35,
+        filename: "exo0035",
+        title: "Équation de type &nbsp; $\\cos (a\\cdot x+b) = \\cos \\alpha$",
+        description: "Résoudre une équation de la forme $\\cos x = \\cos \\alpha$ $\\sin x = \\sin \\alpha$.",
+        keyWords: ["Trigonométrie", "Algèbre", "Équation", "Première"],
+        options: {}
+      }, {
+        id: 36,
+        filename: "exo0036",
+        title: "Placer des points sur le cercle trigonométrique",
+        description: "Placer sur le cercle trigonométrique le point correspondant à une mesure donnée en radians.",
+        keyWords: ["Trigonométrie", "Première", "Radians", "Seconde"],
+        options: {}
+      }, {
+        id: 37,
+        filename: "exo0037",
+        title: "Dérivée d'une fonction trigonométrique",
+        description: "Dériver une fonction de la forme &nbsp; $f(t)=A\\sin(\\omega t+\\varphi)$.",
+        keyWords: ["Dérivation", "Trigonométrie", "Première"],
+        options: {}
+      }, {
+        id: 38,
+        filename: "exo0038",
+        title: "Choix de la meilleure forme",
+        description: "Une fonction du second degré est donnée sous différentes formes. Vous devez utiliser la plus appropriée meilleure pour répondre à différentes questions.",
+        keyWords: ["Analyse", "Second degré", "Seconde"],
+        options: {}
+      }, {
+        id: 39,
+        filename: "exo0039",
+        title: "* Associer tableaux de variations et fonctions du second degré",
+        description: "Cinq paraboles et cinq fonctions du second degré sont données. À chaque fonction, il faut attribuer le tableau qui lui correspond.",
+        keyWords: ["Analyse", "Fonction", "Tableau de variation", "Forme canonique", "Second degré", "Seconde"],
+        options: {}
+      }, {
+        id: 40,
+        filename: "exo0040",
+        title: "Somme de fractions",
+        description: "Ajouter des fractions et simplifier le résultat.",
+        keyWords: ["Calcul", "Collège", "Fraction"],
+        options: {}
+      }, {
         id: 41,
         filename: "exo0041",
         title: "Termes d'une suite explicite",
         description: "Calculer les termes d'une suite donnée explicitement.",
         keyWords: ["Analyse", "Suite", "Première"],
         options: {}
+      }, {
+        id: 42,
+        filename: "exo0042",
+        title: "Termes d'une suite récurrente",
+        description: "Calculer les termes d'une suite donnée par récurence.",
+        keyWords: ["Analyse", "Suite", "Première"],
+        options: {}
+      }, {
+        id: 43,
+        filename: "exo0043",
+        title: "Suites et intérêts composés",
+        description: "On donne le rendement annuel d'un placement. On cherche à savoir au bout de combien de temps on aura doublé le capital initial.",
+        keyWords: ["Analyse", "Suite", "Première"],
+        options: {}
+      }, {
+        id: 44,
+        filename: "exo0044",
+        title: "De la forme algébrique à la forme trigonométrique",
+        description: "On vous donne un nombre complexe sous sa forme algébrique. vous devez trouver sa forme trigonométrique, c'est à dire son module et son argument.",
+        keyWords: ["Géométrie", "Complexe", "Première"],
+        options: {}
+      }, {
+        id: 45,
+        filename: "exo0045",
+        title: "De la forme trigonométrique à la forme algébrique",
+        description: "On vous donne un nombre complexe sous sa forme trigonométrique. vous devez trouver sa forme algébrique.",
+        keyWords: ["Géométrie", "Complexe", "Première"]
+      }, {
+        id: 46,
+        filename: "exo0046",
+        title: "Calcul d'un angle avec les complexes",
+        description: "Trois points A,B et C sont donnés. Il faut trouver l'angle $\\widehat{BAC}$.",
+        keyWords: ["Géométrie", "Complexe", "Première"],
+        options: {}
+      }, {
+        id: 47,
+        filename: "exo0047",
+        title: "Calcul de l'aire d'un parallélogramme avec les complexes",
+        description: "Quatre points A, B, D sont donnés. On sait que $ABCD$ est un parallélogramme. Il faut trouver l'aire de $ABCD$.",
+        keyWords: ["Géométrie", "Complexe", "Première"],
+        options: {}
+      }, {
+        id: 48,
+        filename: "exo0048",
+        title: "Reconnaître les courbes fonction / dérivée ou fonction / primitive",
+        description: "On donne la courbe d'une fonction $f$ et la courbe de sa dérivée $f'$ (ou de sa primitive $F$), il faut reconnaître quelle courbe correspond à $f$ et quelle courbe correspond à $f'$ (ou $F$).",
+        keyWords: ["Analyse", "Déerivation", "Première", "Primitive", "Terminale"],
+        options: {
+          a: {
+            tag: "Dérivée ou Primitive",
+            options: ["Dérivée", "Primitive"]
+          }
+        }
+      }, {
+        id: 49,
+        filename: "exo0049",
+        title: "Donnez la primitive d'une fonction",
+        description: "Une fonction polynome est donnée, il faut donner sa primitive.",
+        keyWords: ["Analyse", "fonction", "Primitive", "Terminale"],
+        options: {}
+      }, {
+        id: 50,
+        filename: "exo0050",
+        title: "Ajustement par la méthode des moindres carrés",
+        description: "On vous donne une série statistique à deux variables $(x;y)$. Vous devez déterminer un ajustement de $y$ en $x$ par la méthode des moindres carrés.",
+        keyWords: ["Statistiques", "Ajustement", "carré", "TSTL", "BTS"],
+        options: {
+          a: {
+            tag: "Coordonnées du point moyen",
+            options: ["Non", "Oui"]
+          },
+          b: {
+            tag: "Changement de variable",
+            options: ["Non", "Oui"]
+          },
+          c: {
+            tag: "Calcul d'interpolation",
+            options: ["Non", "Oui"]
+          }
+        }
       }, {
         id: 51,
         filename: "exo0051",
@@ -212,6 +388,18 @@ define([], function() {
           b: {
             tag: "équation",
             options: ["f(ax+b)=f(cx+d)", "a.f(x)+b = c.f(x)+d", "a.f²(x)+...=0,", "c.f(ax+b)+d=...", "a.f²(ax+b)+...=0"]
+          }
+        }
+      }, {
+        id: 54,
+        filename: "exo0054",
+        title: "Équations différentielles du premier ordre",
+        description: "Résoudre des équations différentielles du premier ordre, avec coefficients constant et second membre.",
+        keyWords: ["exponentielle", "équation", "TSTL", "BTS"],
+        options: {
+          a: {
+            tag: "second membre",
+            options: ["u' exp(-b/a.t)+Y", "u' exp(-b/a.t)", "Y", "u' exp(-b/a.t) OU Y"]
           }
         }
       }

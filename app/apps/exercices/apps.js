@@ -1,10 +1,10 @@
 define(["marionette","app"], function(Marionette,app){
 
 	var API = {
-		exercicesList: function(){
+		exercicesList: function(criterion){
 			app.Ariane.reset([{text:"Exercices", e:"exercices:list", link:"exercices"}]);
 			require(["apps/exercices/list/list_controller"], function(listController){
-				listController.list();
+				listController.list(criterion);
 			});
 		},
 
@@ -14,7 +14,7 @@ define(["marionette","app"], function(Marionette,app){
 				{text:"Exercice #"+id, e:"exercices:show:", data:id, link:"exercice:"+id}
 			]);
 			require(["apps/exercices/show/show_controller"], function(showController){
-				showController.show(id);
+				showController.execExoForTest(id);
 			});
 		},
 
@@ -22,7 +22,7 @@ define(["marionette","app"], function(Marionette,app){
 			var auth = app.Auth;
 			var testForProf = function(){
 				require(["apps/exercices/show/show_controller"], function(showController){
-					showController.execExoFicheForTest(idEF);
+					showController.execExoFicheForProf(idEF);
 				});
 			}
 
@@ -37,7 +37,23 @@ define(["marionette","app"], function(Marionette,app){
 				"Admin": testForProf,
 				"Prof": testForProf,
 				"Eleve": execForEleve,
-				"def": this.notFound,
+				"def": function(){ app.trigger("notFound") },
+			});
+			todo();
+		},
+
+		runUE: function(idUE){
+			var auth = app.Auth;
+			var forEleve = function(){
+				app.Ariane.reset([]);
+				require(["apps/exercices/show/show_controller"], function(showController){
+					showController.execUEForEleve(idUE);
+				});
+			}
+
+			var todo = auth.mapItem({
+				"Eleve": forEleve,
+				"def": function(){ app.trigger("notFound") },
 			});
 			todo();
 		},
@@ -49,6 +65,15 @@ define(["marionette","app"], function(Marionette,app){
 		API.exercicesList();
 	});
 
+	app.on("exercices:filter", function(criterion){
+		if(criterion){
+			app.navigate("exercices/filter/criterion:" + criterion);
+		}
+		else{
+			app.navigate("exercices");
+		}
+	});
+
 	app.on("exercice:show", function(id, data){
 		app.navigate("exercice:" + id);
 		API.exerciceShow(id, data);
@@ -56,20 +81,26 @@ define(["marionette","app"], function(Marionette,app){
 
 	app.on("exercice-fiche:run", function(idEF, idUF){
 		if (idUF) {
-			app.navigate("user-fiche:"+idUF+"/exercice-fiche:" + idEF);
+			app.navigate("fiche-eleve:"+idUF+"/exercice-fiche:" + idEF);
 		} else {
 			app.navigate("exercice-fiche:" + idEF);
 		}
 		API.runExoFiche(idUF, idEF);
 	});
 
+	app.on("exercice-fait:run", function(idUE){
+		app.navigate("exercice-fait:"+idUE);
+		API.runUE(idUE);
+	})
+
 	var Router = Marionette.AppRouter.extend({
 		controller: API,
 		appRoutes: {
-			"exercices": "exercicesList",
+			"exercices(/filter/criterion::criterion)": "exercicesList",
 			"exercice::id": "exerciceShow",
 			"exercice-fiche::id": "runExoFiche",
-			"user-fiche::idUF/exercice-fiche::idEF":"runExoFiche",
+			"fiche-eleve::idUF/exercice-fiche::idEF":"runExoFiche",
+			"exercice-fait::idUE":"runUE"
 		}
 	});
 

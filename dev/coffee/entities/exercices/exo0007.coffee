@@ -4,11 +4,12 @@ define ["utils/math","utils/help"], (mM, help) ->
 	# description:"Un tableau de valeur d'une fonction est donné. Il faut déterminer une image et un antécédent."
 	# keyWords:["Fonctions","Antécédent","Image","Seconde"]
 
-	Controller =
-		init: (inputs, options) ->
-
-			borne_inf = -7
-			borne_sup = 7
+	return {
+		m: -7
+		M: 7
+		init: (inputs) ->
+			borne_inf = @m
+			borne_sup = @M
 			if typeof inputs.a is "undefined" then a = inputs.a = mM.alea.real { min:0, max:1 }
 			else a = Number inputs.a
 
@@ -29,84 +30,92 @@ define ["utils/math","utils/help"], (mM, help) ->
 
 			fct = (x) -> ((((a*x)+b)*x)+c)*x+d
 
-			yi = fct(xi)
-			ya = fct(xa)
-
+			yi =
+			ya =
 			# Calcul des valeurs du tableau de variation
 			tabx = [borne_inf..borne_sup]
 			taby = ( fct(x) for x in tabx)
 			antecedents = ( x for x, i in tabx when taby[i] is ya )
+
+			[
+				xi
+				fct(xi)
+				xa
+				fct(xa)
+				tabx
+				taby
+				antecedents
+			]
+
+		getBriques: (inputs, options) ->
+			[xi, yi, xa, ya, tabx, taby, antecedents]
 			tabx.unshift("$x$")
 			taby.unshift("$f(x)$")
 
-			{
-				inputs: inputs
-				briques: [
-					{
-						bareme:100
-						items: [
-							{
-								type:"text"
-								rank:1
-								ps:[
-									"On considère la fonction &nbsp; $f$ &nbsp; défnie sur l'intervalle &nbsp; $[#{borne_inf};#{borne_sup}]$."
-									"On donne le tableau de valeur suivant :"
-								]
-							}
-							{
-								type:"tableau"
-								rank:2
-								entetes: false
-								lignes:[
-									tabx
-									taby
-								]
-							}
-							{
-								type:"text"
-								rank:3
-								ps:[
-									"Donnez l'image de #{xi} par &nbsp; $f$."
-								]
-							}
-							{
-								type:"input"
-								rank:4
-								waited: "number"
-								tag:"Image"
-								description:"Image de #{xi}"
-								name: "i"
-								good: yi
-							}
-							{
-								type:"text"
-								rank:5
-								ps:[
-									"Donnez un antécédent (un seul !) de #{ya} par &nbsp; $f$."
-								]
-							}
-							{
-								type:"input"
-								rank:6
-								waited: "number"
-								tag:"Antécédent"
-								description:"Antécédent de #{ya}"
-								name: "a"
-								good: antecedents
-							}
-							{
-								type:"validation"
-								rank:7
-								clavier: ["aide"]
-							}
-							{
-								type: "aide"
-								rank:8
-								list: help.fonction.image_antecedent
-							}
-						]
-					}
-				]
-			}
-
-	return Controller
+			[
+				{
+					bareme:100
+					items: [
+						{
+							type:"text"
+							rank:1
+							ps:[
+								"On considère la fonction &nbsp; $f$ &nbsp; défnie sur l'intervalle &nbsp; $[#{@m};#{@M}]$."
+								"On donne le tableau de valeur suivant :"
+							]
+						}
+						{
+							type:"tableau"
+							rank:2
+							entetes: false
+							lignes:[
+								tabx
+								taby
+							]
+						}
+						{
+							type:"text"
+							rank:3
+							ps:[
+								"Donnez l'image de #{xi} par &nbsp; $f$."
+							]
+						}
+						{
+							type:"input"
+							rank:4
+							waited: "number"
+							tag:"Image"
+							description:"Image de #{xi}"
+							name: "i"
+							good: yi
+						}
+						{
+							type:"text"
+							rank:5
+							ps:[
+								"Donnez un antécédent (un seul !) de #{ya} par &nbsp; $f$."
+							]
+						}
+						{
+							type:"input"
+							rank:6
+							waited: "number"
+							tag:"Antécédent"
+							description:"Antécédent de #{ya}"
+							name: "a"
+							good: antecedents
+						}
+						{
+							type:"validation"
+							rank:7
+							clavier: ["aide"]
+						}
+						{
+							type: "aide"
+							rank:8
+							list: help.fonction.image_antecedent
+						}
+					]
+				}
+			]
+	}

@@ -1,10 +1,11 @@
 define(["utils/math", "utils/help"], function(mM, help) {
-  var Controller;
-  Controller = {
-    init: function(inputs, options) {
+  return {
+    m: -7,
+    M: 7,
+    init: function(inputs) {
       var a, antecedents, b, borne_inf, borne_sup, c, d, fct, i, j, results, tabx, taby, x, xa, xi, ya, yi;
-      borne_inf = -7;
-      borne_sup = 7;
+      borne_inf = this.m;
+      borne_sup = this.M;
       if (typeof inputs.a === "undefined") {
         a = inputs.a = mM.alea.real({
           min: 0,
@@ -56,9 +57,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
       fct = function(x) {
         return ((((a * x) + b) * x) + c) * x + d;
       };
-      yi = fct(xi);
-      ya = fct(xa);
-      tabx = (function() {
+      yi = ya = tabx = (function() {
         results = [];
         for (var j = borne_inf; borne_inf <= borne_sup ? j <= borne_sup : j >= borne_sup; borne_inf <= borne_sup ? j++ : j--){ results.push(j); }
         return results;
@@ -83,61 +82,61 @@ define(["utils/math", "utils/help"], function(mM, help) {
         }
         return results1;
       })();
+      return [xi, fct(xi), xa, fct(xa), tabx, taby, antecedents];
+    },
+    getBriques: function(inputs, options) {
+      [xi, yi, xa, ya, tabx, taby, antecedents];
       tabx.unshift("$x$");
       taby.unshift("$f(x)$");
-      return {
-        inputs: inputs,
-        briques: [
-          {
-            bareme: 100,
-            items: [
-              {
-                type: "text",
-                rank: 1,
-                ps: ["On considère la fonction &nbsp; $f$ &nbsp; défnie sur l'intervalle &nbsp; $[" + borne_inf + ";" + borne_sup + "]$.", "On donne le tableau de valeur suivant :"]
-              }, {
-                type: "tableau",
-                rank: 2,
-                entetes: false,
-                lignes: [tabx, taby]
-              }, {
-                type: "text",
-                rank: 3,
-                ps: ["Donnez l'image de " + xi + " par &nbsp; $f$."]
-              }, {
-                type: "input",
-                rank: 4,
-                waited: "number",
-                tag: "Image",
-                description: "Image de " + xi,
-                name: "i",
-                good: yi
-              }, {
-                type: "text",
-                rank: 5,
-                ps: ["Donnez un antécédent (un seul !) de " + ya + " par &nbsp; $f$."]
-              }, {
-                type: "input",
-                rank: 6,
-                waited: "number",
-                tag: "Antécédent",
-                description: "Antécédent de " + ya,
-                name: "a",
-                good: antecedents
-              }, {
-                type: "validation",
-                rank: 7,
-                clavier: ["aide"]
-              }, {
-                type: "aide",
-                rank: 8,
-                list: help.fonction.image_antecedent
-              }
-            ]
-          }
-        ]
-      };
+      return [
+        {
+          bareme: 100,
+          items: [
+            {
+              type: "text",
+              rank: 1,
+              ps: ["On considère la fonction &nbsp; $f$ &nbsp; défnie sur l'intervalle &nbsp; $[" + this.m + ";" + this.M + "]$.", "On donne le tableau de valeur suivant :"]
+            }, {
+              type: "tableau",
+              rank: 2,
+              entetes: false,
+              lignes: [tabx, taby]
+            }, {
+              type: "text",
+              rank: 3,
+              ps: ["Donnez l'image de " + xi + " par &nbsp; $f$."]
+            }, {
+              type: "input",
+              rank: 4,
+              waited: "number",
+              tag: "Image",
+              description: "Image de " + xi,
+              name: "i",
+              good: yi
+            }, {
+              type: "text",
+              rank: 5,
+              ps: ["Donnez un antécédent (un seul !) de " + ya + " par &nbsp; $f$."]
+            }, {
+              type: "input",
+              rank: 6,
+              waited: "number",
+              tag: "Antécédent",
+              description: "Antécédent de " + ya,
+              name: "a",
+              good: antecedents
+            }, {
+              type: "validation",
+              rank: 7,
+              clavier: ["aide"]
+            }, {
+              type: "aide",
+              rank: 8,
+              list: help.fonction.image_antecedent
+            }
+          ]
+        }
+      ];
     }
   };
-  return Controller;
 });

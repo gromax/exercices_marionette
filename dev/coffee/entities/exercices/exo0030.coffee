@@ -5,8 +5,8 @@
 	# description: "On donne l'expression de suites et il faut l'associer à la forme donnée par récurence."
 	# keyWords:["Analyse", "Suite", "Première"]
 
-	Controller =
-		init: (inputs, options) ->
+	return {
+		init: (inputs) ->
 			items=[]
 			if inputs.q1? then q1 = Number inputs.q1
 			else q1 = inputs.q1 = mM.alea.real( { values:{min:1, max:10}, sign:true } )
@@ -37,44 +37,46 @@
 			# On affecte le rang, ce qui revient à affecter les couleurs
 			item.rank = o[i] for item,i in items
 
-			liste_fixe = _.shuffle ({ type: "normal", text:"$#{item.a}$", color:colors.html(item.rank)} for item in items)
-			liste_choix = _.shuffle ({ text:"$#{item.b}$ &nbsp; et &nbsp; $u_0=#{item.c}$", rank:item.rank } for item in items)
+			[
+				_.shuffle ({ type: "normal", text:"$#{item.a}$", color:colors.html(item.rank)} for item in items)
+				_.shuffle ({ text:"$#{item.b}$ &nbsp; et &nbsp; $u_0=#{item.c}$", rank:item.rank } for item in items)
+			]
 
-			{
-				inputs: inputs
-				briques: [
-					{
-						bareme: 100
-						items: [
-							{
-								type: "text"
-								rank: 1
-								ps: [
-									"On vous donee d'abord des suites données explicitement."
-									"Ensuite on vous donne des suites données par récurence."
-									"Associez-les en utilisant les boutons de la deuxième liste"
-								]
-							}
-							{
-								type: "color-list"
-								rank: 2
-								list: liste_fixe
-							}
-							{
-								type: "color-choice"
-								rank: 3
-								name: "it"
-								list: liste_choix
-							}
-							{
-								type: "validation"
-								rank: 4
-								clavier: []
-							}
-						]
-					}
-				]
-			}
+		getBriques: (inputs, options) ->
+			[ liste_fixe, liste_choix ] = @init(inputs)
+
+			[
+				{
+					bareme: 100
+					items: [
+						{
+							type: "text"
+							rank: 1
+							ps: [
+								"On vous donee d'abord des suites données explicitement."
+								"Ensuite on vous donne des suites données par récurence."
+								"Associez-les en utilisant les boutons de la deuxième liste"
+							]
+						}
+						{
+							type: "color-list"
+							rank: 2
+							list: liste_fixe
+						}
+						{
+							type: "color-choice"
+							rank: 3
+							name: "it"
+							list: liste_choix
+						}
+						{
+							type: "validation"
+							rank: 4
+							clavier: []
+						}
+					]
+				}
+			]
 
 		tex:(data) ->
 			# en chantier
@@ -103,6 +105,4 @@
 				}
 			out
 
-	return Controller
-
-
+	}

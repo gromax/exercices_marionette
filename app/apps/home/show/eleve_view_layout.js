@@ -3,6 +3,7 @@ define(["jst","marionette"], function(JST,Marionette){
 		template: window.JST["home/show/eleve-view-layout"],
 		regions: {
 			devoirsRegion: "#devoirs-region",
+			unfinishedRegion: "#unfinished-region",
 		}
 	});
 

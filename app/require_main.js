@@ -15,14 +15,10 @@ requirejs.config({
 		tpl : "../vendor/requirejs-underscore-tpl/underscore-tpl",
 		underscore: "../vendor/underscore/underscore",
 		md5: "../vendor/md5/src/md5",
-		"tether.original":"https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min",
-		//tether:"../vendor/tether/dist/js/tether.min",
-		tether:"./tether.rustine",
-		bootstrap:"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min",
-		//bootstrap:"../vendor/bootstrap4/js/bootstrap.min",
+		popper:"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min",
+		bootstrap:"../vendor/bootstrap/dist/js/bootstrap",
 		jst:"../dist/templates.underscore",
 		mathjax: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML",
-		BBcache: "../node_modules/backbone-fetch-cache/backbone.fetch-cache.min",
 		jsxgraph: "https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.6/jsxgraphcore",
 	},
 
@@ -40,7 +36,10 @@ requirejs.config({
 			deps: ["backbone"],
 			exports: "Marionette"
 		},
-		bootstrap: ["tether","jquery"],
+		popper:{
+			exports: "popper.js"
+		},
+		bootstrap: ["jquery", "popper"],
 		"jquery-ui": ["jquery"], // il faut bootstrap avant jquery-ui
 		"spin.jquery": ["spin", "jquery"],
 		tpl: ["text"],
@@ -56,6 +55,12 @@ requirejs.config({
 	}
 });
 
-require(["app"], function(app){
-	app.start();
+
+require(["popper"], function(p){
+	window.Popper = p;
+	require(["app"], function(app){
+		app.start();
+	});
 });
+
+
