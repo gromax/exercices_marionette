@@ -1,7 +1,7 @@
 define([
 	"app",
 	"marionette",
-	"apps/common/loading_view",
+	"apps/common/alert_view",
 	"apps/devoirs/edit/edit_fiche_layout",
 	"apps/devoirs/edit/tabs_panel",
 	"apps/devoirs/edit/edit_fiche_view",
@@ -18,7 +18,7 @@ define([
 ], function(
 	app,
 	Marionette,
-	LoadingView,
+	AlertView,
 	Layout,
 	TabsPanel,
 	ShowView,
@@ -37,6 +37,7 @@ define([
 		channelName: "entities",
 		show: function(id){
 			// vue des paramètres du devoir lui même
+			app.trigger("header:loading", true);
 			var layout = new Layout();
 			var tabs = new TabsPanel({panel:0});
 
@@ -56,14 +57,8 @@ define([
 				app.trigger("devoir:exams",id);
 			});
 
-			var loadingView = new LoadingView({
-				title: "Affichage d'un devoir",
-				message: "Chargement des données."
-			});
-
 			layout.on("render", function(){
 				layout.getRegion('tabsRegion').show(tabs);
-				layout.getRegion('contentRegion').show(loadingView);
 			});
 
 			app.regions.getRegion('main').show(layout);
@@ -86,15 +81,22 @@ define([
 						view.on("form:submit", function(data){
 							var updatingItem = fiche.save(data);
 							if(updatingItem){
+								app.trigger("header:loading", true);
 								$.when(updatingItem).done(function(){
 									view.goToShow();
 								}).fail(function(response){
 									if(response.status == 422){
 										view.triggerMethod("form:data:invalid", response.responseJSON.errors);
+									} else {
+										if(response.status == 401){
+											alert("Vous devez vous (re)connecter !");
+											app.trigger("home:logout");
+										} else {
+											alert("Erreur inconnue. Essayez à nouveau !");
+										}
 									}
-									else{
-										alert("Erreur inconnue. Essayez à nouveau !");
-									}
+								}).always(function(){
+									app.trigger("header:loading", false);
 								});
 							}
 							else {
@@ -107,12 +109,23 @@ define([
 						var view = new MissingView();
 						layout.getRegion('contentRegion').show(view);
 					}
+				}).fail(function(response){
+					if(response.status == 401){
+						alert("Vous devez vous (re)connecter !");
+						app.trigger("home:logout");
+					} else {
+						var alertView = new AlertView();
+						app.regions.getRegion('main').show(alertView);
+					}
+				}).always(function(){
+					app.trigger("header:loading", false);
 				});
 			});
 		},
 
 		showExercices: function(id){
 			// Vue pour les exercices de la fiche
+			app.trigger("header:loading", true);
 			var layout = new Layout();
 			var tabs = new TabsPanel({panel:1});
 
@@ -132,14 +145,8 @@ define([
 				app.trigger("devoir:exams",id);
 			});
 
-			var loadingView = new LoadingView({
-				title: "Affichage des exercices d'un devoir",
-				message: "Chargement des données."
-			});
-
 			layout.on("render", function(){
 				layout.getRegion('tabsRegion').show(tabs);
-				layout.getRegion('contentRegion').show(loadingView);
 			});
 
 			app.regions.getRegion('main').show(layout);
@@ -172,15 +179,22 @@ define([
 							var model = childView.model;
 							var updatingItem = model.save(data);
 							if(updatingItem){
+								app.trigger("header:loading", true);
 								$.when(updatingItem).done(function(){
 									childView.goToShow();
 								}).fail(function(response){
 									if(response.status == 422){
 										childView.triggerMethod("form:data:invalid", response.responseJSON.errors);
+									} else {
+										if(response.status == 401){
+											alert("Vous devez vous (re)connecter !");
+											app.trigger("home:logout");
+										} else {
+											alert("Erreur inconnue. Essayez à nouveau !");
+										}
 									}
-									else{
-										alert("Erreur inconnue. Essayez à nouveau !");
-									}
+								}).always(function(){
+									app.trigger("header:loading", false);
 								});
 							}
 							else {
@@ -203,6 +217,7 @@ define([
 									var new_exofiche = new ExoFiche({ idFiche:fiche.get("id") , idE:model.get("id") }, { parse:true});
 									var savingItem = new_exofiche.save();
 									if (savingItem){
+										app.trigger("header:loading", true);
 										$.when(savingItem).done(function(){
 											exofiches.add(new_exofiche);
 											addExerciceView.trigger("dialog:close");
@@ -211,7 +226,15 @@ define([
 												newExoFicheView.flash("success");
 											}
 										}).fail(function(response){
-											alert("An unprocessed error happened. Please try again!");
+											if(response.status == 401){
+												alert("Vous devez vous (re)connecter !");
+												addExerciceView.trigger("dialog:close");
+												app.trigger("home:logout");
+											} else {
+												alert("Erreur inconnue. Essayez à nouveau !");
+											}
+										}).always(function(){
+											app.trigger("header:loading", false);
 										});
 									} else {
 										alert("An unprocessed error happened. Please try again!");
@@ -228,12 +251,23 @@ define([
 						var view = new MissingView();
 						layout.getRegion('contentRegion').show(view);
 					}
+				}).fail(function(response){
+					if(response.status == 401){
+						alert("Vous devez vous (re)connecter !");
+						app.trigger("home:logout");
+					} else {
+						var alertView = new AlertView();
+						app.regions.getRegion('main').show(alertView);
+					}
+				}).always(function(){
+					app.trigger("header:loading", false);
 				});
 			});
 		},
 
 		showUserfiches: function(id){
 			// Vue pour les userfiches de la fiche
+			app.trigger("header:loading", true);
 			var layout = new Layout();
 			var tabs = new TabsPanel({panel:2});
 
@@ -253,14 +287,8 @@ define([
 				app.trigger("devoir:exams",id);
 			});
 
-			var loadingView = new LoadingView({
-				title: "Affichage des fiches élèves d'un devoir",
-				message: "Chargement des données."
-			});
-
 			layout.on("render", function(){
 				layout.getRegion('tabsRegion').show(tabs);
-				layout.getRegion('contentRegion').show(loadingView);
 			});
 
 			app.regions.getRegion('main').show(layout);
@@ -281,11 +309,19 @@ define([
 							model.set("actif", !model.get("actif"));
 							var updatingItem = model.save();
 							if (updatingItem) {
+								app.trigger("header:loading", true);
 								$.when(updatingItem).done(function(){
 									childview.render();
 									childview.flash("success");
 								}).fail(function(response){
-									alert("Une erreur inconnue s'est produite. Réessayez !");
+									if(response.status == 401){
+										alert("Vous devez vous (re)connecter !");
+										app.trigger("home:logout");
+									} else {
+										alert("Erreur inconnue. Essayez à nouveau !");
+									}
+								}).always(function(){
+									app.trigger("header:loading", false);
 								});
 							} else {
 								childview.flash("danger");
@@ -304,12 +340,23 @@ define([
 						var view = new MissingView();
 						layout.getRegion('contentRegion').show(view);
 					}
+				}).fail(function(response){
+					if(response.status == 401){
+						alert("Vous devez vous (re)connecter !");
+						app.trigger("home:logout");
+					} else {
+						var alertView = new AlertView();
+						app.regions.getRegion('main').show(alertView);
+					}
+				}).always(function(){
+					app.trigger("header:loading", false);
 				});
 			});
 		},
 
 		showAddUserfiche: function(id){
 			// Vue pour l'ajout de fiches élèves
+			app.trigger("header:loading", true);
 			var layout = new Layout();
 			var tabs = new TabsPanel({panel:3});
 
@@ -329,14 +376,8 @@ define([
 				app.trigger("devoir:exams",id);
 			});
 
-			var loadingView = new LoadingView({
-				title: "Affichage des exercices d'un devoir",
-				message: "Chargement des données."
-			});
-
 			layout.on("render", function(){
 				layout.getRegion('tabsRegion').show(tabs);
-				layout.getRegion('contentRegion').show(loadingView);
 			});
 
 			app.regions.getRegion('main').show(layout);
@@ -365,6 +406,7 @@ define([
 
 								var savingItem = new_userfiche.save();
 								if (savingItem){
+									app.trigger("header:loading", true);
 									$.when(savingItem).done(function(){
 										new_userfiche.set({nomUser:model.get("nom"), prenomUser:model.get("prenom")});
 										userfiches.add(new_userfiche);
@@ -372,7 +414,14 @@ define([
 										childView.flash("success");
 
 									}).fail(function(response){
-										alert("An unprocessed error happened. Please try again!");
+										if(response.status == 401){
+											alert("Vous devez vous (re)connecter !");
+											app.trigger("home:logout");
+										} else {
+											alert("Erreur inconnue. Essayez à nouveau !");
+										}
+									}).always(function(){
+										app.trigger("header:loading", false);
 									});
 								} else {
 									alert("An unprocessed error happened. Please try again!");
@@ -392,11 +441,22 @@ define([
 						var view = new MissingView();
 						layout.getRegion('contentRegion').show(view);
 					}
+				}).fail(function(response){
+					if(response.status == 401){
+						alert("Vous devez vous (re)connecter !");
+						app.trigger("home:logout");
+					} else {
+						var alertView = new AlertView();
+						app.regions.getRegion('main').show(alertView);
+					}
+				}).always(function(){
+					app.trigger("header:loading", false);
 				});
 			});
 		},
 
 		showExams: function(id){
+			app.trigger("header:loading", true);
 			var layout = new Layout();
 			var tabs = new TabsPanel({panel:4});
 
@@ -416,14 +476,8 @@ define([
 				app.trigger("devoir:addUserfiche",id);
 			});
 
-			var loadingView = new LoadingView({
-				title: "Affichage des versions Tex du devoir",
-				message: "Chargement des données."
-			});
-
 			layout.on("render", function(){
 				layout.getRegion('tabsRegion').show(tabs);
-				layout.getRegion('contentRegion').show(loadingView);
 			});
 
 			app.regions.getRegion('main').show(layout);
@@ -449,6 +503,7 @@ define([
 							edView.on("form:submit", function(data){
 								var updatingExam = model.save(data);
 								if(updatingExam){
+									app.trigger("header:loading", true);
 									$.when(updatingExam).done(function(){
 										childView.render();
 										edView.trigger("dialog:close");
@@ -457,8 +512,15 @@ define([
 										if(response.status == 422){
 											edView.triggerMethod("form:data:invalid", response.responseJSON.errors);
 										} else {
-											alert("An unprocessed error happened. Please try again!");
+											if(response.status == 401){
+												alert("Vous devez vous (re)connecter !");
+												app.trigger("home:logout");
+											} else {
+												alert("Erreur inconnue. Essayez à nouveau !");
+											}
 										}
+									}).always(function(){
+										app.trigger("header:loading", false);
 									});
 								} else {
 									this.triggerMethod("form:data:invalid", model.validationError);
@@ -474,11 +536,19 @@ define([
 							model.set("locked", !locked);
 							var updatingExam = model.save();
 							if (updatingExam) {
+								app.trigger("header:loading", false);
 								$.when(updatingExam).done(function(){
 									childView.render();
 									childView.flash("success");
 								}).fail(function(response){
-									alert("Une erreur inconnue s'est produite. Réessayez !");
+									if(response.status == 401){
+										alert("Vous devez vous (re)connecter !");
+										app.trigger("home:logout");
+									} else {
+										alert("Erreur inconnue. Essayez à nouveau !");
+									}
+								}).always(function(){
+									app.trigger("header:loading", false);
 								});
 							} else {
 								alert("Une erreur inconnue s'est produite. Réessayez !");
@@ -494,6 +564,7 @@ define([
 						panel.on("exam:new", function(){
 							require(["entities/exam"], function(Exam){
 								var fetchingNew = channel.request("new:exam:entity", id);
+								app.trigger("header:loading", true);
 								$.when(fetchingNew).done(function(newExamParams){
 									var newExam = new Exam({ nom:"Tex", idFiche:id, data:newExamParams.data });
 									var savingItem = newExam.save();
@@ -504,8 +575,19 @@ define([
 										alert("An unprocessed error happened. Please try again!");
 									});
 
-								}).fail(function(newExamParams){
-									console.log(newExamParams);
+								}).fail(function(response){
+									if (response.status == 401){
+										alert("Vous devez vous (re)connecter !");
+										app.trigger("home:logout");
+									} else {
+										if (_.isArray(response.messages)) {
+											alert(response.messages.join("\n"));
+										} else {
+											alert("Une erreur inconnue s'est produite. Réessayez !");
+										}
+									}
+								}).always(function(){
+									app.trigger("header:loading", false);
 								});
 							});
 						});
@@ -518,6 +600,16 @@ define([
 						var view = new MissingView();
 						layout.getRegion('contentRegion').show(view);
 					}
+				}).fail(function(response){
+					if(response.status == 401){
+						alert("Vous devez vous (re)connecter !");
+						app.trigger("home:logout");
+					} else {
+						var alertView = new AlertView();
+						app.regions.getRegion('main').show(alertView);
+					}
+				}).always(function(){
+					app.trigger("header:loading", false);
 				});
 			});
 

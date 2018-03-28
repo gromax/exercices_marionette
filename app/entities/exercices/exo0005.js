@@ -52,6 +52,82 @@ define(["utils/math", "utils/help"], function(mM, help) {
         forbidden: [A]
       }).save(inputs);
       return [A, B, A.toClone().minus(B).norme()];
+    },
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, ref, that;
+      that = this;
+      if (((ref = options.a) != null ? ref.value : void 0) === 1) {
+        fct_item = function(inputs, index) {
+          var A, B, gAB, ref1;
+          ref1 = that.init(inputs, options), A = ref1[0], B = ref1[1], gAB = ref1[2];
+          return "$z_A = " + (A.affixe().tex()) + "$ &nbsp; et &nbsp; $z_B = " + (B.affixe().tex()) + "$";
+        };
+        return {
+          children: [
+            {
+              type: "text",
+              children: ["On donne les affixes de deux points &nbsp; $A$, &nbsp et &nbsp; $B$.", "Vous devez donner la distance &nbsp; $AB$."]
+            }, {
+              type: "enumerate",
+              refresh: true,
+              enumi: "1",
+              children: _.map(inputs_list, fct_item)
+            }
+          ]
+        };
+      } else {
+        fct_item = function(inputs, index) {
+          var A, B, gAB, ref1;
+          ref1 = that.init(inputs, options), A = ref1[0], B = ref1[1], gAB = ref1[2];
+          return "$" + (A.texLine()) + "$ &nbsp; et &nbsp; $" + (B.texLine()) + "$";
+        };
+        return {
+          children: [
+            {
+              type: "text",
+              children: ["On donne les coordonnées de deux points &nbsp; $A$, &nbsp et &nbsp; $B$.", "Vous devez donner la distance &nbsp; $AB$."]
+            }, {
+              type: "enumerate",
+              refresh: true,
+              enumi: "1",
+              children: _.map(inputs_list, fct_item)
+            }
+          ]
+        };
+      }
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, ref, that;
+      that = this;
+      if (((ref = options.a) != null ? ref.value : void 0) === 1) {
+        fct_item = function(inputs, index) {
+          var A, B, gAB, ref1;
+          ref1 = that.init(inputs, options), A = ref1[0], B = ref1[1], gAB = ref1[2];
+          return "$z_A = " + (A.affixe().tex()) + "$ et $z_B = " + (B.affixe().tex()) + "$";
+        };
+        return {
+          children: [
+            "On donne les affixes de deux points $A$ et $B$.", "Vous devez donner la distance $AB$.", {
+              type: "enumerate",
+              children: _.map(inputs_list, fct_item)
+            }
+          ]
+        };
+      } else {
+        fct_item = function(inputs, index) {
+          var A, B, gAB, ref1;
+          ref1 = that.init(inputs, options), A = ref1[0], B = ref1[1], gAB = ref1[2];
+          return "$" + (A.texLine()) + "$ et $" + (B.texLine()) + "$";
+        };
+        return {
+          children: [
+            "On donne les coordonnées de deux points $A$ et $B$.", "Vous devez donner la distance $AB$.", {
+              type: "enumerate",
+              children: _.map(inputs_list, fct_item)
+            }
+          ]
+        };
+      }
     }
   };
 });

@@ -126,4 +126,91 @@
 				}
 			]
 
+		getExamBriques: (inputs_list,options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[zA, zB, zC, zAB, zAC, z, ang] = that.init(inputs,options)
+				return "$z_A=#{zA.tex()}$, &nbsp; $z_B = #{zB.tex()}$ &nbsp; et &nbsp; $z_C = #{zC.tex()}$."
+
+			return {
+				children: [
+					{
+						type: "text",
+						children: [
+							"On donne les points &nbsp; $A$, &nbsp; $B$ &nbsp; et &nbsp; $C$ &nbsp; d'affixes respectives &nbsp; $z_A$, &nbsp; $z_B$ &nbsp; et &nbsp; $z_C$."
+							"À chaque fois :"
+						]
+					}
+					{
+						type: "enumerate",
+						refresh:false
+						enumi:"a",
+						children: [
+							"Donnez &nbsp;$z_1$ &nbsp; et &nbsp; $z_2$, affixes respectives de &nbsp; $\\overrightarrow{AC}$ &nbsp; $\\overrightarrow{AB}$."
+							"Calculez &nbsp; $z_1\\cdot\\overline{z_2}$"
+							"Déduisez l'angle &nbsp; $\\widehat{BAC}$."
+						]
+					}
+					{
+						type: "enumerate"
+						enumi: "1"
+						refresh: true
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+		getTex: (inputs_list, options) ->
+			if inputs_list.length is 1
+				[zA, zB, zC, zAB, zAC, z, ang] = @init(inputs_list[0],options)
+				return {
+					children: [
+						"On donne les points $A$, $B$ et $C$ d'affixes respectives $z_A$, $z_B$ et $z_C$."
+						"$z_A=#{zA.tex()}$, $z_B = #{zB.tex()}$ et $z_C = #{zC.tex()}$."
+						{
+							type: "enumerate",
+							enumi:"a)",
+							children: [
+								"Donnez $z_1$ et $z_2$, affixes respectives de $\\overrightarrow{AC}$ $\\overrightarrow{AB}$."
+								"Calculez $z_1\\cdot\\overline{z_2}$"
+								"Déduisez l'angle $\\widehat{BAC}$."
+							]
+						}
+					]
+				}
+
+			else
+				that = @
+
+				fct_item = (inputs, index) ->
+					[zA, zB, zC, zAB, zAC, z, ang] = that.init(inputs,options)
+					return "$z_A=#{zA.tex()}$, $z_B = #{zB.tex()}$ et $z_C = #{zC.tex()}$."
+
+				return {
+					children: [
+						"On donne les points $A$, $B$ et $C$ d'affixes respectives $z_A$, $z_B$ et $z_C$."
+						"À chaque fois :"
+						{
+							type: "enumerate",
+							enumi:"a)",
+							children: [
+								"Donnez $z_1$ et $z_2$, affixes respectives de $\\overrightarrow{AC}$ $\\overrightarrow{AB}$."
+								"Calculez $z_1\\cdot\\overline{z_2}$"
+								"Déduisez l'angle $\\widehat{BAC}$."
+							]
+						}
+						{
+							type: "enumerate"
+							enumi: "1)"
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
+
+
+
+
+
+
+
 	}

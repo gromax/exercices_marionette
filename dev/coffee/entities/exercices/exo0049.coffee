@@ -64,11 +64,43 @@ define ["utils/math","utils/help"], (mM, help) ->
 				}
 			]
 
-		tex: (data) ->
-			if not isArray(data) then data = [ data ]
-			{
-				title:@title
-				content:Handlebars.templates["tex_enumerate"] { items: ("$x \\mapsto #{item.f}$" for item in data), large:false }
+		getExamBriques: (inputs_list,options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[deriveeTex, poly] = that.init(inputs,options)
+				return "$#{ deriveeTex }$"
+
+			return {
+				children: [
+					{
+						type: "text",
+						children: [
+							"Pour chachune des fonctions suivantes, donnez l'expression générale d'une primitive."
+						]
+					}
+					{
+						type: "enumerate",
+						refresh:true
+						enumi:"1",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+		getTex: (inputs_list, options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[deriveeTex, poly] = that.init(inputs,options)
+				return "$#{ deriveeTex }$"
+
+			return {
+				children: [
+							"Pour chachune des fonctions suivantes, donnez l'expression générale d'une primitive."
+					{
+						type: "enumerate",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
 			}
 
 	}

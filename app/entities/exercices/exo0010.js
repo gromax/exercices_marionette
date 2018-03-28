@@ -110,30 +110,55 @@ define(["utils/math", "utils/help"], function(mM, help) {
         }
       ];
     },
-    tex: function(data) {
-      var item, ref, title;
-      if (!isArray(data)) {
-        data = [data];
-      }
-      if (((ref = data[0]) != null ? ref.options.d.value : void 0) === 0) {
-        title = "Résoudre dans $\\mathbb{R}$";
+    getExamBriques: function(inputs_list, options) {
+      var dansR, ensemble, fct_item, that;
+      dansR = Number(options.d.value) === 0;
+      if (dansR) {
+        ensemble = "R";
       } else {
-        title = "Résoudre dans $\\mathbb{C}";
+        ensemble = "C";
       }
+      that = this;
+      fct_item = function(inputs, index) {
+        var poly;
+        poly = that.init(inputs, dansR);
+        return "$P(x)=" + (poly.tex()) + "$";
+      };
       return {
-        title: title,
-        content: Handlebars.templates["tex_enumerate"]({
-          items: (function() {
-            var i, len, results;
-            results = [];
-            for (i = 0, len = data.length; i < len; i++) {
-              item = data[i];
-              results.push("$" + item.equation + "$");
-            }
-            return results;
-          })(),
-          large: false
-        })
+        children: [
+          {
+            type: "text",
+            children: ["Pour les polynomes suivants, donnez le discriminant et les racines dans &nbsp; $\\mathbb{" + ensemble + "}$ &nbsp; quand elles existent."]
+          }, {
+            type: "enumerate",
+            refresh: true,
+            enumi: "1",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var dansR, ensemble, fct_item, that;
+      dansR = Number(options.d.value) === 0;
+      if (dansR) {
+        ensemble = "R";
+      } else {
+        ensemble = "C";
+      }
+      that = this;
+      fct_item = function(inputs, index) {
+        var poly;
+        poly = that.init(inputs, dansR);
+        return "$P(x)=" + (poly.tex()) + "$";
+      };
+      return {
+        children: [
+          "Pour les polynomes suivants, donnez le discriminant et les racines dans $\\mathbb{" + ensemble + "}$ quand elles existent.", {
+            type: "enumerate",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
       };
     }
   };

@@ -211,22 +211,68 @@ define ["utils/math"], (mM) ->
 
 			]
 
-		tex: (data) ->
-			# en chantier
-			if not isArray(data) then data = [ data ]
-			out = []
-			for itData in data
-				out.push {
-					title:@title
-					content: Handlebars.templates["tex_enumerate"] {
-						pre:"Soit l'équation différentielle $(E):#{itData.tex.premier_membre} = #{itData.tex.second_membre}$"
-						items: [
-							"Donnez $y_0(t)$, expression de la solution générale de $\\left(E_0\\right):#{itData.tex.premier_membre} = 0$"
-							"Une solution générale de $(E)$ est de la forme $y_1(t) = #{itData.tex.forme_y1_tex}$. Donnez cette solution en précisant le(s) valeur(s) de #{itData.tex.symboles_a_trouver.join(" ,")}."
-							"Soit $y$ une solution de $(E)$ qui vérifie $y(0) = #{itData.tex.y0}$. Donnez l'expression de y."
-						]
-						large:false
-					}
+		getExamBriques: (inputs_list,options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[premier_membre_tex, second_membre_tex, good_y0, good_y0F, forme_y1_tex, symboles_a_trouver, good_y1, good_y1F, y0, good_y, good_yF] = that.init(inputs,options)
+				return {
+					children:[
+						{
+							type: "text"
+							children: [
+								"Soit l'équation différentielle &nbsp; $(E):#{premier_membre} = #{second_membre}$"
+							]
+						}
+						{
+							type:"enumerate"
+							enumi: "1"
+							children:[
+								"Donnez &nbsp; $y_0(t)$, expression de la solution générale de &nbsp; $\\left(E_0\\right):#{premier_membre} = 0$"
+								"Une solution générale de &nbsp; $(E)$ &nbsp; est de la forme &nbsp; $y_1(t) = #{forme_y1_tex}$. Donnez cette solution en précisant le(s) valeur(s) de &nbsp; #{itData.tex.symboles_a_trouver.join(", &nbsp; ")}."
+								"Soit &nbsp; $y$ &nbsp; une solution de &nbsp; $(E)$ &nbsp; qui vérifie &nbsp; $y(0) = #{y0}$. Donnez l'expression de &nbsp; $y$."
+							]
+						}
+					]
 				}
-			out
+
+			return {
+				children: [
+					{
+						type: "subtitles"
+						enumi: "A"
+						refresh : true
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+		getTex: (inputs_list, options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[premier_membre_tex, second_membre_tex, good_y0, good_y0F, forme_y1_tex, symboles_a_trouver, good_y1, good_y1F, y0, good_y, good_yF] = that.init(inputs,options)
+				return {
+					children:[
+						"Soit l'équation différentielle &nbsp; $(E):#{premier_membre} = #{second_membre}$"
+						{
+							type:"enumerate"
+							enumi: "1)"
+							children:[
+								"Donnez $y_0(t)$, expression de la solution générale de $\\left(E_0\\right):#{premier_membre} = 0$"
+								"Une solution générale de $(E)$ est de la forme $y_1(t) = #{forme_y1_tex}$. Donnez cette solution en précisant le(s) valeur(s) de #{itData.tex.symboles_a_trouver.join(", ")}."
+								"Soit $y$ une solution de $(E)$ qui vérifie $y(0) = #{y0}$. Donnez l'expression de $y$."
+							]
+						}
+					]
+				}
+
+			return {
+				children: [
+					{
+						type: "enumerate"
+						enumi: "A)"
+						refresh : true
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
 	}

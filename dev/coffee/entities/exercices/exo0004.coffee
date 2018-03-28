@@ -141,5 +141,88 @@
 				A.toClone("D").minus(B).plus(C)
 				B.toClone("E").minus(A).plus(C)
 			]
+
+		getExamBriques: (inputs_list,options) ->
+			optA = options.a?.value ? 0
+			that = @
+			if Number(optA) is 1
+				fct_item = (inputs, index) ->
+					[A, B, C, good, goodABDC] = that.init(inputs,options)
+					return "$z_A=#{A.affixe().tex()}$ &nbsp; ; &nbsp; $z_B=#{B.affixe().tex()}$ &nbsp; et &nbsp; $z_C=#{C.affixe().tex()}$"
+
+				return {
+					children: [
+						{
+							type: "text",
+							children: [
+								"On donne les affixes de trois points &nbsp; $A$, &nbsp; $B$ &nbsp; et &nbsp; $C$."
+								"Vous devez donner l'affixe du point &nbsp; $D$ &nbsp; tel que &nbsp; $ABCD$ &nbsp; soit un parallélogramme."
+							]
+						}
+						{
+							type: "enumerate",
+							refresh:true
+							enumi:"1",
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
+
+			else
+				fct_item = (inputs, index) ->
+					[A, B, C, good, goodABDC] = that.init(inputs,options)
+					return "$#{A.texLine()}$ &nbsp; ; &nbsp; $#{B.texLine()}$ &nbsp; et &nbsp; $#{C.texLine()}$"
+
+				return {
+					children: [
+						{
+							type: "text",
+							children: [
+								"On donne les coordonnées de trois points &nbsp; $A$, &nbsp; $B$ &nbsp; et &nbsp; $C$."
+								"Vous devez donner les coordonnées du point &nbsp; $D$ &nbsp; tel que &nbsp; $ABCD$ &nbsp; soit un parallélogramme."
+							]
+						}
+						{
+							type: "enumerate",
+							refresh:true
+							enumi:"1",
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
+
+		getTex: (inputs_list, options) ->
+			optA = options.a?.value ? 0
+			that = @
+			if Number(optA) is 1
+				fct_item = (inputs, index) ->
+					[A, B, C, good, goodABDC] = that.init(inputs,options)
+					return "$z_A=#{A.affixe().tex()}$ ; $z_B=#{B.affixe().tex()}$ et $z_C=#{C.affixe().tex()}$"
+
+				return {
+					children: [
+						"On donne les affixes de trois points $A$, $B$ et $C$."
+						"Vous devez donner l'affixe de $D$ tel que $ABCD$ soit un parallélogramme."
+						{
+							type: "enumerate",
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
+			else
+				fct_item = (inputs, index) ->
+					[A, B, C, good, goodABDC] = that.init(inputs,options)
+					return "$#{A.texLine()}$ ; $#{B.texLine()}$ et $#{C.texLine()}$"
+
+				return {
+					children: [
+						"On donne les coordonnées de trois points $A$, $B$ et $C$."
+						"Vous devez donner les coordonnées de $D$ tel que $ABCD$ soit un parallélogramme."
+						{
+							type: "enumerate",
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
 	}
 

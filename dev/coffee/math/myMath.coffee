@@ -5,6 +5,9 @@
 				if decimals? then out = num.toFixed decimals
 				else out = String num
 				out.replace '.', ","
+			toPrecision: (num, decimals) ->
+				if decimals? then Number(num.toFixed decimals)
+				else num
 		}
 		alea: {
 			# Ensemble des objets produits aléatoirement
@@ -514,7 +517,21 @@
 					custom:false	# fonction custom
 				}
 
-				params = _.pick(params, _.keys(default_config)...)
+				keysFilter = [
+					"formes"
+					"p_forme"
+					"tolerance"
+					"approx"
+					"p_approx"
+					"arrondi"
+					"p_arrondi"
+					"p_modulo"
+					"symbols"
+					"custom"
+					"goodTex"
+				]
+
+				params = _.pick(params, keysFilter...)
 				config = _.extend default_config, params
 
 				erreur = erreurManager.main(goodObject,userInfo.object,config.symbols)
@@ -566,7 +583,8 @@
 					when erreur.float and erreur.approx_ok and (erreur.ecart<=config.approx) and not erreur.moduloError
 						errors.push "Vous avez donné une approximation. Il faut donner une valeur exacte."
 						note = config.p_approx
-					else errors.push "La bonne réponse était &nbsp; $#{ config.goodTex ? goodObject.tex()}$"
+					else
+						errors.push "La bonne réponse était &nbsp; $#{ config.goodTex ? goodObject.tex()}$"
 					#when config.custom isnt false
 					#	{ note, errors } = config.custom(userInfo.object, goodObject)
 				{ note: note, errors:errors }

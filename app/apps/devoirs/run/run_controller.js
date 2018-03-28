@@ -1,7 +1,7 @@
 define([
 	"app",
 	"marionette",
-	"apps/common/loading_view",
+	"apps/common/alert_view",
 	"apps/common/missing_item_view",
 	"apps/devoirs/run/exercices_list_view",
 	"apps/devoirs/run/devoir_panel",
@@ -10,7 +10,7 @@ define([
 ], function(
 	app,
 	Marionette,
-	LoadingView,
+	AlertView,
 	MissingView,
 	ExercicesListView,
 	DevoirPanel,
@@ -20,12 +20,7 @@ define([
 	var Controller = Marionette.Object.extend({
 		channelName: "entities",
 		showProf: function(id){
-			var loadingView = new LoadingView({
-				title: "Affichage d'un devoir",
-				message: "Chargement des données."
-			});
-
-			app.regions.getRegion('main').show(loadingView);
+			app.trigger("header:loading", true);
 			var channel = this.getChannel();
 
 			require(["entities/dataManager"], function(){
@@ -64,17 +59,22 @@ define([
 						var view = new MissingView();
 						app.regions.getRegion('main').show(view);
 					}
+				}).fail(function(response){
+					if(response.status == 401){
+						alert("Vous devez vous (re)connecter !");
+						app.trigger("home:logout");
+					} else {
+						var alertView = new AlertView();
+						app.regions.getRegion('main').show(alertView);
+					}
+				}).always(function(){
+					app.trigger("header:loading", false);
 				});
 			});
 		},
 
 		showEleve: function(id){
-			var loadingView = new LoadingView({
-				title: "Affichage d'un devoir",
-				message: "Chargement des données."
-			});
-
-			app.regions.getRegion('main').show(loadingView);
+			app.trigger("header:loading", true);
 			var channel = this.getChannel();
 
 			require(["entities/dataManager"], function(){
@@ -111,6 +111,16 @@ define([
 						var view = new MissingView();
 						app.regions.getRegion('main').show(view);
 					}
+				}).fail(function(response){
+					if(response.status == 401){
+						alert("Vous devez vous (re)connecter !");
+						app.trigger("home:logout");
+					} else {
+						var alertView = new AlertView();
+						app.regions.getRegion('main').show(alertView);
+					}
+				}).always(function(){
+					app.trigger("header:loading", false);
 				});
 			});
 		},

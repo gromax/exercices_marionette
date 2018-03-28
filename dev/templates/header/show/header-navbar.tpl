@@ -1,5 +1,5 @@
 <nav class="navbar navbar-dark bg-primary">
-	<a class="navbar-brand js-home" href="#Home">Exercices de maths</a>
+	<a class="navbar-brand js-home" href="#Home">Exercices de maths &nbsp; <span class="js-spinner"></span></a>
 	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
 		<span class="navbar-toggler-icon"></span>
 	</button>

@@ -60,25 +60,43 @@ define(["utils/math", "utils/help"], function(mM, help) {
         }
       ];
     },
-    tex: function(data) {
-      var item;
-      if (!isArray(data)) {
-        data = [data];
-      }
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var angleRad, m, ref, z;
+        ref = that.init(inputs, options), z = ref[0], m = ref[1], angleRad = ref[2];
+        return "$|z| = " + (m.tex()) + "$ &nbsp; et &nbsp; $arg(z)=" + angleRad + "$";
+      };
       return {
-        title: this.title,
-        content: Handlebars.templates["tex_enumerate"]({
-          pre: "Dans chaque cas, connaissant $|z|$ et $arg(z)$ en radians, donnez la forme algébrique de $z$.",
-          items: (function() {
-            var i, len, results;
-            results = [];
-            for (i = 0, len = data.length; i < len; i++) {
-              item = data[i];
-              results.push("$|z| = " + item.tex.m + "$ et $arg(z) = " + item.tex.a + "$");
-            }
-            return results;
-          })()
-        })
+        children: [
+          {
+            type: "text",
+            children: ["Donnez &nbsp; $z$ &nbsp; sous sa forme algébrique."]
+          }, {
+            type: "enumerate",
+            refresh: true,
+            enumi: "1",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var angleRad, m, ref, z;
+        ref = that.init(inputs, options), z = ref[0], m = ref[1], angleRad = ref[2];
+        return "$|z| = " + (m.tex()) + "$ et $arg(z)=" + angleRad + "$";
+      };
+      return {
+        children: [
+          "Donnez $z$ sous sa forme algébrique.", {
+            type: "enumerate",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
       };
     }
   };

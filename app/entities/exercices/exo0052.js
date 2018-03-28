@@ -130,11 +130,11 @@ define(["utils/math", "utils/help"], function(mM, help) {
       fct_item = function(inputs, index) {
         var ens, mu, p, ref, std;
         ref = that.init(inputs), mu = ref[0], std = ref[1], ens = ref[2], p = ref[3];
-        return "$\\mu = " + mu + "$ &nbsp; et &nbsp; $\\sigma = " + std + "$. Calculer &nbsp; $p(" + ens + ")$.";
+        return "$\\mu = " + mu + "$ et $\\sigma = " + std + "$. Calculer $p(" + ens + ")$.";
       };
       return {
         children: [
-          "La variable aléatoire &nbsp; $X$ &nbsp; suit la loi normale &nbsp; $\\mathcal{N}(\\mu;\\sigma)$.", "Dans les cas suivants, calculez les probabilités à 0,01 près.", {
+          "La variable aléatoire $X$ suit la loi normale $\\mathcal{N}(\\mu;\\sigma)$.", "Dans les cas suivants, calculez les probabilités à 0,01 près.", {
             type: "enumerate",
             children: _.map(inputs_list, fct_item)
           }

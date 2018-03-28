@@ -17,7 +17,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 							type:"text"
 							rank: 1
 							ps:[
-								"L'équation est de type $x=a$. Donnez $a$."
+								"L'équation est de type &nbsp; $x=a$. Donnez &nbsp; $a$."
 							]
 						}
 						{
@@ -50,7 +50,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 							type:"text"
 							rank: 1
 							ps:[
-								"L'équation est de type $y=m\\:x+p$. Donnez $m$ et $p$."
+								"L'équation est de type &nbsp; $y=m\\:x+p$. Donnez &nbsp; $m$ &nbsp; et &nbsp; $p$."
 							]
 						}
 						{
@@ -98,9 +98,9 @@ define ["utils/math","utils/help"], (mM, help) ->
 						type:"text"
 						rank: 1
 						ps:[
-							"On se place dans un repère orthogonal $(O;I,J)$"
-							"On donne deux points $#{A.texLine()}$ et $#{B.texLine()}$."
-							"Il faut déterminer l'équation réduite de la droite $(AB)$."
+							"On se place dans un repère orthogonal &nbsp; $(O;I,J)$"
+							"On donne deux points $#{A.texLine()}$ &nbsp; et &nbsp; $#{B.texLine()}$."
+							"Il faut déterminer l'équation réduite de la droite &nbsp; $(AB)$."
 						]
 					}]
 				}
@@ -148,4 +148,47 @@ define ["utils/math","utils/help"], (mM, help) ->
 				B
 				mM.droite.par2pts A,B
 			]
+
+
+		getExamBriques: (inputs_list,options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[A, B, droite] = that.init(inputs,options)
+				return "$#{A.texLine()}$ &nbsp; et &nbsp; $#{B.texLine()}$"
+
+			return {
+				children: [
+					{
+						type: "text",
+						children: [
+							"On donne les coordonnées de deux points &nbsp; $A$ &nbsp; et &nbsp; $B$."
+							"Vous devez donner l'équation réduite de la droite &nbsp; $(AB)$."
+						]
+					}
+					{
+						type: "enumerate",
+						refresh:true
+						enumi:"1",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+		getTex: (inputs_list, options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[A, B, droite] = that.init(inputs,options)
+				return "$#{A.texLine()}$ et $#{B.texLine()}$"
+
+			return {
+				children: [
+					"On donne les coordonnées de deux points $A$ et $B$."
+					"Vous devez donner l'équation réduite de la droite $(AB)$."
+					{
+						type: "enumerate",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
 	}

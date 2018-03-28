@@ -4,6 +4,9 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 	# description:"Cinq paraboles sont données. On propose cinq fonctions du second degré dont on ne connait que le discriminant et le coefficient du terme de second degré. À chaque fonction, il faut attribuer la parabole qui la représente."
 	# keyWords:["Analyse","Fonction","Courbe","Affine","Seconde"]
 
+	# debug: tex à faire
+
+
 	return {
 		max: 6
 		init: (inputs) ->

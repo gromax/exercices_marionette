@@ -130,25 +130,74 @@ define(["utils/math", "utils/help"], function(mM, help) {
         }
       ];
     },
-    tex: function(data) {
-      var i, itemData, len, out;
-      if (!isArray(data)) {
-        data = [data];
-      }
-      out = [];
-      for (i = 0, len = data.length; i < len; i++) {
-        itemData = data[i];
-        out.push({
-          title: "Choix de la meilleure forme",
-          contents: [
-            "On donne $f(x)$ sous trois formes :", "\\[f(x) = " + itemData.tex.normale + "\\]", "\\[f(x) = " + itemData.tex.canonique + "\\]", "\\[f(x) = " + itemData.tex.facto + "\\]", Handlebars.templates["tex_enumerate"]({
-              pre: "Sans, ou avec peu de calcul, en utilisant la forme la plus adaptée, donnez :",
-              items: ["Les coordonnées du sommet $S$ de la courbe de $f$", "Les solutions de $f(x) = 0$", "Les solultions, si elles existent, de $f(x) = " + itemData.tex.yA + "$"]
-            })
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var canoniqueTex, factoTex, normalTex, racines, ref, solutionsA, xS, yA, yS;
+        ref = that.init(inputs, options), normalTex = ref[0], canoniqueTex = ref[1], factoTex = ref[2], xS = ref[3], yS = ref[4], racines = ref[5], yA = ref[6], solutionsA = ref[7];
+        return {
+          type: "text",
+          children: ["$f(x) = " + normalTex, "$f(x) = " + canoniqueTex, "$f(x) = " + factoTex + "$", "$A=yA.tex()$."]
+        };
+      };
+      return {
+        children: [
+          {
+            type: "text",
+            children: ["On propose la fonction &nbsp; $f$ &nbsp; définie de trois façons différentes. :", "En utilisant bien ces différentes formes, répondez aux questions avec le moins de calcul possible.", "À chaque fois :"]
+          }, {
+            type: "enumerate",
+            refresh: false,
+            enumi: "a",
+            children: ["Les coordonnées du sommet &nbsp; $S$ &nbsp; de la courbe de &nbsp; $f$", "Les racines de &nbsp; $f(x)$", "Les solultions, si elles existent, de &nbsp; $f(x) = A$"]
+          }, {
+            type: "enumerate",
+            enumi: "1",
+            refresh: true,
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var canoniqueTex, factoTex, fct_item, normalTex, racines, ref, solutionsA, that, xS, yA, yS;
+      if (inputs_list.length === 1) {
+        ref = this.init(inputs_list[0], options), normalTex = ref[0], canoniqueTex = ref[1], factoTex = ref[2], xS = ref[3], yS = ref[4], racines = ref[5], yA = ref[6], solutionsA = ref[7];
+        return {
+          children: [
+            "On propose la fonction $f$ définie de trois façons différentes. :", "$f(x) = " + normalTex, "$f(x) = " + canoniqueTex, "$f(x) = " + factoTex + "$", "En utilisant bien ces différentes formes, répondez aux questions avec le moins de calcul possible.", {
+              type: "enumerate",
+              enumi: "a)",
+              children: ["Les coordonnées du sommet $S$ de la courbe de $f$", "Les racines de $f(x)$", "Les solultions, si elles existent, de $f(x) = " + (yA.tex()) + "$"]
+            }
           ]
-        });
+        };
+      } else {
+        that = this;
+        fct_item = function(inputs, index) {
+          var ref1;
+          ref1 = that.init(inputs, options), normalTex = ref1[0], canoniqueTex = ref1[1], factoTex = ref1[2], xS = ref1[3], yS = ref1[4], racines = ref1[5], yA = ref1[6], solutionsA = ref1[7];
+          return {
+            type: "enumerate",
+            enumi: "a)",
+            children: ["$f(x) = " + normalTex, "$f(x) = " + canoniqueTex, "$f(x) = " + factoTex + "$", "$A=yA.tex()$."]
+          };
+        };
+        return {
+          children: [
+            "On propose la fonction $f$ définie de trois façons différentes. :", "En utilisant bien ces différentes formes, répondez aux questions avec le moins de calcul possible.", "À chaque fois :", {
+              type: "enumerate",
+              enumi: "A)",
+              children: ["Les coordonnées du sommet $S$ de la courbe de $f$", "Les racines de $f(x)$", "Les solultions, si elles existent, de $f(x) = A$"]
+            }, {
+              type: "enumerate",
+              enumi: "1)",
+              children: _.map(inputs_list, fct_item)
+            }
+          ]
+        };
       }
-      return out;
     }
   };
 });

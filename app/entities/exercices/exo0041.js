@@ -123,43 +123,22 @@ define(["utils/math", "utils/help"], function(mM, help) {
         };
       }
     },
-    tex: function(data) {
-      var it, its, symbs;
-      symbs = ["", "<", "\\leqslant"];
-      if (!isArray(data)) {
-        data = [data];
-      }
-      its = (function() {
-        var i, len, results;
-        results = [];
-        for (i = 0, len = data.length; i < len; i++) {
-          it = data[i];
-          results.push(it.tex.expression);
-        }
-        return results;
-      })();
-      if (its.length > 1) {
-        return [
-          {
-            title: this.title,
-            content: Handlebars.templates["tex_enumerate"]({
-              pre: "Dans les cas suivants, calculez $u_0$, $u_1$, $u_2$ et $u_{10}$.",
-              items: its,
-              large: false
-            })
+    getTex: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var expression, ref, ref1, u0, u1, u10, u2;
+        ref = that.init(inputs_item, options), expression = ref[0], (ref1 = ref[1], u0 = ref1[0], u1 = ref1[1], u2 = ref1[2], u10 = ref1[3]);
+        return expression;
+      };
+      return {
+        children: [
+          "Dans les cas suivants, calculez $u_0$, $u_1$, $u_2$ et $u_{10}$.", {
+            type: "enumerate",
+            children: _.map(inputs_list, fct_item)
           }
-        ];
-      } else {
-        return [
-          {
-            title: this.title,
-            content: Handlebars.templates["tex_plain"]({
-              content: "Calculez $u_0$, $u_1$, $u_2$ et $u_{10}$ avec " + its[0] + ".",
-              large: false
-            })
-          }
-        ];
-      }
+        ]
+      };
     }
   };
 });

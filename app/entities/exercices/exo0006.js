@@ -1,15 +1,16 @@
 define(["utils/math"], function(mM) {
   return {
+    max: 11,
     getBriques: function(inputs, options) {
       var briqueEnnonce, displayedPts, iPts, initGraph, max, name, optA, pt, ref, strNames, strPts;
-      max = 11;
+      max = this.max;
       iPts = this.init(inputs);
       displayedPts = (function() {
-        var j, len, ref, results;
+        var i, len, ref, results;
         ref = ["A", "B", "C", "D", "E"];
         results = [];
-        for (j = 0, len = ref.length; j < len; j++) {
-          name = ref[j];
+        for (i = 0, len = ref.length; i < len; i++) {
+          name = ref[i];
           results.push(mM.alea.vector({
             name: name,
             values: [
@@ -25,10 +26,10 @@ define(["utils/math"], function(mM) {
       optA = Number((ref = options.a.value) != null ? ref : 0);
       if (optA === 0) {
         strPts = ((function() {
-          var j, len, results;
+          var i, len, results;
           results = [];
-          for (j = 0, len = iPts.length; j < len; j++) {
-            pt = iPts[j];
+          for (i = 0, len = iPts.length; i < len; i++) {
+            pt = iPts[i];
             results.push("$" + (pt.texLine()) + "$");
           }
           return results;
@@ -40,19 +41,19 @@ define(["utils/math"], function(mM) {
         };
       } else {
         strPts = ((function() {
-          var j, len, results;
+          var i, len, results;
           results = [];
-          for (j = 0, len = iPts.length; j < len; j++) {
-            pt = iPts[j];
+          for (i = 0, len = iPts.length; i < len; i++) {
+            pt = iPts[i];
             results.push("$z_" + pt.name + " = " + (pt.affixe().tex()) + "$");
           }
           return results;
         })()).join(", &nbsp;");
         strNames = ((function() {
-          var j, len, results;
+          var i, len, results;
           results = [];
-          for (j = 0, len = iPts.length; j < len; j++) {
-            pt = iPts[j];
+          for (i = 0, len = iPts.length; i < len; i++) {
+            pt = iPts[i];
             results.push("$" + pt.name + "$");
           }
           return results;
@@ -65,10 +66,10 @@ define(["utils/math"], function(mM) {
       }
       initGraph = function(graph) {
         return graph.points = (function() {
-          var j, len, results;
+          var i, len, results;
           results = [];
-          for (j = 0, len = displayedPts.length; j < len; j++) {
-            pt = displayedPts[j];
+          for (i = 0, len = displayedPts.length; i < len; i++) {
+            pt = displayedPts[i];
             results.push(graph.create('point', mM.float([pt.x, pt.y]), {
               name: pt.name,
               fixed: false,
@@ -98,26 +99,26 @@ define(["utils/math"], function(mM) {
               },
               renderingFunctions: [initGraph],
               getData: function(graph) {
-                var j, k, len, len1, out, p, ref1, ref2;
+                var i, j, len, len1, out, p, ref1, ref2;
                 out = {};
                 ref1 = graph.points;
-                for (j = 0, len = ref1.length; j < len; j++) {
-                  p = ref1[j];
+                for (i = 0, len = ref1.length; i < len; i++) {
+                  p = ref1[i];
                   out["x" + p.name] = p.X();
                 }
                 ref2 = graph.points;
-                for (k = 0, len1 = ref2.length; k < len1; k++) {
-                  p = ref2[k];
+                for (j = 0, len1 = ref2.length; j < len1; j++) {
+                  p = ref2[j];
                   out["y" + p.name] = p.Y();
                 }
                 return out;
               },
               verification: function(answers_data) {
-                var a_x, a_y, d2, g_x, g_y, j, len, messages, note;
+                var a_x, a_y, d2, g_x, g_y, i, len, messages, note;
                 note = 0;
                 messages = [];
-                for (j = 0, len = iPts.length; j < len; j++) {
-                  pt = iPts[j];
+                for (i = 0, len = iPts.length; i < len; i++) {
+                  pt = iPts[i];
                   g_x = mM.float(pt.x);
                   g_y = mM.float(pt.y);
                   a_x = Number(answers_data["x" + pt.name]);
@@ -146,17 +147,17 @@ define(["utils/math"], function(mM) {
                     }
                   ],
                   post: function(graph) {
-                    var k, l, len1, len2, ref1, results;
+                    var j, k, len1, len2, ref1, results;
                     ref1 = graph.points;
-                    for (k = 0, len1 = ref1.length; k < len1; k++) {
-                      pt = ref1[k];
+                    for (j = 0, len1 = ref1.length; j < len1; j++) {
+                      pt = ref1[j];
                       pt.setAttribute({
                         fixed: true
                       });
                     }
                     results = [];
-                    for (l = 0, len2 = iPts.length; l < len2; l++) {
-                      pt = iPts[l];
+                    for (k = 0, len2 = iPts.length; k < len2; k++) {
+                      pt = iPts[k];
                       name = pt.name;
                       g_x = mM.float(pt.x);
                       g_y = mM.float(pt.y);
@@ -181,13 +182,14 @@ define(["utils/math"], function(mM) {
       ];
     },
     init: function(inputs) {
-      var name;
+      var max, name;
+      max = this.max;
       return (function() {
-        var j, len, ref, results;
+        var i, len, ref, results;
         ref = ["A", "B", "C", "D", "E"];
         results = [];
-        for (j = 0, len = ref.length; j < len; j++) {
-          name = ref[j];
+        for (i = 0, len = ref.length; i < len; i++) {
+          name = ref[i];
           results.push(mM.alea.vector({
             name: name,
             def: inputs,
@@ -201,26 +203,6 @@ define(["utils/math"], function(mM) {
         }
         return results;
       })();
-    },
-    tex: function(data) {
-      var i, itemData, j, len, out;
-      if (!isArray(data)) {
-        data = [data];
-      }
-      out = [];
-      for (i = j = 0, len = data.length; j < len; i = ++j) {
-        itemData = data[i];
-        out.push({
-          title: this.title,
-          contents: [
-            Handlebars.templates["tex_courbes"]({
-              max: this.max,
-              scale: .03 * this.max
-            }), itemData.tex.enonce + " " + itemData.tex.liste.join(" ; ")
-          ]
-        });
-      }
-      return out;
     }
   };
 });

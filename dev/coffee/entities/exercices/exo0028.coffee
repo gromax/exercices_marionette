@@ -69,7 +69,9 @@
 					inputs.x = String x
 				fa = mM.float fct, { x:x, decimals:2 }
 				f2a = mM.float derivee, { x:x, decimals:2 }
-				t = mM.exec [f2a, "x", x, "-", "*", fa, "+"], {simplify:true, developp:true}
+				p = mM.misc.toPrecision(-mM.float(derivee, { x:x })*x+mM.float(fct, { x:x }),2)
+				console.log p
+				t = mM.exec [f2a, "x", "*", p, "+"], {simplify:true}
 			else
 				x = false
 				fa = false
@@ -162,12 +164,19 @@
 							type: "input"
 							rank: 1
 							waited: "number"
-							tag:"$y=$"
+							tag:"$\\mathcal{T}$"
+							answerPreprocessing:(userValue)->
+								pattern =/y\s*=([\s*+-/0-9a-zA-Z]+)/
+								result = pattern.exec(userValue)
+								if result
+									{ processed:result[1], error:false }
+								else
+									{ processed:userValue, error:"L'équation doit être de la forme y=..." }
 							name:"e"
 							description:"Équation de la tangente"
 							good:t
+							goodTex: "y = #{t.tex()}"
 							developp:true
-							cor_prefix:"y="
 							formes:"FRACTION"
 						}
 						{
@@ -185,25 +194,84 @@
 
 			briques
 
-		tex: (data) ->
-			# en travaux
-			if not isArray(data) then data = [ data ]
-			if (data[0]?.options.e?.value is 1)
-				{
-					title:@title
-					content:Handlebars.templates["tex_enumerate"] {
-						pre:"Dans tous les cas, déterminer l'expression de $f'(x)$ ; calulez $f(a)$ et $f'(a)$ à $0,01$ près ; déterminez la tangente à $\\mathcal{C}_f$ à l'abscisse $a$."
-						items: ("$x \\mapsto #{item.fct}$ et $a=#{item.inputs.x}$" for item in data)
-						large:false
-					}
+		getExamBriques: (inputs_list,options) ->
+			optE = Number(options.e.value ? 0)
+			that = @
+			fct_item = (inputs, index) ->
+				[fct, derivee, deriveeForTex, x, fa, f2a, t] = that.init(inputs,options)
+				if optE is 1
+					return "$f(x) = #{fct.tex()}$ et $a=#{x}$"
+				else
+					return "$f(x) = #{fct.tex()}$"
+
+			if optE is 1
+				return {
+					children: [
+						{
+							type: "text",
+							children: [
+								"Dans tous les cas, déterminer l'expression de $f'(x)$ ; calulez $f(a)$ et $f'(a)$ à $0,01$ près ; déterminez la tangente à $\\mathcal{C}_f$ à l'abscisse $a$."
+							]
+						}
+						{
+							type: "enumerate",
+							refresh:true
+							enumi:"1",
+							children: _.map(inputs_list, fct_item)
+						}
+					]
 				}
 			else
-				{
-					title:@title
-					content:Handlebars.templates["tex_enumerate"] {
-						pre: "Donnez les dérivées des fonctions suivantes :"
-						items: ("$x \\mapsto #{item.fct}$" for item in data)
-						large:false
-					}
-			}
+				return {
+					children: [
+						{
+							type: "text",
+							children: [
+								"Dans tous les cas, déterminer l'expression de $f'(x)$."
+							]
+						}
+						{
+							type: "enumerate",
+							refresh:true
+							enumi:"1",
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
+
+		getTex: (inputs_list, options) ->
+			optE = Number(options.e.value ? 0)
+			that = @
+			fct_item = (inputs, index) ->
+				[fct, derivee, deriveeForTex, x, fa, f2a, t] = that.init(inputs,options)
+				if optE is 1
+					return "$f(x) = #{fct.tex()}$ et $a=#{x}$"
+				else
+					return "$f(x) = #{fct.tex()}$"
+
+			if optE is 1
+				return {
+					children: [
+						"Dans tous les cas, déterminer l'expression de $f'(x)$ ; calulez $f(a)$ et $f'(a)$ à $0,01$ près ; déterminez la tangente à $\\mathcal{C}_f$ à l'abscisse $a$."
+						{
+							type: "enumerate",
+							refresh:true
+							enumi:"1",
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
+			else
+				return {
+					children: [
+						"Dans tous les cas, déterminer l'expression de $f'(x)$."
+						{
+							type: "enumerate",
+							refresh:true
+							enumi:"1",
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
+
 	}

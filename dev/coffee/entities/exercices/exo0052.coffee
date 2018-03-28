@@ -101,11 +101,11 @@ define ["utils/math","utils/help"], (mM, help) ->
 			that = @
 			fct_item = (inputs, index) ->
 				[mu, std, ens, p] = that.init(inputs)
-				return "$\\mu = #{mu}$ &nbsp; et &nbsp; $\\sigma = #{std}$. Calculer &nbsp; $p(#{ens})$."
+				return "$\\mu = #{mu}$ et $\\sigma = #{std}$. Calculer $p(#{ens})$."
 
 			return {
 				children: [
-					"La variable aléatoire &nbsp; $X$ &nbsp; suit la loi normale &nbsp; $\\mathcal{N}(\\mu;\\sigma)$."
+					"La variable aléatoire $X$ suit la loi normale $\\mathcal{N}(\\mu;\\sigma)$."
 					"Dans les cas suivants, calculez les probabilités à 0,01 près."
 					{
 						type: "enumerate",

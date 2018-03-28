@@ -113,6 +113,68 @@ define(["utils/math", "utils/help"], function(mM, help) {
           ]
         }
       ];
+    },
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var aire, ref, z, zA, zAB, zAD, zB, zD;
+        ref = that.init(inputs, options), zA = ref[0], zB = ref[1], zD = ref[2], zAB = ref[3], zAD = ref[4], z = ref[5], aire = ref[6];
+        return "$z_A=" + (zA.tex()) + "$, &nbsp; $z_B = " + (zB.tex()) + "$ &nbsp; et &nbsp; $z_D = " + (zD.tex()) + "$.";
+      };
+      return {
+        children: [
+          {
+            type: "text",
+            children: ["On donne les points &nbsp; $A$, &nbsp; $B$ &nbsp; et &nbsp; $D$ &nbsp; d'affixes respectives &nbsp; $z_A$, &nbsp; $z_B$ &nbsp; et &nbsp; $z_D$.", "$C$ &nbsp; est tel que &nbsp; $ABCD$ &nbsp; est un parallélogramme.", "À chaque fois :"]
+          }, {
+            type: "enumerate",
+            refresh: false,
+            enumi: "a",
+            children: ["Donnez &nbsp;$z_1$ &nbsp; et &nbsp; $z_2$, affixes respectives de &nbsp; $\\overrightarrow{AD}$ &nbsp; $\\overrightarrow{AB}$.", "Calculez &nbsp; $z_1\\cdot\\overline{z_2}$", "Déduisez l'aire de &nbsp; $ABCD$."]
+          }, {
+            type: "enumerate",
+            enumi: "1",
+            refresh: true,
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var aire, fct_item, ref, that, z, zA, zAB, zAD, zB, zD;
+      if (inputs_list.length === 1) {
+        ref = this.init(inputs_list[0], options), zA = ref[0], zB = ref[1], zD = ref[2], zAB = ref[3], zAD = ref[4], z = ref[5], aire = ref[6];
+        return {
+          children: [
+            "On donne les points $A$, $B$ et $D$ d'affixes respectives $z_A$, $z_B$ et $z_D$.", "$z_A=" + (zA.tex()) + "$, $z_B = " + (zB.tex()) + "$ et $z_D = " + (zD.tex()) + "$.", "$C$ est tel que $ABCD$ est un parallélogramme.", {
+              type: "enumerate",
+              enumi: "a)",
+              children: ["Donnez $z_1$ et $z_2$, affixes respectives de $\\overrightarrow{AD}$ $\\overrightarrow{AB}$.", "Calculez $z_1\\cdot\\overline{z_2}$", "Déduisez l'aire de $ABCD$."]
+            }
+          ]
+        };
+      } else {
+        that = this;
+        fct_item = function(inputs, index) {
+          var ref1;
+          ref1 = that.init(inputs, options), zA = ref1[0], zB = ref1[1], zD = ref1[2], zAB = ref1[3], zAD = ref1[4], z = ref1[5], aire = ref1[6];
+          return "$z_A=" + (zA.tex()) + "$, $z_B = " + (zB.tex()) + "$ et $z_D = " + (zD.tex()) + "$.";
+        };
+        return {
+          children: [
+            "On donne les points $A$, $B$ et $D$ d'affixes respectives $z_A$, $z_B$ et $z_D$.", "$C$ est tel que $ABCD$ est un parallélogramme.", "À chaque fois :", {
+              type: "enumerate",
+              enumi: "a)",
+              children: ["Donnez $z_1$ et $z_2$, affixes respectives de $\\overrightarrow{AD}$ $\\overrightarrow{AB}$.", "Calculez $z_1\\cdot\\overline{z_2}$", "Déduisez l'aire de $ABCD$."]
+            }, {
+              type: "enumerate",
+              enumi: "1)",
+              children: _.map(inputs_list, fct_item)
+            }
+          ]
+        };
+      }
     }
   };
 });

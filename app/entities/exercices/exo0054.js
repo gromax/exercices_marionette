@@ -261,24 +261,62 @@ define(["utils/math"], function(mM) {
         }
       ];
     },
-    tex: function(data) {
-      var i, itData, len, out;
-      if (!isArray(data)) {
-        data = [data];
-      }
-      out = [];
-      for (i = 0, len = data.length; i < len; i++) {
-        itData = data[i];
-        out.push({
-          title: this.title,
-          content: Handlebars.templates["tex_enumerate"]({
-            pre: "Soit l'équation différentielle $(E):" + itData.tex.premier_membre + " = " + itData.tex.second_membre + "$",
-            items: ["Donnez $y_0(t)$, expression de la solution générale de $\\left(E_0\\right):" + itData.tex.premier_membre + " = 0$", "Une solution générale de $(E)$ est de la forme $y_1(t) = " + itData.tex.forme_y1_tex + "$. Donnez cette solution en précisant le(s) valeur(s) de " + (itData.tex.symboles_a_trouver.join(" ,")) + ".", "Soit $y$ une solution de $(E)$ qui vérifie $y(0) = " + itData.tex.y0 + "$. Donnez l'expression de y."],
-            large: false
-          })
-        });
-      }
-      return out;
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var forme_y1_tex, good_y, good_y0, good_y0F, good_y1, good_y1F, good_yF, premier_membre_tex, ref, second_membre_tex, symboles_a_trouver, y0;
+        ref = that.init(inputs, options), premier_membre_tex = ref[0], second_membre_tex = ref[1], good_y0 = ref[2], good_y0F = ref[3], forme_y1_tex = ref[4], symboles_a_trouver = ref[5], good_y1 = ref[6], good_y1F = ref[7], y0 = ref[8], good_y = ref[9], good_yF = ref[10];
+        return {
+          children: [
+            {
+              type: "text",
+              children: ["Soit l'équation différentielle &nbsp; $(E):" + premier_membre + " = " + second_membre + "$"]
+            }, {
+              type: "enumerate",
+              enumi: "1",
+              children: ["Donnez &nbsp; $y_0(t)$, expression de la solution générale de &nbsp; $\\left(E_0\\right):" + premier_membre + " = 0$", "Une solution générale de &nbsp; $(E)$ &nbsp; est de la forme &nbsp; $y_1(t) = " + forme_y1_tex + "$. Donnez cette solution en précisant le(s) valeur(s) de &nbsp; " + (itData.tex.symboles_a_trouver.join(", &nbsp; ")) + ".", "Soit &nbsp; $y$ &nbsp; une solution de &nbsp; $(E)$ &nbsp; qui vérifie &nbsp; $y(0) = " + y0 + "$. Donnez l'expression de &nbsp; $y$."]
+            }
+          ]
+        };
+      };
+      return {
+        children: [
+          {
+            type: "subtitles",
+            enumi: "A",
+            refresh: true,
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var forme_y1_tex, good_y, good_y0, good_y0F, good_y1, good_y1F, good_yF, premier_membre_tex, ref, second_membre_tex, symboles_a_trouver, y0;
+        ref = that.init(inputs, options), premier_membre_tex = ref[0], second_membre_tex = ref[1], good_y0 = ref[2], good_y0F = ref[3], forme_y1_tex = ref[4], symboles_a_trouver = ref[5], good_y1 = ref[6], good_y1F = ref[7], y0 = ref[8], good_y = ref[9], good_yF = ref[10];
+        return {
+          children: [
+            "Soit l'équation différentielle &nbsp; $(E):" + premier_membre + " = " + second_membre + "$", {
+              type: "enumerate",
+              enumi: "1)",
+              children: ["Donnez $y_0(t)$, expression de la solution générale de $\\left(E_0\\right):" + premier_membre + " = 0$", "Une solution générale de $(E)$ est de la forme $y_1(t) = " + forme_y1_tex + "$. Donnez cette solution en précisant le(s) valeur(s) de " + (itData.tex.symboles_a_trouver.join(", ")) + ".", "Soit $y$ une solution de $(E)$ qui vérifie $y(0) = " + y0 + "$. Donnez l'expression de $y$."]
+            }
+          ]
+        };
+      };
+      return {
+        children: [
+          {
+            type: "enumerate",
+            enumi: "A)",
+            refresh: true,
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
     }
   };
 });

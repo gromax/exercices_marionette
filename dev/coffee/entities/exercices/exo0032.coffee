@@ -53,4 +53,45 @@
 					]
 				}
 			]
+
+		getExamBriques: (inputs_list,options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[ang, p] = that.init(inputs,options)
+				return "$\\alpha =#{ang.tex()}$ &nbsp; radians"
+
+			return {
+				children: [
+					{
+						type: "text",
+						children: [
+							"Donnez la mesure principale de &nbsp; $\\alpha$."
+						]
+					}
+					{
+						type: "enumerate",
+						refresh:true
+						enumi:"1",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+		getTex: (inputs_list, options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[ang, p] = that.init(inputs,options)
+				return "$\\alpha =#{ang.tex()}$ radians"
+
+			return {
+				children: [
+					"Donnez la mesure principale de $\\alpha$."
+					{
+						type: "enumerate",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+
 	}

@@ -62,4 +62,47 @@
 				B
 				A.symetrique(B, "A'").simplify()
 			]
+
+		getExamBriques: (inputs_list,options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[A, B, gAp] = that.init(inputs,options)
+				return "$#{A.texLine()}$ &nbsp; et &nbsp; $#{B.texLine()}$"
+
+			return {
+				children: [
+					{
+						type: "text",
+						children: [
+							"On donne les coordonnées de deux points &nbsp; $A$ &nbsp; et &nbsp; $B$."
+							"Vous devez donner les coordonnées du symétrique de &nbsp; $A$ &nbsp; par rapport à &nbsp; $B$."
+						]
+					}
+					{
+						type: "enumerate",
+						refresh:true
+						enumi:"1",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+		getTex: (inputs_list, options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[A, B, gAp] = that.init(inputs,options)
+				return "$#{A.texLine()}$ et $#{B.texLine()}$"
+
+			return {
+				children: [
+					"On donne les coordonnées de deux points $A$ et $B$."
+					"Vous devez donner les coordonnées du symétrique de $A$ par rapport à $B$."
+					{
+						type: "enumerate",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+
 	}

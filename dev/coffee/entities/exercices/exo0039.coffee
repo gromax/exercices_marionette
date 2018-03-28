@@ -5,6 +5,7 @@ define ["utils/math", "utils/help", "utils/colors"], (mM, help, colors) ->
 	# keyWords:["Analyse","Fonction","Tableau de variation", "Forme canonique", "Second degré","Seconde"]
 
 	# debug: en attente
+	# debug : tex à faire
 
 	return {
 		init: (inputs) ->
@@ -12,7 +13,6 @@ define ["utils/math", "utils/help", "utils/colors"], (mM, help, colors) ->
 			items = []
 			# Les paraboles sont définies par sommet et point
 			liste = _.shuffle [{cano:true, convexe:true}, {cano:true, convexe:false}, {cano:false, convexe:true}, {cano:false, convexe:false}]
-			arrayShuffle(liste)
 			tabs = []
 			for cas, i in liste
 				if (typeof inputs["xA"+i] isnt "undefined") and (typeof inputs["yA"+i] isnt "undefined") and (typeof inputs["xB"+i] isnt "undefined") and (typeof inputs["yB"+i] isnt "undefined") and (typeof inputs["c"+i] isnt "undefined")

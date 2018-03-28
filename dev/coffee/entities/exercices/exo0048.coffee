@@ -7,6 +7,8 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 	#	a:{ tag:"Dérivée ou Primitive" , options:["Dérivée", "Primitive"] }
 	#}
 
+	# debug : tex à faire
+
 	return {
 		max: 6
 		init: (inputs, options) ->

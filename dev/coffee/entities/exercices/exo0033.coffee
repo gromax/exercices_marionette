@@ -62,4 +62,46 @@ define ["utils/math", "utils/help"], (mM, help) ->
 					]
 				}
 			]
+
+		getExamBriques: (inputs_list,options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[membreGaucheTex, membreDroiteTex, sols] = that.init(inputs,options)
+				return "$#{membreGaucheTex} = #{membreDroiteTex}$"
+
+			return {
+				children: [
+					{
+						type: "text",
+						children: [
+							"Donnez les solutions des équations suivantes :"
+						]
+					}
+					{
+						type: "enumerate",
+						refresh:true
+						enumi:"1",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+		getTex: (inputs_list, options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[membreGaucheTex, membreDroiteTex, sols] = that.init(inputs,options)
+				return "$#{membreGaucheTex} = #{membreDroiteTex}$"
+
+			return {
+				children: [
+					"Donnez les solutions des équations suivantes :"
+					{
+						type: "enumerate",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+
+
 	}

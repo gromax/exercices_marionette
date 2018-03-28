@@ -1,7 +1,7 @@
 define([
 	"app",
 	"marionette",
-	"apps/common/loading_view",
+	"apps/common/alert_view",
 	"apps/common/list_layout",
 	"apps/devoirs/list/list_panel",
 	"apps/devoirs/list/list_view",
@@ -9,7 +9,7 @@ define([
 ], function(
 	app,
 	Marionette,
-	LoadingView,
+	AlertView,
 	Layout,
 	Panel,
 	ListView,
@@ -20,13 +20,12 @@ define([
 		channelName: 'entities',
 
 		list: function(){
-			var loadingView = new LoadingView();
-			app.regions.getRegion('main').show(loadingView);
+			app.trigger("header:loading", true);
 			var listItemsLayout = new Layout();
 			var listItemsPanel = new Panel();
 			var channel = this.getChannel();
 
-			require(["entities/dataManager"], function(){
+			require(["entities/devoir", "entities/dataManager"], function(Item){
 				var fetching = channel.request("custom:entities",["fiches"]);
 				$.when(fetching).done(function(fiches){
 					var listItemsView = new ListView({
@@ -48,16 +47,25 @@ define([
 						view.on("form:submit", function(data){
 							var savingItem = newItem.save(data);
 							if (savingItem){
+								app.trigger("header:loading", true);
 								$.when(savingItem).done(function(){
-									items.add(newItem);
+									fiches.add(newItem);
 									view.trigger("dialog:close");
 									listItemsView.flash(newItem);
 								}).fail(function(response){
 									if(response.status == 422){
 										view.triggerMethod("form:data:invalid", response.responseJSON.errors);
 									} else {
-										alert("An unprocessed error happened. Please try again!");
+										if(response.status == 401){
+											alert("Vous devez vous (re)connecter !");
+											view.trigger("dialog:close");
+											app.trigger("home:logout");
+										} else {
+											alert("Une erreur inconnue s'est produite. Réessayez !");
+										}
 									}
+								}).always(function(){
+									app.trigger("header:loading", false);
 								});
 							} else {
 								view.triggerMethod("form:data:invalid",newItem.validationError);
@@ -79,11 +87,19 @@ define([
 						model.set(attr_name, !attr_value);
 						var updatingItem = model.save();
 						if (updatingItem) {
+							app.trigger("header:loading", true);
 							$.when(updatingItem).done(function(){
 								childView.render();
 								childView.flash("success");
 							}).fail(function(response){
-								alert("Une erreur inconnue s'est produite. Réessayez !");
+								if(response.status == 401){
+									alert("Vous devez vous (re)connecter !");
+									app.trigger("home:logout");
+								} else {
+									alert("Une erreur inconnue s'est produite. Réessayez !");
+								}
+							}).always(function(){
+								app.trigger("header:loading", false);
 							});
 						} else {
 							alert("Une erreur inconnue s'est produite. Réessayez !");
@@ -95,12 +111,18 @@ define([
 					});
 
 					app.regions.getRegion('main').show(listItemsLayout);
-				});
-
+				}).fail(function(response){
+					if(response.status == 401){
+						alert("Vous devez vous (re)connecter !");
+						app.trigger("home:logout");
+					} else {
+						var alertView = new AlertView();
+						app.regions.getRegion('main').show(alertView);
+					}
+				}).always(function(){
+					app.trigger("header:loading", false);
+				})
 			});
-
-
-
 		}
 	});
 

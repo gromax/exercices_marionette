@@ -1,4 +1,18 @@
-define(["app","marionette","apps/common/loading_view", "apps/common/missing_item_view", "apps/exercices/show/show_view"], function(app, Marionette, LoadingView, MissingView, View){
+define([
+	"app",
+	"marionette",
+	"apps/common/alert_view",
+	"apps/common/missing_item_view",
+	"apps/exercices/show/show_view",
+	"apps/exercices/show/answers_view"
+], function(
+	app,
+	Marionette,
+	AlertView,
+	MissingView,
+	View,
+	AnswersView
+){
 	// Il faudra envisager un exercice vide
 	// Ou un exercice dont le fichier js n'existe pas
 	// et éventuellement un chargement
@@ -7,15 +21,10 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 		channelName: "entities",
 
 		show: function(id, params){
+			app.trigger("header:loading", true);
+
 			// Envoyé pour un test direct
 			// Ou bien pour l'exécution d'un exofiche
-
-			// Cette partie est-elle vraiment utile ? à voir
-			//var loadingView = new LoadingView({
-			//	title: "Exercice #"+id,
-			//	message: "Chargement des données."
-			//});
-			//app.regions.getRegion('main').show(loadingView);
 
 
 			// id permet de trouver l'exercice
@@ -40,6 +49,7 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 				optionsValues:null,
 				showOptionsButton:false,
 				showReinitButton:false,
+				showAnswersButton:false,
 				ue: false,
 				save:null,
 			};
@@ -66,6 +76,7 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 						pied:pied,
 						showOptionsButton: exo_params.showOptionsButton,
 						showReinitButton: exo_params.showReinitButton,
+						showAnswersButton: exo_params.showAnswersButton,
 					});
 					var note = 0;
 
@@ -105,6 +116,37 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 						view.on("options:form:submit", function(submitedDataOptions){
 							var new_exo_params = _.extend(exo_params, { optionsValues:submitedDataOptions });
 							self.show(id,new_exo_params);
+						});
+					}
+
+					if (exo_params.showAnswersButton) {
+						view.on("button:answers", function(){
+							var aView = new AnswersView({answers:answersData});
+							aView.on("form:cancel",function(){
+								aView.trigger("dialog:close");
+							});
+							aView.on("form:submit",function(submitedAnswers){
+								exo_params.ue.set("answers", JSON.stringify(submitedAnswers))
+								aView.trigger("dialog:close");
+
+								channel.once("update:note", function(note){
+									app.trigger("header:loading", true);
+									var savingUE = exo_params.ue.save();
+									$.when(savingUE).fail(function(response){
+										if(response.status == 401){
+											alert("Vous devez vous (re)connecter !");
+											app.trigger("home:logout");
+										} else {
+											alert("Erreur inconnue. Essayez à nouveau !");
+										}
+									}).always(function(){
+										app.trigger("header:loading", false);
+									});
+								});
+
+								self.show(id, exo_params);
+							});
+							app.regions.getRegion('dialog').show(aView);
 						});
 					}
 
@@ -165,11 +207,15 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 								// ajoutera au savingUE le when -> faits.add() le cas échéant
 								// retournera le savingUE à l'exercice pour qu'il puisse y lier le when -> traitement_final()
 								var savingUE = exo_params.save.apply(exo_params,[note, answersData, exo.get("inputs"), finished]);
-								$.when(savingUE).done(function(){
+								if (savingUE){
+									$.when(savingUE).done(function(){
+										traitement_final(brique_view, model, verifs);
+									}).fail(function(response){
+										alert("An unprocessed error happened. Please try again!");
+									});
+								} else {
 									traitement_final(brique_view, model, verifs);
-								}).fail(function(response){
-									alert("An unprocessed error happened. Please try again!");
-								});
+								}
 							} else {
 								// On ne sauvegarde pas, on exécuter directement le traitement final
 								traitement_final(brique_view, model, verifs);
@@ -195,8 +241,7 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 								// On s'arêtera si une validation renvoie false ou si on arrive à la fin de l'exercice
 								//var model = brique_view.model;
 								var brique_view = view.listView.children.findByModel(model);
-								console.log(brique_view);
-								console.log(model);
+
 								var model_validation = model.validation(answersData);
 								var validation_error = _.some(model_validation, function(item){ return _.has(item, "error"); })
 								if (validation_error === false) {
@@ -208,7 +253,11 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 									// La validation n'ayant pas abouti, on ne va pas plus loin
 									go_on = false;
 								}
-
+							}
+							if (exo_params.ue){
+								// Lors d'un refresh avec changement de answers, la note peut avoir changé
+								exo_params.ue.set("note",note);
+								channel.trigger("update:note");
 							}
 						}
 					});
@@ -218,6 +267,8 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 				}).fail(function(response){
 					var view = new MissingView({ message:"Cet exercice n'existe pas !" });
 					app.regions.getRegion('main').show(view);
+				}).always(function(){
+					app.trigger("header:loading", false);
 				});
 			});
 		},
@@ -231,6 +282,7 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 			// Il faut charger le exofiche correspondant à id pour obtenir le idE et data.options
 			var channel = this.getChannel();
 			var that = this;
+			app.trigger("header:loading", true);
 			require(["entities/dataManager"], function(){
 				var fetchingExoFiches = channel.request("custom:entities", ["exofiches"]);
 				$.when(fetchingExoFiches).done(function(exofiches){
@@ -246,8 +298,16 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 						var view = new MissingView({ message:"Cet exercice n'existe pas !" });
 						app.regions.getRegion('main').show(view);
 					}
-				}).fail(function(){
-					alert("Erreur inconnue !");
+				}).fail(function(response){
+					if(response.status == 401){
+						alert("Vous devez vous (re)connecter !");
+						app.trigger("home:logout");
+					} else {
+						var alertView = new AlertView();
+						app.regions.getRegion('main').show(alertView);
+					}
+				}).always(function(){
+					app.trigger("header:loading", false);
 				});
 			});
 		},
@@ -262,6 +322,7 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 
 			var self = this;
 			var channel = this.getChannel();
+			app.trigger("header:loading", true);
 			require(["entities/aUE", "entities/dataManager"], function(ItemUE){
 				var fetchingData = channel.request("custom:entities", ["userfiches", "exofiches", "faits"]);
 				$.when(fetchingData).done(function(userfiches, exofiches, faits){
@@ -328,13 +389,25 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 						var view = new MissingView({ message:"Cet exercice n'existe pas !" });
 						app.regions.getRegion('main').show(view);
 					}
+				}).fail(function(response){
+					if(response.status == 401){
+						alert("Vous devez vous (re)connecter !");
+						app.trigger("home:logout");
+					} else {
+						var alertView = new AlertView();
+						app.regions.getRegion('main').show(alertView);
+					}
+				}).always(function(){
+					app.trigger("header:loading", false);
 				});
 			});
 		},
 
-		execUEForEleve:function(idUE){
+
+		execUEForProf:function(idUE){
 			var self = this;
 			var channel = this.getChannel();
+			app.trigger("header:loading", true);
 			require(["entities/dataManager"], function(){
 				var fetchingData = channel.request("custom:entities", ["userfiches", "exofiches", "faits"]);
 				$.when(fetchingData).done(function(userfiches, exofiches, faits){
@@ -345,7 +418,71 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 						var userfiche = userfiches.get(idUF);
 						var exofiche = exofiches.get(idEF);
 
-						// Il faut réfléchir au fil d'ariane
+						// debug : Il faut réfléchir au fil d'ariane
+						// debug : prévoir une fenêtre de modif des données
+
+						var idE = exofiche.get("idE");
+						// On ne doit transmettre que des options brutes
+						var exoficheOptions = _.mapObject(exofiche.get("options"), function(val,key){
+							return val.value;
+						});
+
+						var saveFunction = false;
+						var showReinitButton = false;
+						if (userfiche.get("actif") && userfiche.get("ficheActive")){
+							// La fiche étant active, l'exercice sera sauvegardé
+							// Il parait aussi logique de permettre de poursuivre la fiche en relancçant l'exercice
+							showReinitButton = true
+							saveFunction = function(note, answers, inputs, finished){
+								var ue = this.ue; // cette commande nécessite que la fonction soit appelée dans le bon contexte
+								if (ue) {
+									var savingUE = ue.save({
+										note: Math.ceil(note),
+										answers: JSON.stringify(answers),
+										finished: finished
+									});
+									return savingUE;
+								} else {
+									return false;
+								}
+							}
+						}
+
+						self.show(idE, { optionsValues:exoficheOptions, save:saveFunction, showReinitButton:showReinitButton, ue:ue, showAnswersButton:true });
+
+					} else {
+						var view = new MissingView({ message:"Cette sauvegarde de votre travail n'existe pas !" });
+						app.regions.getRegion('main').show(view);
+					}
+				}).fail(function(response){
+					if(response.status == 401){
+						alert("Vous devez vous (re)connecter !");
+						app.trigger("home:logout");
+					} else {
+						var alertView = new AlertView();
+						app.regions.getRegion('main').show(alertView);
+					}
+				}).always(function(){
+					app.trigger("header:loading", false);
+				});
+			});
+		},
+
+		execUEForEleve:function(idUE){
+			var self = this;
+			var channel = this.getChannel();
+			app.trigger("header:loading", true);
+			require(["entities/dataManager"], function(){
+				var fetchingData = channel.request("custom:entities", ["userfiches", "exofiches", "faits"]);
+				$.when(fetchingData).done(function(userfiches, exofiches, faits){
+					var ue = faits.get(idUE);
+					if (ue){
+						var idEF = ue.get("aEF");
+						var idUF = ue.get("aUF");
+						var userfiche = userfiches.get(idUF);
+						var exofiche = exofiches.get(idEF);
+
+						// debug : Il faut réfléchir au fil d'ariane
 
 						var idE = exofiche.get("idE");
 						// On ne doit transmettre que des options brutes
@@ -395,6 +532,16 @@ define(["app","marionette","apps/common/loading_view", "apps/common/missing_item
 						var view = new MissingView({ message:"Cette sauvegarde de votre travail n'existe pas !" });
 						app.regions.getRegion('main').show(view);
 					}
+				}).fail(function(response){
+					if(response.status == 401){
+						alert("Vous devez vous (re)connecter !");
+						app.trigger("home:logout");
+					} else {
+						var alertView = new AlertView();
+						app.regions.getRegion('main').show(alertView);
+					}
+				}).always(function(){
+					app.trigger("header:loading", false);
 				});
 			});
 		}

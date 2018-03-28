@@ -7,10 +7,11 @@ define(["marionette","app","apps/header/show/show_view"], function(Marionette,ap
 				navbar.listenTo(app.Auth,"change",function(){
 					this.logChange();
 				});
+				navbar.listenTo(app,"header:loading", navbar.spin);
 			} else {
 				console.log("Erreur : Objet session non défini !");
 			}
-		}
+		},
 	};
 
 	return Controller;

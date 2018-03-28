@@ -1,13 +1,13 @@
 define([
 	"app",
 	"marionette",
-	"apps/common/loading_view",
+	"apps/common/alert_view",
 	"apps/common/missing_item_view",
 	"apps/devoirs/faits/faits_view"
 ], function(
 	app,
 	Marionette,
-	LoadingView,
+	AlertView,
 	MissingView,
 	ListView
 ){
@@ -19,8 +19,7 @@ define([
 			// idEF : est l'assoication exercice/fiche, référence d'un exercice à l'intérieur d'un devoir
 			// Chaque exercice fait est associé à un UF et un EF
 
-			var loadingView = new LoadingView();
-			app.regions.getRegion('main').show(loadingView);
+			app.trigger("header:loading", true);
 			var channel = this.getChannel();
 
 			require(["entities/dataManager"], function(){
@@ -69,6 +68,16 @@ define([
 						var view = new MissingView();
 						app.regions.getRegion('main').show(view);
 					}
+				}).fail(function(response){
+					if(response.status == 401){
+						alert("Vous devez vous (re)connecter !");
+						app.trigger("home:logout");
+					} else {
+						var alertView = new AlertView();
+						app.regions.getRegion('main').show(alertView);
+					}
+				}).always(function(){
+					app.trigger("header:loading", false);
 				});
 			});
 		},
@@ -80,8 +89,7 @@ define([
 			//   Chaque exercice fait est associé à un UF et un EF
 			// Soit on ne fourni pas d'arguments, dans ce cas on affiche tous ceux qui ne sont pas terminés
 
-			var loadingView = new LoadingView();
-			app.regions.getRegion('main').show(loadingView);
+			app.trigger("header:loading", true);
 			var channel = this.getChannel();
 
 			require(["entities/dataManager"], function(){
@@ -142,6 +150,16 @@ define([
 						var view = new MissingView();
 						app.regions.getRegion('main').show(view);
 					}
+				}).fail(function(response){
+					if(response.status == 401){
+						alert("Vous devez vous (re)connecter !");
+						app.trigger("home:logout");
+					} else {
+						var alertView = new AlertView();
+						app.regions.getRegion('main').show(alertView);
+					}
+				}).always(function(){
+					app.trigger("header:loading", false);
 				});
 
 			});

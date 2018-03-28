@@ -2,10 +2,21 @@ define(["marionette","app"], function(Marionette,app){
 
 	var API = {
 		devoirsList: function(){
-			app.Ariane.reset([{ text:"Devoirs", e:"devoirs:list", link:"devoirs"}]);
-			require(["apps/devoirs/list/list_controller"], function(Controller){
-				Controller.list();
+			var auth = app.Auth;
+			var profFct = function(){
+				app.Ariane.reset([{ text:"Devoirs", e:"devoirs:list", link:"devoirs"}]);
+				require(["apps/devoirs/list/list_controller"], function(Controller){
+					Controller.list();
+				});
+			}
+
+			var todo = auth.mapItem({
+				"Admin": profFct,
+				"Prof": profFct,
+				"Eleve": function(){ app.trigger("notFound"); },
+				"def": function(){ app.trigger("home:login"); },
 			});
+			todo();
 		},
 
 		devoirShow: function(id){
@@ -32,7 +43,7 @@ define(["marionette","app"], function(Marionette,app){
 				"Admin": devoirEdition,
 				"Prof": devoirEdition,
 				"Eleve": exoFicheRun,
-				"def": function(){ app.trigger("notFound"); },
+				"def": function(){ app.trigger("home:login"); },
 			});
 			todo();
 		},
@@ -52,7 +63,8 @@ define(["marionette","app"], function(Marionette,app){
 			var todo = auth.mapItem({
 				"Admin": exoFicheRun,
 				"Prof": exoFicheRun,
-				"def": function(){ app.trigger("notFound"); },
+				"Eleve": function(){ app.trigger("notFound"); },
+				"def": function(){ app.trigger("home:login"); },
 			});
 			todo();
 		},
@@ -74,7 +86,8 @@ define(["marionette","app"], function(Marionette,app){
 			var todo = auth.mapItem({
 				"Admin": devoirEF_list,
 				"Prof": devoirEF_list,
-				"def": function(){ app.trigger("notFound"); },
+				"Eleve": function(){ app.trigger("notFound"); },
+				"def": function(){ app.trigger("home:login"); },
 			});
 			todo();
 		},
@@ -95,7 +108,8 @@ define(["marionette","app"], function(Marionette,app){
 			var todo = auth.mapItem({
 				"Admin": devoirUF_list,
 				"Prof": devoirUF_list,
-				"def": function(){ app.trigger("notFound"); }
+				"Eleve": function(){ app.trigger("notFound"); },
+				"def": function(){ app.trigger("home:login"); },
 			});
 			todo();
 		},
@@ -117,7 +131,8 @@ define(["marionette","app"], function(Marionette,app){
 			var todo = auth.mapItem({
 				"Admin": devoirAddUF,
 				"Prof": devoirAddUF,
-				"def": function(){ app.trigger("notFound"); },
+				"Eleve": function(){ app.trigger("notFound"); },
+				"def": function(){ app.trigger("home:login"); },
 			});
 			todo();
 		},
@@ -138,7 +153,8 @@ define(["marionette","app"], function(Marionette,app){
 			var todo = auth.mapItem({
 				"Admin": fct,
 				"Prof": fct,
-				"def": function(){ app.trigger("notFound"); },
+				"Eleve": function(){ app.trigger("notFound"); },
+				"def": function(){ app.trigger("home:login"); },
 			});
 			todo();
 
@@ -158,7 +174,8 @@ define(["marionette","app"], function(Marionette,app){
 			var todo = auth.mapItem({
 				"Admin": fct,
 				"Prof": fct,
-				"def": function(){ app.trigger("notFound"); },
+				"Eleve": function(){ app.trigger("notFound"); },
+				"def": function(){ app.trigger("home:login"); },
 			});
 			todo();
 		},
@@ -172,8 +189,10 @@ define(["marionette","app"], function(Marionette,app){
 				});
 			}
 			var todo = auth.mapItem({
+				"Admin": function(){ app.trigger("notFound"); },
+				"Prof": function(){ app.trigger("notFound"); },
 				"Eleve": forEleve,
-				"def": function(){ app.trigger("notFound"); },
+				"def": function(){ app.trigger("home:login"); },
 			});
 
 			todo();
@@ -199,7 +218,8 @@ define(["marionette","app"], function(Marionette,app){
 			var todo = auth.mapItem({
 				"Admin": forProf,
 				"Prof": forProf,
-				"def": function(){ app.trigger("notFound"); },
+				"Eleve": function(){ app.trigger("notFound"); },
+				"def": function(){ app.trigger("home:login"); },
 			});
 
 			todo();
@@ -215,8 +235,10 @@ define(["marionette","app"], function(Marionette,app){
 			}
 
 			var todo = auth.mapItem({
-				"def": function(){ app.trigger("notFound"); },
+				"Admin": function(){ app.trigger("notFound"); },
+				"Prof": function(){ app.trigger("notFound"); },
 				"Eleve": forEleve,
+				"def": function(){ app.trigger("home:login"); },
 			});
 
 			todo();

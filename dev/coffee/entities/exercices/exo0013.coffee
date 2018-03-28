@@ -4,6 +4,8 @@ define ["utils/math"], (mM) ->
 	# description:"On donne l'équation réduite d'une droite. Il faut tracer cette droite."
 	# keyWords:["Géométrie","Droite","Équation","Seconde"]
 
+	# debug: tex à faire
+
 	return {
 		init: (inputs) ->
 			A = mM.alea.vector({ name:"A", def:inputs }).save(inputs)
@@ -58,14 +60,20 @@ define ["utils/math"], (mM) ->
 								out
 							verification: (answers_data) ->
 								note = 0
-								xA = Number answers_data["xA"]
-								yA = Number answers_data["yA"]
-								xB = Number answers_data["xB"]
-								yB = Number answers_data["yB"]
+								u = {
+									A:{
+										x: Number answers_data["xA"]
+										y: Number answers_data["yA"]
+									}
+									B:{
+										x: Number answers_data["xB"]
+										y: Number answers_data["yB"]
+									}
+								}
 
-								dA = droite.float_distance(xA,yA)
-								dB = droite.float_distance(xB,yB)
-								dAB = Math.sqrt((xA-xB)*(xA-xB)+(yA-yB)*(yA-yB))
+								dA = droite.float_distance(u.A.x,u.A.y)
+								dB = droite.float_distance(u.B.x,u.B.y)
+								dAB = Math.sqrt((u.A.x-u.B.x)^2+(u.A.y-u.B.y)^2)
 
 								messages = []
 								if (dA<dmax)
@@ -98,7 +106,7 @@ define ["utils/math"], (mM) ->
 									]
 									post: (graph)->
 										for pt in graph.points
-											pt.setAttribute {fixed:true}
+											pt.setAttribute {fixed:true, x:u[pt.name].x, y: u[pt.name].y}
 										graph.create('line',droite.float_2_points(max), {strokeColor:'blue',strokeWidth:2,fixed:true})
 								}
 						}

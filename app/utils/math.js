@@ -8847,6 +8847,13 @@
             out = String(num);
           }
           return out.replace('.', ",");
+        },
+        toPrecision: function(num, decimals) {
+          if (decimals != null) {
+            return Number(num.toFixed(decimals));
+          } else {
+            return num;
+          }
         }
       },
       alea: {
@@ -9836,7 +9843,7 @@
       },
       verif: {
         number: function(userInfo, goodObject, params) {
-          var approx, config, default_config, erreur, errors, note, ref;
+          var approx, config, default_config, erreur, errors, keysFilter, note, ref;
           if (typeof goodObject === "number") {
             goodObject = new RealNumber(goodObject);
           }
@@ -9852,7 +9859,8 @@
             symbols: null,
             custom: false
           };
-          params = _.pick.apply(_, [params].concat(slice.call(_.keys(default_config))));
+          keysFilter = ["formes", "p_forme", "tolerance", "approx", "p_approx", "arrondi", "p_arrondi", "p_modulo", "symbols", "custom", "goodTex"];
+          params = _.pick.apply(_, [params].concat(slice.call(keysFilter)));
           config = _.extend(default_config, params);
           erreur = erreurManager.main(goodObject, userInfo.object, config.symbols);
           note = 0;

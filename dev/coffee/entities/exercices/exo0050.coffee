@@ -9,6 +9,8 @@ define ["utils/math","utils/help"], (mM, help) ->
 	#	c:{ tag:"Calcul d'interpolation" , options:["Non", "Oui"] }
 	#}
 
+	# debug : tex à faire
+
 	return {
 		init: (inputs, options) ->
 			calculInterpolation = Number(options.c.value ? 0) is 1

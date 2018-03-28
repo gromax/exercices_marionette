@@ -12,7 +12,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
             {
               type: "text",
               rank: 1,
-              ps: ["L'équation est de type $x=a$. Donnez $a$."]
+              ps: ["L'équation est de type &nbsp; $x=a$. Donnez &nbsp; $a$."]
             }, {
               type: "input",
               rank: 2,
@@ -40,7 +40,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
             {
               type: "text",
               rank: 1,
-              ps: ["L'équation est de type $y=m\\:x+p$. Donnez $m$ et $p$."]
+              ps: ["L'équation est de type &nbsp; $y=m\\:x+p$. Donnez &nbsp; $m$ &nbsp; et &nbsp; $p$."]
             }, {
               type: "input",
               rank: 2,
@@ -85,7 +85,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
             {
               type: "text",
               rank: 1,
-              ps: ["On se place dans un repère orthogonal $(O;I,J)$", "On donne deux points $" + (A.texLine()) + "$ et $" + (B.texLine()) + "$.", "Il faut déterminer l'équation réduite de la droite $(AB)$."]
+              ps: ["On se place dans un repère orthogonal &nbsp; $(O;I,J)$", "On donne deux points $" + (A.texLine()) + "$ &nbsp; et &nbsp; $" + (B.texLine()) + "$.", "Il faut déterminer l'équation réduite de la droite &nbsp; $(AB)$."]
             }
           ]
         }, {
@@ -128,6 +128,45 @@ define(["utils/math", "utils/help"], function(mM, help) {
         forbidden: [A]
       }).save(inputs);
       return [A, B, mM.droite.par2pts(A, B)];
+    },
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var A, B, droite, ref;
+        ref = that.init(inputs, options), A = ref[0], B = ref[1], droite = ref[2];
+        return "$" + (A.texLine()) + "$ &nbsp; et &nbsp; $" + (B.texLine()) + "$";
+      };
+      return {
+        children: [
+          {
+            type: "text",
+            children: ["On donne les coordonnées de deux points &nbsp; $A$ &nbsp; et &nbsp; $B$.", "Vous devez donner l'équation réduite de la droite &nbsp; $(AB)$."]
+          }, {
+            type: "enumerate",
+            refresh: true,
+            enumi: "1",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var A, B, droite, ref;
+        ref = that.init(inputs, options), A = ref[0], B = ref[1], droite = ref[2];
+        return "$" + (A.texLine()) + "$ et $" + (B.texLine()) + "$";
+      };
+      return {
+        children: [
+          "On donne les coordonnées de deux points $A$ et $B$.", "Vous devez donner l'équation réduite de la droite $(AB)$.", {
+            type: "enumerate",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
     }
   };
 });

@@ -1,13 +1,13 @@
 define([
 	"app",
 	"marionette",
-	"apps/common/loading_view",
+	"apps/common/alert_view",
 	"apps/common/missing_item_view",
 	"apps/devoirs/exam/exam_view"
 ], function(
 	app,
 	Marionette,
-	LoadingView,
+	AlertView,
 	MissingView,
 	View
 ){
@@ -19,12 +19,7 @@ define([
 		channelName: "entities",
 
 		show: function(id){
-			var loadingView = new LoadingView({
-				title: "Devoir en version papier #"+id,
-				message: "Chargement des données."
-			});
-			app.regions.getRegion('main').show(loadingView);
-
+			app.trigger("header:loading", true);
 			var channel = this.getChannel();
 			require(["entities/dataManager"], function(){
 				var fetchingData = channel.request("custom:entities", ["exams"]);
@@ -91,6 +86,16 @@ define([
 						var view = new MissingView({ message:"Cet exercice n'existe pas !" });
 						app.regions.getRegion('main').show(view);
 					}
+				}).fail(function(response){
+					if(response.status == 401){
+						alert("Vous devez vous (re)connecter !");
+						app.trigger("home:logout");
+					} else {
+						var alertView = new AlertView();
+						app.regions.getRegion('main').show(alertView);
+					}
+				}).always(function(){
+					app.trigger("header:loading", false);
 				});
 			});
 		}

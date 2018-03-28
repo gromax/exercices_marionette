@@ -4,6 +4,8 @@ define ["utils/math","utils/help"], (mM, help) ->
 	# description:"Un tableau de valeur d'une fonction est donné. Il faut déterminer une image et un antécédent."
 	# keyWords:["Fonctions","Antécédent","Image","Seconde"]
 
+	# debug : tex à faire
+
 	return {
 		m: -7
 		M: 7

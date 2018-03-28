@@ -37,13 +37,20 @@ define(["marionette","app"], function(Marionette,app){
 				"Admin": testForProf,
 				"Prof": testForProf,
 				"Eleve": execForEleve,
-				"def": function(){ app.trigger("notFound") },
+				"def": function(){ app.trigger("home:login"); },
 			});
 			todo();
 		},
 
 		runUE: function(idUE){
 			var auth = app.Auth;
+			var forProf = function(){
+				app.Ariane.reset([]);
+				require(["apps/exercices/show/show_controller"], function(showController){
+					showController.execUEForProf(idUE);
+				});
+			}
+
 			var forEleve = function(){
 				app.Ariane.reset([]);
 				require(["apps/exercices/show/show_controller"], function(showController){
@@ -52,8 +59,10 @@ define(["marionette","app"], function(Marionette,app){
 			}
 
 			var todo = auth.mapItem({
+				"Admin": forProf,
+				"Prof": forProf,
 				"Eleve": forEleve,
-				"def": function(){ app.trigger("notFound") },
+				"def": function(){ app.trigger("home:login"); },
 			});
 			todo();
 		},

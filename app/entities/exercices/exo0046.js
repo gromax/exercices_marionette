@@ -116,6 +116,68 @@ define(["utils/math", "utils/help"], function(mM, help) {
           ]
         }
       ];
+    },
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var ang, ref, z, zA, zAB, zAC, zB, zC;
+        ref = that.init(inputs, options), zA = ref[0], zB = ref[1], zC = ref[2], zAB = ref[3], zAC = ref[4], z = ref[5], ang = ref[6];
+        return "$z_A=" + (zA.tex()) + "$, &nbsp; $z_B = " + (zB.tex()) + "$ &nbsp; et &nbsp; $z_C = " + (zC.tex()) + "$.";
+      };
+      return {
+        children: [
+          {
+            type: "text",
+            children: ["On donne les points &nbsp; $A$, &nbsp; $B$ &nbsp; et &nbsp; $C$ &nbsp; d'affixes respectives &nbsp; $z_A$, &nbsp; $z_B$ &nbsp; et &nbsp; $z_C$.", "À chaque fois :"]
+          }, {
+            type: "enumerate",
+            refresh: false,
+            enumi: "a",
+            children: ["Donnez &nbsp;$z_1$ &nbsp; et &nbsp; $z_2$, affixes respectives de &nbsp; $\\overrightarrow{AC}$ &nbsp; $\\overrightarrow{AB}$.", "Calculez &nbsp; $z_1\\cdot\\overline{z_2}$", "Déduisez l'angle &nbsp; $\\widehat{BAC}$."]
+          }, {
+            type: "enumerate",
+            enumi: "1",
+            refresh: true,
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var ang, fct_item, ref, that, z, zA, zAB, zAC, zB, zC;
+      if (inputs_list.length === 1) {
+        ref = this.init(inputs_list[0], options), zA = ref[0], zB = ref[1], zC = ref[2], zAB = ref[3], zAC = ref[4], z = ref[5], ang = ref[6];
+        return {
+          children: [
+            "On donne les points $A$, $B$ et $C$ d'affixes respectives $z_A$, $z_B$ et $z_C$.", "$z_A=" + (zA.tex()) + "$, $z_B = " + (zB.tex()) + "$ et $z_C = " + (zC.tex()) + "$.", {
+              type: "enumerate",
+              enumi: "a)",
+              children: ["Donnez $z_1$ et $z_2$, affixes respectives de $\\overrightarrow{AC}$ $\\overrightarrow{AB}$.", "Calculez $z_1\\cdot\\overline{z_2}$", "Déduisez l'angle $\\widehat{BAC}$."]
+            }
+          ]
+        };
+      } else {
+        that = this;
+        fct_item = function(inputs, index) {
+          var ref1;
+          ref1 = that.init(inputs, options), zA = ref1[0], zB = ref1[1], zC = ref1[2], zAB = ref1[3], zAC = ref1[4], z = ref1[5], ang = ref1[6];
+          return "$z_A=" + (zA.tex()) + "$, $z_B = " + (zB.tex()) + "$ et $z_C = " + (zC.tex()) + "$.";
+        };
+        return {
+          children: [
+            "On donne les points $A$, $B$ et $C$ d'affixes respectives $z_A$, $z_B$ et $z_C$.", "À chaque fois :", {
+              type: "enumerate",
+              enumi: "a)",
+              children: ["Donnez $z_1$ et $z_2$, affixes respectives de $\\overrightarrow{AC}$ $\\overrightarrow{AB}$.", "Calculez $z_1\\cdot\\overline{z_2}$", "Déduisez l'angle $\\widehat{BAC}$."]
+            }, {
+              type: "enumerate",
+              enumi: "1)",
+              children: _.map(inputs_list, fct_item)
+            }
+          ]
+        };
+      }
     }
   };
 });

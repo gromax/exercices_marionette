@@ -103,13 +103,49 @@ define ["utils/math","utils/help"], (mM, help) ->
 
 			]
 
-		tex: (data) ->
-			# en chantier
-			if not isArray(data) then data = [ data ]
-			if data[0]?.options.d.value is 0 then title = "Résoudre dans $\\mathbb{R}$"
-			else title = "Résoudre dans $\\mathbb{C}"
-			{
-				title:title
-				content:Handlebars.templates["tex_enumerate"] { items: ("$#{item.equation}$" for item in data), large:false }
+		getExamBriques: (inputs_list,options) ->
+			dansR = Number(options.d.value) is 0
+			if dansR then ensemble = "R"
+			else ensemble = "C"
+			that = @
+			fct_item = (inputs, index) ->
+				poly = that.init(inputs,dansR)
+				return "$P(x)=#{poly.tex()}$"
+
+			return {
+				children: [
+					{
+						type: "text",
+						children: [
+							"Pour les polynomes suivants, donnez le discriminant et les racines dans &nbsp; $\\mathbb{#{ensemble}}$ &nbsp; quand elles existent."
+						]
+					}
+					{
+						type: "enumerate",
+						refresh:true
+						enumi:"1",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
 			}
+
+		getTex: (inputs_list, options) ->
+			dansR = Number(options.d.value) is 0
+			if dansR then ensemble = "R"
+			else ensemble = "C"
+			that = @
+			fct_item = (inputs, index) ->
+				poly = that.init(inputs,dansR)
+				return "$P(x)=#{poly.tex()}$"
+
+			return {
+				children: [
+					"Pour les polynomes suivants, donnez le discriminant et les racines dans $\\mathbb{#{ensemble}}$ quand elles existent."
+					{
+						type: "enumerate",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
 	}

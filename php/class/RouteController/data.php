@@ -55,6 +55,19 @@ class data
         return false;
     }
 
+    public function fetchMe()
+    {
+        // Renvoie les données de l'utilisateur connecté
+        $uLog =Logged::getConnectedUser();
+        if (!$uLog->connexionOk())
+        {
+            EC::addError("Déconnecté !");
+            EC::set_error_code(401);
+            return false;
+        }
+        return $uLog->toArray();
+    }
+
     public function customFetch()
     {
         // Renvoie les données demandées
@@ -62,6 +75,7 @@ class data
         $uLog =Logged::getConnectedUser();
         if (!$uLog->connexionOk())
         {
+            EC::addError("Déconnecté !");
             EC::set_error_code(401);
             return false;
         }

@@ -232,7 +232,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 			that = @
 			fct_item = (inputs, index) ->
 				[eqTex, info_notation, goods, domaine] = that.init(inputs,options)
-				if domaine then return "$#{ eqTex }$. "+domaine
+				if domaine then return ["$#{ eqTex }$.", domaine]
 				else return "$#{ eqTex }$"
 
 			return {
@@ -280,13 +280,5 @@ define ["utils/math","utils/help"], (mM, help) ->
 			md = expr2.replace(X,"x").order()
 			if a is 1 then options = { altFunctionTex:["exp"] } else options = {}
 			{ goods:goods, eqTex:mg.tex(options)+" = "+md.tex(options) }
-
-		tex: (data) ->
-			# en chantier
-			if not isArray(data) then data = [ data ]
-			{
-				title:@title
-				content:Handlebars.templates["tex_enumerate"] { items: ("$#{item.equation}$" for item in data), large:false }
-			}
 
 	}

@@ -59,25 +59,43 @@ define(["utils/math", "utils/help"], function(mM, help) {
         }
       ];
     },
-    tex: function(data) {
-      var item;
-      if (!isArray(data)) {
-        data = [data];
-      }
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var angleRad, m, ref, z;
+        ref = that.init(inputs, options), z = ref[0], m = ref[1], angleRad = ref[2];
+        return "$z = " + (z.tex()) + "$";
+      };
       return {
-        title: this.title,
-        content: Handlebars.templates["tex_enumerate"]({
-          pre: "Dans chaque cas, donnez le module $|z|$ et l'argument $arg(z)$.",
-          items: (function() {
-            var i, len, results;
-            results = [];
-            for (i = 0, len = data.length; i < len; i++) {
-              item = data[i];
-              results.push("$z = " + item.tex.z + "$");
-            }
-            return results;
-          })()
-        })
+        children: [
+          {
+            type: "text",
+            children: ["Donnez le module et l'argument de &nbsp; $z$."]
+          }, {
+            type: "enumerate",
+            refresh: true,
+            enumi: "1",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var angleRad, m, ref, z;
+        ref = that.init(inputs, options), z = ref[0], m = ref[1], angleRad = ref[2];
+        return "$z = " + (z.tex()) + "$";
+      };
+      return {
+        children: [
+          "Donnez le module et l'argument de $z$.", {
+            type: "enumerate",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
       };
     }
   };

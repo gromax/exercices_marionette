@@ -53,7 +53,15 @@ define(["marionette","app","jst"], function(Marionette,app,JST){
 
 		onUsersList: function(e){
 			app.trigger("users:list");
-		}
+		},
+
+		spin: function(set_on){
+			if (set_on){
+				$("span.js-spinner", this.$el).html("<i class='fa fa-spinner fa-spin'></i>");
+			} else {
+				$("span.js-spinner", this.$el).html("");
+			}
+		},
 	});
 
 	return Headers;

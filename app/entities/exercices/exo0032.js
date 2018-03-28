@@ -46,6 +46,45 @@ define(["utils/math", "utils/help"], function(mM, help) {
           ]
         }
       ];
+    },
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var ang, p, ref;
+        ref = that.init(inputs, options), ang = ref[0], p = ref[1];
+        return "$\\alpha =" + (ang.tex()) + "$ &nbsp; radians";
+      };
+      return {
+        children: [
+          {
+            type: "text",
+            children: ["Donnez la mesure principale de &nbsp; $\\alpha$."]
+          }, {
+            type: "enumerate",
+            refresh: true,
+            enumi: "1",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var ang, p, ref;
+        ref = that.init(inputs, options), ang = ref[0], p = ref[1];
+        return "$\\alpha =" + (ang.tex()) + "$ radians";
+      };
+      return {
+        children: [
+          "Donnez la mesure principale de $\\alpha$.", {
+            type: "enumerate",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
     }
   };
 });

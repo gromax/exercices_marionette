@@ -113,25 +113,19 @@
 					]
 				}
 
+		getTex: (inputs_list, options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[expression, [u0, u1, u2, u10]] = that.init(inputs_item,options)
+				return expression
 
-		tex: (data) ->
-			# debug : en chantier
-			symbs = ["","<","\\leqslant"]
-			if not isArray(data) then data = [ data ]
-			its = ( it.tex.expression for it in data )
-			if its.length > 1 then [{
-					title:@title
-					content:Handlebars.templates["tex_enumerate"] {
-						pre:"Dans les cas suivants, calculez $u_0$, $u_1$, $u_2$ et $u_{10}$."
-						items: its
-						large:false
+			return {
+				children: [
+					"Dans les cas suivants, calculez $u_0$, $u_1$, $u_2$ et $u_{10}$."
+					{
+						type: "enumerate",
+						children: _.map(inputs_list, fct_item)
 					}
-				}]
-			else [{
-					title:@title
-					content:Handlebars.templates["tex_plain"] {
-						content: "Calculez $u_0$, $u_1$, $u_2$ et $u_{10}$ avec #{its[0]}."
-						large:false
-					}
-				}]
+				]
+			}
 	}

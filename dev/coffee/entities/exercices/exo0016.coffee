@@ -4,6 +4,9 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 	# description:"Cinq paraboles et cinq fonctions du second degré sont données. À chaque fonction, il faut attribuer la parabole qui la représente."
 	# keyWords:["Analyse","Fonction","Courbe","Second degré","Seconde"]
 
+	# debug: tex à faire
+
+
 	return {
 		max: 6
 		init: (inputs) ->

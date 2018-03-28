@@ -170,36 +170,77 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
         }
       ];
     },
-    tex: function(data) {
-      var col1, col2, content, itData, j, len, out;
-      if (!isArray(data)) {
-        data = [data];
-      }
-      out = [];
-      for (j = 0, len = data.length; j < len; j++) {
-        itData = data[j];
-        col1 = Handlebars.templates["tex_enumerate"]({
-          numero: "a)",
-          items: itData.tex.gauche
-        });
-        col2 = Handlebars.templates["tex_enumerate"]({
-          numero: "\\hspace{-7mm}1)",
-          items: itData.tex.droite
-        });
-        content = Handlebars.templates["tex_plain"]({
-          multicols: 2,
-          center: true,
-          contents: [col1, "\\columnbreak", col2]
-        });
-        out.push({
-          title: this.title,
-          content: Handlebars.templates["tex_plain"]({
-            contents: ["Associez les formes explicites et les formes récurrentes deux à deux.", content],
-            large: false
-          })
-        });
-      }
-      return out;
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var liste_choix, liste_fixe, ref;
+        ref = that.init(inputs, options), liste_fixe = ref[0], liste_choix = ref[1];
+        return {
+          children: [
+            {
+              type: "text",
+              children: ["Associez les formes explicites et les formes récurrentes deux à deux."]
+            }, {
+              type: "2cols",
+              col1: {
+                type: "enumerate",
+                enumi: "a",
+                children: _.pluck(liste_fixe, "text")
+              },
+              col2: {
+                type: "enumerate",
+                enumi: "1",
+                children: _.pluck(liste_choix, "text")
+              }
+            }
+          ]
+        };
+      };
+      return {
+        children: [
+          {
+            type: "subtitles",
+            enumi: "A",
+            refresh: true,
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var liste_choix, liste_fixe, ref;
+        ref = that.init(inputs, options), liste_fixe = ref[0], liste_choix = ref[1];
+        return [
+          "Associez les formes explicites et les formes récurrentes deux à deux.", {
+            type: "multicols",
+            cols: 2,
+            children: [
+              {
+                type: "enumerate",
+                enumi: "a",
+                children: _.pluck(liste_fixe, "text")
+              }, {
+                type: "enumerate",
+                enumi: "1",
+                children: _.pluck(liste_choix, "text")
+              }
+            ]
+          }
+        ];
+      };
+      return {
+        children: [
+          {
+            type: "enumerate",
+            enumi: "A",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
     }
   };
 });

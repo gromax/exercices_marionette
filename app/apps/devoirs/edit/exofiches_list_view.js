@@ -24,7 +24,7 @@ define(["jst", "marionette", "mathjax"], function(JST, Marionette, Mathjax){
 			"click button.js-edit": "exercice:edit",
 			"click button.js-delete": "exercice:delete",
 			"click button.js-cancel": "exercice:cancel",
-			"click": "exercice:test"
+			"click button.js-test" : "exercice:test"
 		},
 
 		flash: function(cssClass){

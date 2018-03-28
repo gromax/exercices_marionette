@@ -11,10 +11,10 @@ define(["utils/math"], function(mM) {
           sign: true
         }) / 100;
       }
-      if (inputs.inputs != null) {
+      if (inputs.b != null) {
         b = Number(inputs.b);
       } else {
-        b = inp.b = mM.alea.real({
+        b = inputs.b = mM.alea.real({
           min: 1,
           max: 20
         });
@@ -93,43 +93,44 @@ define(["utils/math"], function(mM) {
         }
       ];
     },
-    tex: function(data) {
-      var it, its, symbs;
-      symbs = ["", "<", "\\leqslant"];
-      if (!isArray(data)) {
-        data = [data];
-      }
-      its = (function() {
-        var i, len, results;
-        results = [];
-        for (i = 0, len = data.length; i < len; i++) {
-          it = data[i];
-          results.push("$u_0 = " + it.tex.u0 + "$ et $u_{n+1} = " + it.tex.formule + "$");
-        }
-        return results;
-      })();
-      if (its.length > 1) {
-        return [
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var formule, ref, u0, u1, u10, u2, u3;
+        ref = that.init(inputs, options), u0 = ref[0], formule = ref[1], u1 = ref[2], u2 = ref[3], u3 = ref[4], u10 = ref[5];
+        return "$u_0 = " + u0 + "$ &nbsp; et &nbsp; $u_{n+1}= " + formule + "$";
+      };
+      return {
+        children: [
           {
-            title: this.title,
-            content: Handlebars.templates["tex_enumerate"]({
-              pre: "Dans les cas suivants, calculez $u_1$, $u_2$, $u_3$ et $u_{10}$.",
-              items: its,
-              large: false
-            })
+            type: "text",
+            children: ["On considère la suite &nbsp; $(u_n)$ &nbsp; définie par récurence.", "On demande de calculer les termes &nbsp;$u_1$, &nbsp; $u_2$, &nbsp; $u_3$ &nbsp; et &nbsp; $u_{10}$ &nbsp; à 0,01 près."]
+          }, {
+            type: "enumerate",
+            refresh: true,
+            enumi: "1",
+            children: _.map(inputs_list, fct_item)
           }
-        ];
-      } else {
-        return [
-          {
-            title: this.title,
-            content: Handlebars.templates["tex_plain"]({
-              content: "Calculez $u_1$, $u_2$, $u_3$ et $u_{10}$ avec " + its[0] + ".",
-              large: false
-            })
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var formule, ref, u0, u1, u10, u2, u3;
+        ref = that.init(inputs, options), u0 = ref[0], formule = ref[1], u1 = ref[2], u2 = ref[3], u3 = ref[4], u10 = ref[5];
+        return "$u_0 = " + u0 + "$ et $u_{n+1}= " + formule + "$";
+      };
+      return {
+        children: [
+          "On considère la suite $(u_n)$ définie par récurence.", "On demande de calculer les termes $u_1$, $u_2$, $u_3$ et $u_{10}$ à 0,01 près.", {
+            type: "enumerate",
+            children: _.map(inputs_list, fct_item)
           }
-        ];
-      }
+        ]
+      };
     }
   };
 });

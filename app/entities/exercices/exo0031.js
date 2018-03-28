@@ -72,6 +72,45 @@ define(["utils/math", "utils/help"], function(mM, help) {
           ]
         }
       ];
+    },
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var d, gDtR, gRtD, r, ref;
+        ref = that.init(inputs, options), r = ref[0], gRtD = ref[1], d = ref[2], gDtR = ref[3];
+        return "$\\alpha =" + (r.tex()) + "$ &nbsp; radians et &nbsp; $\\beta = " + (d.tex()) + "$ degrés";
+      };
+      return {
+        children: [
+          {
+            type: "text",
+            children: ["Convertissez &nbsp; $\\alpha$ &nbsp; en degrés et &nbsp; $\\beta$ &nbsp; en radians."]
+          }, {
+            type: "enumerate",
+            refresh: true,
+            enumi: "1",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var d, gDtR, gRtD, r, ref;
+        ref = that.init(inputs, options), r = ref[0], gRtD = ref[1], d = ref[2], gDtR = ref[3];
+        return "$\\alpha =" + (r.tex()) + "$ radians et $\\beta = " + (d.tex()) + "$ degrés";
+      };
+      return {
+        children: [
+          "Convertissez $\\alpha$ en degrés et $\\beta$ en radians.", {
+            type: "enumerate",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
     }
   };
 });

@@ -3,27 +3,34 @@ define(["marionette","app"], function(Marionette,app){
 	var API = {
 		listUsers: function(criterion){
 			var auth = app.Auth;
-			if (auth.isAdmin()||auth.isProf()){
+			var forProf = function(){
 				app.Ariane.reset([{ text:"Utilisateurs", e:"users:list", link:"users"}]);
 				require(["apps/users/list/list_controller"], function(listController){
 					listController.listUsers(criterion);
 				});
-			} else {
-				app.trigger("notFound");
 			}
+
+			var todo = auth.mapItem({
+				"Admin": forProf,
+				"Prof": forProf,
+				"Eleve": function(){ app.trigger("notFound"); },
+				"def": function(){ app.trigger("home:login"); },
+			});
+
+			todo();
 		},
 
 		showUser: function(id){
 			var auth = app.Auth;
-			if (auth.isAdmin()||auth.isProf()){
-				app.Ariane.reset([{ text:"Utilisateurs", e:"users:list", link:"users"}]);
-				require(["apps/users/show/show_controller"], function(showController){
-					showController.showUser(id, false);
-				});
-			} else if(auth.get("id") == id) {
+			if(auth.get("id") == id) {
 				app.Ariane.reset([]);
 				require(["apps/users/show/show_controller"], function(showController){
 					showController.showUser(id, true);
+				});
+			} else if (auth.isAdmin()||auth.isProf()){
+				app.Ariane.reset([{ text:"Utilisateurs", e:"users:list", link:"users"}]);
+				require(["apps/users/show/show_controller"], function(showController){
+					showController.showUser(id, false);
 				});
 			} else {
 				app.trigger("notFound");
@@ -32,15 +39,15 @@ define(["marionette","app"], function(Marionette,app){
 
 		editUser: function(id){
 			var auth = app.Auth;
-			if (auth.isAdmin()||auth.isProf()){
-				app.Ariane.reset([{ text:"Utilisateurs", e:"users:list", link:"users"}]);
-				require(["apps/users/edit/edit_controller"], function(editController){
-					editController.editUser(id, false);
-				});
-			} else if(auth.get("id") == id) {
+			if(auth.get("id") == id) {
 				app.Ariane.reset([]);
 				require(["apps/users/edit/edit_controller"], function(editController){
 					editController.editUser(id, true);
+				});
+			} else if (auth.isAdmin()||auth.isProf()){
+				app.Ariane.reset([{ text:"Utilisateurs", e:"users:list", link:"users"}]);
+				require(["apps/users/edit/edit_controller"], function(editController){
+					editController.editUser(id, false);
 				});
 			} else {
 				app.trigger("notFound");
@@ -49,15 +56,15 @@ define(["marionette","app"], function(Marionette,app){
 
 		editUserPwd: function(id){
 			var auth = app.Auth;
-			if (auth.isAdmin()||auth.isProf()){
-				app.Ariane.reset([{ text:"Utilisateurs", e:"users:list", link:"users"}]);
-				require(["apps/users/edit/edit_controller"], function(editController){
-					editController.editUserPwd(id, false);
-				});
-			} else if(auth.get("id") == id) {
+			if(auth.get("id") == id) {
 				app.Ariane.reset([]);
 				require(["apps/users/edit/edit_controller"], function(editController){
 					editController.editUserPwd(id, true);
+				});
+			} else if (auth.isAdmin()||auth.isProf()){
+				app.Ariane.reset([{ text:"Utilisateurs", e:"users:list", link:"users"}]);
+				require(["apps/users/edit/edit_controller"], function(editController){
+					editController.editUserPwd(id, false);
 				});
 			} else {
 				app.trigger("notFound");

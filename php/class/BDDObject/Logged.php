@@ -32,8 +32,14 @@ class Logged extends User
 	{
 		if ( (self::$_connectedUser === null) || ($force === true) ) {
 			$trySession = SC::get()->getParam('user', null);
-			if (($trySession instanceof Logged) && $trySession->connexionOk()) self::$_connectedUser = $trySession;
-			else self::$_connectedUser = new Logged();
+			if (($trySession instanceof Logged) && $trySession->connexionOk())
+			{
+				self::$_connectedUser = $trySession;
+			}
+			else
+			{
+				self::$_connectedUser = new Logged();
+			}
 		}
 		return self::$_connectedUser;
 	}
@@ -129,9 +135,6 @@ class Logged extends User
 			if ($this->rank==self::RANK_DISCONNECTED) $this->isConnected=false;
 			else {
 				$this->isConnected= ( ((time()-$this->lastTime)<self::TIME_OUT) && ($this->ip == $_SERVER['REMOTE_ADDR']) && ($this->id !== null));
-				if (!$this->isConnected) {
-					EC::addError(time()."-".$this->lastTime+"<?>".self::TIME_OUT." et ".$this->ip." =? ".$_SERVER['REMOTE_ADDR']." et ".$this->id);
-				}
 			}
 		}
 		if ($this->isConnected) $this->lastTime = time();

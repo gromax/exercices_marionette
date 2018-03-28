@@ -30,7 +30,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
             {
               type: "text",
               rank: 1,
-              ps: ["Le 1 janvier 2010, on place la somme de " + c0 + " € sur un compte bancaire qui rapporte tous les ans " + (mM.misc.numToStr(r)) + "&nbsp;% d'intérêts composés.", "Soit &nbsp; $(C_n)$ &nbsp; la suite représentant le capital sur le compte au 1 janvier de l'année 2010$+n$.", "Donnez le premier terme &nbsp; $C_0$ &nbsp; et la raison &nbsp; $q$ &nbsp; de la suite."]
+              ps: ["Le 1 janvier 2010, on place la somme de " + c0 + " € sur un compte bancaire qui rapporte tous les ans " + (mM.misc.numToStr(r)) + "&nbsp;% d'intérêts composés.", "Soit &nbsp; $(C_n)$ &nbsp; la suite représentant le capital sur le compte au 1 janvier de l'année &nbsp; $2010+n$.", "Donnez le premier terme &nbsp; $C_0$ &nbsp; et la raison &nbsp; $q$ &nbsp; de la suite."]
             }, {
               type: "input",
               rank: 2,
@@ -86,24 +86,67 @@ define(["utils/math", "utils/help"], function(mM, help) {
         }
       ];
     },
-    tex: function(data) {
-      var i, itData, len, out;
-      if (!isArray(data)) {
-        data = [data];
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var c0, n, q, r, ref;
+        ref = that.init(inputs, options), c0 = ref[0], r = ref[1], q = ref[2], n = ref[3];
+        return "Capital initial : " + c0 + " € ; taux : " + (mM.misc.numToStr(r)) + "&nbsp;%";
+      };
+      return {
+        children: [
+          {
+            type: "text",
+            children: ["Le 1 janvier 2010, on place une somme sur un compte bancaire qui rapporte tous les ans des intérêts.", "Soit &nbsp; $(C_n)$ &nbsp; la suite représentant le capital sur le compte au 1 janvier de l'année &nbsp; $2010+n$.", "Dans tous les cas :"]
+          }, {
+            type: "enumerate",
+            refresh: false,
+            enumi: "a",
+            children: ["Donnez le premier terme &nbsp; $C_0$ &nbsp; et la raison &nbsp; $q$ &nbsp; de la suite.", "Donnez le rang &nbsp; $n$ &nbsp; de l'année pour laquelle le capital aura doublé.", "Précisez l'année correspondante."]
+          }, {
+            type: "enumerate",
+            refresh: true,
+            enumi: "1",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var c0, fct_item, n, q, r, ref, that;
+      if (inputs_list.length === 1) {
+        ref = that.init(inputs_list[0], options), c0 = ref[0], r = ref[1], q = ref[2], n = ref[3];
+        return {
+          children: [
+            "Le 1 janvier 2010, on place une somme de " + c0 + " € sur un compte bancaire qui rapporte tous les ans " + (mM.misc.numToStr(r)) + "\\,\\% des intérêts composés.", "Soit $(C_n)$ la suite représentant le capital sur le compte au 1 janvier de l'année $2010+n$.", {
+              type: "enumerate",
+              enumi: "a)",
+              children: ["Donnez le premier terme $C_0$ et la raison $q$ de la suite.", "Donnez le rang $n$ de l'année pour laquelle le capital aura doublé.", "Précisez l'année correspondante."]
+            }
+          ]
+        };
+      } else {
+        that = this;
+        fct_item = function(inputs, index) {
+          var ref1;
+          ref1 = that.init(inputs, options), c0 = ref1[0], r = ref1[1], q = ref1[2], n = ref1[3];
+          return "Capital initial : " + c0 + " € ; taux : " + (mM.misc.numToStr(r)) + "\\,\\%";
+        };
+        return {
+          children: [
+            "Le 1 janvier 2010, on place une somme sur un compte bancaire qui rapporte tous les ans des intérêts.", "Soit $(C_n)$ la suite représentant le capital sur le compte au 1 janvier de l'année $2010+n$.", "Dans tous les cas :", {
+              type: "enumerate",
+              enumi: "a)",
+              children: ["Donnez le premier terme $C_0$ et la raison $q$ de la suite.", "Donnez le rang $n$ de l'année pour laquelle le capital aura doublé.", "Précisez l'année correspondante."]
+            }, {
+              type: "enumerate",
+              enumi: "1)",
+              children: _.map(inputs_list, fct_item)
+            }
+          ]
+        };
       }
-      out = [];
-      for (i = 0, len = data.length; i < len; i++) {
-        itData = data[i];
-        out.push({
-          title: this.title,
-          content: Handlebars.templates["tex_enumerate"]({
-            pre: "Le 1 janvier 2010, on place la somme de " + itData.tex.c0 + " euros sur un compte bancaire qui rapporte tous les ans " + itData.tex.r + "\\% d'intérêts composés. Soit $(C_n)$ la suite représentant le capital sur le compte au 1 janvier de l'année 2010$+n$.",
-            items: ["$(C_n)$ est une suité géométrique. Donnez son premier terme et sa raison.", "Au bout de combien d'année le capital sera-t-il le double du capital initial ?"],
-            large: false
-          })
-        });
-      }
-      return out;
     }
   };
 });

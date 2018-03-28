@@ -2,36 +2,56 @@ define(["marionette","app"], function(Marionette,app){
 
 	var API = {
 		classesList: function(){
-			if (app.Auth.isProf()||app.Auth.isAdmin()){
+			var auth = app.Auth;
+			var forProf = function(){
 				app.Ariane.reset([{ text:"Classes", e:"classes:list", link:"classes"}]);
 				require(["apps/classes/list/list_controller"], function(Controller){
 					Controller.list();
 				});
-			} else {
-				app.trigger("notFound");
 			}
+
+			var todo = auth.mapItem({
+				"Admin": forProf,
+				"Prof": forProf,
+				"Eleve": function(){ app.trigger("notFound"); },
+				"def": function(){ app.trigger("home:login"); },
+			});
+			todo();
 		},
 
 		classeShow: function(id){
-			if (app.Auth.isProf()||app.Auth.isAdmin()){
+			var auth = app.Auth;
+			var forProf = function(){
 				app.Ariane.reset([{ text:"Classes", e:"classes:list", link:"classes"}]);
 				require(["apps/classes/show/show_controller"], function(Controller){
 					Controller.show(id);
 				});
-			} else {
-				app.trigger("notFound");
 			}
+
+			var todo = auth.mapItem({
+				"Admin": forProf,
+				"Prof": forProf,
+				"Eleve": function(){ app.trigger("notFound"); },
+				"def": function(){ app.trigger("home:login"); },
+			});
+			todo();
 		},
 
 		classeEdit: function(id){
-			if (app.Auth.isProf()||app.Auth.isAdmin()){
+			var forProf = function(){
 				app.Ariane.reset([{ text:"Classes", e:"classes:list", link:"classes"}]);
 				require(["apps/classes/edit/edit_controller"], function(Controller){
 					Controller.edit(id);
 				});
-			} else {
-				app.trigger("notFound");
 			}
+
+			var todo = auth.mapItem({
+				"Admin": forProf,
+				"Prof": forProf,
+				"Eleve": function(){ app.trigger("notFound"); },
+				"def": function(){ app.trigger("home:login"); },
+			});
+			todo();
 		},
 	};
 

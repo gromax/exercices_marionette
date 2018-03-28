@@ -78,31 +78,78 @@
 				}
 			]
 
-		tex:(data) ->
-			# en chantier
-			if not isArray(data) then data = [ data ]
-			out = []
-			for itData in data
-				col1 = Handlebars.templates["tex_enumerate"] {
-					numero:"a)"
-					items:itData.tex.gauche
+		getExamBriques: (inputs_list,options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[ liste_fixe, liste_choix ] = that.init(inputs,options)
+				return {
+					children: [
+						{
+							type: "text"
+							children: [
+								"Associez les formes explicites et les formes récurrentes deux à deux."
+							]
+						}
+						{
+							type: "2cols"
+							col1:{
+								type: "enumerate"
+								enumi: "a"
+								children: _.pluck(liste_fixe,"text")
+							}
+							col2:{
+								type: "enumerate"
+								enumi: "1"
+								children: _.pluck(liste_choix,"text")
+							}
+						}
+					]
 				}
-				col2 = Handlebars.templates["tex_enumerate"] {
-					numero:"\\hspace{-7mm}1)"
-					items:itData.tex.droite
-				}
-				content = Handlebars.templates["tex_plain"] {
-					multicols:2
-					center:true
-					contents:[col1, "\\columnbreak", col2]
-				}
-				out.push {
-					title:@title
-					content: Handlebars.templates["tex_plain"] {
-						contents:["Associez les formes explicites et les formes récurrentes deux à deux.", content]
-						large:false
+
+			return {
+				children: [
+					{
+						type: "subtitles"
+						enumi: "A"
+						refresh: true
+						children: _.map(inputs_list, fct_item)
 					}
-				}
-			out
+				]
+			}
+
+		getTex: (inputs_list,options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[ liste_fixe, liste_choix ] = that.init(inputs,options)
+				return [
+					"Associez les formes explicites et les formes récurrentes deux à deux."
+					{
+						type: "multicols"
+						cols: 2
+						children: [
+							{
+								type: "enumerate"
+								enumi: "a"
+								children: _.pluck(liste_fixe,"text")
+							}
+							{
+								type: "enumerate"
+								enumi: "1"
+								children: _.pluck(liste_choix,"text")
+							}
+						]
+					}
+				]
+
+
+			return {
+				children: [
+					{
+						type: "enumerate"
+						enumi: "A"
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
 
 	}

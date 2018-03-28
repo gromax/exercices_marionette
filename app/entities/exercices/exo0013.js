@@ -83,15 +83,21 @@ define(["utils/math"], function(mM) {
                 return out;
               },
               verification: function(answers_data) {
-                var dA, dAB, dB, messages, note, xA, xB, yA, yB;
+                var dA, dAB, dB, messages, note, u;
                 note = 0;
-                xA = Number(answers_data["xA"]);
-                yA = Number(answers_data["yA"]);
-                xB = Number(answers_data["xB"]);
-                yB = Number(answers_data["yB"]);
-                dA = droite.float_distance(xA, yA);
-                dB = droite.float_distance(xB, yB);
-                dAB = Math.sqrt((xA - xB) * (xA - xB) + (yA - yB) * (yA - yB));
+                u = {
+                  A: {
+                    x: Number(answers_data["xA"]),
+                    y: Number(answers_data["yA"])
+                  },
+                  B: {
+                    x: Number(answers_data["xB"]),
+                    y: Number(answers_data["yB"])
+                  }
+                };
+                dA = droite.float_distance(u.A.x, u.A.y);
+                dB = droite.float_distance(u.B.x, u.B.y);
+                dAB = Math.sqrt((u.A.x - u.B.x) ^ 2 + (u.A.y - u.B.y) ^ 2);
                 messages = [];
                 if (dA < dmax) {
                   messages.push({
@@ -138,7 +144,9 @@ define(["utils/math"], function(mM) {
                     for (i = 0, len = ref1.length; i < len; i++) {
                       pt = ref1[i];
                       pt.setAttribute({
-                        fixed: true
+                        fixed: true,
+                        x: u[pt.name].x,
+                        y: u[pt.name].y
                       });
                     }
                     return graph.create('line', droite.float_2_points(max), {

@@ -58,8 +58,8 @@ define(["utils/math", "utils/help"], function(mM, help) {
       return [membreGauche, membreDroite, solutions];
     },
     getBriques: function(inputs, options) {
-      var membreDroite, membreGauche, ref, solutions;
-      ref = this.init(inputs), membreGauche = ref[0], membreDroite = ref[1], solutions = ref[2];
+      var membreDroiteTex, membreGaucheTex, ref, solutions;
+      ref = this.init(inputs), membreGaucheTex = ref[0], membreDroiteTex = ref[1], solutions = ref[2];
       return [
         {
           bareme: 100,
@@ -85,6 +85,45 @@ define(["utils/math", "utils/help"], function(mM, help) {
           ]
         }
       ];
+    },
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var membreDroiteTex, membreGaucheTex, ref, sols;
+        ref = that.init(inputs, options), membreGaucheTex = ref[0], membreDroiteTex = ref[1], sols = ref[2];
+        return "$" + membreGaucheTex + " = " + membreDroiteTex + "$";
+      };
+      return {
+        children: [
+          {
+            type: "text",
+            children: ["Donnez les solutions des équations suivantes :"]
+          }, {
+            type: "enumerate",
+            refresh: true,
+            enumi: "1",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var membreDroiteTex, membreGaucheTex, ref, sols;
+        ref = that.init(inputs, options), membreGaucheTex = ref[0], membreDroiteTex = ref[1], sols = ref[2];
+        return "$" + membreGaucheTex + " = " + membreDroiteTex + "$";
+      };
+      return {
+        children: [
+          "Donnez les solutions des équations suivantes :", {
+            type: "enumerate",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
     }
   };
 });

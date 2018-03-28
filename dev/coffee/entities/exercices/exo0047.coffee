@@ -127,4 +127,88 @@
 				}
 			]
 
+		getExamBriques: (inputs_list,options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[zA, zB, zD, zAB, zAD, z, aire] = that.init(inputs,options)
+				return "$z_A=#{zA.tex()}$, &nbsp; $z_B = #{zB.tex()}$ &nbsp; et &nbsp; $z_D = #{zD.tex()}$."
+
+			return {
+				children: [
+					{
+						type: "text",
+						children: [
+							"On donne les points &nbsp; $A$, &nbsp; $B$ &nbsp; et &nbsp; $D$ &nbsp; d'affixes respectives &nbsp; $z_A$, &nbsp; $z_B$ &nbsp; et &nbsp; $z_D$."
+							"$C$ &nbsp; est tel que &nbsp; $ABCD$ &nbsp; est un parallélogramme."
+							"À chaque fois :"
+						]
+					}
+					{
+						type: "enumerate",
+						refresh:false
+						enumi:"a",
+						children: [
+							"Donnez &nbsp;$z_1$ &nbsp; et &nbsp; $z_2$, affixes respectives de &nbsp; $\\overrightarrow{AD}$ &nbsp; $\\overrightarrow{AB}$."
+							"Calculez &nbsp; $z_1\\cdot\\overline{z_2}$"
+							"Déduisez l'aire de &nbsp; $ABCD$."
+						]
+					}
+					{
+						type: "enumerate"
+						enumi: "1"
+						refresh: true
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+		getTex: (inputs_list, options) ->
+			if inputs_list.length is 1
+				[zA, zB, zD, zAB, zAD, z, aire] = @init(inputs_list[0],options)
+				return {
+					children: [
+						"On donne les points $A$, $B$ et $D$ d'affixes respectives $z_A$, $z_B$ et $z_D$."
+						"$z_A=#{zA.tex()}$, $z_B = #{zB.tex()}$ et $z_D = #{zD.tex()}$."
+						"$C$ est tel que $ABCD$ est un parallélogramme."
+						{
+							type: "enumerate",
+							enumi:"a)",
+							children: [
+								"Donnez $z_1$ et $z_2$, affixes respectives de $\\overrightarrow{AD}$ $\\overrightarrow{AB}$."
+								"Calculez $z_1\\cdot\\overline{z_2}$"
+								"Déduisez l'aire de $ABCD$."
+							]
+						}
+					]
+				}
+
+			else
+				that = @
+
+				fct_item = (inputs, index) ->
+					[zA, zB, zD, zAB, zAD, z, aire] = that.init(inputs,options)
+					return "$z_A=#{zA.tex()}$, $z_B = #{zB.tex()}$ et $z_D = #{zD.tex()}$."
+
+				return {
+					children: [
+						"On donne les points $A$, $B$ et $D$ d'affixes respectives $z_A$, $z_B$ et $z_D$."
+						"$C$ est tel que $ABCD$ est un parallélogramme."
+						"À chaque fois :"
+						{
+							type: "enumerate",
+							enumi:"a)",
+							children: [
+								"Donnez $z_1$ et $z_2$, affixes respectives de $\\overrightarrow{AD}$ $\\overrightarrow{AB}$."
+								"Calculez $z_1\\cdot\\overline{z_2}$"
+								"Déduisez l'aire de $ABCD$."
+							]
+						}
+						{
+							type: "enumerate"
+							enumi: "1)"
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
+
 	}

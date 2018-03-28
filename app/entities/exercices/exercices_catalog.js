@@ -95,14 +95,14 @@ define([], function() {
       }, {
         id: 11,
         filename: "exo0011",
-        title: "*Équation somme et produit",
+        title: "Équation somme et produit",
         description: "On connaît la somme et le produit de deux nombres, il faut calculer ces nombres.",
         keyWords: ["Analyse", "Trinome", "Équation", "Racines", "Première"],
         options: {}
       }, {
         id: 12,
         filename: "exo0012",
-        title: "*Tracer la courbe d'une fonction affine",
+        title: "Tracer la courbe d'une fonction affine",
         description: "L'expression d'une fonction affine étant donnée, il faut tracer sa courbe dans un repère.",
         keyWords: ["Analyse", "Fonction", "Courbe", "Affine", "Seconde"],
         options: {}
@@ -154,6 +154,39 @@ define([], function() {
         keyWords: ["Analyse", "Fonction", "Courbe", "Affine", "Seconde"],
         options: {}
       }, {
+        id: 19,
+        filename: "exo0019",
+        title: "Inéquation du second degré",
+        description: "Il faut résoudre une inéquation du second degré.",
+        keyWords: ["Analyse", "Trinome", "Équation", "Racines", "Première"],
+        options: {}
+      }, {
+        id: 20,
+        filename: "exo0020",
+        title: "Moyenne et écart-type",
+        description: "Une série statistique est donnée. Il faut calculer sa moyenne et son écart-type.",
+        keyWords: ["Statistiques", "Moyenne", "Écart-type", "Première"],
+        options: {}
+      }, {
+        id: 21,
+        filename: "exo0021",
+        title: "Médiane et quartiles",
+        description: "Une série statistique est donnée. Il faut calculer le premier quartile, la médiane et le troisième quartile.",
+        keyWords: ["Statistiques", "Médiane", "Quartile", "Seconde"],
+        options: {}
+      }, {
+        id: 22,
+        filename: "exo0022",
+        title: "Développer une expression",
+        description: "Une expression est donnée, il faut la développer.",
+        keyWords: ["Algèbre", "fonction"],
+        options: {
+          a: {
+            tag: "Difficulté",
+            options: ["Alea", "Facile", "Facile avec fraction", "Moyen", "Moyen avec fraction"]
+          }
+        }
+      }, {
         id: 23,
         filename: "exo0023",
         title: "Équation de la tangente à une courbe",
@@ -161,11 +194,32 @@ define([], function() {
         keyWords: ["Dérivation", "Tangente", "Équation", "Première"],
         options: {}
       }, {
+        id: 24,
+        filename: "exo0024",
+        title: "Loi binomiale",
+        description: "Calculer des probabilités avec la loi binomiale.",
+        keyWords: ["probabilités", "binomiale", "Première"],
+        options: {}
+      }, {
+        id: 25,
+        filename: "exo0025",
+        title: "Loi binomiale : Intervalle de fluctuation",
+        description: "Calculer un intervalle de fluctuation.",
+        keyWords: ["probabilités", "binomiale", "Intervalle de fluctuation", "Première"],
+        options: {}
+      }, {
         id: 26,
         filename: "exo0026",
         title: "Coordonnées d'un vecteur",
         description: "Calculer les coordonnées du vecteur entre deux points.",
         keyWords: ["Géométrie", "Repère", "Vecteur", "Seconde"],
+        options: {}
+      }, {
+        id: 27,
+        filename: "exo0027",
+        title: "Calculs avec les complexes",
+        description: "Faire les calculs de base avec les complexes.",
+        keyWords: ["Géométrie", "Complexe", "Première"],
         options: {}
       }, {
         id: 28,
@@ -187,6 +241,13 @@ define([], function() {
             options: ["non", "oui"]
           }
         }
+      }, {
+        id: 29,
+        filename: "exo0029",
+        title: "Équation du premier degré",
+        description: "Résoudre une équation du premier degré.",
+        keyWords: ["Affine", "Algèbre", "Équation", "Seconde"],
+        options: {}
       }, {
         id: 30,
         filename: "exo0030",

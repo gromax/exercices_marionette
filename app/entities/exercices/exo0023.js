@@ -19,10 +19,11 @@ define(["utils/math", "utils/help"], function(mM, help) {
       return [A, B, mM.droite.par2pts(A, B)];
     },
     getBriques: function(inputs, options) {
-      var A, B, doite, ref, xAtex, yAtex;
-      ref = this.init(inputs), A = ref[0], B = ref[1], doite = ref[2];
+      var A, B, droite, eqReduite, ref, xAtex, yAtex;
+      ref = this.init(inputs), A = ref[0], B = ref[1], droite = ref[2];
       xAtex = A.x.tex();
       yAtex = A.y.tex();
+      eqReduite = droite.reduiteObject();
       return [
         {
           bareme: 100,
@@ -30,17 +31,33 @@ define(["utils/math", "utils/help"], function(mM, help) {
             {
               type: "text",
               rank: 1,
-              ps: ["On considère une fonction une fonction &nbsp; $f$ &nbsp; dérivable sur $\\mathbb{R}$.", "$\\mathcal{C}$ &nbsp; est sa courbe représentative dans un repère.", "On sait que &nbsp; $f\\left(" + xAtex + "\\right) = " + yAtex + "$ &nbsp; et &nbsp; $f'\\left(" + xAtex + "\\right) = " + (droite.m().tex()) + "$.", "Donnez l'équation de la tangente &nbsp; $\\mathcal{T}$ &nbsp; à la courbe &nbsp; $\\mathcal{C}$ &nbsp; en l'abscisse &nbsp; $" + xAtex + "$."]
+              ps: ["On considère une fonction une fonction &nbsp; $f$ &nbsp; dérivable sur &nbsp; $\\mathbb{R}$.", "$\\mathcal{C}$ &nbsp; est sa courbe représentative dans un repère.", "On sait que &nbsp; $f\\left(" + xAtex + "\\right) = " + yAtex + "$ &nbsp; et &nbsp; $f'\\left(" + xAtex + "\\right) = " + (droite.m().tex()) + "$.", "Donnez l'équation de la tangente &nbsp; $\\mathcal{T}$ &nbsp; à la courbe &nbsp; $\\mathcal{C}$ &nbsp; en l'abscisse &nbsp; $" + xAtex + "$."]
             }, {
               type: "input",
               rank: 2,
               waited: "number",
-              tag: "$y=$",
+              tag: "$\\mathcal{T}$",
+              answerPreprocessing: function(userValue) {
+                var pattern, result;
+                pattern = /y\s*=([\s*+-\/0-9a-zA-Z]+)/;
+                result = pattern.exec(userValue);
+                if (result) {
+                  return {
+                    processed: result[1],
+                    error: false
+                  };
+                } else {
+                  return {
+                    processed: userValue,
+                    error: "L'équation doit être de la forme y=..."
+                  };
+                }
+              },
               name: "e",
               description: "Équation de la tangente",
-              good: droite.reduiteObject(),
+              good: eqReduite,
+              goodTex: "y = " + (eqReduite.tex()),
               developp: true,
-              cor_prefix: "y=",
               formes: "FRACTION"
             }, {
               type: "validation",
@@ -55,26 +72,47 @@ define(["utils/math", "utils/help"], function(mM, help) {
         }
       ];
     },
-    tex: function(data) {
-      var item;
-      if (!isArray(data)) {
-        data = [data];
-      }
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var A, B, droite, ref, xAtex, yAtex;
+        ref = that.init(inputs), A = ref[0], B = ref[1], droite = ref[2];
+        xAtex = A.x.tex();
+        yAtex = A.y.tex();
+        return "$a=" + xAtex + "$ &nbsp; : &nbsp; $f(a) = " + yAtex + "$ &nbsp; et &nbsp; $f'(a) = " + (droite.m().tex()) + "$.";
+      };
       return {
-        title: this.title,
-        content: Handlebars.templates["tex_enumerate"]({
-          pre: "Dans le(s) cas suivant(s), on considère une fonction $f$ et sa courbe. Pour une certaine valeur $a$, on donne $f(a)$ et $f'(a)$. Donnez la tangente à la courbe au point d'abscisse $a$.",
-          items: (function() {
-            var i, len, results;
-            results = [];
-            for (i = 0, len = data.length; i < len; i++) {
-              item = data[i];
-              results.push("$a=" + item.values.a + "$, $f(a)=" + item.values.y + "$ et $f'(a)=" + item.values.der + "$");
-            }
-            return results;
-          })(),
-          large: false
-        })
+        children: [
+          {
+            type: "text",
+            children: ["On considère une fonction une fonction &nbsp; $f$ &nbsp; dérivable sur &nbsp; $\\mathbb{R}$.", "$\\mathcal{C}$ &nbsp; est sa courbe représentative dans un repère.", "Dans les cas suivants, donnez l'équation de la tangente &nbsp; $\\mathcal{T}$ &nbsp; à la courbe &nbsp; $\\mathcal{C}$ &nbsp; en l'abscisse &nbsp; $a$."]
+          }, {
+            type: "enumerate",
+            refresh: true,
+            enumi: "1",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var A, B, droite, ref, xAtex, yAtex;
+        ref = that.init(inputs), A = ref[0], B = ref[1], droite = ref[2];
+        xAtex = A.x.tex();
+        yAtex = A.y.tex();
+        return "$a=" + xAtex + "$ &nbsp; : &nbsp; $f(a) = " + yAtex + "$ &nbsp; et &nbsp; $f'(a) = " + (droite.m().tex()) + "$.";
+      };
+      return {
+        children: [
+          "On considère une fonction une fonction $f$ dérivable sur $\\mathbb{R}$.", "$\\mathcal{C}$ est sa courbe représentative dans un repère.", "Dans les cas suivants, donnez l'équation de la tangente $\\mathcal{T}$ à la courbe $\\mathcal{C}$ en l'abscisse $a$.", {
+            type: "enumerate",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
       };
     }
   };

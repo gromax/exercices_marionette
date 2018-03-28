@@ -17,6 +17,6 @@
 <% if(n_faits< num) {%>
 <p class="text-danger">Vous devez encore faire cet exercice <b><%- num-n_faits %> fois</b>.</p>
 <% } else { %>
-<p class="text-success">Vous avez répété cet exercice <b><%- n_faits %> fois</b>. Vous pouvez continuer pour améliorer votre note.</p>
+<p class="text-success"><a href="#" class="js-faits" title="Voir les exercices sauvegardés">Vous avez répété cet exercice <b><%- n_faits %> fois</b>.</a> Vous pouvez continuer pour améliorer votre note.</p>
 <% } %>
 </div>

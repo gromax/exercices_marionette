@@ -15,7 +15,7 @@ final class SessionController
 	public static function get()
 	{
 		if( !empty(self::$session) ) return self::$session;
-		else return self::$session = new SessionController(true);	
+		else return self::$session = new SessionController(true);
 	}
 
 	/*public static function launch ($start = false)
@@ -86,7 +86,7 @@ final class SessionController
 		if (session_name () == $this->session_name) return;
 
 		setcookie (session_name (), '');
-		session_name ($this->session_name);  
+		session_name ($this->session_name);
 	}
 
 	/* Savoir si une session est démarrée */
@@ -118,7 +118,7 @@ final class SessionController
 	{
 		if (!$this->isStarted ()) $this->start();
 		unset($_SESSION[$key]);
-	}	
+	}
 
 	/* Récupérer une valeur mise en session */
 

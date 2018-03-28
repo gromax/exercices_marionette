@@ -15,7 +15,7 @@ define ["utils/math", "utils/help"], (mM, help) ->
 					if values.length>1 then values.push "+"
 				expression = mM.exec values
 				inputs.e = String expression
-
+			expression
 		getBriques: (inputs, options) ->
 			expression = @init(inputs)
 
@@ -49,4 +49,47 @@ define ["utils/math", "utils/help"], (mM, help) ->
 					]
 				}
 			]
+
+		getExamBriques: (inputs_list,options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				expression = that.init(inputs,options)
+				return "$#{expression.tex()}$"
+
+			return {
+				children: [
+					{
+						type: "text",
+						children: [
+							"Donnez les expressions sous forme d'une fraction réduite."
+						]
+					}
+					{
+						type: "enumerate"
+						enumi: "1"
+						refresh: true
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+		getTex: (inputs_list, options) ->
+			that = @
+
+			fct_item = (inputs, index) ->
+				expression = that.init(inputs,options)
+				return "$#{expression.tex()}$"
+
+			return {
+				children: [
+					"Donnez les expressions sous forme d'une fraction réduite."
+					{
+						type: "enumerate"
+						enumi: "1)"
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+
 	}

@@ -29,7 +29,7 @@
 							rank:1
 							ps:[
 								"Le 1 janvier 2010, on place la somme de #{c0} € sur un compte bancaire qui rapporte tous les ans #{mM.misc.numToStr r}&nbsp;% d'intérêts composés."
-								"Soit &nbsp; $(C_n)$ &nbsp; la suite représentant le capital sur le compte au 1 janvier de l'année 2010$+n$."
+								"Soit &nbsp; $(C_n)$ &nbsp; la suite représentant le capital sur le compte au 1 janvier de l'année &nbsp; $2010+n$."
 								"Donnez le premier terme &nbsp; $C_0$ &nbsp; et la raison &nbsp; $q$ &nbsp; de la suite."
 							]
 						}
@@ -99,21 +99,87 @@
 				}
 			]
 
-		tex: (data) ->
-			if not isArray(data) then data = [ data ]
-			out=[]
-			for itData in data
-				out.push {
-					title:@title
-					content:Handlebars.templates["tex_enumerate"] {
-						pre:"Le 1 janvier 2010, on place la somme de #{itData.tex.c0} euros sur un compte bancaire qui rapporte tous les ans #{itData.tex.r}\\% d'intérêts composés. Soit $(C_n)$ la suite représentant le capital sur le compte au 1 janvier de l'année 2010$+n$."
-						items: [
-							"$(C_n)$ est une suité géométrique. Donnez son premier terme et sa raison."
-							"Au bout de combien d'année le capital sera-t-il le double du capital initial ?"
+		getExamBriques: (inputs_list,options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[c0, r, q, n] = that.init(inputs,options)
+				return "Capital initial : #{c0} € ; taux : #{mM.misc.numToStr r}&nbsp;%"
+
+			return {
+				children: [
+					{
+						type: "text",
+						children: [
+							"Le 1 janvier 2010, on place une somme sur un compte bancaire qui rapporte tous les ans des intérêts."
+							"Soit &nbsp; $(C_n)$ &nbsp; la suite représentant le capital sur le compte au 1 janvier de l'année &nbsp; $2010+n$."
+							"Dans tous les cas :"
 						]
-						large:false
 					}
+					{
+						type: "enumerate",
+						refresh:false
+						enumi:"a",
+						children: [
+							"Donnez le premier terme &nbsp; $C_0$ &nbsp; et la raison &nbsp; $q$ &nbsp; de la suite."
+							"Donnez le rang &nbsp; $n$ &nbsp; de l'année pour laquelle le capital aura doublé."
+							"Précisez l'année correspondante."
+						]
+					}
+
+					{
+						type: "enumerate",
+						refresh:true
+						enumi:"1",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+		getTex: (inputs_list, options) ->
+			if inputs_list.length is 1
+				[c0, r, q, n] = that.init(inputs_list[0],options)
+				return {
+					children: [
+						"Le 1 janvier 2010, on place une somme de #{c0} € sur un compte bancaire qui rapporte tous les ans #{mM.misc.numToStr r}\\,\\% des intérêts composés."
+						"Soit $(C_n)$ la suite représentant le capital sur le compte au 1 janvier de l'année $2010+n$."
+						{
+							type: "enumerate",
+							enumi:"a)",
+							children: [
+								"Donnez le premier terme $C_0$ et la raison $q$ de la suite."
+								"Donnez le rang $n$ de l'année pour laquelle le capital aura doublé."
+								"Précisez l'année correspondante."
+							]
+						}
+					]
 				}
-			out
+			else
+				that = @
+				fct_item = (inputs, index) ->
+					[c0, r, q, n] = that.init(inputs,options)
+					return "Capital initial : #{c0} € ; taux : #{mM.misc.numToStr r}\\,\\%"
+
+				return {
+					children: [
+						"Le 1 janvier 2010, on place une somme sur un compte bancaire qui rapporte tous les ans des intérêts."
+						"Soit $(C_n)$ la suite représentant le capital sur le compte au 1 janvier de l'année $2010+n$."
+						"Dans tous les cas :"
+						{
+							type: "enumerate",
+							enumi:"a)",
+							children: [
+								"Donnez le premier terme $C_0$ et la raison $q$ de la suite."
+								"Donnez le rang $n$ de l'année pour laquelle le capital aura doublé."
+								"Précisez l'année correspondante."
+							]
+						}
+						{
+							type: "enumerate",
+							enumi: "1)"
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
+
 	}
 

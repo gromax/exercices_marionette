@@ -1,10 +1,17 @@
-define(["app","apps/home/login/login_view"], function(app, LoginView){
+define([
+	"app",
+	"apps/home/login/login_view"
+], function(
+	app,
+	LoginView
+){
 	var Controller = {
 		showLogin: function(){
 			var view = new LoginView();
 			view.on("form:submit", function(data){
 				var openingSession = app.Auth.save(data);
 				if(openingSession){
+					app.trigger("header:loading", true);
 					$.when(openingSession).done(function(response){
 						// En cas d'échec de connexion, l'api server renvoie une erreur
 						app.trigger("home:show");
@@ -15,6 +22,8 @@ define(["app","apps/home/login/login_view"], function(app, LoginView){
 						else{
 							alert("An unprocessed error happened. Please try again!");
 						}
+					}).always(function(){
+						app.trigger("header:loading", false);
 					});
 				}
 				else {

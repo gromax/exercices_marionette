@@ -70,25 +70,43 @@ define(["utils/math", "utils/help"], function(mM, help) {
         }
       ];
     },
-    tex: function(data) {
-      var item;
-      if (!isArray(data)) {
-        data = [data];
-      }
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var deriveeTex, poly, ref;
+        ref = that.init(inputs, options), deriveeTex = ref[0], poly = ref[1];
+        return "$" + deriveeTex + "$";
+      };
       return {
-        title: this.title,
-        content: Handlebars.templates["tex_enumerate"]({
-          items: (function() {
-            var j, len, results;
-            results = [];
-            for (j = 0, len = data.length; j < len; j++) {
-              item = data[j];
-              results.push("$x \\mapsto " + item.f + "$");
-            }
-            return results;
-          })(),
-          large: false
-        })
+        children: [
+          {
+            type: "text",
+            children: ["Pour chachune des fonctions suivantes, donnez l'expression générale d'une primitive."]
+          }, {
+            type: "enumerate",
+            refresh: true,
+            enumi: "1",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var deriveeTex, poly, ref;
+        ref = that.init(inputs, options), deriveeTex = ref[0], poly = ref[1];
+        return "$" + deriveeTex + "$";
+      };
+      return {
+        children: [
+          "Pour chachune des fonctions suivantes, donnez l'expression générale d'une primitive.", {
+            type: "enumerate",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
       };
     }
   };

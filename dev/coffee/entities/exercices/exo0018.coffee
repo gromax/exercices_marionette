@@ -70,9 +70,11 @@ define ["utils/math","utils/help"], (mM, help) ->
 								dmax = .2
 								messages = []
 								note = 0
+								u = {}
 								for p in ["A", "B", "C"]
 									x = Number answers_data["x"+p]
 									y = Number answers_data["y"+p]
+									u[p] = { x:x, y:y }
 									if droite.float_y(x)>0 then d = droite.float_distance(x,y)
 									else d = droite.float_distance(x,-y)
 									if d<dmax
@@ -99,8 +101,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 									]
 									post: (graph)->
 										for pt in graph.points
-											pt.setAttribute {fixed:true}
-
+											pt.setAttribute {fixed:true, x:u[pt.name].x, y:u[pt.name].y}
 										y1 = Math.abs(droite.float_y(-max))
 										y2 = Math.abs(droite.float_y(max))
 										x0 = droite.float_x(0)
@@ -117,4 +118,46 @@ define ["utils/math","utils/help"], (mM, help) ->
 					]
 				}
 			]
+
+
+		getExamBriques: (inputs_list,options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[A, B, droite] = that.init(inputs,options)
+				namef = "f_#{index}"
+				return "$#{namef}:x\\mapsto\\left|#{droite.reduiteObject().tex()}\\right|$"
+
+			return {
+				children: [
+					{
+						type: "text",
+						children: [
+							"Tracez les courbes des fonctions suivantes."
+						]
+					}
+					{
+						type: "enumerate",
+						refresh:true
+						enumi:"1",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+		getTex: (inputs_list, options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[A, B, droite] = that.init(inputs,options)
+				namef = "f_#{index}"
+				return "$#{namef}:x\\mapsto\\left|#{droite.reduiteObject().tex()}\\right|$"
+
+			return {
+				children: [
+					"Tracez les courbes des fonctions suivantes."
+					{
+						type: "enumerate",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
 	}

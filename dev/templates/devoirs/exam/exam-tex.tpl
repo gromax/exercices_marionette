@@ -46,7 +46,9 @@
 <%
 	var letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	var recursive_fct = function(el, index){
-		if((typeof el == "object")&&(el!==null)){
+		if (_.isArray(el)){
+			_.each(el,recursive_fct);
+		} else if((typeof el == "object")&&(el!==null)){
 			switch (el.type){
 				case "multicols" : %>
 \begin{multicols}{<%- el.cols %>}
@@ -54,7 +56,7 @@
 \end{multicols}
 <%					break;
 				case "enumerate": %>
-\begin{enumerate}<%if (el.tag){%>[<%-el.tag %>]<% } %>
+\begin{enumerate}<%if (el.enumi){%>[<%-el.enumi %>]<% } %>
 <% _.each(el.children, function(it, index){ %>\item <%recursive_fct(it, index); }); %>
 \end{enumerate}
 <%			}

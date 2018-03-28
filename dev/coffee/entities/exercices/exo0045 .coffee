@@ -67,14 +67,43 @@
 				}
 			]
 
-		tex: (data) ->
-			if not isArray(data) then data = [ data ]
-			{
-				title:@title
-				content:Handlebars.templates["tex_enumerate"] {
-					pre: "Dans chaque cas, connaissant $|z|$ et $arg(z)$ en radians, donnez la forme algébrique de $z$."
-					items: ("$|z| = #{item.tex.m}$ et $arg(z) = #{item.tex.a}$" for item in data)
-				}
+		getExamBriques: (inputs_list,options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[z, m, angleRad] = that.init(inputs,options)
+				return "$|z| = #{ m.tex()}$ &nbsp; et &nbsp; $arg(z)=#{angleRad}$"
+
+			return {
+				children: [
+					{
+						type: "text",
+						children: [
+							"Donnez &nbsp; $z$ &nbsp; sous sa forme algébrique."
+						]
+					}
+					{
+						type: "enumerate",
+						refresh:true
+						enumi:"1",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+		getTex: (inputs_list, options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[z, m, angleRad] = that.init(inputs,options)
+				return "$|z| = #{ m.tex()}$ et $arg(z)=#{angleRad}$"
+
+			return {
+				children: [
+					"Donnez $z$ sous sa forme algébrique."
+					{
+						type: "enumerate",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
 			}
 
 	}

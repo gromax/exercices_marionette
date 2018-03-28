@@ -7,9 +7,12 @@ define ["utils/math"], (mM) ->
 	#	a:{ tag:"complexes", options:["non", "oui"], def:0}
 	#}
 
+	# debug : tex à faire
+
 	return {
+		max: 11
 		getBriques: (inputs, options) ->
-			max = 11
+			max = @max
 			iPts = @init(inputs)
 			displayedPts = ( mM.alea.vector({ name:name, values:[{min:-max+1, max:max-1}]}) for name in ["A", "B", "C", "D", "E"] )
 
@@ -116,19 +119,7 @@ define ["utils/math"], (mM) ->
 			]
 
 		init: (inputs) ->
+			max=@max
 			return ( mM.alea.vector({ name:name, def:inputs, values:[{min:-max+1, max:max-1}]}).save(inputs) for name in ["A", "B", "C", "D", "E"] )
 
-		tex: (data) ->
-			# en chantier
-			if not isArray(data) then data = [ data ]
-			out = []
-			for itemData,i in data
-				out.push {
-					title:@title
-					contents: [
-						Handlebars.templates["tex_courbes"] { max:@max, scale:.03*@max }
-						itemData.tex.enonce + " " + itemData.tex.liste.join(" ; ")
-					]
-				}
-			out
 	}

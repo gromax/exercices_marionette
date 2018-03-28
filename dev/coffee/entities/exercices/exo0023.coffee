@@ -16,10 +16,10 @@ define ["utils/math", "utils/help"], (mM, help) ->
 			]
 
 		getBriques: (inputs, options) ->
-			[A, B, doite] = @init(inputs)
+			[A, B, droite] = @init(inputs)
 			xAtex = A.x.tex()
 			yAtex = A.y.tex()
-
+			eqReduite = droite.reduiteObject()
 			[
 				{
 					bareme: 100
@@ -28,7 +28,7 @@ define ["utils/math", "utils/help"], (mM, help) ->
 							type: "text"
 							rank: 1
 							ps: [
-								"On considère une fonction une fonction &nbsp; $f$ &nbsp; dérivable sur $\\mathbb{R}$."
+								"On considère une fonction une fonction &nbsp; $f$ &nbsp; dérivable sur &nbsp; $\\mathbb{R}$."
 								"$\\mathcal{C}$ &nbsp; est sa courbe représentative dans un repère."
 								"On sait que &nbsp; $f\\left(#{xAtex}\\right) = #{yAtex}$ &nbsp; et &nbsp; $f'\\left(#{xAtex}\\right) = #{droite.m().tex()}$."
 								"Donnez l'équation de la tangente &nbsp; $\\mathcal{T}$ &nbsp; à la courbe &nbsp; $\\mathcal{C}$ &nbsp; en l'abscisse &nbsp; $#{xAtex}$."
@@ -38,12 +38,19 @@ define ["utils/math", "utils/help"], (mM, help) ->
 							type: "input"
 							rank: 2
 							waited: "number"
-							tag:"$y=$"
+							tag:"$\\mathcal{T}$"
+							answerPreprocessing:(userValue)->
+								pattern =/y\s*=([\s*+-/0-9a-zA-Z]+)/
+								result = pattern.exec(userValue)
+								if result
+									{ processed:result[1], error:false }
+								else
+									{ processed:userValue, error:"L'équation doit être de la forme y=..." }
 							name:"e"
 							description:"Équation de la tangente"
-							good:droite.reduiteObject()
+							good:eqReduite
+							goodTex: "y = #{eqReduite.tex()}"
 							developp:true
-							cor_prefix: "y="
 							formes:"FRACTION"
 						}
 						{
@@ -60,15 +67,50 @@ define ["utils/math", "utils/help"], (mM, help) ->
 				}
 			]
 
-		tex: (data) ->
-			# en chantier
-			if not isArray(data) then data = [ data ]
-			{
-				title:@title
-				content:Handlebars.templates["tex_enumerate"] {
-					pre: "Dans le(s) cas suivant(s), on considère une fonction $f$ et sa courbe. Pour une certaine valeur $a$, on donne $f(a)$ et $f'(a)$. Donnez la tangente à la courbe au point d'abscisse $a$."
-					items: ("$a=#{item.values.a}$, $f(a)=#{item.values.y}$ et $f'(a)=#{item.values.der}$" for item in data)
-					large:false
-				}
+		getExamBriques: (inputs_list,options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[A, B, droite] = that.init(inputs)
+				xAtex = A.x.tex()
+				yAtex = A.y.tex()
+				return "$a=#{xAtex}$ &nbsp; : &nbsp; $f(a) = #{yAtex}$ &nbsp; et &nbsp; $f'(a) = #{droite.m().tex()}$."
+
+			return {
+				children: [
+					{
+						type: "text",
+						children: [
+							"On considère une fonction une fonction &nbsp; $f$ &nbsp; dérivable sur &nbsp; $\\mathbb{R}$."
+							"$\\mathcal{C}$ &nbsp; est sa courbe représentative dans un repère."
+							"Dans les cas suivants, donnez l'équation de la tangente &nbsp; $\\mathcal{T}$ &nbsp; à la courbe &nbsp; $\\mathcal{C}$ &nbsp; en l'abscisse &nbsp; $a$."
+						]
+					}
+					{
+						type: "enumerate",
+						refresh:true
+						enumi:"1",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+		getTex: (inputs_list, options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[A, B, droite] = that.init(inputs)
+				xAtex = A.x.tex()
+				yAtex = A.y.tex()
+				return "$a=#{xAtex}$ &nbsp; : &nbsp; $f(a) = #{yAtex}$ &nbsp; et &nbsp; $f'(a) = #{droite.m().tex()}$."
+
+			return {
+				children: [
+					"On considère une fonction une fonction $f$ dérivable sur $\\mathbb{R}$."
+					"$\\mathcal{C}$ est sa courbe représentative dans un repère."
+					"Dans les cas suivants, donnez l'équation de la tangente $\\mathcal{T}$ à la courbe $\\mathcal{C}$ en l'abscisse $a$."
+					{
+						type: "enumerate",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
 			}
 	}

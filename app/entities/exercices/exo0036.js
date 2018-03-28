@@ -138,6 +138,45 @@ define(["utils/math"], function(mM) {
           ]
         }
       ];
+    },
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var ang, deg, ref;
+        ref = that.init(inputs, options), deg = ref[0], ang = ref[1];
+        return "$" + (ang.tex()) + "$";
+      };
+      return {
+        children: [
+          {
+            type: "text",
+            children: ["Placez sur un cercle trigonométrique les points dont les mesures sont données en radians :"]
+          }, {
+            type: "enumerate",
+            refresh: true,
+            enumi: "1",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var ang, deg, ref;
+        ref = that.init(inputs, options), deg = ref[0], ang = ref[1];
+        return "$" + (ang.tex()) + "$";
+      };
+      return {
+        children: [
+          "Placez sur un cercle trigonométrique les points dont les mesures sont données en radians :", {
+            type: "enumerate",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
     }
   };
 });

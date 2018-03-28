@@ -114,25 +114,109 @@
 
 			]
 
-		tex: (data) ->
-			if not isArray(data) then data = [ data ]
-			out = []
-			for itemData in data
-				out.push {
-					title:"Choix de la meilleure forme"
-					contents: [
-						"On donne $f(x)$ sous trois formes :"
-						"\\[f(x) = #{itemData.tex.normale}\\]"
-						"\\[f(x) = #{itemData.tex.canonique}\\]"
-						"\\[f(x) = #{itemData.tex.facto}\\]"
 
-						Handlebars.templates["tex_enumerate"] { pre:"Sans, ou avec peu de calcul, en utilisant la forme la plus adaptée, donnez :", items:[
-							"Les coordonnées du sommet $S$ de la courbe de $f$"
-							"Les solutions de $f(x) = 0$"
-							"Les solultions, si elles existent, de $f(x) = #{itemData.tex.yA}$"
-							]}
+		getExamBriques: (inputs_list,options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[normalTex, canoniqueTex, factoTex, xS, yS, racines, yA, solutionsA] = that.init(inputs,options)
+				return {
+					type:"text",
+					children:[
+						"$f(x) = #{normalTex}"
+						"$f(x) = #{canoniqueTex}"
+						"$f(x) = #{factoTex}$"
+						"$A=yA.tex()$."
 					]
 				}
-			out
+
+			return {
+				children: [
+					{
+						type: "text",
+						children: [
+							"On propose la fonction &nbsp; $f$ &nbsp; définie de trois façons différentes. :"
+							"En utilisant bien ces différentes formes, répondez aux questions avec le moins de calcul possible."
+							"À chaque fois :"
+						]
+					}
+					{
+						type: "enumerate",
+						refresh:false
+						enumi:"a",
+						children: [
+							"Les coordonnées du sommet &nbsp; $S$ &nbsp; de la courbe de &nbsp; $f$"
+							"Les racines de &nbsp; $f(x)$"
+							"Les solultions, si elles existent, de &nbsp; $f(x) = A$"
+						]
+					}
+					{
+						type: "enumerate"
+						enumi: "1"
+						refresh: true
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+		getTex: (inputs_list, options) ->
+			if inputs_list.length is 1
+				[normalTex, canoniqueTex, factoTex, xS, yS, racines, yA, solutionsA] = @init(inputs_list[0],options)
+				return {
+					children: [
+						"On propose la fonction $f$ définie de trois façons différentes. :"
+						"$f(x) = #{normalTex}"
+						"$f(x) = #{canoniqueTex}"
+						"$f(x) = #{factoTex}$"
+						"En utilisant bien ces différentes formes, répondez aux questions avec le moins de calcul possible."
+						{
+							type: "enumerate",
+							enumi:"a)",
+							children: [
+								"Les coordonnées du sommet $S$ de la courbe de $f$"
+								"Les racines de $f(x)$"
+								"Les solultions, si elles existent, de $f(x) = #{yA.tex()}$"
+							]
+						}
+					]
+				}
+
+			else
+				that = @
+
+				fct_item = (inputs, index) ->
+					[normalTex, canoniqueTex, factoTex, xS, yS, racines, yA, solutionsA] = that.init(inputs,options)
+					return {
+						type:"enumerate",
+						enumi: "a)"
+						children:[
+							"$f(x) = #{normalTex}"
+							"$f(x) = #{canoniqueTex}"
+							"$f(x) = #{factoTex}$"
+							"$A=yA.tex()$."
+						]
+					}
+
+				return {
+					children: [
+						"On propose la fonction $f$ définie de trois façons différentes. :"
+						"En utilisant bien ces différentes formes, répondez aux questions avec le moins de calcul possible."
+						"À chaque fois :"
+						{
+							type: "enumerate",
+							enumi:"A)",
+							children: [
+								"Les coordonnées du sommet $S$ de la courbe de $f$"
+								"Les racines de $f(x)$"
+								"Les solultions, si elles existent, de $f(x) = A$"
+							]
+						}
+						{
+							type: "enumerate"
+							enumi: "1)"
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
+
 
 	}

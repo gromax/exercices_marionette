@@ -1,13 +1,20 @@
-define(["app","marionette","apps/common/loading_view","apps/common/missing_item_view","apps/classes/edit/edit_view"], function(app, Marionette, LoadingView, MissingView, EditView){
+define([
+	"app",
+	"marionette",
+	"apps/common/alert_view",
+	"apps/common/missing_item_view",
+	"apps/classes/edit/edit_view"
+], function(
+	app,
+	Marionette,
+	AlertView,
+	MissingView,
+	EditView
+){
 	var Controller = Marionette.Object.extend({
 		channelName: "entities",
 		edit: function(id){
-			var loadingView = new LoadingView({
-				title: "Modification d'une classe",
-				message: "Chargement des données."
-			});
-
-			app.regions.getRegion('main').show(loadingView);
+			app.trigger("header:loading", true);
 			var channel = this.getChannel();
 			require(["entities/dataManager"], function(){
 				var fetchingClasse = channel.request("classe:entity",id);
@@ -33,7 +40,12 @@ define(["app","marionette","apps/common/loading_view","apps/common/missing_item_
 										view.triggerMethod("form:data:invalid", response.responseJSON.errors);
 									}
 									else{
-										alert("Erreur inconnue. Essayez à nouveau !");
+										if(response.status == 401){
+											alert("Vous devez vous (re)connecter !");
+											app.trigger("home:logout");
+										} else {
+											alert("Erreur inconnue. Essayez à nouveau !");
+										}
 									}
 								});
 							}
@@ -47,6 +59,16 @@ define(["app","marionette","apps/common/loading_view","apps/common/missing_item_
 						view = new MissingView({message:"Cette classe n'existe pas !"});
 					}
 					app.regions.getRegion('main').show(view);
+				}).fail(function(response){
+					if(response.status == 401){
+						alert("Vous devez vous (re)connecter !");
+						app.trigger("home:logout");
+					} else {
+						var alertView = new AlertView();
+						app.regions.getRegion('main').show(alertView);
+					}
+				}).always(function(){
+					app.trigger("header:loading", false);
 				});
 			});
 		}

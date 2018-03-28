@@ -1,17 +1,30 @@
-define(["app", "marionette", "apps/common/loading_view","apps/common/missing_item_view","apps/users/edit/edit_view","apps/users/edit/editpwd_view"], function(app, Marionette, LoadingView, MissingView, EditView, EditPwdView){
+define([
+	"app",
+	"marionette",
+	"apps/common/alert_view",
+	"apps/common/missing_item_view",
+	"apps/users/edit/edit_view",
+	"apps/users/edit/editpwd_view"
+], function(
+	app,
+	Marionette,
+	AlertView,
+	MissingView,
+	EditView,
+	EditPwdView
+){
 	var Controller = Marionette.Object.extend({
 		channelName: "entities",
 
 		editUser: function(id, isMe){
-			var loadingView = new LoadingView({
-				title: "Modification d'un utilisateur",
-				message: "Chargement des données."
-			});
-
-			app.regions.getRegion('main').show(loadingView);
+			app.trigger("header:loading", true);
 			var channel = this.getChannel();
 			require(["entities/dataManager"], function(){
-				var fetchingUser = channel.request("user:entity", id);
+				if (isMe) {
+					var fetchingUser = channel.request("user:me");
+				} else {
+					var fetchingUser = channel.request("user:entity", id);
+				}
 				$.when(fetchingUser).done(function(user){
 					var view;
 					if(user !== undefined){
@@ -34,6 +47,7 @@ define(["app", "marionette", "apps/common/loading_view","apps/common/missing_ite
 						});
 
 						view.on("form:submit", function(data){
+							app.trigger("header:loading", true);
 							var updatingUser = user.save(data);
 							if(updatingUser){
 								$.when(updatingUser).done(function(){
@@ -41,10 +55,16 @@ define(["app", "marionette", "apps/common/loading_view","apps/common/missing_ite
 								}).fail(function(response){
 									if(response.status == 422){
 										view.triggerMethod("form:data:invalid", response.responseJSON.errors);
+									} else {
+										if (response.status == 401){
+											alert("Vous devez vous (re)connecter !");
+											app.trigger("home:logout");
+										} else {
+											alert("Erreur inconnue. Essayez à nouveau !");
+										}
 									}
-									else{
-										alert("Erreur inconnue. Essayez à nouveau !");
-									}
+								}).always(function(){
+									app.trigger("header:loading", false);
 								});
 							}
 							else {
@@ -75,20 +95,29 @@ define(["app", "marionette", "apps/common/loading_view","apps/common/missing_ite
 						view = new MissingView({message:"Cet utilisateur n'existe pas !"});
 					}
 					app.regions.getRegion('main').show(view);
+				}).fail(function(response){
+					if(response.status == 401){
+						alert("Vous devez vous (re)connecter !");
+						app.trigger("home:logout");
+					} else {
+						var alertView = new AlertView();
+						app.regions.getRegion('main').show(alertView);
+					}
+				}).always(function(){
+					app.trigger("header:loading", false);
 				});
 			});
 		},
 		editUserPwd: function(id, isMe){
-			var loadingView = new LoadingView({
-				title: "Modification du mot de passe utilisateur",
-				message: "Chargement des données."
-			});
-
-			app.regions.getRegion('main').show(loadingView);
+			app.trigger("header:loading", true);
 			var channel = this.getChannel();
 
 			require(["entities/dataManager"], function(){
-				var fetchingUser = channel.request("user:entity", id);
+				if (isMe) {
+					var fetchingUser = channel.request("user:me");
+				} else {
+					var fetchingUser = channel.request("user:entity", id);
+				}
 				$.when(fetchingUser).done(function(user){
 					var view;
 					if(user !== undefined){
@@ -113,6 +142,7 @@ define(["app", "marionette", "apps/common/loading_view","apps/common/missing_ite
 							if (data.pwd!==data.pwdConfirm){
 								view.triggerMethod("form:data:invalid", { pwdConfirm:"Les mots de passe sont différents."});
 							} else {
+								app.trigger("header:loading", true);
 								var updatingUser = user.save(_.omit(data,"pwdConfirm"));
 								if(updatingUser){
 									$.when(updatingUser).done(function(){
@@ -121,10 +151,16 @@ define(["app", "marionette", "apps/common/loading_view","apps/common/missing_ite
 									}).fail(function(response){
 										if(response.status == 422){
 											view.triggerMethod("form:data:invalid", response.responseJSON.errors);
+										} else {
+											if(response.status == 401){
+												alert("Vous devez vous (re)connecter !");
+												app.trigger("home:logout");
+											} else {
+												alert("Erreur inconnue. Essayez à nouveau !");
+											}
 										}
-										else{
-											alert("Erreur inconnue. Essayez à nouveau !");
-										}
+									}).always(function(){
+										app.trigger("header:loading", false);
 									});
 								} else {
 									view.triggerMethod("form:data:invalid", user.validationError);
@@ -151,6 +187,16 @@ define(["app", "marionette", "apps/common/loading_view","apps/common/missing_ite
 						view = new ExosManager.UsersApp.Show.MissingUser();
 					}
 					app.regions.getRegion('main').show(view);
+				}).fail(function(response){
+					if(response.status == 401){
+						alert("Vous devez vous (re)connecter !");
+						app.trigger("home:logout");
+					} else {
+						var alertView = new AlertView();
+						app.regions.getRegion('main').show(alertView);
+					}
+				}).always(function(){
+					app.trigger("header:loading", false);
 				});
 			});
 		}

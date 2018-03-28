@@ -62,4 +62,86 @@
 				B
 				A.toClone().minus(B).norme()
 			]
+
+		getExamBriques: (inputs_list,options) ->
+			that = @
+
+			if options.a?.value is 1
+				fct_item = (inputs, index) ->
+					[A, B, gAB] = that.init(inputs,options)
+					return "$z_A = #{A.affixe().tex()}$ &nbsp; et &nbsp; $z_B = #{B.affixe().tex()}$"
+				return {
+					children: [
+						{
+							type: "text",
+							children: [
+								"On donne les affixes de deux points &nbsp; $A$, &nbsp et &nbsp; $B$."
+								"Vous devez donner la distance &nbsp; $AB$."
+							]
+						}
+						{
+							type: "enumerate",
+							refresh:true
+							enumi:"1",
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
+
+			else
+				fct_item = (inputs, index) ->
+					[A, B, gAB] = that.init(inputs,options)
+					return "$#{A.texLine()}$ &nbsp; et &nbsp; $#{B.texLine()}$"
+
+				return {
+					children: [
+						{
+							type: "text",
+							children: [
+								"On donne les coordonnées de deux points &nbsp; $A$, &nbsp et &nbsp; $B$."
+								"Vous devez donner la distance &nbsp; $AB$."
+							]
+						}
+						{
+							type: "enumerate",
+							refresh:true
+							enumi:"1",
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
+
+		getTex: (inputs_list, options) ->
+			that = @
+			if options.a?.value is 1
+				fct_item = (inputs, index) ->
+					[A, B, gAB] = that.init(inputs,options)
+					return "$z_A = #{A.affixe().tex()}$ et $z_B = #{B.affixe().tex()}$"
+
+				return {
+					children: [
+						"On donne les affixes de deux points $A$ et $B$."
+						"Vous devez donner la distance $AB$."
+						{
+							type: "enumerate",
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
+
+			else
+				fct_item = (inputs, index) ->
+					[A, B, gAB] = that.init(inputs,options)
+					return "$#{A.texLine()}$ et $#{B.texLine()}$"
+
+				return {
+					children: [
+						"On donne les coordonnées de deux points $A$ et $B$."
+						"Vous devez donner la distance $AB$."
+						{
+							type: "enumerate",
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
 	}

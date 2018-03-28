@@ -178,7 +178,7 @@ define(["backbone.radio","entities/exercices/exercices_catalog", "jst"], functio
 						if (typeof exoController.getTex == "function" ) {
 							_.extend(item, exoController.getTex(inputs,options))
 						} else {
-							item.message = "Cet exercice n'a pas de fonction Tex [#"+idE+"]";
+							item.message = "\\textcolor{red}{Cet exercice n'a pas de fonction Tex ["+idE+"]}";
 						}
 						counter--;
 						if (counter == 0) {
@@ -187,7 +187,7 @@ define(["backbone.radio","entities/exercices/exercices_catalog", "jst"], functio
 					}
 
 					var failedCB = function() {
-						item.message = "Le fichier "+filename+" n'a pu être chargé.";
+						item.message = "\\textcolor{red}{Le fichier \\verb?"+filename+"? n'a pu être chargé.}";
 						counter--;
 						if (counter == 0) {
 							defer.resolve( fct_remove_blank_lines(template(templateDatas)) );
@@ -195,7 +195,7 @@ define(["backbone.radio","entities/exercices/exercices_catalog", "jst"], functio
 					}
 					require(["entities/exercices/"+filename], successCB, failedCB);
 				} else {
-					item.message="L'exercice #"+idE+" n'est pas dans le catalogue.";
+					item.message="\\textcolor{red}{L'exercice ["+idE+"] n'est pas dans le catalogue.}";
 					item.title = "Exercice inconnu";
 					counter--;
 					if (counter == 0) {
@@ -245,7 +245,9 @@ define(["backbone.radio","entities/exercices/exercices_catalog", "jst"], functio
 					var fetchingExo = API.newExamEntityWithParams(params);
 					$.when(fetchingExo).done(function(exoModel){
 						defer.resolve(exoModel);
-					})
+					}).fail(function(response){
+						defer.reject(response);
+					});
 				});
 			});
 			return defer.promise();

@@ -4,6 +4,8 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 	# description:"On donne cinq fonctions affines et cinq droites. Il faut associer chaque fonction affine avec la droite qui la représente."
 	# keyWords:["Analyse","Fonction","Courbe","Affine","Seconde"]
 
+	# debug: tex à faire
+
 	return {
 		max: 6
 		init: (inputs,options) ->

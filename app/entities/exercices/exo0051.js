@@ -65,7 +65,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
         {
           type: "text",
           rank: 1,
-          ps: ["La variable aléatoire $X$ suit la <b>loi uniforme</b> sur $[" + Xmin + ";" + Xmax + "]$.", "<b>Remarque :</b> on note parfois $\\mathcal{U}([" + Xmin + ";" + Xmax + "])$ cette loi."]
+          ps: ["La variable aléatoire &nbsp; $X$ &nbsp; suit la <b>loi uniforme</b> sur &nbsp; $[" + Xmin + ";" + Xmax + "]$.", "<b>Remarque :</b> on note parfois &nbsp; $\\mathcal{U}([" + Xmin + ";" + Xmax + "])$ &nbsp; cette loi."]
         }, {
           type: "input",
           rank: 2,
@@ -116,65 +116,69 @@ define(["utils/math", "utils/help"], function(mM, help) {
         }
       ];
     },
-    tex: function(data) {
-      var a, b, ens, i, itData, its, itsQuest, len, sa, sb, symbs;
-      symbs = ["", "<", "\\leqslant"];
-      if (!isArray(data)) {
-        data = [data];
+    getExamBriques: function(inputs_list, options) {
+      var calcE, calcStd, enonce, fct_item, ref, ref1, sup, that;
+      that = this;
+      calcE = Number((ref = options.a.value) != null ? ref : 0) === 0;
+      calcStd = Number((ref1 = options.b.value) != null ? ref1 : 0) === 0;
+      fct_item = function(inputs, index) {
+        var Xmax, Xmin, a, b, ens, ref2;
+        ref2 = that.init(inputs), Xmin = ref2[0], Xmax = ref2[1], a = ref2[2], b = ref2[3], ens = ref2[4];
+        return "$X\\in [" + Xmin + ";" + Xmax + "]$, calculer &nbsp; $p(" + ens + ")$.";
+      };
+      enonce = ["La variable aléatoire &nbsp; $X$ &nbsp; suit la <b>loi uniforme</b> sur &nbsp; $[X_{Min};X_{Max}]$.", "Faites les calculs de probabilités à 0,01 près."];
+      if (calcE || calcStd) {
+        sup = [];
+        if (calcE) {
+          sup.push("l'espérance &nbsp; $E(X)$");
+        }
+        if (calcStd) {
+          sup.push("l'écart-type &nbsp; $\\sigma(X)$");
+        }
+        enonce.push("Dans chaque cas, calculez aussi " + (sup.join("&nbsp; et ")) + " &nbsp; à 0,01 près.");
       }
-      its = [];
-      for (i = 0, len = data.length; i < len; i++) {
-        itData = data[i];
-        sa = Number(itData.inputs.sa);
-        if (sa === 0) {
-          ens = "X";
-        } else {
-          a = Number(itData.inputs.a);
-          ens = a + " " + symbs[sa] + " X";
-        }
-        sb = Number(itData.inputs.sb);
-        if (sb !== 0) {
-          b = Number(itData.inputs.b);
-          ens = ens + " " + symbs[sb] + " " + b;
-        }
-        if ((itData.options.a !== 0) || (itData.options.b !== 0)) {
-          itsQuest = ["Donnez $p(" + ens + ")$"];
-          if (itData.options.a !== 0) {
-            itsQuest.push("Donnez $E(X)$ à $0,01$ près.");
-          }
-          if (itData.options.b !== 0) {
-            itsQuest.push("Donnez $\\sigma(X)$ à $0,01$ près.");
-          }
-          its.push(Handlebars.templates["tex_enumerate"]({
-            pre: "La variable $X$ suit la loi uniforme sur $[" + itData.inputs.Xmin + ";" + itData.inputs.Xmax + "]$.",
-            items: itsQuest
-          }));
-        } else {
-          its.push("La variable $X$ suit la loi uniforme sur $[" + itData.inputs.Xmin + ";" + itData.inputs.Xmax + "]$.\n\nDonnez $p(" + ens + ")$");
-        }
-      }
-      if (its.length > 1) {
-        return [
+      return {
+        children: [
           {
-            title: this.title,
-            content: Handlebars.templates["tex_enumerate"]({
-              items: its,
-              numero: "1)",
-              large: false
-            })
+            type: "text",
+            children: enonce
+          }, {
+            type: "enumerate",
+            refresh: true,
+            enumi: "1",
+            children: _.map(inputs_list, fct_item)
           }
-        ];
-      } else {
-        return [
-          {
-            title: this.title,
-            content: Handlebars.templates["tex_plain"]({
-              content: its[0],
-              large: false
-            })
-          }
-        ];
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var calcE, calcStd, children, fct_item, ref, ref1, sup, that;
+      that = this;
+      calcE = Number((ref = options.a.value) != null ? ref : 0) === 0;
+      calcStd = Number((ref1 = options.b.value) != null ? ref1 : 0) === 0;
+      fct_item = function(inputs, index) {
+        var Xmax, Xmin, a, b, ens, ref2;
+        ref2 = that.init(inputs), Xmin = ref2[0], Xmax = ref2[1], a = ref2[2], b = ref2[3], ens = ref2[4];
+        return "$X\\in [" + Xmin + ";" + Xmax + "]$, calculer $p(" + ens + ")$.";
+      };
+      children = ["La variable aléatoire $X$ suit la \\textbf{loi uniforme} sur $[X_{Min};X_{Max}]$.", "Faites les calculs de probabilités à 0,01 près."];
+      if (calcE || calcStd) {
+        sup = [];
+        if (calcE) {
+          sup.push("l'espérance $E(X)$");
+        }
+        if (calcStd) {
+          sup.push("l'écart-type $\\sigma(X)$");
+        }
+        children.push("Dans chaque cas, calculez aussi " + (sup.join(" et ")) + " à 0,01 près.");
       }
+      children.push({
+        type: "enumerate",
+        children: _.map(inputs_list, fct_item)
+      });
+      return {
+        children: children
+      };
     }
   };
 });

@@ -7,6 +7,9 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 	#	n:{ tag:"Nombre de courbes" , options:["3", "4", "5", "6", "7"] , def:2 }
 	# }
 
+	# debug: tex à faire
+
+
 	return {
 		max: 6
 		init: (inputs,options) ->

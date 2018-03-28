@@ -53,4 +53,43 @@ define ["utils/math", "utils/help"], (mM, help) ->
 				}
 			]
 
+		getExamBriques: (inputs_list,options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[f, fDer, fTex] = that.init(inputs,options)
+				return "$#{fTex}$"
+
+			return {
+				children: [
+					{
+						type: "text",
+						children: [
+							"Donnez la dérivée des fonctions suivantes :"
+						]
+					}
+					{
+						type: "enumerate",
+						refresh:true
+						enumi:"1",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+		getTex: (inputs_list, options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[f, fDer, fTex] = that.init(inputs,options)
+				return "$#{fTex}$"
+
+			return {
+				children: [
+					"Donnez la dérivée des fonctions suivantes :"
+					{
+						type: "enumerate",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
 	}

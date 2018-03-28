@@ -385,7 +385,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
         var domaine, eqTex, goods, info_notation, ref;
         ref = that.init(inputs, options), eqTex = ref[0], info_notation = ref[1], goods = ref[2], domaine = ref[3];
         if (domaine) {
-          return ("$" + eqTex + "$. ") + domaine;
+          return ["$" + eqTex + "$.", domaine];
         } else {
           return "$" + eqTex + "$";
         }
@@ -482,27 +482,6 @@ define(["utils/math", "utils/help"], function(mM, help) {
       return {
         goods: goods,
         eqTex: mg.tex(options) + " = " + md.tex(options)
-      };
-    },
-    tex: function(data) {
-      var item;
-      if (!isArray(data)) {
-        data = [data];
-      }
-      return {
-        title: this.title,
-        content: Handlebars.templates["tex_enumerate"]({
-          items: (function() {
-            var i, len, results;
-            results = [];
-            for (i = 0, len = data.length; i < len; i++) {
-              item = data[i];
-              results.push("$" + item.equation + "$");
-            }
-            return results;
-          })(),
-          large: false
-        })
       };
     }
   };

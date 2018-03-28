@@ -91,6 +91,45 @@ define(["utils/math", "utils/help"], function(mM, help) {
           ]
         }
       ];
+    },
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var membreDroiteTex, membreGaucheTex, ref, sols;
+        ref = that.init(inputs, options), membreGaucheTex = ref[0], membreDroiteTex = ref[1], sols = ref[2];
+        return "$" + membreGaucheTex + " = " + membreDroiteTex + "$";
+      };
+      return {
+        children: [
+          {
+            type: "text",
+            children: ["Donnez les solutions des équations suivantes :"]
+          }, {
+            type: "enumerate",
+            refresh: true,
+            enumi: "1",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var membreDroiteTex, membreGaucheTex, ref, sols;
+        ref = that.init(inputs, options), membreGaucheTex = ref[0], membreDroiteTex = ref[1], sols = ref[2];
+        return "$" + membreGaucheTex + " = " + membreDroiteTex + "$";
+      };
+      return {
+        children: [
+          "Donnez les solutions des équations suivantes :", {
+            type: "enumerate",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
     }
   };
 });

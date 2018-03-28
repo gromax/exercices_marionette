@@ -1,10 +1,23 @@
-define(["app", "marionette", "apps/home/signin/signin_view", "apps/common/loading_view",  "apps/common/not_found", "apps/home/signin/test_mdp_view", "apps/home/signin/new_eleve_view"], function(app, Marionette, SigninView, LoadingView, NotFoundView, TestMdpView, NewEleveView){
+define([
+	"app",
+	"marionette",
+	"apps/home/signin/signin_view",
+	"apps/common/not_found",
+	"apps/home/signin/test_mdp_view",
+	"apps/home/signin/new_eleve_view"
+], function(
+	app,
+	Marionette,
+	SigninView,
+	NotFoundView,
+	TestMdpView,
+	NewEleveView
+){
 	var Controller = Marionette.Object.extend({
 		channelName: "entities",
 
 		showSignin: function(){
-			var loadingView = new LoadingView();
-			app.regions.getRegion('main').show(loadingView);
+			app.trigger("header:loading", true);
 			var channel = this.getChannel();
 			require(["entities/dataManager"], function(){
 				var fetching = channel.request("classes:entities");
@@ -21,6 +34,7 @@ define(["app", "marionette", "apps/home/signin/signin_view", "apps/common/loadin
 
 							mdp_view.on("form:submit", function(data_test){
 								testingMdp = newUser.testClasseMdp(data_test.mdp);
+								app.trigger("header:loading", true);
 								$.when(testingMdp).done(function(){
 									newUser.set("classeMdp", data_test.mdp);
 									mdp_view.trigger("dialog:close");
@@ -33,6 +47,7 @@ define(["app", "marionette", "apps/home/signin/signin_view", "apps/common/loadin
 										// Mais la fonction renvoie false directement si le save n'est pas permis pour ne pas vérifier des conditions comme un terme vide
 										var savingUser = newUser.save(data_user);
 										if (savingUser){
+											app.trigger("header:loading", true);
 											$.when(savingUser).done(function(){
 												console.log("succès");
 												new_eleve_view.trigger("dialog:close");
@@ -42,15 +57,14 @@ define(["app", "marionette", "apps/home/signin/signin_view", "apps/common/loadin
 												} else {
 													alert("An unprocessed error happened. Please try again!");
 												}
+											}).always(function(){
+												app.trigger("header:loading", false);
 											});
 										} else {
 											new_eleve_view.triggerMethod("form:data:invalid",newUser.validationError);
 										}
 
 									});
-
-
-
 
 									app.regions.getRegion('dialog').show(new_eleve_view);
 								}).fail(function(response){
@@ -60,7 +74,9 @@ define(["app", "marionette", "apps/home/signin/signin_view", "apps/common/loadin
 									else{
 										alert("Erreur inconnue. Essayez à nouveau !");
 									}
-								})
+								}).always(function(){
+									app.trigger("header:loading", false);
+								});
 							});
 
 							app.regions.getRegion('dialog').show(mdp_view);
@@ -68,6 +84,11 @@ define(["app", "marionette", "apps/home/signin/signin_view", "apps/common/loadin
 						});
 					});
 					app.regions.getRegion('main').show(listClassesView);
+				}).fail(function(response){
+					var alertView = new AlertView();
+					app.regions.getRegion('main').show(alertView);
+				}).always(function(){
+					app.trigger("header:loading", false);
 				});
 			});
 		}

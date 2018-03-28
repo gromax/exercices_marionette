@@ -19,7 +19,6 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
           convexe: false
         }
       ]);
-      arrayShuffle(liste);
       tabs = [];
       for (i = j = 0, len = liste.length; j < len; i = ++j) {
         cas = liste[i];

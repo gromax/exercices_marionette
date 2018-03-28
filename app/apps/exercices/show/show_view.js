@@ -1,4 +1,13 @@
-define(["jst","marionette", "mathjax", "backbone.syphon"], function(JST, Marionette, MathJax){
+define([
+	"jst",
+	"marionette",
+	"mathjax",
+	"backbone.syphon"
+], function(
+	JST,
+	Marionette,
+	MathJax
+){
 	var BriqueItemView = Marionette.View.extend({
 		className: "card-body",
 		template: window.JST["exercices/common/brique-item"],
@@ -357,7 +366,7 @@ define(["jst","marionette", "mathjax", "backbone.syphon"], function(JST, Marione
 		},
 
 		serializeData:function(){
-			optionsItems = _.map(
+			var optionsItems = _.map(
 				this.model.attributes,
 				function(val,key){
 					return { key: key, tag: val.tag, options: val.options, value: val.value || 0 };
@@ -366,6 +375,8 @@ define(["jst","marionette", "mathjax", "backbone.syphon"], function(JST, Marione
 			return { optionsItems : optionsItems };
 		},
 	});
+
+
 
 	var View = Marionette.View.extend({
 		template: window.JST["exercices/show/show-view"],
@@ -378,17 +389,19 @@ define(["jst","marionette", "mathjax", "backbone.syphon"], function(JST, Marione
 			},
 			options: {
 				el: '#options',
-			}
+			},
 		},
 
 		ui:{
 			reinit:"button.js-reinit",
-			setoptions:"button.js-options"
+			setoptions:"button.js-options",
+			setanswers:"button.js-answers",
 		},
 
 		triggers: {
 			"click @ui.reinit":"button:reinit",
 			"click @ui.setoptions":"button:options",
+			"click @ui.setanswers":"button:answers",
 		},
 
 		onRender: function() {
@@ -430,6 +443,7 @@ define(["jst","marionette", "mathjax", "backbone.syphon"], function(JST, Marione
 			var data = _.clone(this.model.attributes);
 			data.showOptionsButton = this.options.showOptionsButton;
 			data.showReinitButton = this.options.showReinitButton;
+			data.showAnswersButton = this.options.showAnswersButton;
 			return data;
 		},
 
@@ -443,7 +457,7 @@ define(["jst","marionette", "mathjax", "backbone.syphon"], function(JST, Marione
 				this.showChildView('options', optionsView);
 				this.listenTo(optionsView, "options:form:submit", function(data){ this.trigger("options:form:submit", data); });
 			}
-		}
+		},
 
 	});
 

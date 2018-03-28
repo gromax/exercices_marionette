@@ -68,13 +68,42 @@
 				}
 			]
 
-		tex: (data) ->
-			if not isArray(data) then data = [ data ]
-			{
-				title:@title
-				content:Handlebars.templates["tex_enumerate"] {
-					pre: "Dans chaque cas, donnez le module $|z|$ et l'argument $arg(z)$."
-					items: ("$z = #{item.tex.z}$" for item in data)
-				}
+		getExamBriques: (inputs_list,options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[z, m, angleRad] = that.init(inputs,options)
+				return "$z = #{ z.tex()}$"
+
+			return {
+				children: [
+					{
+						type: "text",
+						children: [
+							"Donnez le module et l'argument de &nbsp; $z$."
+						]
+					}
+					{
+						type: "enumerate",
+						refresh:true
+						enumi:"1",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
 			}
+
+		getTex: (inputs_list, options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[z, m, angleRad] = that.init(inputs,options)
+				return "$z = #{ z.tex()}$"
+			return {
+				children: [
+					"Donnez le module et l'argument de $z$."
+					{
+						type: "enumerate",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
 	}

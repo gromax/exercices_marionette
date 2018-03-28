@@ -96,6 +96,8 @@ define(["backbone.radio"], function(Radio){
 						}
 						defer.resolve.apply(null,_.map(ask, function(item){ return API.stored_data[item]; }));
 					});
+				}).fail(function(response){
+					defer.reject(response);
 				});
 			}
 
@@ -117,7 +119,7 @@ define(["backbone.radio"], function(Radio){
 							API.stored_data.classes = data;
 							API.stored_time.classes = t;
 							defer.resolve(data);
-						},
+						}
 					});
 				});
 			}
@@ -140,38 +142,45 @@ define(["backbone.radio"], function(Radio){
 			return promise;
 		},
 
-		getUsers: function(){
-			t= Date.now();
+		getUser: function(userId){
 			var defer = $.Deferred();
-
-			if ((typeof API.stored_data.users!=="undefined") && (typeof API.stored_time.users !=="undefined") && (t-API.stored_time.users<API.timeout)){
-				defer.resolve(API.stored_data.users);
-			} else {
-				require(["entities/users"], function(user_collec){
-					var users = new user_collec();
-					users.fetch({
-						success: function(data){
-							API.stored_data.users = data;
-							API.stored_time.users = t;
-							defer.resolve(data);
-						}
-					});
-				});
-			}
+			var fetchingUsers = API.getCustomEntities(["users"]);
+			$.when(fetchingUsers).done(function(users){
+				defer.resolve(users.get(userId));
+			}).fail(function(response){
+				defer.reject(response);
+			});
 
 			var promise = defer.promise();
 			return promise;
 		},
 
-		getUser: function(userId){
+		getMe: function(){
 			var defer = $.Deferred();
-			var fetchingUsers = API.getUsers();
-			$.when(fetchingUsers).done(function(users){
-				defer.resolve(users.get(userId));
-			});
+			t= Date.now();
+			if ((typeof API.stored_data.me!=="undefined") && (typeof API.stored_time.me!="undefined") && (t-API.stored_time.me<API.timeout)){
+				defer.resolve(API.stored_data.me);
+			} else {
+				var request = $.ajax("api/me",{
+					method:'GET',
+					dataType:'json'
+				});
 
-			var promise = defer.promise();
-			return promise;
+				request.done(function(data){
+					require([
+						"entities/user"
+					], function(
+						User
+					){
+						API.stored_data.me = new User(data, {parse:true});
+						API.stored_time.me = t;
+						defer.resolve(API.stored_data.me);
+					});
+				}).fail(function(response){
+					defer.reject(response);
+				});
+			}
+			return defer.promise();
 		},
 
 		purge: function(){
@@ -186,6 +195,6 @@ define(["backbone.radio"], function(Radio){
 	channel.reply('data:purge', API.purge );
 	channel.reply('classes:entities', API.getClasses );
 	channel.reply('classe:entity', API.getClasse );
-	channel.reply('users:entities', API.getUsers );
 	channel.reply('user:entity', API.getUser );
+	channel.reply('user:me', API.getMe );
 });

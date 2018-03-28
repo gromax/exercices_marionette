@@ -1,7 +1,7 @@
 define([
 	"app",
 	"marionette",
-	"apps/common/loading_view",
+	"apps/common/alert_view",
 	"apps/common/list_layout",
 	"apps/users/list/list_panel",
 	"apps/users/list/list_view",
@@ -11,7 +11,7 @@ define([
 ], function(
 	app,
 	Marionette,
-	LoadingView,
+	AlertView,
 	Layout,
 	Panel,
 	UsersView,
@@ -24,14 +24,13 @@ define([
 
 		listUsers: function(criterion){
 			criterion = criterion || "";
-			var loadingView = new LoadingView();
-			app.regions.getRegion('main').show(loadingView);
+			app.trigger("header:loading", true);
 			var usersListLayout = new Layout();
 			var usersListPanel = new Panel({filterCriterion:criterion});
 			var channel = this.getChannel();
 
 			require(["entities/user","entities/dataManager"], function(User){
-				var fetchingUsers = channel.request("users:entities");
+				var fetchingUsers = channel.request("custom:entities", ["users"]);
 				$.when(fetchingUsers).done(function(users){
 					var usersListView = new UsersView({
 						collection: users,
@@ -72,7 +71,13 @@ define([
 									if(response.status == 422){
 										view.triggerMethod("form:data:invalid", response.responseJSON.errors);
 									} else {
-										alert("An unprocessed error happened. Please try again!");
+										if(response.status == 401){
+											alert("Vous devez vous (re)connecter !");
+											view.trigger("dialog:close");
+											app.trigger("home:logout");
+										} else {
+											alert("Erreur inconnue. Essayez à nouveau !");
+										}
 									}
 								});
 							} else {
@@ -96,6 +101,7 @@ define([
 
 						view.on("form:submit", function(data){
 							var updatingUser = model.save(data);
+							app.trigger("header:loading", true);
 							if(updatingUser){
 								$.when(updatingUser).done(function(){
 									childView.render();
@@ -105,8 +111,16 @@ define([
 									if(response.status == 422){
 										view.triggerMethod("form:data:invalid", response.responseJSON.errors);
 									} else {
-										alert("An unprocessed error happened. Please try again!");
+										if(response.status == 401){
+											alert("Vous devez vous (re)connecter !");
+											view.trigger("dialog:close");
+											app.trigger("home:logout");
+										} else {
+											alert("Erreur inconnue. Essayez à nouveau !");
+										}
 									}
+								}).always(function(){
+									app.trigger("header:loading", false);
 								});
 							} else {
 								this.triggerMethod("form:data:invalid", model.validationError);
@@ -137,8 +151,16 @@ define([
 										if(response.status == 422){
 											view.triggerMethod("form:data:invalid", response.responseJSON.errors);
 										} else {
-											alert("An unprocessed error happened. Please try again!");
+											if(response.status == 401){
+												alert("Vous devez vous (re)connecter !");
+												view.trigger("dialog:close");
+												app.trigger("home:logout");
+											} else {
+												alert("Erreur inconnue. Essayez à nouveau !");
+											}
 										}
+									}).always(function(){
+										app.trigger("header:loading", false);
 									});
 								} else {
 									this.triggerMethod("form:data:invalid", model.validationError);
@@ -154,6 +176,16 @@ define([
 					});
 
 					app.regions.getRegion('main').show(usersListLayout);
+				}).fail(function(response){
+					if(response.status == 401){
+						alert("Vous devez vous (re)connecter !");
+						app.trigger("home:logout");
+					} else {
+						var alertView = new AlertView();
+						app.regions.getRegion('main').show(alertView);
+					}
+				}).always(function(){
+					app.trigger("header:loading", false);
 				});
 			});
 		}

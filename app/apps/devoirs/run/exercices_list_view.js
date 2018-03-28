@@ -12,7 +12,7 @@ define(["jst","marionette", "mathjax"], function(JST,Marionette, MathJax){
 			if (this.options.profMode==true){
 				return window.JST["devoirs/run/exercice-list-item-prof"];
 			} else {
-				return window.JST["devoirs/run/exercice-list-item"];
+				return window.JST["devoirs/run/exercice-list-item-eleve"];
 			}
 		},
 

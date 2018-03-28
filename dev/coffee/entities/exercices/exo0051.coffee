@@ -47,8 +47,8 @@ define ["utils/math","utils/help"], (mM, help) ->
 					type: "text"
 					rank: 1
 					ps:[
-						"La variable aléatoire $X$ suit la <b>loi uniforme</b> sur $[#{Xmin};#{Xmax}]$."
-						"<b>Remarque :</b> on note parfois $\\mathcal{U}([#{Xmin};#{Xmax}])$ cette loi."
+						"La variable aléatoire &nbsp; $X$ &nbsp; suit la <b>loi uniforme</b> sur &nbsp; $[#{Xmin};#{Xmax}]$."
+						"<b>Remarque :</b> on note parfois &nbsp; $\\mathcal{U}([#{Xmin};#{Xmax}])$ &nbsp; cette loi."
 					]
 				}
 				{
@@ -102,45 +102,67 @@ define ["utils/math","utils/help"], (mM, help) ->
 				}
 			]
 
-		tex: (data) ->
-			# à faire
-			symbs = ["","<","\\leqslant"]
-			if not isArray(data) then data = [ data ]
-			its=[]
-			for itData in data
-				sa = Number itData.inputs.sa
-				if sa is 0 then ens = "X"
-				else
-					a = Number itData.inputs.a
-					ens = "#{a} #{symbs[sa]} X"
-				sb = Number itData.inputs.sb
-				if sb isnt 0
-					b = Number itData.inputs.b
-					ens = "#{ens} #{symbs[sb]} #{b}"
-				if (itData.options.a isnt 0) or (itData.options.b isnt 0)
-					itsQuest = ["Donnez $p(#{ens})$"]
-					if itData.options.a isnt 0 then itsQuest.push "Donnez $E(X)$ à $0,01$ près."
-					if itData.options.b isnt 0 then itsQuest.push "Donnez $\\sigma(X)$ à $0,01$ près."
-					its.push Handlebars.templates["tex_enumerate"] {
-						pre:"La variable $X$ suit la loi uniforme sur $[#{itData.inputs.Xmin};#{itData.inputs.Xmax}]$."
-						items: itsQuest
-					}
-				else its.push """La variable $X$ suit la loi uniforme sur $[#{itData.inputs.Xmin};#{itData.inputs.Xmax}]$.
+		getExamBriques: (inputs_list,options) ->
+			that = @
+			calcE = Number(options.a.value ? 0) is 0
+			calcStd = Number(options.b.value ? 0) is 0
 
-				Donnez $p(#{ens})$"""
-			if its.length > 1 then [{
-					title:@title
-					content:Handlebars.templates["tex_enumerate"] {
-						items: its
-						numero:"1)"
-						large:false
+			fct_item = (inputs, index) ->
+				[Xmin, Xmax, a, b, ens] = that.init(inputs)
+				return "$X\\in [#{Xmin};#{Xmax}]$, calculer &nbsp; $p(#{ens})$."
+
+			enonce = [
+				"La variable aléatoire &nbsp; $X$ &nbsp; suit la <b>loi uniforme</b> sur &nbsp; $[X_{Min};X_{Max}]$."
+				"Faites les calculs de probabilités à 0,01 près."
+			]
+			if calcE or calcStd
+				sup = []
+				if calcE then sup.push("l'espérance &nbsp; $E(X)$")
+				if calcStd then sup.push("l'écart-type &nbsp; $\\sigma(X)$")
+				enonce.push("Dans chaque cas, calculez aussi #{sup.join("&nbsp; et ")} &nbsp; à 0,01 près.")
+
+			return {
+				children: [
+					{
+						type: "text",
+						children: enonce
 					}
-				}]
-			else [{
-					title:@title
-					content:Handlebars.templates["tex_plain"] {
-						content: its[0]
-						large:false
+					{
+						type: "enumerate",
+						refresh:true
+						enumi:"1",
+						children: _.map(inputs_list, fct_item)
 					}
-				}]
+				]
+			}
+
+
+		getTex: (inputs_list, options) ->
+			that = @
+			calcE = Number(options.a.value ? 0) is 0
+			calcStd = Number(options.b.value ? 0) is 0
+
+			fct_item = (inputs, index) ->
+				[Xmin, Xmax, a, b, ens] = that.init(inputs)
+				return "$X\\in [#{Xmin};#{Xmax}]$, calculer $p(#{ens})$."
+
+			children = [
+				"La variable aléatoire $X$ suit la \\textbf{loi uniforme} sur $[X_{Min};X_{Max}]$."
+				"Faites les calculs de probabilités à 0,01 près."
+			]
+
+			if calcE or calcStd
+				sup = []
+				if calcE then sup.push("l'espérance $E(X)$")
+				if calcStd then sup.push("l'écart-type $\\sigma(X)$")
+				children.push("Dans chaque cas, calculez aussi #{sup.join(" et ")} à 0,01 près.")
+
+			children.push({
+				type: "enumerate",
+				children: _.map(inputs_list, fct_item)
+			})
+
+			return {
+				children:  children
+			}
 	}

@@ -51,6 +51,45 @@ define(["utils/math", "utils/help"], function(mM, help) {
           ]
         }
       ];
+    },
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var f, fDer, fTex, ref;
+        ref = that.init(inputs, options), f = ref[0], fDer = ref[1], fTex = ref[2];
+        return "$" + fTex + "$";
+      };
+      return {
+        children: [
+          {
+            type: "text",
+            children: ["Donnez la dérivée des fonctions suivantes :"]
+          }, {
+            type: "enumerate",
+            refresh: true,
+            enumi: "1",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var f, fDer, fTex, ref;
+        ref = that.init(inputs, options), f = ref[0], fDer = ref[1], fTex = ref[2];
+        return "$" + fTex + "$";
+      };
+      return {
+        children: [
+          "Donnez la dérivée des fonctions suivantes :", {
+            type: "enumerate",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
     }
   };
 });

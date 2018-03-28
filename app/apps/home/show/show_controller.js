@@ -1,7 +1,7 @@
 define([
 	"app",
 	"marionette",
-	"apps/common/loading_view",
+	"apps/common/alert_view",
 	"apps/home/show/admin_view",
 	"apps/home/show/off_view",
 	"apps/common/not_found",
@@ -11,7 +11,7 @@ define([
 ], function(
 	app,
 	Marionette,
-	LoadingView,
+	AlertView,
 	AdminView,
 	OffView,
 	NotFound,
@@ -48,11 +48,7 @@ define([
 		},
 
 		showEleveHome: function(){
-			var loadingView = new LoadingView({
-				title: "Affichage de l'accueuil",
-				message: "Chargement des données."
-			});
-			app.regions.getRegion('main').show(loadingView);
+			app.trigger("header:loading", true);
 			var layout = new EleveViewLayout();
 
 			var channel = this.getChannel();
@@ -96,8 +92,18 @@ define([
 							layout.getRegion('unfinishedRegion').show(unfinishedMessageView);
 						}
 					});
-
 					app.regions.getRegion('main').show(layout);
+				}).fail(function(response){
+
+					if(response.status == 401){
+						alert("Vous devez vous (re)connecter !");
+						app.trigger("home:logout");
+					} else {
+						var alertView = new AlertView();
+						app.regions.getRegion('main').show(alertView);
+					}
+				}).always(function(){
+					app.trigger("header:loading", false);
 				});
 			});
 		}

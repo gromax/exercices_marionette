@@ -1,7 +1,7 @@
 define(["utils/math", "utils/help"], function(mM, help) {
   return {
     init: function(inputs, options) {
-      var a, aPol, b, coeff, derivee, deriveeForTex, f2a, fa, fct, operands, optA, optD, optE, ref, ref1, ref2, t, x, xmax, xmin;
+      var a, aPol, b, coeff, derivee, deriveeForTex, f2a, fa, fct, operands, optA, optD, optE, p, ref, ref1, ref2, t, x, xmax, xmin;
       optA = Number((ref = options.a.value) != null ? ref : 0);
       optD = Number((ref1 = options.d.value) != null ? ref1 : 0);
       optE = Number((ref2 = options.e.value) != null ? ref2 : 0);
@@ -129,9 +129,14 @@ define(["utils/math", "utils/help"], function(mM, help) {
           x: x,
           decimals: 2
         });
-        t = mM.exec([f2a, "x", x, "-", "*", fa, "+"], {
-          simplify: true,
-          developp: true
+        p = mM.misc.toPrecision(-mM.float(derivee, {
+          x: x
+        }) * x + mM.float(fct, {
+          x: x
+        }), 2);
+        console.log(p);
+        t = mM.exec([f2a, "x", "*", p, "+"], {
+          simplify: true
         });
       } else {
         x = false;
@@ -218,12 +223,28 @@ define(["utils/math", "utils/help"], function(mM, help) {
               type: "input",
               rank: 1,
               waited: "number",
-              tag: "$y=$",
+              tag: "$\\mathcal{T}$",
+              answerPreprocessing: function(userValue) {
+                var pattern, result;
+                pattern = /y\s*=([\s*+-\/0-9a-zA-Z]+)/;
+                result = pattern.exec(userValue);
+                if (result) {
+                  return {
+                    processed: result[1],
+                    error: false
+                  };
+                } else {
+                  return {
+                    processed: userValue,
+                    error: "L'équation doit être de la forme y=..."
+                  };
+                }
+              },
               name: "e",
               description: "Équation de la tangente",
               good: t,
+              goodTex: "y = " + (t.tex()),
               developp: true,
-              cor_prefix: "y=",
               formes: "FRACTION"
             }, {
               type: "validation",
@@ -239,44 +260,83 @@ define(["utils/math", "utils/help"], function(mM, help) {
       }
       return briques;
     },
-    tex: function(data) {
-      var item, ref, ref1;
-      if (!isArray(data)) {
-        data = [data];
-      }
-      if (((ref = data[0]) != null ? (ref1 = ref.options.e) != null ? ref1.value : void 0 : void 0) === 1) {
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, optE, ref, that;
+      optE = Number((ref = options.e.value) != null ? ref : 0);
+      that = this;
+      fct_item = function(inputs, index) {
+        var derivee, deriveeForTex, f2a, fa, fct, ref1, t, x;
+        ref1 = that.init(inputs, options), fct = ref1[0], derivee = ref1[1], deriveeForTex = ref1[2], x = ref1[3], fa = ref1[4], f2a = ref1[5], t = ref1[6];
+        if (optE === 1) {
+          return "$f(x) = " + (fct.tex()) + "$ et $a=" + x + "$";
+        } else {
+          return "$f(x) = " + (fct.tex()) + "$";
+        }
+      };
+      if (optE === 1) {
         return {
-          title: this.title,
-          content: Handlebars.templates["tex_enumerate"]({
-            pre: "Dans tous les cas, déterminer l'expression de $f'(x)$ ; calulez $f(a)$ et $f'(a)$ à $0,01$ près ; déterminez la tangente à $\\mathcal{C}_f$ à l'abscisse $a$.",
-            items: (function() {
-              var i, len, results;
-              results = [];
-              for (i = 0, len = data.length; i < len; i++) {
-                item = data[i];
-                results.push("$x \\mapsto " + item.fct + "$ et $a=" + item.inputs.x + "$");
-              }
-              return results;
-            })(),
-            large: false
-          })
+          children: [
+            {
+              type: "text",
+              children: ["Dans tous les cas, déterminer l'expression de $f'(x)$ ; calulez $f(a)$ et $f'(a)$ à $0,01$ près ; déterminez la tangente à $\\mathcal{C}_f$ à l'abscisse $a$."]
+            }, {
+              type: "enumerate",
+              refresh: true,
+              enumi: "1",
+              children: _.map(inputs_list, fct_item)
+            }
+          ]
         };
       } else {
         return {
-          title: this.title,
-          content: Handlebars.templates["tex_enumerate"]({
-            pre: "Donnez les dérivées des fonctions suivantes :",
-            items: (function() {
-              var i, len, results;
-              results = [];
-              for (i = 0, len = data.length; i < len; i++) {
-                item = data[i];
-                results.push("$x \\mapsto " + item.fct + "$");
-              }
-              return results;
-            })(),
-            large: false
-          })
+          children: [
+            {
+              type: "text",
+              children: ["Dans tous les cas, déterminer l'expression de $f'(x)$."]
+            }, {
+              type: "enumerate",
+              refresh: true,
+              enumi: "1",
+              children: _.map(inputs_list, fct_item)
+            }
+          ]
+        };
+      }
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, optE, ref, that;
+      optE = Number((ref = options.e.value) != null ? ref : 0);
+      that = this;
+      fct_item = function(inputs, index) {
+        var derivee, deriveeForTex, f2a, fa, fct, ref1, t, x;
+        ref1 = that.init(inputs, options), fct = ref1[0], derivee = ref1[1], deriveeForTex = ref1[2], x = ref1[3], fa = ref1[4], f2a = ref1[5], t = ref1[6];
+        if (optE === 1) {
+          return "$f(x) = " + (fct.tex()) + "$ et $a=" + x + "$";
+        } else {
+          return "$f(x) = " + (fct.tex()) + "$";
+        }
+      };
+      if (optE === 1) {
+        return {
+          children: [
+            "Dans tous les cas, déterminer l'expression de $f'(x)$ ; calulez $f(a)$ et $f'(a)$ à $0,01$ près ; déterminez la tangente à $\\mathcal{C}_f$ à l'abscisse $a$.", {
+              type: "enumerate",
+              refresh: true,
+              enumi: "1",
+              children: _.map(inputs_list, fct_item)
+            }
+          ]
+        };
+      } else {
+        return {
+          children: [
+            "Dans tous les cas, déterminer l'expression de $f'(x)$.", {
+              type: "enumerate",
+              refresh: true,
+              enumi: "1",
+              children: _.map(inputs_list, fct_item)
+            }
+          ]
         };
       }
     }

@@ -129,15 +129,20 @@ define(["utils/math", "utils/help"], function(mM, help) {
                 return out;
               },
               verification: function(answers_data) {
-                var d, dmax, i, len, messages, note, p, ref1, x, y;
+                var d, dmax, i, len, messages, note, p, ref1, u, x, y;
                 dmax = .2;
                 messages = [];
                 note = 0;
+                u = {};
                 ref1 = ["A", "B", "C"];
                 for (i = 0, len = ref1.length; i < len; i++) {
                   p = ref1[i];
                   x = Number(answers_data["x" + p]);
                   y = Number(answers_data["y" + p]);
+                  u[p] = {
+                    x: x,
+                    y: y
+                  };
                   if (droite.float_y(x) > 0) {
                     d = droite.float_distance(x, y);
                   } else {
@@ -174,7 +179,9 @@ define(["utils/math", "utils/help"], function(mM, help) {
                     for (j = 0, len1 = ref2.length; j < len1; j++) {
                       pt = ref2[j];
                       pt.setAttribute({
-                        fixed: true
+                        fixed: true,
+                        x: u[pt.name].x,
+                        y: u[pt.name].y
                       });
                     }
                     y1 = Math.abs(droite.float_y(-max));
@@ -209,6 +216,47 @@ define(["utils/math", "utils/help"], function(mM, help) {
           ]
         }
       ];
+    },
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var A, B, droite, namef, ref;
+        ref = that.init(inputs, options), A = ref[0], B = ref[1], droite = ref[2];
+        namef = "f_" + index;
+        return "$" + namef + ":x\\mapsto\\left|" + (droite.reduiteObject().tex()) + "\\right|$";
+      };
+      return {
+        children: [
+          {
+            type: "text",
+            children: ["Tracez les courbes des fonctions suivantes."]
+          }, {
+            type: "enumerate",
+            refresh: true,
+            enumi: "1",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var A, B, droite, namef, ref;
+        ref = that.init(inputs, options), A = ref[0], B = ref[1], droite = ref[2];
+        namef = "f_" + index;
+        return "$" + namef + ":x\\mapsto\\left|" + (droite.reduiteObject().tex()) + "\\right|$";
+      };
+      return {
+        children: [
+          "Tracez les courbes des fonctions suivantes.", {
+            type: "enumerate",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
     }
   };
 });

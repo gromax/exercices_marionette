@@ -3,7 +3,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
     init: function(inputs) {
       var N, expression, values;
       if (inputs.e != null) {
-        return expression = mM.parse(inputs.e, {
+        expression = mM.parse(inputs.e, {
           simplify: false
         });
       } else {
@@ -26,8 +26,9 @@ define(["utils/math", "utils/help"], function(mM, help) {
           }
         }
         expression = mM.exec(values);
-        return inputs.e = String(expression);
+        inputs.e = String(expression);
       }
+      return expression;
     },
     getBriques: function(inputs, options) {
       var expression;
@@ -56,6 +57,46 @@ define(["utils/math", "utils/help"], function(mM, help) {
           ]
         }
       ];
+    },
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var expression;
+        expression = that.init(inputs, options);
+        return "$" + (expression.tex()) + "$";
+      };
+      return {
+        children: [
+          {
+            type: "text",
+            children: ["Donnez les expressions sous forme d'une fraction réduite."]
+          }, {
+            type: "enumerate",
+            enumi: "1",
+            refresh: true,
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var expression;
+        expression = that.init(inputs, options);
+        return "$" + (expression.tex()) + "$";
+      };
+      return {
+        children: [
+          "Donnez les expressions sous forme d'une fraction réduite.", {
+            type: "enumerate",
+            enumi: "1)",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
     }
   };
 });

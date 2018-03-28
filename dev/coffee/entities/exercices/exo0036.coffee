@@ -4,6 +4,8 @@ define ["utils/math"], (mM) ->
 	# description:"Placer sur le cercle trigonométrique le point correspondant à une mesure donnée en radians."
 	# keyWords:["Trigonométrie", "Première", "Radians", "Seconde"]
 
+	# debug : tex à améliorer
+
 	return {
 		init: (inputs) ->
 			if inputs.deg? then deg = mM.toNumber inputs.deg
@@ -103,4 +105,41 @@ define ["utils/math"], (mM) ->
 				}
 			]
 
+		getExamBriques: (inputs_list,options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[deg, ang] = that.init(inputs,options)
+				return "$#{ang.tex()}$"
+
+			return {
+				children: [
+					{
+						type: "text",
+						children: [
+							"Placez sur un cercle trigonométrique les points dont les mesures sont données en radians :"
+						]
+					}
+					{
+						type: "enumerate",
+						refresh:true
+						enumi:"1",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+		getTex: (inputs_list, options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[deg, ang] = that.init(inputs,options)
+				return "$#{ang.tex()}$"
+			return {
+				children: [
+					"Placez sur un cercle trigonométrique les points dont les mesures sont données en radians :"
+					{
+						type: "enumerate",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
 	}
