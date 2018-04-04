@@ -310,7 +310,7 @@
 			for borne in @_liste
 				if borneOpen is null
 					borneOpen = borne
-					if borne.type then str = "\\left["+borne.value.tex()+";"
+					if borne.type then str = "\\left[#{borne.value.tex()};"
 					else str = "\\left]#{borne.value.tex()};"
 				else
 					# Fermeture de l'intervalle (qui peut être un singleton)

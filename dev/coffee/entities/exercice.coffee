@@ -503,8 +503,8 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 					when "exo0052" then require ["entities/exercices/exo0052"], successCB, failedCB
 					when "exo0053" then require ["entities/exercices/exo0053"], successCB, failedCB
 					when "exo0054" then require ["entities/exercices/exo0054"], successCB, failedCB
-					#when "exo0055" then require ["entities/exercices/exo0055"], successCB, failedCB
-					#when "exo0056" then require ["entities/exercices/exo0056"], successCB, failedCB
+					when "exo0055" then require ["entities/exercices/exo0055"], successCB, failedCB
+					when "exo0056" then require ["entities/exercices/exo0056"], successCB, failedCB
 					#when "exo0057" then require ["entities/exercices/exo0057"], successCB, failedCB
 					#when "exo0058" then require ["entities/exercices/exo0058"], successCB, failedCB
 					#when "exo0059" then require ["entities/exercices/exo0059"], successCB, failedCB

@@ -10,9 +10,9 @@ define ["utils/math","utils/help"], (mM, help) ->
 			else n = Number inputs.n
 			if (typeof inputs.p is "undefined") then p = inputs.p = mM.alea.real({min:1, max:19})
 			else p = Number inputs.p
+			{Xlow,Xhigh} = mM.intervalle_fluctuation.binomial(n,p/100)
 			if (typeof inputs.nf is "undefined") then nf = inputs.nf = Math.min Xhigh+mM.alea.real({min:-2, max:2}), n
 			else nf = Number inputs.nf
-			{Xlow,Xhigh} = mM.intervalle_fluctuation.binomial(n,p/100)
 			# Tableau pour l'étape 2
 			Xdeb = Math.max(Xlow-mM.alea.real({min:1, max:3}),0)
 			Xfin = Math.min(Xlow+mM.alea.real({min:1, max:3}),Xhigh)
@@ -20,10 +20,10 @@ define ["utils/math","utils/help"], (mM, help) ->
 			Xfin2 = Math.min(Xhigh+mM.alea.real({min:1, max:3}),n)
 			if Xdeb2<=Xfin then k_values = [Xdeb..Xfin2]
 			else k_values = [Xdeb..Xfin].concat [Xdeb2..Xfin2]
-			p_values = ( numToStr( mM.repartition.binomial(n,p/100,k),3 ) for k in k_values)
+			p_values = ( mM.misc.numToStr( mM.repartition.binomial(n,p/100,k),3 ) for k in k_values)
 			flow=Xlow/n
 			fhigh=Xhigh/n
-			IF = mM.ensemble.intervalle "[", fixNumber(flow,2), fixNumber(fhigh,2), "]"
+			IF = mM.ensemble.intervalle "[", mM.misc.toPrecision(flow,2), mM.misc.toPrecision(fhigh,2), "]"
 
 			[
 				p
@@ -48,8 +48,8 @@ define ["utils/math","utils/help"], (mM, help) ->
 							rank: 1
 							ps:[
 								"Une usine fabrique des tuyaux en caoutchouc."
-								"Le fabriquant affirme que #{p} % des tuyaux sont poreux. On prélève #{n} tuyaux dans la production."
-								"On obtient #{nf} tuyaux poreux."
+								"Le fabriquant affirme que #{p} % des tuyaux sont poreux."
+								"On prélève #{n} tuyaux dans la production."
 								"Donnez les résultats des calculs suivants :"
 							]
 						}
@@ -68,7 +68,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 							rank: 3
 							tag:"$\\sigma(X)$"
 							name:"std"
-							description:"Écart-type à 0,001 près"
+							description:"Écart-type à 0,01 près"
 							good:Math.sqrt(n*p*(100-p))/100
 							waited:"number"
 							arrondi:-2
@@ -222,15 +222,10 @@ define ["utils/math","utils/help"], (mM, help) ->
 				[p, n, nf, Xlow, Xhigh, k_values, p_values, IF] = @init(inputs_list[0], options)
 				return {
 					children: [
-						{
-							type:"text"
-							ps: [
-								"Une usine fabrique des tuyaux en caoutchouc."
-								"Le fabriquant affirme que #{p} \\% des tuyaux sont poreux."
-								"On prélève #{n} tuyaux dans la production."
-								"Soit $X$ le nombre de tuyau poreux dans un tel échantillon."
-							]
-						}
+						"Une usine fabrique des tuyaux en caoutchouc."
+						"Le fabriquant affirme que #{p} \\% des tuyaux sont poreux."
+						"On prélève #{n} tuyaux dans la production."
+						"Soit $X$ le nombre de tuyau poreux dans un tel échantillon."
 						{
 							type:"tableau"
 							lignes: [
@@ -268,17 +263,12 @@ define ["utils/math","utils/help"], (mM, help) ->
 
 				return {
 					children: [
-						{
-							type:"text"
-							ps: [
-								"Une usine fabrique des tuyaux en caoutchouc."
-								"Le fabriquant affirme que $p\\,\\%$ des tuyaux sont poreux."
-								"On prélève $n$ tuyaux dans la production."
-								"On obtient $k$ tuyaux poreux."
-								"Soit $X$ le nombre de tuyau poreux dans un tel échantillon."
-								"Pour les différentes valeurs de $p$, $n$ et $k$, déterminez :"
-							]
-						}
+						"Une usine fabrique des tuyaux en caoutchouc."
+						"Le fabriquant affirme que $p\\,\\%$ des tuyaux sont poreux."
+						"On prélève $n$ tuyaux dans la production."
+						"On obtient $k$ tuyaux poreux."
+						"Soit $X$ le nombre de tuyau poreux dans un tel échantillon."
+						"Pour les différentes valeurs de $p$, $n$ et $k$, déterminez :"
 						{
 							type: "enumerate"
 							enumi: "a"

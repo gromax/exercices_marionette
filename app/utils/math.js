@@ -5718,7 +5718,7 @@
           if (borneOpen === null) {
             borneOpen = borne;
             if (borne.type) {
-              str = "\\left[" + borne.value.tex() + ";";
+              str = "\\left[" + (borne.value.tex()) + ";";
             } else {
               str = "\\left]" + (borne.value.tex()) + ";";
             }
@@ -6774,12 +6774,13 @@
       };
 
       Polynome.prototype.tex = function(config) {
-        var a, aa, b, c, canonique, cs, cs0, len, monome, options, output, ref, xS, yS;
+        var a, aa, b, c, canonique, cs, cs0, len, monome, options, output, ref, variable, xS, yS;
         options = mergeObj({
           tex: true,
           canonique: false
         }, config);
         canonique = (options.canonique === true) && (this.degre() === 2);
+        variable = options.variable || this._variable;
         switch (false) {
           case !canonique:
             a = this.getCoeff(2);
@@ -6789,7 +6790,7 @@
             yS = this.calc(xS);
             if (!xS.isNul()) {
               cs = xS.compositeString(options);
-              output = "\\left(" + this._variable;
+              output = "\\left(" + variable;
               if (cs[1]) {
                 output = output + "-";
               } else {
@@ -6797,7 +6798,7 @@
               }
               output = output + cs[0] + "\\right)^2";
             } else {
-              output = this._variable + "^2";
+              output = variable + "^2";
             }
             cs = a.compositeString(options);
             if (cs[0] !== "1") {
@@ -6839,7 +6840,8 @@
       };
 
       Polynome.prototype.monomeToTex = function(monome, options) {
-        var cs, output;
+        var cs, output, variable;
+        variable = options.variable || this._variable;
         cs = monome.coeff.compositeString(options);
         if (cs[1]) {
           output = "";
@@ -6856,7 +6858,7 @@
           output = output + "1";
         }
         if (monome.power > 0) {
-          output = output + this._variable;
+          output = output + variable;
         }
         if (monome.power > 1) {
           output = output + "^{" + monome.power + "}";
@@ -9922,8 +9924,7 @@
           ok = goodObject.isEqual(userInfo.object, config.tolerance);
           return {
             note: ok ? 1 : 0,
-            ok: ok,
-            formeOk: true
+            errors: ["La bonne réponse était &nbsp; $" + (goodObject.tex()) + "$"]
           };
         },
         equation: function(userInfo, goodObject, params) {

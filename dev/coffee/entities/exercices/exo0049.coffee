@@ -75,7 +75,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 					{
 						type: "text",
 						children: [
-							"Pour chachune des fonctions suivantes, donnez l'expression générale d'une primitive."
+							"Pour chacune des fonctions suivantes, donnez l'expression générale d'une primitive."
 						]
 					}
 					{
@@ -95,7 +95,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 
 			return {
 				children: [
-							"Pour chachune des fonctions suivantes, donnez l'expression générale d'une primitive."
+					"Pour chacune des fonctions suivantes, donnez l'expression générale d'une primitive."
 					{
 						type: "enumerate",
 						children: _.map(inputs_list, fct_item)

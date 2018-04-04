@@ -600,10 +600,10 @@
 				}, params
 
 				ok = goodObject.isEqual(userInfo.object,config.tolerance)
+
 				{
 					note: if ok then 1 else 0
-					ok: ok								# ok = true -> la réponse s'affiche en vert avec éventuellement une remarque
-					formeOk : true						# La forme est ok par défaut. Pas vérifiée pour ensemble
+					errors: ["La bonne réponse était &nbsp; $#{goodObject.tex()}$"]
 				}
 			equation: (userInfo,goodObject,params) ->
 				# fonction de vérification des exercices pour les equation

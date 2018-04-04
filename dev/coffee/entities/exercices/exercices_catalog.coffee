@@ -487,6 +487,22 @@ define [], () ->
 					a:{ tag:"second membre" , options:["u' exp(-b/a.t)+Y", "u' exp(-b/a.t)", "Y", "u' exp(-b/a.t) OU Y"]}
 				}
 			}
+			{
+				id:55
+				filename: "exo0055"
+				title:"Calculer une intégrale"
+				description:"Calculer l'intégrale d'une fonction polynôme."
+				keyWords:["Analyse", "fonction", "Primitive", "Intégrale", "Terminale"]
+				options: {}
+			}
+			{
+				id:56
+				filename: "exo0056"
+				title:"Intervalle de fluctuation asymptotique"
+				description:"Dans le cadre de l'approximation d'une loi Binomiale par une loi Normale, calculer un intervalle de fluctuation asymptotique et prendre une décision."
+				keyWords:["probabilités","binomiale","normale", "Intervalle de fluctuation","TSTL"]
+				options: {}
+			}
 		]
 		get: (id) ->
 			idExo = Number id

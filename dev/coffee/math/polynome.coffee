@@ -142,6 +142,7 @@
 		tex: (config) ->
 			options = mergeObj { tex:true, canonique:false }, config
 			canonique = (options.canonique is true) and (@degre() is 2)
+			variable = options.variable or @_variable
 			switch
 				when canonique
 					a = @getCoeff(2)
@@ -151,12 +152,12 @@
 					yS = @calc(xS)
 					if not xS.isNul()
 						cs = xS.compositeString options
-						output = "\\left("+@_variable
+						output = "\\left("+variable
 						# inversion du signe devant le xS
 						if cs[1] then output = output + "-"
 						else output = output + "+"
 						output = output+ cs[0] + "\\right)^2"
-					else output = @_variable+"^2"
+					else output = variable+"^2"
 					cs = a.compositeString options
 					if cs[0] isnt "1" then output = cs[0]+output
 					if not cs[1] then output = "-"+output
@@ -176,6 +177,7 @@
 						output = output+cs[0]
 			output
 		monomeToTex : (monome,options) ->
+			variable = options.variable or @_variable
 			cs = monome.coeff.compositeString options
 			if cs[1] then output = ""
 			else output = "-"
@@ -183,7 +185,7 @@
 				output = output+cs[0]
 				if cs[2] and (monome.power>0) then output = "\\left("+output+"\\right)"
 			if (monome.power is 0) and (cs[0] is "1") then output = output+"1"
-			if monome.power >0 then output = output+@_variable
+			if monome.power >0 then output = output+variable
 			if monome.power >1 then output = output+"^{"+monome.power+"}"
 			[output,cs[1]]
 		simplify: () ->

@@ -18,6 +18,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
       } else {
         p = Number(inputs.p);
       }
+      ref = mM.intervalle_fluctuation.binomial(n, p / 100), Xlow = ref.Xlow, Xhigh = ref.Xhigh;
       if (typeof inputs.nf === "undefined") {
         nf = inputs.nf = Math.min(Xhigh + mM.alea.real({
           min: -2,
@@ -26,7 +27,6 @@ define(["utils/math", "utils/help"], function(mM, help) {
       } else {
         nf = Number(inputs.nf);
       }
-      ref = mM.intervalle_fluctuation.binomial(n, p / 100), Xlow = ref.Xlow, Xhigh = ref.Xhigh;
       Xdeb = Math.max(Xlow - mM.alea.real({
         min: 1,
         max: 3
@@ -65,13 +65,13 @@ define(["utils/math", "utils/help"], function(mM, help) {
         results3 = [];
         for (m = 0, len = k_values.length; m < len; m++) {
           k = k_values[m];
-          results3.push(numToStr(mM.repartition.binomial(n, p / 100, k), 3));
+          results3.push(mM.misc.numToStr(mM.repartition.binomial(n, p / 100, k), 3));
         }
         return results3;
       })();
       flow = Xlow / n;
       fhigh = Xhigh / n;
-      IF = mM.ensemble.intervalle("[", fixNumber(flow, 2), fixNumber(fhigh, 2), "]");
+      IF = mM.ensemble.intervalle("[", mM.misc.toPrecision(flow, 2), mM.misc.toPrecision(fhigh, 2), "]");
       return [p, n, nf, Xlow, Xhigh, k_values, p_values, IF];
     },
     getBriques: function(inputs, options) {
@@ -84,7 +84,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
             {
               type: "text",
               rank: 1,
-              ps: ["Une usine fabrique des tuyaux en caoutchouc.", "Le fabriquant affirme que " + p + " % des tuyaux sont poreux. On prélève " + n + " tuyaux dans la production.", "On obtient " + nf + " tuyaux poreux.", "Donnez les résultats des calculs suivants :"]
+              ps: ["Une usine fabrique des tuyaux en caoutchouc.", "Le fabriquant affirme que " + p + " % des tuyaux sont poreux.", "On prélève " + n + " tuyaux dans la production.", "Donnez les résultats des calculs suivants :"]
             }, {
               type: "input",
               rank: 2,
@@ -99,7 +99,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
               rank: 3,
               tag: "$\\sigma(X)$",
               name: "std",
-              description: "Écart-type à 0,001 près",
+              description: "Écart-type à 0,01 près",
               good: Math.sqrt(n * p * (100 - p)) / 100,
               waited: "number",
               arrondi: -2
@@ -203,10 +203,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
         ref = this.init(inputs_list[0], options), p = ref[0], n = ref[1], nf = ref[2], Xlow = ref[3], Xhigh = ref[4], k_values = ref[5], p_values = ref[6], IF = ref[7];
         return {
           children: [
-            {
-              type: "text",
-              ps: ["Une usine fabrique des tuyaux en caoutchouc.", "Le fabriquant affirme que " + p + " \\% des tuyaux sont poreux.", "On prélève " + n + " tuyaux dans la production.", "Soit $X$ le nombre de tuyau poreux dans un tel échantillon."]
-            }, {
+            "Une usine fabrique des tuyaux en caoutchouc.", "Le fabriquant affirme que " + p + " \\% des tuyaux sont poreux.", "On prélève " + n + " tuyaux dans la production.", "Soit $X$ le nombre de tuyau poreux dans un tel échantillon.", {
               type: "tableau",
               lignes: [_.flatten(["$k$", k_values]), _.flatten(["$p(X\\leqslant k)$", p_values])]
             }, {
@@ -230,10 +227,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
         };
         return {
           children: [
-            {
-              type: "text",
-              ps: ["Une usine fabrique des tuyaux en caoutchouc.", "Le fabriquant affirme que $p\\,\\%$ des tuyaux sont poreux.", "On prélève $n$ tuyaux dans la production.", "On obtient $k$ tuyaux poreux.", "Soit $X$ le nombre de tuyau poreux dans un tel échantillon.", "Pour les différentes valeurs de $p$, $n$ et $k$, déterminez :"]
-            }, {
+            "Une usine fabrique des tuyaux en caoutchouc.", "Le fabriquant affirme que $p\\,\\%$ des tuyaux sont poreux.", "On prélève $n$ tuyaux dans la production.", "On obtient $k$ tuyaux poreux.", "Soit $X$ le nombre de tuyau poreux dans un tel échantillon.", "Pour les différentes valeurs de $p$, $n$ et $k$, déterminez :", {
               type: "enumerate",
               enumi: "a",
               children: ["L'espérance $E(X)$ et l'écart-type $\\sigma(X)$", "L'intervalle de fluctuation au seuil de 95 \\%", "Considérant la valeur de $k$, l'affirmation doit-elle être acceptée/rejetée ?"]
