@@ -16,6 +16,7 @@ define(["marionette","jquery-ui","bootstrap"], function(Marionette){
 			regions: {
 				header: "#header-region",
 				ariane: "#ariane-region",
+				message: "#message-region",
 				main: "#main-region",
 				dialog: "#dialog-region"
 			}

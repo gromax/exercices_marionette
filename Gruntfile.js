@@ -3,6 +3,14 @@ module.exports = function(grunt) {
 
   //Initializing the configuration object
   grunt.initConfig({
+    uglify: {
+      main: {
+        files: {
+          'dist/main.min.js': 'dist/main.js',
+        }
+      }
+    },
+
     jst: {
       compile: {
         options: {
@@ -15,7 +23,7 @@ module.exports = function(grunt) {
           }
         },
         files: {
-          "dist/templates.underscore.js": ["dev/templates/**/*.tpl"]
+          "app/templates.underscore.js": ["dev/templates/**/*.tpl"]
         }
       }
     },
@@ -102,6 +110,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-jst');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
+
   // Task definition
   grunt.registerTask('default', ['watch']);
 };

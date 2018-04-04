@@ -272,21 +272,21 @@ define([], function() {
       }, {
         id: 33,
         filename: "exo0033",
-        title: "Équation modulo &nbsp; $2\\pi$",
+        title: "Équation modulo $2\\pi$",
         description: "Résoudre une équation portant sur des mesures angulaires en radians, avec un terme $2k\\pi$.",
         keyWords: ["Trigonométrie", "Algèbre", "Équation", "Première"],
         options: {}
       }, {
         id: 34,
         filename: "exo0034",
-        title: "Équation de type &nbsp; $\\cos x = \\cos \\alpha$",
+        title: "Équation de type $\\cos x = \\cos \\alpha$",
         description: "Résoudre une équation de la forme $\\cos x = \\cos \\alpha$ $\\sin x = \\sin \\alpha$.",
         keyWords: ["Trigonométrie", "Algèbre", "Équation", "Première"],
         options: {}
       }, {
         id: 35,
         filename: "exo0035",
-        title: "Équation de type &nbsp; $\\cos (a\\cdot x+b) = \\cos \\alpha$",
+        title: "Équation de type $\\cos (a\\cdot x+b) = \\cos \\alpha$",
         description: "Résoudre une équation de la forme $\\cos x = \\cos \\alpha$ $\\sin x = \\sin \\alpha$.",
         keyWords: ["Trigonométrie", "Algèbre", "Équation", "Première"],
         options: {}

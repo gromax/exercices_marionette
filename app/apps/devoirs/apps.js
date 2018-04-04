@@ -198,7 +198,7 @@ define(["marionette","app"], function(Marionette,app){
 			todo();
 		},
 
-		showExercicesFaits(idUF, idEF){
+		showExercicesFaits:function(idUF, idEF){
 			var auth = app.Auth;
 			var forProf = function(){
 				if (!idUF){
@@ -225,7 +225,7 @@ define(["marionette","app"], function(Marionette,app){
 			todo();
 		},
 
-		showUnfinished(idU){
+		showUnfinished:function(idU){
 			var auth = app.Auth;
 			var forEleve = function(){
 				app.Ariane.reset([{ text:"Exercices à terminer", e:"faits:unfinished", link:"exercices/a-finir"}]);

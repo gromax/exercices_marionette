@@ -40,8 +40,9 @@ define([
 						var idUser = userfiche.get("idUser");
 						var user = users.get(idUser);
 						app.Ariane.add([
-							{ text:"Devoir #"+idFiche, e:"devoir:showUserfiches", data:idFiche, link:"devoir:"+idFiche+"/fiches-eleves"},
-							{ text:user.get("nomComplet")+" #"+idUF, e:"devoirs:fiche-eleve:show", data:idUF, link:"devoir-eleve:"+idUF },
+							{ text:"Devoir #"+idFiche, e:"devoir:show", data:idFiche, link:"devoir:"+idFiche},
+							{ text:"Fiches élèves", e:"devoir:showUserfiches", data:idFiche, link:"devoir:"+idFiche+"/fiches-eleves"},
+							{ text:user.get("nomComplet")+" #"+idUF, e:"devoirs:fiche-eleve:show", data:idUF, link:"devoirs/fiche-eleve:"+idUF },
 							{ text:"Exercice "+(index+1) },
 						]);
 
@@ -102,6 +103,7 @@ define([
 						var userfiche = userfiches.get(idUF);
 						var exofiche = exofiches.get(idEF);
 						if((userfiche !== undefined) && (exofiche !== undefined)){
+
 							okDisplay = true;
 							filter = function(child, index, collection){
 								return (child.get("aUF") == idUF) && (child.get("aEF") == idEF);

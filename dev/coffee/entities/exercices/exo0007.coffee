@@ -4,8 +4,6 @@ define ["utils/math","utils/help"], (mM, help) ->
 	# description:"Un tableau de valeur d'une fonction est donné. Il faut déterminer une image et un antécédent."
 	# keyWords:["Fonctions","Antécédent","Image","Seconde"]
 
-	# debug : tex à faire
-
 	return {
 		m: -7
 		M: 7
@@ -50,7 +48,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 			]
 
 		getBriques: (inputs, options) ->
-			[xi, yi, xa, ya, tabx, taby, antecedents]
+			[xi, yi, xa, ya, tabx, taby, antecedents] = @init(inputs)
 			tabx.unshift("$x$")
 			taby.unshift("$f(x)$")
 
@@ -120,4 +118,95 @@ define ["utils/math","utils/help"], (mM, help) ->
 					]
 				}
 			]
+
+		getExamBriques: (inputs_list,options) ->
+			xlow = @m
+			xhigh = @M
+			that = @
+			fct_item = (inputs, index) ->
+				[xi, yi, xa, ya, tabx, taby, antecedents] = that.init(inputs)
+				tabx.unshift("$x$")
+				taby.unshift("$f(x)$")
+				return {
+					children: [
+						{
+							type: "text"
+							children:[
+								"On considère la fonction &nbsp; $f$ &nbsp; défnie sur l'intervalle &nbsp; $[#{xlow};#{xhigh}]$."
+								"On donne le tableau de valeur suivant :"
+							]
+						}
+						{
+							type:"tableau"
+							lignes: [
+								tabx
+								taby
+							]
+						}
+						{
+							type: "enumerate"
+							enumi:"1"
+							children: [
+								"Donnez l'image de #{xi} par &nbsp; $f$"
+								"Donnez un antécédent de #{ya} par &nbsp; $f$"
+							]
+						}
+					]
+				}
+
+			return {
+				children: [
+					{
+						type: "subtitles"
+						enumi: "A"
+						refresh:true
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+		getTex: (inputs_list, options) ->
+			xlow = @m
+			xhigh = @M
+			that = @
+			fct_item = (inputs, index) ->
+				[xi, yi, xa, ya, tabx, taby, antecedents] = that.init(inputs)
+				tabx.unshift("$x$")
+				taby.unshift("$f(x)$")
+				return [
+					"On considère la fonction $f$ défnie sur l'intervalle $[#{xlow};#{xhigh}]$."
+					"On donne le tableau de valeur suivant :"
+					{
+						type:"tableau"
+						setup: "|*{ #{tabx.length} }{c|}"
+						lignes: [
+							tabx
+							taby
+						]
+					}
+					{
+						type: "enumerate",
+						children: [
+							"Donnez l'image de #{xi} par $f$"
+							"Donnez un antécédent de #{ya} par $f$"
+						]
+					}
+				]
+
+
+			if inputs_list.length is 1
+				return fct_item(inputs_list[0],0)
+			else
+				return {
+					children: [
+						{
+							type: "enumerate"
+							enumi: "A"
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
+
+
+
 	}

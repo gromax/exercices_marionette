@@ -141,6 +141,7 @@ define([
 								view.triggerMethod("form:data:invalid", { pwdConfirm:"Les mots de passe sont différents."});
 							} else {
 								var updatingUser = model.save(_.omit(data,"pwdConfirm"));
+								app.trigger("header:loading", true);
 								if(updatingUser){
 									$.when(updatingUser).done(function(){
 										// Supprimer pwd de user
@@ -172,7 +173,18 @@ define([
 					});
 
 					usersListView.on("item:delete", function(childView,e){
-						childView.remove();
+						var model = childView.model;
+						var idUser = model.get("id");
+						var destroyRequest = model.destroy();
+						app.trigger("header:loading", true);
+						$.when(destroyRequest).done(function(){
+							childView.remove();
+							channel.request("user:destroy:update", idUser);
+						}).fail(function(response){
+							alert("Erreur. Essayez à nouveau !");
+						}).always(function(){
+							app.trigger("header:loading", false);
+						});
 					});
 
 					app.regions.getRegion('main').show(usersListLayout);

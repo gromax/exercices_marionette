@@ -11,13 +11,12 @@ requirejs.config({
 		marionette: "../vendor/backbone.marionette/lib/backbone.marionette",
 		spin: "../vendor/spin",
 		"spin.jquery": "../vendor/spin.jquery",
-		text: "../vendor/requirejs-text/text",
-		tpl : "../vendor/requirejs-underscore-tpl/underscore-tpl",
 		underscore: "../vendor/underscore/underscore",
 		md5: "../vendor/md5/src/md5",
-		popper:"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min",
+		//popper:"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min",
+		popper:"../vendor/popper.js/dist/umd/popper.min",
 		bootstrap:"../vendor/bootstrap/dist/js/bootstrap",
-		jst:"../dist/templates.underscore",
+		jst:"../app/templates.underscore",
 		mathjax: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML",
 		jsxgraph: "https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.6/jsxgraphcore",
 	},
@@ -42,7 +41,6 @@ requirejs.config({
 		bootstrap: ["jquery", "popper"],
 		"jquery-ui": ["jquery"], // il faut bootstrap avant jquery-ui
 		"spin.jquery": ["spin", "jquery"],
-		tpl: ["text"],
 		mathjax: {
 			exports: "MathJax",
 			init: function () {

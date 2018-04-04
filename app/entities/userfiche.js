@@ -33,9 +33,9 @@ define([], function(){
 			var exercices_coeff={}
 			if (aEFsCollec) {
 				var models = aEFsCollec.models;
-				for (item of models){
+				_.each(models, function(item){
 					exercices_coeff[item.get("id")] = { coeff:item.get("coeff"), num:item.get("num") };
-				}
+				});
 			}
 			return exercices_coeff;
 		},

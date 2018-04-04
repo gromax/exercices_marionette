@@ -10,11 +10,11 @@ define(["jst","marionette"], function(JST,Marionette){
 			"click a.js-exams": "tab:exams",
 		},
 
-		serializeData(){
+		serializeData:function(){
 			return { panel:this.options.panel };
 		},
 
-		setPanel(panel){
+		setPanel:function(panel){
 			this.options.panel = panel;
 			this.render();
 		},

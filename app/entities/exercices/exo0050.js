@@ -1,15 +1,16 @@
 define(["utils/math", "utils/help"], function(mM, help) {
   return {
     init: function(inputs, options) {
-      var A, N, _a, _b, a, b, calculInterpolation, chgTex, cv, ecart, i, j, max, min, r, ref, ref1, ref2, results, serie_x, serie_y, serie_z, table_x, table_y, tables, x, y;
+      var A, N, _a, _b, a, b, calculInterpolation, changementVariable, chgTex, cv, ecart, i, j, max, min, r, ref, ref1, ref2, ref3, results, serie_x, serie_y, serie_z, table_x, table_y, tables, x, y;
       calculInterpolation = Number((ref = options.c.value) != null ? ref : 0) === 1;
+      changementVariable = Number((ref1 = options.b.value) != null ? ref1 : 0) === 1;
       if (typeof inputs.cv !== "undefined") {
         cv = Number(inputs.cv);
       } else {
-        if (options.b.value === 0) {
-          cv = inputs.cv = 0;
+        if (changementVariable(cv = inputs.cv = mM.alea.real([1, 2, 3]))) {
+
         } else {
-          cv = inputs.cv = mM.alea.real([1, 2, 3]);
+          cv = inputs.cv = 0;
         }
       }
       if (typeof inputs.table === "undefined") {
@@ -21,9 +22,9 @@ define(["utils/math", "utils/help"], function(mM, help) {
         min = mM.alea.real([0, 1, 2, 3, 4, 5]) * ecart;
         max = (N - 1) * ecart + min;
         table_x = (function() {
-          var j, ref1, results;
+          var j, ref2, results;
           results = [];
-          for (i = j = 0, ref1 = N; 0 <= ref1 ? j <= ref1 : j >= ref1; i = 0 <= ref1 ? ++j : --j) {
+          for (i = j = 0, ref2 = N; 0 <= ref2 ? j <= ref2 : j >= ref2; i = 0 <= ref2 ? ++j : --j) {
             results.push(i * ecart + min);
           }
           return results;
@@ -125,12 +126,12 @@ define(["utils/math", "utils/help"], function(mM, help) {
           serie_z = serie_y;
           chgTex = false;
       }
-      ref1 = serie_x.ajustement(serie_z, 3), a = ref1.a, b = ref1.b, r = ref1.r;
+      ref2 = serie_x.ajustement(serie_z, 3), a = ref2.a, b = ref2.b, r = ref2.r;
       if (calculInterpolation) {
         if (typeof inputs.i === "undefined") {
           i = inputs.i = min + Math.floor(ecart * 10 * (mM.alea.real((function() {
             results = [];
-            for (var j = 1, ref2 = N - 2; 1 <= ref2 ? j <= ref2 : j >= ref2; 1 <= ref2 ? j++ : j--){ results.push(j); }
+            for (var j = 1, ref3 = N - 2; 1 <= ref3 ? j <= ref3 : j >= ref3; 1 <= ref3 ? j++ : j--){ results.push(j); }
             return results;
           }).apply(this)) + .2 + Math.random() * .6)) / 10;
         } else {
@@ -231,7 +232,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
           {
             type: "text",
             rank: 1,
-            ps: ["Donnez les coefficients de l'ajustement affine : &nbsp; $" + tagVar + "=ax+b$ &nbsp; à 0,001 près", "Donnez ses coordonnées à 0,01 près"]
+            ps: ["Donnez les coefficients de l'ajustement affine : &nbsp; $" + tagVar + "=ax+b$ &nbsp; à 0,001 près"]
           }, {
             type: "input",
             rank: 2,
@@ -289,65 +290,168 @@ define(["utils/math", "utils/help"], function(mM, help) {
       }
       return briques;
     },
-    tex: function(data) {
-      var A, cv, ennonce, i, itData, its, j, len, out, tables, tagVar, tex_chgt, xs, ys;
-      if (!isArray(data)) {
-        data = [data];
-      }
-      out = [];
-      for (j = 0, len = data.length; j < len; j++) {
-        itData = data[j];
-        cv = Number(itData.inputs.cv);
-        tables = itData.inputs.table.split("_");
-        xs = tables[0].split(";");
-        ys = tables[1].split(";");
-        xs.unshift("$x_i$");
-        ys.unshift("$y_i$");
-        ennonce = Handlebars.templates["tex_tabular"]({
-          pre: "On considère la série statistique donnée par le tableau suivant :",
-          lines: [xs, ys],
-          cols: xs.length,
-          large: false
-        });
-        switch (cv) {
-          case 1:
-            tex_chgt = "On propose le changement de variable suivant : $z = \\ln(y)$.";
-            break;
-          case 2:
-            A = Number(itData.inputs.A);
-            tex_chgt = "On propose le changement de variable suivant : $z = \\ln\\left(\\dfrac{" + A + "}{y}-1\\right)$.";
-            break;
-          case 3:
-            A = Number(itData.inputs.A);
-            tex_chgt = "On propose le changement de variable suivant : $z = \\ln(" + A + "-y)$.";
-            break;
-          default:
-            tex_chgt = "";
+    getExamBriques: function(inputs_list, options) {
+      var calculG, calculInterpolation, changementVariable, children, fct_item, questions, ref, ref1, ref2, tagVar, that;
+      calculG = Number((ref = options.a.value) != null ? ref : 0) === 1;
+      changementVariable = Number((ref1 = options.b.value) != null ? ref1 : 0) === 1;
+      calculInterpolation = Number((ref2 = options.c.value) != null ? ref2 : 0) === 1;
+      that = this;
+      fct_item = function(inputs, index) {
+        var a, b, chgTex, children, i, ps, ref3, serie_x, serie_y, serie_z, y;
+        ref3 = that.init(inputs, options), serie_x = ref3[0], serie_y = ref3[1], serie_z = ref3[2], chgTex = ref3[3], a = ref3[4], b = ref3[5], i = ref3[6], y = ref3[7];
+        children = [
+          {
+            type: "tableau",
+            lignes: [_.flatten(["$x_i$", serie_x.getValues()]), _.flatten(["$y_i$", serie_y.getValues()])]
+          }
+        ];
+        ps = [];
+        if (chgTex !== false) {
+          ps.push("On propose le changement de variable suivant : &nbsp; " + chgTex + ".");
         }
-        if (cv === 0) {
-          tagVar = "y";
+        if (i !== false) {
+          ps.push("Interpolation en &nbsp; $x = " + (mM.misc.numToStr(i, 1)) + "$");
+        }
+        if (ps.length > 0) {
+          children.push({
+            type: "text",
+            ps: ps
+          });
+        }
+        return {
+          children: children
+        };
+      };
+      if (changementVariable) {
+        tagVar = "z";
+      } else {
+        tagVar = "y";
+      }
+      if (!(calculG || calculInterpolation)) {
+        children = [
+          {
+            type: "text",
+            children: ["On donne les séries statistiques suivantes.", "Dans tous les cas, donnez, à 0,001 près, les coefficients de l'ajustement affine : &nbsp; $" + tagVar + "=ax+b$"]
+          }
+        ];
+      } else {
+        questions = [];
+        if (calculG) {
+          questions.push("Soit &nbsp; $G$ &nbsp; le point moyen du nuage &nbsp; $M_i\\left(x_i;" + tagVar + "_i\\right)$. Donnez ses coordonnées à 0,01 près");
+        }
+        questions.push("Donnez, à 0,001 près, les coefficients de l'ajustement affine : &nbsp; $" + tagVar + "=ax+b$");
+        if (calculInterpolation) {
+          questions.push("Donnez, à 0,01 près, l'interpolation de la valeur de &nbsp; $y$ &nbsp; pour la valeur de &nbsp; $x$ &nbsp; indiquée.");
+        }
+        children = [
+          {
+            type: "text",
+            children: ["On donne les séries statistiques suivantes.", "Dans tous les cas :"]
+          }, {
+            type: "enumerate",
+            enumi: "1",
+            children: questions
+          }
+        ];
+      }
+      children.push({
+        type: "subtitles",
+        enumi: "A",
+        refresh: true,
+        children: _.map(inputs_list, fct_item)
+      });
+      return {
+        children: children
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var calculG, calculInterpolation, changementVariable, children, fct_item, questions, ref, ref1, ref2, tagVar, that;
+      calculG = Number((ref = options.a.value) != null ? ref : 0) === 1;
+      changementVariable = Number((ref1 = options.b.value) != null ? ref1 : 0) === 1;
+      calculInterpolation = Number((ref2 = options.c.value) != null ? ref2 : 0) === 1;
+      that = this;
+      fct_item = function(inputs, index) {
+        var a, b, chgTex, children, i, ps, ref3, serie_x, serie_y, serie_z, y;
+        ref3 = that.init(inputs, options), serie_x = ref3[0], serie_y = ref3[1], serie_z = ref3[2], chgTex = ref3[3], a = ref3[4], b = ref3[5], i = ref3[6], y = ref3[7];
+        children = [
+          {
+            type: "tableau",
+            lignes: [_.flatten(["$x_i$", serie_x.getValues()]), _.flatten(["$y_i$", serie_y.getValues()])]
+          }
+        ];
+        ps = [];
+        if (chgTex !== false) {
+          ps.push("On propose le changement de variable suivant : " + chgTex + ".");
+        }
+        if (i !== false) {
+          ps.push("Interpolation en $x = " + (mM.misc.numToStr(i, 1)) + "$");
+        }
+        if (ps.length > 0) {
+          children.push({
+            type: "text",
+            ps: ps
+          });
+        }
+        return children;
+      };
+      if (changementVariable) {
+        tagVar = "z";
+      } else {
+        tagVar = "y";
+      }
+      if (inputs_list.length === 1) {
+        if (!(calculG || calculInterpolation)) {
+          children = ["On donne la série statistique suivante.", "Donnez, à 0,001 près, les coefficients de l'ajustement affine : &nbsp; $" + tagVar + "=ax+b$"];
         } else {
-          tagVar = "z";
+          questions = [];
+          if (calculG) {
+            questions.push("Soit &nbsp; $G$ &nbsp; le point moyen du nuage $M_i\\left(x_i;" + tagVar + "_i\\right)$. Donnez ses coordonnées à 0,01 près");
+          }
+          questions.push("Donnez, à 0,001 près, les coefficients de l'ajustement affine : $" + tagVar + "=ax+b$");
+          if (calculInterpolation) {
+            questions.push("Donnez, à 0,01 près, l'interpolation de la valeur de $y$ pour la valeur de $x$ indiquée.");
+          }
+          children = [
+            "On donne la séries statistique suivante.", {
+              type: "enumerate",
+              enumi: "1",
+              children: questions
+            }
+          ];
         }
-        its = [];
-        if (itData.options.a.value !== 0) {
-          its.push("Donnez les coordonnées de $G$, centre du nuage des $M_i\\left(x_i;" + tagVar + "_i\\right)$ à $0,01$ près.");
+        children.push(fct_item(inputs_list[0]));
+        return {
+          children: children
+        };
+      } else {
+        if (!(calculG || calculInterpolation)) {
+          children = ["On donne les séries statistiques suivantes.", "Dans tous les cas, donnez, à 0,001 près, les coefficients de l'ajustement affine : &nbsp; $" + tagVar + "=ax+b$"];
+        } else {
+          questions = [];
+          if (calculG) {
+            questions.push("Soit &nbsp; $G$ &nbsp; le point moyen du nuage $M_i\\left(x_i;" + tagVar + "_i\\right)$. Donnez ses coordonnées à 0,01 près");
+          }
+          questions.push("Donnez, à 0,001 près, les coefficients de l'ajustement affine : $" + tagVar + "=ax+b$");
+          if (calculInterpolation) {
+            questions.push("Donnez, à 0,01 près, l'interpolation de la valeur de $y$ pour la valeur de $x$ indiquée.");
+          }
+          children = [
+            "On donne les séries statistiques suivantes.", "Dans tous les cas :", {
+              type: "enumerate",
+              enumi: "1",
+              children: questions
+            }
+          ];
         }
-        its.push("Donnez les coefficients de l'ajustement affine : $" + tagVar + "=ax+b$ à 0,001 près");
-        if (itData.options.c.value !== 0) {
-          i = Number(itData.inputs.i);
-          its.push("Donnez la valeur de $y$ pour $x = " + (numToStr(i, 1)) + "$ à 0,01 près");
-        }
-        out.push({
-          title: this.title,
-          content: ennonce + Handlebars.templates["tex_enumerate"]({
-            pre: tex_chgt,
-            items: its,
-            large: false
-          })
+        children.push({
+          type: "enumerate",
+          enumi: "A)",
+          children: _.map(inputs_list, fct_item)
         });
+        return {
+          children: children
+        };
       }
-      return out;
     }
   };
 });

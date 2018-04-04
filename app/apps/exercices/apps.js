@@ -18,9 +18,16 @@ define(["marionette","app"], function(Marionette,app){
 			});
 		},
 
+		runExoFicheProf:function(id){
+			this.runExoFiche(false, id);
+		},
+
 		runExoFiche: function(idUF, idEF){
 			var auth = app.Auth;
 			var testForProf = function(){
+				app.Ariane.reset([
+					{ text:"Devoirs", e:"devoirs:list", link:"devoirs"},
+				]);
 				require(["apps/exercices/show/show_controller"], function(showController){
 					showController.execExoFicheForProf(idEF);
 				});
@@ -45,7 +52,9 @@ define(["marionette","app"], function(Marionette,app){
 		runUE: function(idUE){
 			var auth = app.Auth;
 			var forProf = function(){
-				app.Ariane.reset([]);
+				app.Ariane.reset([
+					{ text:"Devoirs", e:"devoirs:list", link:"devoirs"},
+				]);
 				require(["apps/exercices/show/show_controller"], function(showController){
 					showController.execUEForProf(idUE);
 				});
@@ -107,7 +116,7 @@ define(["marionette","app"], function(Marionette,app){
 		appRoutes: {
 			"exercices(/filter/criterion::criterion)": "exercicesList",
 			"exercice::id": "exerciceShow",
-			"exercice-fiche::id": "runExoFiche",
+			"exercice-fiche::id": "runExoFicheProf",
 			"fiche-eleve::idUF/exercice-fiche::idEF":"runExoFiche",
 			"exercice-fait::idUE":"runUE"
 		}

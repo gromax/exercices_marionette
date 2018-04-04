@@ -1,6 +1,6 @@
 define(["utils/math", "utils/help"], function(mM, help) {
   return {
-    initBriques: function(inputs, options) {
+    getBriques: function(inputs, options) {
       var A, B, gAp, ref;
       ref = this.init(inputs), A = ref[0], B = ref[1], gAp = ref[2];
       return [

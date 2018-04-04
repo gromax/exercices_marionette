@@ -4,14 +4,16 @@ define([
 	"apps/home/signin/signin_view",
 	"apps/common/not_found",
 	"apps/home/signin/test_mdp_view",
-	"apps/home/signin/new_eleve_view"
+	"apps/home/signin/new_eleve_view",
+	"apps/common/alert_view",
 ], function(
 	app,
 	Marionette,
 	SigninView,
 	NotFoundView,
 	TestMdpView,
-	NewEleveView
+	NewEleveView,
+	AlertView
 ){
 	var Controller = Marionette.Object.extend({
 		channelName: "entities",
@@ -35,7 +37,9 @@ define([
 							mdp_view.on("form:submit", function(data_test){
 								testingMdp = newUser.testClasseMdp(data_test.mdp);
 								app.trigger("header:loading", true);
-								$.when(testingMdp).done(function(){
+								$.when(testingMdp).always(function(){
+									app.trigger("header:loading", false);
+								}).done(function(){
 									newUser.set("classeMdp", data_test.mdp);
 									mdp_view.trigger("dialog:close");
 
@@ -49,8 +53,15 @@ define([
 										if (savingUser){
 											app.trigger("header:loading", true);
 											$.when(savingUser).done(function(){
-												console.log("succès");
 												new_eleve_view.trigger("dialog:close");
+												var alertView = new AlertView({
+													title: "Inscription réussie",
+													message:"Vous avez créé un compte. Vous pouvez maintenant vous connecter.",
+													dismiss: true,
+													type:"success"
+												});
+												app.regions.getRegion('message').show(alertView);
+												app.trigger("home:show");
 											}).fail(function(response){
 												if(response.status == 422){
 													new_eleve_view.triggerMethod("form:data:invalid", response.responseJSON.errors);
@@ -74,8 +85,6 @@ define([
 									else{
 										alert("Erreur inconnue. Essayez à nouveau !");
 									}
-								}).always(function(){
-									app.trigger("header:loading", false);
 								});
 							});
 

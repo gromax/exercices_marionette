@@ -360,7 +360,7 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
       };
     },
     inputVerification: function(answers_data) {
-      var N, answer_data, bads, closests, customMessage, customMessageFunction, errorItem, errors, it, it_good, item_note, items, j, k, l, lefts, len, len1, len2, len3, m, model_data, note, ref, ref1, ref2, ref3, sol, stringAnswer, title, type, verif_results;
+      var N, answer_data, bads, closests, customMessage, customMessageFunction, errorItem, errors, it, it_good, items, j, k, l, lefts, len, len1, len2, len3, m, model_data, note, ref, ref1, ref2, ref3, sol, stringAnswer, title, type, verifResponse, verif_results;
       note = 0;
       model_data = this.attributes;
       answer_data = answers_data[model_data.name];
@@ -408,23 +408,24 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
             for (j = 0, len = closests.length; j < len; j++) {
               sol = closests[j];
               if (sol.good != null) {
-                ref1 = mM.verif[sol.info.type](sol.info, sol.good, model_data), item_note = ref1.item_note, errors = ref1.errors;
-                note += item_note / N;
+                verifResponse = mM.verif[sol.info.type](sol.info, sol.good, model_data);
+                note += verifResponse.note / N;
                 switch (false) {
-                  case item_note !== 1:
+                  case verifResponse.note !== 1:
                     items.push({
                       type: "success",
                       text: "<i>" + sol.info.expression + "</i> &nbsp; est une bonne réponse."
                     });
                     break;
-                  case !(item_note > 0):
-                    if (errors.length > 0) {
+                  case !(verifResponse.note > 0):
+                    if (verifResponse.errors.length > 0) {
                       items.push({
                         type: "warning",
                         text: "<i>" + sol.info.expression + "</i> &nbsp; est accepté, mais :"
                       });
-                      for (k = 0, len1 = errors.length; k < len1; k++) {
-                        errorItem = errors[k];
+                      ref1 = verifResponse.errors;
+                      for (k = 0, len1 = ref1.length; k < len1; k++) {
+                        errorItem = ref1[k];
                         items.push({
                           type: "warning",
                           text: errorItem
@@ -459,7 +460,7 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
                   results = [];
                   for (l = 0, len2 = lefts.length; l < len2; l++) {
                     it = lefts[l];
-                    results.push("$it.tex()$");
+                    results.push("$" + (it.tex()) + "$");
                   }
                   return results;
                 })()).join(" ; "))
@@ -639,7 +640,172 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
             message: "Fichier " + filename + " introuvable."
           });
         };
-        require(["entities/exercices/" + filename], successCB, failedCB);
+        switch (filename) {
+          case "exo0001":
+            require(["entities/exercices/exo0001"], successCB, failedCB);
+            break;
+          case "exo0002":
+            require(["entities/exercices/exo0002"], successCB, failedCB);
+            break;
+          case "exo0003":
+            require(["entities/exercices/exo0003"], successCB, failedCB);
+            break;
+          case "exo0004":
+            require(["entities/exercices/exo0004"], successCB, failedCB);
+            break;
+          case "exo0005":
+            require(["entities/exercices/exo0005"], successCB, failedCB);
+            break;
+          case "exo0006":
+            require(["entities/exercices/exo0006"], successCB, failedCB);
+            break;
+          case "exo0007":
+            require(["entities/exercices/exo0007"], successCB, failedCB);
+            break;
+          case "exo0008":
+            require(["entities/exercices/exo0008"], successCB, failedCB);
+            break;
+          case "exo0009":
+            require(["entities/exercices/exo0009"], successCB, failedCB);
+            break;
+          case "exo0010":
+            require(["entities/exercices/exo0010"], successCB, failedCB);
+            break;
+          case "exo0011":
+            require(["entities/exercices/exo0011"], successCB, failedCB);
+            break;
+          case "exo0012":
+            require(["entities/exercices/exo0012"], successCB, failedCB);
+            break;
+          case "exo0013":
+            require(["entities/exercices/exo0013"], successCB, failedCB);
+            break;
+          case "exo0014":
+            require(["entities/exercices/exo0014"], successCB, failedCB);
+            break;
+          case "exo0015":
+            require(["entities/exercices/exo0015"], successCB, failedCB);
+            break;
+          case "exo0016":
+            require(["entities/exercices/exo0016"], successCB, failedCB);
+            break;
+          case "exo0017":
+            require(["entities/exercices/exo0017"], successCB, failedCB);
+            break;
+          case "exo0018":
+            require(["entities/exercices/exo0018"], successCB, failedCB);
+            break;
+          case "exo0019":
+            require(["entities/exercices/exo0019"], successCB, failedCB);
+            break;
+          case "exo0020":
+            require(["entities/exercices/exo0020"], successCB, failedCB);
+            break;
+          case "exo0021":
+            require(["entities/exercices/exo0021"], successCB, failedCB);
+            break;
+          case "exo0022":
+            require(["entities/exercices/exo0022"], successCB, failedCB);
+            break;
+          case "exo0023":
+            require(["entities/exercices/exo0023"], successCB, failedCB);
+            break;
+          case "exo0024":
+            require(["entities/exercices/exo0024"], successCB, failedCB);
+            break;
+          case "exo0025":
+            require(["entities/exercices/exo0025"], successCB, failedCB);
+            break;
+          case "exo0026":
+            require(["entities/exercices/exo0026"], successCB, failedCB);
+            break;
+          case "exo0027":
+            require(["entities/exercices/exo0027"], successCB, failedCB);
+            break;
+          case "exo0028":
+            require(["entities/exercices/exo0028"], successCB, failedCB);
+            break;
+          case "exo0029":
+            require(["entities/exercices/exo0029"], successCB, failedCB);
+            break;
+          case "exo0030":
+            require(["entities/exercices/exo0030"], successCB, failedCB);
+            break;
+          case "exo0031":
+            require(["entities/exercices/exo0031"], successCB, failedCB);
+            break;
+          case "exo0032":
+            require(["entities/exercices/exo0032"], successCB, failedCB);
+            break;
+          case "exo0033":
+            require(["entities/exercices/exo0033"], successCB, failedCB);
+            break;
+          case "exo0034":
+            require(["entities/exercices/exo0034"], successCB, failedCB);
+            break;
+          case "exo0035":
+            require(["entities/exercices/exo0035"], successCB, failedCB);
+            break;
+          case "exo0036":
+            require(["entities/exercices/exo0036"], successCB, failedCB);
+            break;
+          case "exo0037":
+            require(["entities/exercices/exo0037"], successCB, failedCB);
+            break;
+          case "exo0038":
+            require(["entities/exercices/exo0038"], successCB, failedCB);
+            break;
+          case "exo0039":
+            require(["entities/exercices/exo0039"], successCB, failedCB);
+            break;
+          case "exo0040":
+            require(["entities/exercices/exo0040"], successCB, failedCB);
+            break;
+          case "exo0041":
+            require(["entities/exercices/exo0041"], successCB, failedCB);
+            break;
+          case "exo0042":
+            require(["entities/exercices/exo0042"], successCB, failedCB);
+            break;
+          case "exo0043":
+            require(["entities/exercices/exo0043"], successCB, failedCB);
+            break;
+          case "exo0044":
+            require(["entities/exercices/exo0044"], successCB, failedCB);
+            break;
+          case "exo0045":
+            require(["entities/exercices/exo0045"], successCB, failedCB);
+            break;
+          case "exo0046":
+            require(["entities/exercices/exo0046"], successCB, failedCB);
+            break;
+          case "exo0047":
+            require(["entities/exercices/exo0047"], successCB, failedCB);
+            break;
+          case "exo0048":
+            require(["entities/exercices/exo0048"], successCB, failedCB);
+            break;
+          case "exo0049":
+            require(["entities/exercices/exo0049"], successCB, failedCB);
+            break;
+          case "exo0050":
+            require(["entities/exercices/exo0050"], successCB, failedCB);
+            break;
+          case "exo0051":
+            require(["entities/exercices/exo0051"], successCB, failedCB);
+            break;
+          case "exo0052":
+            require(["entities/exercices/exo0052"], successCB, failedCB);
+            break;
+          case "exo0053":
+            require(["entities/exercices/exo0053"], successCB, failedCB);
+            break;
+          case "exo0054":
+            require(["entities/exercices/exo0054"], successCB, failedCB);
+            break;
+          default:
+            require(["entities/exercices/" + filename], successCB, failedCB);
+        }
       } else {
         defer.reject({
           message: "Exercice #" + id + " introuvable dans le catalogue."

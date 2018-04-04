@@ -9,15 +9,14 @@ define ["utils/math","utils/help"], (mM, help) ->
 	#	c:{ tag:"Calcul d'interpolation" , options:["Non", "Oui"] }
 	#}
 
-	# debug : tex à faire
-
 	return {
 		init: (inputs, options) ->
 			calculInterpolation = Number(options.c.value ? 0) is 1
+			changementVariable = Number(options.b.value ? 0) is 1
 			if typeof inputs.cv isnt "undefined" then cv = Number inputs.cv
 			else
-				if options.b.value is 0 then cv = inputs.cv = 0
-				else cv = inputs.cv = mM.alea.real [1,2,3]
+				if changementVariable cv = inputs.cv = mM.alea.real [1,2,3]
+				else cv = inputs.cv = 0
 				# Les changements de variables sont : ln ; ln(A-y) ; ln(A/y-b)
 			if (typeof inputs.table is "undefined")
 				N = mM.alea.real { min:6, max:8 }
@@ -180,7 +179,6 @@ define ["utils/math","utils/help"], (mM, help) ->
 						rank: 1
 						ps:[
 							"Donnez les coefficients de l'ajustement affine : &nbsp; $#{tagVar}=ax+b$ &nbsp; à 0,001 près"
-							"Donnez ses coordonnées à 0,01 près"
 						]
 					}
 					{
@@ -248,46 +246,168 @@ define ["utils/math","utils/help"], (mM, help) ->
 
 			briques
 
-		tex: (data) ->
-			if not isArray(data) then data = [ data ]
-			out = []
-			for itData in data
-				cv = Number itData.inputs.cv
-				tables = itData.inputs.table.split("_")
-				xs = tables[0].split(";")
-				ys = tables[1].split(";")
-				xs.unshift("$x_i$")
-				ys.unshift("$y_i$")
-				ennonce = Handlebars.templates["tex_tabular"] {
-					pre:"On considère la série statistique donnée par le tableau suivant :"
-					lines: [xs, ys]
-					cols: xs.length
-					large: false
-				}
-				switch cv
-					when 1 then tex_chgt = "On propose le changement de variable suivant : $z = \\ln(y)$."
-					when 2
-						A = Number itData.inputs.A
-						tex_chgt = "On propose le changement de variable suivant : $z = \\ln\\left(\\dfrac{#{A}}{y}-1\\right)$."
-					when 3
-						A = Number itData.inputs.A
-						tex_chgt = "On propose le changement de variable suivant : $z = \\ln(#{A}-y)$."
-					else tex_chgt = ""
-				if cv is 0 then tagVar = "y" else tagVar = "z"
-				its=[]
-				if itData.options.a.value isnt 0
-					its.push "Donnez les coordonnées de $G$, centre du nuage des $M_i\\left(x_i;#{tagVar}_i\\right)$ à $0,01$ près."
-				its.push "Donnez les coefficients de l'ajustement affine : $#{tagVar}=ax+b$ à 0,001 près"
-				if itData.options.c.value isnt 0
-					i = Number itData.inputs.i
-					its.push "Donnez la valeur de $y$ pour $x = #{numToStr(i,1)}$ à 0,01 près"
-				out.push {
-					title:@title
-					content: ennonce + Handlebars.templates["tex_enumerate"] {
-						pre:tex_chgt
-						items: its
-						large:false
+		getExamBriques: (inputs_list,options) ->
+			calculG = Number(options.a.value ? 0) is 1
+			changementVariable = Number(options.b.value ? 0) is 1
+			calculInterpolation = Number(options.c.value ? 0) is 1
+			that = @
+			fct_item = (inputs, index) ->
+				[serie_x, serie_y, serie_z, chgTex,a,b,i,y] = that.init(inputs, options)
+				children = [
+					{
+						type: "tableau"
+						lignes: [
+							_.flatten(["$x_i$", serie_x.getValues()])
+							_.flatten(["$y_i$", serie_y.getValues()])
+						]
 					}
+				]
+				ps = []
+				if chgTex isnt false
+					ps.push "On propose le changement de variable suivant : &nbsp; #{chgTex}."
+				if i isnt false
+					ps.push "Interpolation en &nbsp; $x = #{mM.misc.numToStr(i,1)}$"
+				if ps.length>0
+					children.push({
+						type:"text"
+						ps:ps
+					})
+				return { children: children }
+
+			if changementVariable then tagVar = "z" else tagVar = "y"
+
+
+			if not(calculG or calculInterpolation)
+				children = [
+					{
+						type: "text"
+						children:[
+							"On donne les séries statistiques suivantes."
+							"Dans tous les cas, donnez, à 0,001 près, les coefficients de l'ajustement affine : &nbsp; $#{tagVar}=ax+b$"
+						]
+					}
+				]
+			else
+				questions = []
+				if calculG
+					questions.push "Soit &nbsp; $G$ &nbsp; le point moyen du nuage &nbsp; $M_i\\left(x_i;#{tagVar}_i\\right)$. Donnez ses coordonnées à 0,01 près"
+				questions.push "Donnez, à 0,001 près, les coefficients de l'ajustement affine : &nbsp; $#{tagVar}=ax+b$"
+				if calculInterpolation
+					questions.push "Donnez, à 0,01 près, l'interpolation de la valeur de &nbsp; $y$ &nbsp; pour la valeur de &nbsp; $x$ &nbsp; indiquée."
+				children = [
+					{
+						type: "text"
+						children:[
+							"On donne les séries statistiques suivantes."
+							"Dans tous les cas :"
+						]
+					}
+					{
+						type: "enumerate"
+						enumi: "1"
+						children: questions
+					}
+				]
+
+			children.push({
+				type: "subtitles"
+				enumi: "A"
+				refresh:true
+				children: _.map(inputs_list, fct_item)
+			});
+
+
+			return {
+				children: children
+			}
+
+		getTex: (inputs_list, options) ->
+			calculG = Number(options.a.value ? 0) is 1
+			changementVariable = Number(options.b.value ? 0) is 1
+			calculInterpolation = Number(options.c.value ? 0) is 1
+			that = @
+			fct_item = (inputs, index) ->
+				[serie_x, serie_y, serie_z, chgTex,a,b,i,y] = that.init(inputs, options)
+				children = [
+					{
+						type: "tableau"
+						lignes: [
+							_.flatten(["$x_i$", serie_x.getValues()])
+							_.flatten(["$y_i$", serie_y.getValues()])
+						]
+					}
+				]
+				ps = []
+				if chgTex isnt false
+					ps.push "On propose le changement de variable suivant : #{chgTex}."
+				if i isnt false
+					ps.push "Interpolation en $x = #{mM.misc.numToStr(i,1)}$"
+				if ps.length>0
+					children.push({
+						type:"text"
+						ps:ps
+					})
+				return children
+
+			if changementVariable then tagVar = "z" else tagVar = "y"
+			if inputs_list.length is 1
+				if not(calculG or calculInterpolation)
+					children = [
+						"On donne la série statistique suivante."
+						"Donnez, à 0,001 près, les coefficients de l'ajustement affine : &nbsp; $#{tagVar}=ax+b$"
+					]
+				else
+					questions = []
+					if calculG
+						questions.push "Soit &nbsp; $G$ &nbsp; le point moyen du nuage $M_i\\left(x_i;#{tagVar}_i\\right)$. Donnez ses coordonnées à 0,01 près"
+					questions.push "Donnez, à 0,001 près, les coefficients de l'ajustement affine : $#{tagVar}=ax+b$"
+					if calculInterpolation
+						questions.push "Donnez, à 0,01 près, l'interpolation de la valeur de $y$ pour la valeur de $x$ indiquée."
+					children = [
+						"On donne la séries statistique suivante."
+						{
+							type: "enumerate"
+							enumi: "1"
+							children: questions
+						}
+					]
+
+				children.push fct_item(inputs_list[0])
+				return {
+					children: children
 				}
-			out
+
+			else
+				if not(calculG or calculInterpolation)
+					children = [
+						"On donne les séries statistiques suivantes."
+						"Dans tous les cas, donnez, à 0,001 près, les coefficients de l'ajustement affine : &nbsp; $#{tagVar}=ax+b$"
+					]
+				else
+					questions = []
+					if calculG
+						questions.push "Soit &nbsp; $G$ &nbsp; le point moyen du nuage $M_i\\left(x_i;#{tagVar}_i\\right)$. Donnez ses coordonnées à 0,01 près"
+					questions.push "Donnez, à 0,001 près, les coefficients de l'ajustement affine : $#{tagVar}=ax+b$"
+					if calculInterpolation
+						questions.push "Donnez, à 0,01 près, l'interpolation de la valeur de $y$ pour la valeur de $x$ indiquée."
+					children = [
+						"On donne les séries statistiques suivantes."
+						"Dans tous les cas :"
+						{
+							type: "enumerate"
+							enumi: "1"
+							children: questions
+						}
+					]
+
+				children.push({
+					type: "enumerate"
+					enumi: "A)"
+					children: _.map(inputs_list, fct_item)
+				});
+
+
+				return {
+					children: children
+				}
 	}

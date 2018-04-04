@@ -25,7 +25,7 @@ define(["jst","marionette"], function(JST,Marionette){
 		remove: function(){
 			var self = this;
 			this.$el.fadeOut(function(){
-				self.model.destroy();
+				self.trigger("model:destroy", this.model);
 				Marionette.View.prototype.remove.call(self);
 			});
 		}

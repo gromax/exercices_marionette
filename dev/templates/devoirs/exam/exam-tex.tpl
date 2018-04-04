@@ -55,8 +55,18 @@
 <%					_.each(el.children,recursive_fct); %>
 \end{multicols}
 <%					break;
+				case "tableau": %>
+\begin{center}
+\begin{tabular}{<%= el.setup %>}
+\hline <%
+_.each(el.lignes, function(row){%>
+	<%= row.join(" & ") %>\\
+	\hline
+<%}); %>\end{tabular}
+\end{center}
+<%					break;
 				case "enumerate": %>
-\begin{enumerate}<%if (el.enumi){%>[<%-el.enumi %>]<% } %>
+\begin{enumerate}<%if (el.enumi){%>[<%-el.enumi %>]<% } else {%>[1)]<% } %>
 <% _.each(el.children, function(it, index){ %>\item <%recursive_fct(it, index); }); %>
 \end{enumerate}
 <%			}

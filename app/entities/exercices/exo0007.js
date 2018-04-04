@@ -85,7 +85,8 @@ define(["utils/math", "utils/help"], function(mM, help) {
       return [xi, fct(xi), xa, fct(xa), tabx, taby, antecedents];
     },
     getBriques: function(inputs, options) {
-      [xi, yi, xa, ya, tabx, taby, antecedents];
+      var antecedents, ref, tabx, taby, xa, xi, ya, yi;
+      ref = this.init(inputs), xi = ref[0], yi = ref[1], xa = ref[2], ya = ref[3], tabx = ref[4], taby = ref[5], antecedents = ref[6];
       tabx.unshift("$x$");
       taby.unshift("$f(x)$");
       return [
@@ -137,6 +138,78 @@ define(["utils/math", "utils/help"], function(mM, help) {
           ]
         }
       ];
+    },
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that, xhigh, xlow;
+      xlow = this.m;
+      xhigh = this.M;
+      that = this;
+      fct_item = function(inputs, index) {
+        var antecedents, ref, tabx, taby, xa, xi, ya, yi;
+        ref = that.init(inputs), xi = ref[0], yi = ref[1], xa = ref[2], ya = ref[3], tabx = ref[4], taby = ref[5], antecedents = ref[6];
+        tabx.unshift("$x$");
+        taby.unshift("$f(x)$");
+        return {
+          children: [
+            {
+              type: "text",
+              children: ["On considère la fonction &nbsp; $f$ &nbsp; défnie sur l'intervalle &nbsp; $[" + xlow + ";" + xhigh + "]$.", "On donne le tableau de valeur suivant :"]
+            }, {
+              type: "tableau",
+              lignes: [tabx, taby]
+            }, {
+              type: "enumerate",
+              enumi: "1",
+              children: ["Donnez l'image de " + xi + " par &nbsp; $f$", "Donnez un antécédent de " + ya + " par &nbsp; $f$"]
+            }
+          ]
+        };
+      };
+      return {
+        children: [
+          {
+            type: "subtitles",
+            enumi: "A",
+            refresh: true,
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, that, xhigh, xlow;
+      xlow = this.m;
+      xhigh = this.M;
+      that = this;
+      fct_item = function(inputs, index) {
+        var antecedents, ref, tabx, taby, xa, xi, ya, yi;
+        ref = that.init(inputs), xi = ref[0], yi = ref[1], xa = ref[2], ya = ref[3], tabx = ref[4], taby = ref[5], antecedents = ref[6];
+        tabx.unshift("$x$");
+        taby.unshift("$f(x)$");
+        return [
+          "On considère la fonction $f$ défnie sur l'intervalle $[" + xlow + ";" + xhigh + "]$.", "On donne le tableau de valeur suivant :", {
+            type: "tableau",
+            setup: "|*{ " + tabx.length + " }{c|}",
+            lignes: [tabx, taby]
+          }, {
+            type: "enumerate",
+            children: ["Donnez l'image de " + xi + " par $f$", "Donnez un antécédent de " + ya + " par $f$"]
+          }
+        ];
+      };
+      if (inputs_list.length === 1) {
+        return fct_item(inputs_list[0], 0);
+      } else {
+        return {
+          children: [
+            {
+              type: "enumerate",
+              enumi: "A",
+              children: _.map(inputs_list, fct_item)
+            }
+          ]
+        };
+      }
     }
   };
 });

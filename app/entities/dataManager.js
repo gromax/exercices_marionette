@@ -188,6 +188,32 @@ define(["backbone.radio"], function(Radio){
 			API.stored_data = {};
 		},
 
+		userDestroyUpdate:function(idUser){
+			// Assure le cache quand un user est supprimé
+			if (API.stored_data.userfiches){
+				var userfichesToPurge = API.stored_data.userfiches.where({idUser : idUser});
+				API.stored_data.userfiches.remove(userfichesToPurge);
+			}
+			if (API.stored_data.faits){
+				delete API.stored_data.faits;
+			}
+		},
+
+		ficheDestroyUpdate:function(idFiche){
+			// Assure le cache quand un user est supprimé
+			if (API.stored_data.userfiches){
+				var userfichesToPurge = API.stored_data.userfiches.where({idFiche : idFiche});
+				API.stored_data.userfiches.remove(userfichesToPurge);
+			}
+			if (API.stored_data.exofiches){
+				var exofichesToPurge = API.stored_data.exofiches.where({idFiche : idFiche});
+				API.stored_data.exofiches.remove(exofichesToPurge);
+			}
+			if (API.stored_data.faits){
+				delete API.stored_data.faits;
+			}
+		},
+
 	};
 
 	var channel = Radio.channel('entities');
@@ -197,4 +223,7 @@ define(["backbone.radio"], function(Radio){
 	channel.reply('classe:entity', API.getClasse );
 	channel.reply('user:entity', API.getUser );
 	channel.reply('user:me', API.getMe );
+	channel.reply('user:destroy:update', API.userDestroyUpdate );
+	channel.reply('fiche:destroy:update', API.ficheDestroyUpdate );
+
 });

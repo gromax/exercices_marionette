@@ -5,7 +5,7 @@
 	# keyWords : ["Géométrie", "Repère", "Seconde"]
 
 	return {
-		initBriques: (inputs, options) ->
+		getBriques: (inputs, options) ->
 			[A, B, gAp] = @init(inputs)
 
 			[

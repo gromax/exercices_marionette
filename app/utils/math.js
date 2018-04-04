@@ -5959,17 +5959,17 @@
       };
 
       TokenOperator.prototype.execute = function(stack) {
-        var ref, ref1;
+        var ref, ref1, ref2, ref3;
         if (this.opType === "0-") {
           return (ref = stack.pop()) != null ? typeof ref.opposite === "function" ? ref.opposite() : void 0 : void 0;
         } else {
-          this.operand2 = stack.pop();
-          this.operand1 = stack.pop();
+          this.operand2 = (ref1 = stack.pop()) != null ? ref1 : new MObject();
+          this.operand1 = (ref2 = stack.pop()) != null ? ref2 : new MObject();
           switch (false) {
             case this.opType !== "+":
               return PlusNumber.makePlus([this.operand1, this.operand2]);
             case this.opType !== "-":
-              return PlusNumber.makePlus([this.operand1, (ref1 = this.operand2) != null ? typeof ref1.opposite === "function" ? ref1.opposite() : void 0 : void 0]);
+              return PlusNumber.makePlus([this.operand1, (ref3 = this.operand2) != null ? typeof ref3.opposite === "function" ? ref3.opposite() : void 0 : void 0]);
             case this.opType !== "*":
               return MultiplyNumber.makeMult([this.operand1, this.operand2]);
             case this.opType !== "/":

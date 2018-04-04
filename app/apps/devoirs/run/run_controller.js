@@ -34,7 +34,8 @@ define([
 						var user = users.get(idUser);
 
 						app.Ariane.add([
-							{ text:"Devoir #"+idFiche, e:"devoir:showUserfiches", data:idFiche, link:"devoir:"+idFiche+"/fiches-eleves"},
+							{ text:"Devoir #"+idFiche, e:"devoir:show", data:idFiche, link:"devoir:"+idFiche},
+							{ text:"Fiches élèves", e:"devoir:showUserfiches", data:idFiche, link:"devoir:"+idFiche+"/fiches-eleves"},
 							{ text:user.get("nomComplet")+" #"+id },
 						]);
 

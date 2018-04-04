@@ -84,9 +84,9 @@ define([
 					// renvoie la brique ayant le focus ce qui sera utile lorsqu'on lira un exercice sauvegardé
 					var MAJ_briques = function(exoview) {
 						var briques = exo.getBriquesUntilFocus();
-						for (b of briques) {
+						_.each(briques, function(b){
 							exoview.showItems(b);
-						}
+						});
 						var b=briques.pop();
 						if (b!==false) {
 							exoview.setFocus(b);
@@ -288,6 +288,16 @@ define([
 				$.when(fetchingExoFiches).done(function(exofiches){
 					var exofiche = exofiches.get(id);
 					if (exofiche){
+						var idFiche = exofiche.get('idFiche');
+						var liste = exofiches.where({"idFiche":idFiche});
+						var index = 1+_.findIndex(liste, function(item){ return item.get("id") == id; });
+
+						app.Ariane.add([
+							{ text:"Devoir #"+idFiche, e:"devoir:show", data:idFiche, link:"devoir:"+idFiche},
+							{ text:"Exercices", e:"devoir:showExercices", data:idFiche, link:"devoir:"+idFiche+"/exercices"},
+							{ text:"Exercice "+index, e:"exercice-fiche:run", data:id, link:"exercice-fiche:"+id}
+						]);
+
 						var idE = exofiche.get("idE");
 						// On ne doit transmettre que des options brutes
 						var exoficheOptions = _.mapObject(exofiche.get("options"), function(val,key){
@@ -296,6 +306,9 @@ define([
 						that.show(idE, { optionsValues:exoficheOptions, showReinitButton:true });
 					} else {
 						var view = new MissingView({ message:"Cet exercice n'existe pas !" });
+						app.Ariane.add([
+							{ text:"Fiche inconnue" }
+						]);
 						app.regions.getRegion('main').show(view);
 					}
 				}).fail(function(response){
@@ -331,7 +344,7 @@ define([
 					if (exofiche && userfiche){
 						// Il faut récupérer le numéro de l'exercice dans le devoir
 						var liste = exofiches.where({"idFiche":userfiche.get("idFiche")});
-						var index = _.findIndex(liste, function(item){ return item.get("id") == idEF; });
+						var index = 1+_.findIndex(liste, function(item){ return item.get("id") == idEF; });
 						app.Ariane.add([
 							{ text:userfiche.get("nomFiche"), e:"devoir:show", data:idUF, link:"devoir:"+idUF},
 							{ text:"Exercice "+(index+1)+"/"+liste.length, e:"exercice-fiche:run", data:[idEF, idUF], link:"user-fiche:"+idUF+"/exercice-fiche:" + idEF },
@@ -416,9 +429,24 @@ define([
 						var idEF = ue.get("aEF");
 						var idUF = ue.get("aUF");
 						var userfiche = userfiches.get(idUF);
+						var nomCompletUser = userfiche.get("nomCompletUser");
 						var exofiche = exofiches.get(idEF);
+						var idFiche = exofiche.get("idFiche");
 
-						// debug : Il faut réfléchir au fil d'ariane
+						var EFs = exofiches.where({idFiche : idFiche});
+						var index = _.findIndex(EFs, function(it){
+							return it.get("id") == idEF;
+						});
+
+						app.Ariane.add([
+							{ text:"Devoir #"+idFiche, e:"devoir:show", data:idFiche, link:"devoir:"+idFiche},
+							{ text:"Fiches élèves", e:"devoir:showUserfiches", data:idFiche, link:"devoir:"+idFiche+"/fiches-eleves"},
+							{ text:nomCompletUser+" #"+idUF, e:"devoirs:fiche-eleve:show", data:idUF, link:"devoirs/fiche-eleve:"+idUF },
+							{ text:"Exercice "+(index+1), e:"devoirs:fiche-eleve:faits", data:[idUF, idEF], link:"devoirs/fiche-eleve:"+idUF+"/exercice:"+idEF },
+							{ text:"Essai #"+idUE, e:"exercice-fait:run", data:idUE, link:"exercice-fait:"+idUE }
+						]);
+
+
 						// debug : prévoir une fenêtre de modif des données
 
 						var idE = exofiche.get("idE");
@@ -451,6 +479,10 @@ define([
 						self.show(idE, { optionsValues:exoficheOptions, save:saveFunction, showReinitButton:showReinitButton, ue:ue, showAnswersButton:true });
 
 					} else {
+						app.Ariane.add([
+							{ text:"Élément manquant"}
+						]);
+
 						var view = new MissingView({ message:"Cette sauvegarde de votre travail n'existe pas !" });
 						app.regions.getRegion('main').show(view);
 					}
@@ -481,8 +513,17 @@ define([
 						var idUF = ue.get("aUF");
 						var userfiche = userfiches.get(idUF);
 						var exofiche = exofiches.get(idEF);
+						var idFiche = exofiche.get("idFiche");
+						var EFs = exofiches.where({idFiche : idFiche});
+						var index = _.findIndex(EFs, function(it){
+							return it.get("id") == idEF;
+						});
 
-						// debug : Il faut réfléchir au fil d'ariane
+						app.Ariane.add([
+							{ text:userfiche.get("nomFiche"), e:"devoir:show", data:idUF, link:"devoir:"+idUF},
+							{ text:"Exercice "+(index+1), e:"userfiche:exofiche:faits", data:[idUF,idEF], link:"devoir:"+idUF+"/exercice:"+idEF},
+							{ text:"Essai #"+idUE },
+						]);
 
 						var idE = exofiche.get("idE");
 						// On ne doit transmettre que des options brutes

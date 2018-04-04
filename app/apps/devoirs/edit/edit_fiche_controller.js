@@ -3,11 +3,13 @@ define([
 	"marionette",
 	"apps/common/alert_view",
 	"apps/devoirs/edit/edit_fiche_layout",
+	"apps/common/list_layout",
 	"apps/devoirs/edit/tabs_panel",
 	"apps/devoirs/edit/edit_fiche_view",
 	"apps/common/missing_item_view",
 	"apps/devoirs/edit/exofiches_list_view",
 	"apps/devoirs/edit/exofiches_panel",
+	"apps/exercices/list/list_panel",
 	"apps/exercices/list/list_view",
 	"apps/devoirs/edit/userfiches_list_view",
 	"apps/devoirs/edit/add_userfiches_list_view",
@@ -20,11 +22,13 @@ define([
 	Marionette,
 	AlertView,
 	Layout,
+	ListLayout,
 	TabsPanel,
 	ShowView,
 	MissingView,
 	ExercicesListView,
 	ExercicesPanel,
+	AddExercicePanel,
 	AddExerciceView,
 	ElevesListView,
 	AddEleveView,
@@ -211,6 +215,8 @@ define([
 								var addExerciceView = new AddExerciceView({
 									collection: collection
 								});
+								var addExerciceLayout = new ListLayout();
+								var addExercicePanel = new AddExercicePanel({filterCriterion:""});
 
 								addExerciceView.on("childview:exercice:show",function(childView, args){
 									var model = childView.model;
@@ -220,8 +226,8 @@ define([
 										app.trigger("header:loading", true);
 										$.when(savingItem).done(function(){
 											exofiches.add(new_exofiche);
-											addExerciceView.trigger("dialog:close");
-											var newExoFicheView = exercices_view.children.findByModel(new_exofiche);
+											addExerciceLayout.trigger("dialog:close");
+											var newExoFicheView = view.children.findByModel(new_exofiche);
 											if(newExoFicheView){
 												newExoFicheView.flash("success");
 											}
@@ -241,7 +247,16 @@ define([
 									}
 								});
 
-								app.regions.getRegion('dialog').show(addExerciceView);
+								addExercicePanel.on("exercices:filter", function(filterCriterion){
+									addExerciceView.triggerMethod("set:filter:criterion", filterCriterion, { preventRender:false });
+								});
+
+								addExerciceLayout.on("render", function(){
+									addExerciceLayout.getRegion('panelRegion').show(addExercicePanel);
+									addExerciceLayout.getRegion('itemsRegion').show(addExerciceView);
+								});
+
+								app.regions.getRegion('dialog').show(addExerciceLayout);
 							});
 						});
 

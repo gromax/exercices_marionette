@@ -4,7 +4,7 @@ define([
 	"backbone.syphon"
 ], function(
 	JST,
-	Marionette,
+	Marionette
 ){
 
 	var AnswersView = Marionette.View.extend({

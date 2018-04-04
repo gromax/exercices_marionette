@@ -68,8 +68,8 @@
 			if @opType is "0-"
 				stack.pop()?.opposite?()
 			else
-				@operand2 = stack.pop()
-				@operand1 = stack.pop()
+				@operand2 = stack.pop() ? new MObject()
+				@operand1 = stack.pop() ? new MObject()
 				switch
 					when @opType is "+" then PlusNumber.makePlus( [@operand1, @operand2] )
 					when @opType is "-" then PlusNumber.makePlus( [@operand1, @operand2?.opposite?()] )

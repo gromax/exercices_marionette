@@ -111,7 +111,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
               type: "tableau",
               rank: 5,
               entetes: false,
-              lignes: [_.flatten(["$x_i$", k_values]), _.flatten(["$y_i$", p_values])]
+              lignes: [_.flatten(["$k$", k_values]), _.flatten(["$p(X\\leqslant k)$", p_values])]
             }, {
               type: "input",
               rank: 4,
@@ -160,6 +160,91 @@ define(["utils/math", "utils/help"], function(mM, help) {
           ]
         }
       ];
+    },
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var IF, Xhigh, Xlow, k_values, n, nf, p, p_values, ref;
+        ref = that.init(inputs, options), p = ref[0], n = ref[1], nf = ref[2], Xlow = ref[3], Xhigh = ref[4], k_values = ref[5], p_values = ref[6], IF = ref[7];
+        return {
+          children: [
+            {
+              type: "text",
+              children: ["$p=" + p + "$ &nbsp; (en %), &nbsp; $n=" + n + "$ &nbsp; et &nbsp; $k=" + nf + "$.", "Pour vous aider, on donne les résultats suivants :"]
+            }, {
+              type: "tableau",
+              lignes: [_.flatten(["$k$", k_values]), _.flatten(["$p(X\\leqslant k)$", p_values])]
+            }
+          ]
+        };
+      };
+      return {
+        children: [
+          {
+            type: "text",
+            ps: ["Une usine fabrique des tuyaux en caoutchouc.", "Le fabriquant affirme que &nbsp; $p\\,\\%$ &nbsp; des tuyaux sont poreux.", "On prélève &nbsp; $n$ &nbsp; tuyaux dans la production.", "On obtient &nbsp; $k$ &nbsp; tuyaux poreux.", "Soit &nbsp; $X$ &nbsp; le nombre de tuyau poreux dans un tel échantillon.", "Pour les différentes valeurs de &nbsp; $p$, &nbsp; $n$ &nbsp; et &nbsp; $k$, déterminez :"]
+          }, {
+            type: "enumerate",
+            enumi: "a",
+            children: ["L'espérance &nbsp; $E(X)$ &nbsp; et l'écart-type &nbsp; $\\sigma(X)$", "L'intervalle de fluctuation au seuil de 95 \\%", "Considérant la valeur de &nbsp; $k$, l'affirmation doit-elle être acceptée/rejetée ?"]
+          }, {
+            type: "enumerate",
+            enumi: "1",
+            refresh: true,
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var IF, Xhigh, Xlow, fct_item, k_values, n, nf, p, p_values, ref, that;
+      if (inputs_list.length === 1) {
+        ref = this.init(inputs_list[0], options), p = ref[0], n = ref[1], nf = ref[2], Xlow = ref[3], Xhigh = ref[4], k_values = ref[5], p_values = ref[6], IF = ref[7];
+        return {
+          children: [
+            {
+              type: "text",
+              ps: ["Une usine fabrique des tuyaux en caoutchouc.", "Le fabriquant affirme que " + p + " \\% des tuyaux sont poreux.", "On prélève " + n + " tuyaux dans la production.", "Soit $X$ le nombre de tuyau poreux dans un tel échantillon."]
+            }, {
+              type: "tableau",
+              lignes: [_.flatten(["$k$", k_values]), _.flatten(["$p(X\\leqslant k)$", p_values])]
+            }, {
+              type: "enumerate",
+              enumi: "1",
+              children: ["Calculez l'espérance $E(X)$ et l'écart-type $\\sigma(X)$", "Déterminez l'intervalle de fluctuation au seuil de 95 \\%. Aidez-vous du tableau ci-dessus.", "On a prélevé un échantillon et on a trouvé " + nf + " tuyaux poreux. L'affirmation doit-elle être acceptée/rejetée ?"]
+            }
+          ]
+        };
+      } else {
+        that = this;
+        fct_item = function(inputs, index) {
+          var ref1;
+          ref1 = that.init(inputs, options), p = ref1[0], n = ref1[1], nf = ref1[2], Xlow = ref1[3], Xhigh = ref1[4], k_values = ref1[5], p_values = ref1[6], IF = ref1[7];
+          return [
+            "$p=" + p + "$ (en \\%), $n=" + n + "$ et $k=" + nf + "$.", "Pour vous aider, on donne les résultats suivants :", {
+              type: "tableau",
+              lignes: [_.flatten(["$k$", k_values]), _.flatten(["$p(X\\leqslant k)$", p_values])]
+            }
+          ];
+        };
+        return {
+          children: [
+            {
+              type: "text",
+              ps: ["Une usine fabrique des tuyaux en caoutchouc.", "Le fabriquant affirme que $p\\,\\%$ des tuyaux sont poreux.", "On prélève $n$ tuyaux dans la production.", "On obtient $k$ tuyaux poreux.", "Soit $X$ le nombre de tuyau poreux dans un tel échantillon.", "Pour les différentes valeurs de $p$, $n$ et $k$, déterminez :"]
+            }, {
+              type: "enumerate",
+              enumi: "a",
+              children: ["L'espérance $E(X)$ et l'écart-type $\\sigma(X)$", "L'intervalle de fluctuation au seuil de 95 \\%", "Considérant la valeur de $k$, l'affirmation doit-elle être acceptée/rejetée ?"]
+            }, {
+              type: "enumerate",
+              enumi: "1",
+              children: _.map(inputs_list, fct_item)
+            }
+          ]
+        };
+      }
     }
   };
 });

@@ -17,7 +17,7 @@ define([
 	NotFound,
 	ListEleveView,
 	EleveViewLayout,
-	UnfinishedView,
+	UnfinishedView
 ){
 	var Controller = Marionette.Object.extend({
 		channelName: "entities",

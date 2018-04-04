@@ -3,7 +3,8 @@ define(["jst","marionette"], function(JST,Marionette){
 		template: window.JST["exercices/list/exercice-list-panel"],
 
 		events: {
-			"submit #filter-form": "filterExercices"
+			"submit #filter-form": "filterExercices",
+			//"input @ui.criterion": "changeFilterExercices"
 		},
 
 		ui: {
@@ -13,6 +14,14 @@ define(["jst","marionette"], function(JST,Marionette){
 		serializeData:function(){
 			return {
 				filterCriterion: this.options.filterCriterion || "",
+			}
+		},
+
+		changeFilterExercices: function(e){
+			e.preventDefault();
+			var criterion = this.$(".js-filter-criterion").val();
+			if (criterion.length>3) {
+				this.trigger("exercices:filter", criterion);
 			}
 		},
 

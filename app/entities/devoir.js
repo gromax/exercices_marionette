@@ -12,6 +12,10 @@ define([], function(){
 			date:"2000-01-01"
 		},
 
+		toJSON: function(){
+			return _.pick(this.attributes, 'id', 'idOwner', 'nom', 'description', 'visible', 'actif');
+		},
+
 		parse: function(data){
 			if (data.id) {
 				data.id = Number(data.id);

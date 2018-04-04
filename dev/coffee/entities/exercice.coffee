@@ -323,15 +323,15 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 						for sol in closests
 							if sol.good?
 								# Un objet good a été associé à cette réponse utilisateur
-								{ item_note, errors } = mM.verif[sol.info.type](sol.info, sol.good, model_data)
-								note += item_note/N
+								verifResponse = mM.verif[sol.info.type](sol.info, sol.good, model_data)
+								note += verifResponse.note/N
 								switch
-									when item_note is 1
+									when verifResponse.note is 1
 										items.push { type:"success", text:"<i>#{sol.info.expression}</i> &nbsp; est une bonne réponse." }
-									when item_note > 0
-										if errors.length>0
+									when verifResponse.note > 0
+										if verifResponse.errors.length>0
 											items.push { type:"warning", text:"<i>#{sol.info.expression}</i> &nbsp; est accepté, mais :" }
-											items.push({ type:"warning", text:errorItem }) for errorItem in errors
+											items.push({ type:"warning", text:errorItem }) for errorItem in verifResponse.errors
 										else
 											items.push { type:"warning", text:"<i>#{sol.info.expression}</i> &nbsp; est accepté mais la réponse peut être améliorée." }
 									else
@@ -340,7 +340,7 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 							else
 								bads.push sol.info.expression
 						if bads.length>0 then items.push { type:"error", text:"Ces solutions que vous donnez sont fausses : #{bads.join(" ; ")}" }
-						if lefts.length>0 then items.push { type:"error",text:"Vous n'avez pas donné ces solutions : #{ ("$it.tex()$" for it in lefts).join(" ; ") }" }
+						if lefts.length>0 then items.push { type:"error",text:"Vous n'avez pas donné ces solutions : #{ ("$#{it.tex()}$" for it in lefts).join(" ; ") }" }
 			else
 				# On attend une réponse simple
 				# mais on peut avoir proposé plusieurs réponses possibles
@@ -448,7 +448,67 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 				failedCB = () ->
 					defer.reject({ message: "Fichier #{filename} introuvable."})
 
-				require ["entities/exercices/#{filename}"], successCB, failedCB
+				switch filename
+					when "exo0001" then require ["entities/exercices/exo0001"], successCB, failedCB
+					when "exo0002" then require ["entities/exercices/exo0002"], successCB, failedCB
+					when "exo0003" then require ["entities/exercices/exo0003"], successCB, failedCB
+					when "exo0004" then require ["entities/exercices/exo0004"], successCB, failedCB
+					when "exo0005" then require ["entities/exercices/exo0005"], successCB, failedCB
+					when "exo0006" then require ["entities/exercices/exo0006"], successCB, failedCB
+					when "exo0007" then require ["entities/exercices/exo0007"], successCB, failedCB
+					when "exo0008" then require ["entities/exercices/exo0008"], successCB, failedCB
+					when "exo0009" then require ["entities/exercices/exo0009"], successCB, failedCB
+					when "exo0010" then require ["entities/exercices/exo0010"], successCB, failedCB
+					when "exo0011" then require ["entities/exercices/exo0011"], successCB, failedCB
+					when "exo0012" then require ["entities/exercices/exo0012"], successCB, failedCB
+					when "exo0013" then require ["entities/exercices/exo0013"], successCB, failedCB
+					when "exo0014" then require ["entities/exercices/exo0014"], successCB, failedCB
+					when "exo0015" then require ["entities/exercices/exo0015"], successCB, failedCB
+					when "exo0016" then require ["entities/exercices/exo0016"], successCB, failedCB
+					when "exo0017" then require ["entities/exercices/exo0017"], successCB, failedCB
+					when "exo0018" then require ["entities/exercices/exo0018"], successCB, failedCB
+					when "exo0019" then require ["entities/exercices/exo0019"], successCB, failedCB
+					when "exo0020" then require ["entities/exercices/exo0020"], successCB, failedCB
+					when "exo0021" then require ["entities/exercices/exo0021"], successCB, failedCB
+					when "exo0022" then require ["entities/exercices/exo0022"], successCB, failedCB
+					when "exo0023" then require ["entities/exercices/exo0023"], successCB, failedCB
+					when "exo0024" then require ["entities/exercices/exo0024"], successCB, failedCB
+					when "exo0025" then require ["entities/exercices/exo0025"], successCB, failedCB
+					when "exo0026" then require ["entities/exercices/exo0026"], successCB, failedCB
+					when "exo0027" then require ["entities/exercices/exo0027"], successCB, failedCB
+					when "exo0028" then require ["entities/exercices/exo0028"], successCB, failedCB
+					when "exo0029" then require ["entities/exercices/exo0029"], successCB, failedCB
+					when "exo0030" then require ["entities/exercices/exo0030"], successCB, failedCB
+					when "exo0031" then require ["entities/exercices/exo0031"], successCB, failedCB
+					when "exo0032" then require ["entities/exercices/exo0032"], successCB, failedCB
+					when "exo0033" then require ["entities/exercices/exo0033"], successCB, failedCB
+					when "exo0034" then require ["entities/exercices/exo0034"], successCB, failedCB
+					when "exo0035" then require ["entities/exercices/exo0035"], successCB, failedCB
+					when "exo0036" then require ["entities/exercices/exo0036"], successCB, failedCB
+					when "exo0037" then require ["entities/exercices/exo0037"], successCB, failedCB
+					when "exo0038" then require ["entities/exercices/exo0038"], successCB, failedCB
+					when "exo0039" then require ["entities/exercices/exo0039"], successCB, failedCB
+					when "exo0040" then require ["entities/exercices/exo0040"], successCB, failedCB
+					when "exo0041" then require ["entities/exercices/exo0041"], successCB, failedCB
+					when "exo0042" then require ["entities/exercices/exo0042"], successCB, failedCB
+					when "exo0043" then require ["entities/exercices/exo0043"], successCB, failedCB
+					when "exo0044" then require ["entities/exercices/exo0044"], successCB, failedCB
+					when "exo0045" then require ["entities/exercices/exo0045"], successCB, failedCB
+					when "exo0046" then require ["entities/exercices/exo0046"], successCB, failedCB
+					when "exo0047" then require ["entities/exercices/exo0047"], successCB, failedCB
+					when "exo0048" then require ["entities/exercices/exo0048"], successCB, failedCB
+					when "exo0049" then require ["entities/exercices/exo0049"], successCB, failedCB
+					when "exo0050" then require ["entities/exercices/exo0050"], successCB, failedCB
+					when "exo0051" then require ["entities/exercices/exo0051"], successCB, failedCB
+					when "exo0052" then require ["entities/exercices/exo0052"], successCB, failedCB
+					when "exo0053" then require ["entities/exercices/exo0053"], successCB, failedCB
+					when "exo0054" then require ["entities/exercices/exo0054"], successCB, failedCB
+					#when "exo0055" then require ["entities/exercices/exo0055"], successCB, failedCB
+					#when "exo0056" then require ["entities/exercices/exo0056"], successCB, failedCB
+					#when "exo0057" then require ["entities/exercices/exo0057"], successCB, failedCB
+					#when "exo0058" then require ["entities/exercices/exo0058"], successCB, failedCB
+					#when "exo0059" then require ["entities/exercices/exo0059"], successCB, failedCB
+					else require ["entities/exercices/#{filename}"], successCB, failedCB
 			else
 				defer.reject({ message: "Exercice ##{id} introuvable dans le catalogue."})
 

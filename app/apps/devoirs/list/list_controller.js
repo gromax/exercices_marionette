@@ -107,7 +107,18 @@ define([
 					});
 
 					listItemsView.on("item:delete", function(childView,e){
-						childView.remove();
+						var model = childView.model;
+						var idFiche = model.get("id");
+						var destroyRequest = model.destroy();
+						app.trigger("header:loading", true);
+						$.when(destroyRequest).done(function(){
+							childView.remove();
+							channel.request("fiche:destroy:update", idFiche);
+						}).fail(function(response){
+							alert("Erreur. Essayez à nouveau !");
+						}).always(function(){
+							app.trigger("header:loading", false);
+						});
 					});
 
 					app.regions.getRegion('main').show(listItemsLayout);
