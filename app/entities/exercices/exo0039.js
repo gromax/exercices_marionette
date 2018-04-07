@@ -1,4 +1,4 @@
-define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) {
+define(["utils/math", "utils/help", "utils/colors", "utils/tabVar"], function(mM, help, colors, TabVarApi) {
   return {
     init: function(inputs) {
       var cano, cas, i, item, items, j, len, liste, max, poly, tab, tabX, tabs, variations, xA, xB, yA, yB;
@@ -76,7 +76,7 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
         } else {
           variations = "-/$-\\infty$,+/$" + yA + "$,-/$-\\infty$";
         }
-        tab = (new TabVar(tabX, {
+        tab = (TabVarApi.make(tabX, {
           hauteur_ligne: 25,
           color: colors.html(i),
           texColor: colors.tex(i)
@@ -87,54 +87,45 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
       return [tabs, items];
     },
     getBriques: function(inputs, options) {
-      var items, ref, tabs;
+      var initTabs, items, ref, tabs;
       ref = this.init(inputs), tabs = ref[0], items = ref[1];
+      initTabs = function($container) {
+        var initOneTab;
+        initOneTab = function(tab) {
+          var $el;
+          $el = $("<div></div>");
+          $container.append($el);
+          return tab.render($el[0]);
+        };
+        return _.each(tabs, initOneTab);
+      };
       return [
         {
-          type: "text",
-          rank: 1,
-          ps: ["On vous donne 4 tableaux de variations et 4 fonctions du second degré.", "Vous devez dire à quelle fonction correspond chaque tableau.", "Pour cela appuyez sur les carrés pour sélectionner la bonne couleur."]
-        }, new BaseBrique({
-          zone: "gauche",
-          tabs: tabs,
-          fcts: {
-            makeContainer: function() {
-              var i, tab;
-              return ("<div id='" + this.divId + "'>") + ((function() {
-                var j, len, ref1, results;
-                ref1 = this.config.tabs;
-                results = [];
-                for (i = j = 0, len = ref1.length; j < len; i = ++j) {
-                  tab = ref1[i];
-                  results.push("<div id='" + this.divId + "_tab" + i + "'></div>");
-                }
-                return results;
-              }).call(this)).join("") + "</div>";
-            },
-            display: function() {
-              var i, j, len, ref1, results, tab;
-              ref1 = this.config.tabs;
-              results = [];
-              for (i = j = 0, len = ref1.length; j < len; i = ++j) {
-                tab = ref1[i];
-                results.push(tab.render($("#" + this.divId + "_tab" + i)));
-              }
-              return results;
+          bareme: 100,
+          items: [
+            {
+              type: "text",
+              rank: 1,
+              ps: ["On vous donne 4 tableaux de variations et 4 fonctions du second degré.", "Vous devez dire à quelle fonction correspond chaque tableau.", "Pour cela appuyez sur les carrés pour sélectionner la bonne couleur."]
+            }, {
+              type: "def",
+              rank: 2,
+              renderingFunctions: [initTabs]
+            }, {
+              type: "color-choice",
+              rank: 3,
+              name: "it",
+              list: _.shuffle(items)
+            }, {
+              type: "validation",
+              rank: 5,
+              clavier: ["aide"]
+            }, {
+              type: "aide",
+              rank: 6,
+              list: help.trinome.canonique_et_parabole.concat(help.trinome.a_et_concavite_parabole)
             }
-          }
-        }), {
-          type: "color-choice",
-          rank: 3,
-          name: "it",
-          list: _.shuffle(items)
-        }, {
-          type: "validation",
-          rank: 5,
-          clavier: ["aide"]
-        }, {
-          type: "aide",
-          rank: 6,
-          list: help.trinome.canonique_et_parabole.concat(help.trinome.a_et_concavite_parabole)
+          ]
         }
       ];
     },

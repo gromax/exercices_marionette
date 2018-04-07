@@ -1,10 +1,9 @@
-define ["utils/math", "utils/help", "utils/colors"], (mM, help, colors) ->
+define ["utils/math", "utils/help", "utils/colors", "utils/tabVar"], (mM, help, colors, TabVarApi) ->
 	# id:39
 	# title:"Associer tableaux de variations et fonctions du second degré"
 	# description:"Cinq paraboles et cinq fonctions du second degré sont données. À chaque fonction, il faut attribuer le tableau qui lui correspond."
 	# keyWords:["Analyse","Fonction","Tableau de variation", "Forme canonique", "Second degré","Seconde"]
 
-	# debug: en attente
 	# debug : tex à faire
 
 	return {
@@ -38,54 +37,63 @@ define ["utils/math", "utils/help", "utils/colors"], (mM, help, colors) ->
 				tabX = ["$-\\infty$", "$#{xA}$", "$+\\infty$"]
 				if yB>yA then variations = "+/$+\\infty$,-/$#{yA}$,+/$+\\infty$"
 				else variations = "-/$-\\infty$,+/$#{yA}$,-/$-\\infty$"
-				tab = (new TabVar(tabX, {hauteur_ligne:25, color:colors.html(i), texColor:colors.tex(i)})).addVarLine(variations)
+				tab = ( TabVarApi.make(tabX, {hauteur_ligne:25, color:colors.html(i), texColor:colors.tex(i)})).addVarLine(variations)
 				tabs.push tab
 				items.push item
-
 			[tabs, items]
 
 		getBriques: (inputs,options) ->
 			[tabs, items] = @init(inputs)
 
+			initTabs = ($container)->
+				initOneTab = (tab) ->
+					$el = $("<div></div>")
+					$container.append($el)
+					tab.render $el[0]
+				_.each(tabs, initOneTab)
+
 			[
 				{
-					type: "text"
-					rank: 1
-					ps:[
-						"On vous donne 4 tableaux de variations et 4 fonctions du second degré."
-						"Vous devez dire à quelle fonction correspond chaque tableau."
-						"Pour cela appuyez sur les carrés pour sélectionner la bonne couleur."
+					bareme:100
+					items:[
+						{
+							type: "text"
+							rank: 1
+							ps:[
+								"On vous donne 4 tableaux de variations et 4 fonctions du second degré."
+								"Vous devez dire à quelle fonction correspond chaque tableau."
+								"Pour cela appuyez sur les carrés pour sélectionner la bonne couleur."
+							]
+						}
+						{
+							type: "def"
+							rank: 2
+							renderingFunctions:[
+								initTabs
+							]
+
+						}
+						{
+							type:"color-choice"
+							rank: 3
+							name:"it"
+							list: _.shuffle(items)
+						}
+						{
+							type: "validation"
+							rank: 5
+							clavier: ["aide"]
+						}
+						{
+							type: "aide"
+							rank: 6
+							list: help.trinome.canonique_et_parabole.concat(help.trinome.a_et_concavite_parabole)
+						}
 					]
 				}
-
-				new BaseBrique {
-					zone:"gauche"
-					tabs:tabs
-					fcts: {
-						makeContainer: ->
-							"<div id='#{@divId}'>"+("<div id='#{@divId}_tab#{i}'></div>" for tab,i in @config.tabs).join("")+"</div>"
-						display: ->
-							tab.render $("##{@divId}_tab#{i}") for tab,i in @config.tabs
-					}
-				}
-
-				{
-					type:"color-choice"
-					rank: 3
-					name:"it"
-					list: _.shuffle(items)
-				}
-				{
-					type: "validation"
-					rank: 5
-					clavier: ["aide"]
-				}
-				{
-					type: "aide"
-					rank: 6
-					list: help.trinome.canonique_et_parabole.concat(help.trinome.a_et_concavite_parabole)
-				}
 			]
+
+
 		tex: (data) ->
 			if not isArray(data) then data = [ data ]
 			out = []

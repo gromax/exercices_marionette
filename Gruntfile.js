@@ -39,6 +39,8 @@ module.exports = function(grunt) {
           'app/entities/exercices.js' : 'dev/coffee/entities/exercices.coffee',
           'app/utils/help.js' : 'dev/coffee/utils/help.coffee',
           'app/utils/colors.js' : 'dev/coffee/utils/colors.coffee',
+          'app/utils/svg.js' : 'dev/coffee/utils/svg.coffee',
+          'app/utils/tabVar.js' : 'dev/coffee/utils/tabVar.coffee',
         }
       },
 
