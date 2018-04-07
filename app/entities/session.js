@@ -69,6 +69,23 @@ define(["backbone.radio"], function(Radio){
 			});
 		},
 
+		getWithForgottenKey: function(key) {
+			var that = this;
+			var defer = $.Deferred();
+			var request = $.ajax("api/forgotten/"+key,{
+				method:'GET',
+				dataType:'json'
+			});
+			request.done(function(response){
+				that.refresh(response);
+				defer.resolve();
+			}).fail(function(response){
+				defer.reject(response);
+			});
+
+			return defer.promise();
+		},
+
 		isAdmin:function(){
 			var rank = this.get("rank");
 			return (rank == "Root")||(rank == "Admin");
@@ -135,11 +152,25 @@ define(["backbone.radio"], function(Radio){
 			});
 			Auth.getAuth(callback);
 			return Auth;
+		},
+
+		sendForgottenEmail: function(email){
+			return request = $.ajax(
+				"api/forgotten",
+				{
+					method:'POST',
+					dataType:'json',
+					data: {
+						email:email
+					}
+				}
+			);
 		}
 	};
 
 	var channel = Radio.channel('entities');
 	channel.reply('session:entity', API.getSession );
+	channel.reply('forgotten:password', API.sendForgottenEmail );
 
 	return ; // Pas nécessaire de retourner l'objet Session
 });

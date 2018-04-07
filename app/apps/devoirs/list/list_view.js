@@ -49,6 +49,28 @@ define(["jst","marionette"], function(JST,Marionette){
 			}
 		},
 
+		triggers:{
+			"click a.js-sort":"sort",
+		},
+
+		onSort:function(view,e){
+			var name = $(e.currentTarget).attr("name");
+			if (name) {
+				if (this.collection.comparator==name) {
+					this.collection.comparator = function(a,b){
+						if (a.get(name)>b.get(name)) {
+							return -1;
+						} else {
+							return 1;
+						}
+					}
+				} else {
+					this.collection.comparator=name;
+				}
+				this.collection.sort();
+			}
+		},
+
 		onRender:function(){
 			this.subCollection = new CollectionView({
 				collection:this.collection

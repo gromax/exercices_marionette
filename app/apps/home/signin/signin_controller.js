@@ -66,7 +66,7 @@ define([
 												if(response.status == 422){
 													new_eleve_view.triggerMethod("form:data:invalid", response.responseJSON.errors);
 												} else {
-													alert("An unprocessed error happened. Please try again!");
+													alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/026]");
 												}
 											}).always(function(){
 												app.trigger("header:loading", false);
@@ -83,7 +83,7 @@ define([
 										mdp_view.triggerMethod("form:data:invalid", {mdp:"Mot de passe incorrect."});
 									}
 									else{
-										alert("Erreur inconnue. Essayez à nouveau !");
+										alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/027]");
 									}
 								});
 							});

@@ -137,7 +137,7 @@ define([
 											alert("Vous devez vous (re)connecter !");
 											app.trigger("home:logout");
 										} else {
-											alert("Erreur inconnue. Essayez à nouveau !");
+											alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/023]");
 										}
 									}).always(function(){
 										app.trigger("header:loading", false);
@@ -211,7 +211,7 @@ define([
 									$.when(savingUE).done(function(){
 										traitement_final(brique_view, model, verifs);
 									}).fail(function(response){
-										alert("An unprocessed error happened. Please try again!");
+										alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/023]");
 									});
 								} else {
 									traitement_final(brique_view, model, verifs);

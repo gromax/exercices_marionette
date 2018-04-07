@@ -12,6 +12,7 @@ define(["jst","marionette"], function(JST,Marionette){
 			"click td a.js-edit": "item:edit",
 			"click td a.js-editPwd": "item:editPwd",
 			"click button.js-delete": "item:delete",
+			"click button.js-forgotten": "item:forgotten",
 			"click": "item:show"
 		},
 
@@ -105,6 +106,7 @@ define(["jst","marionette"], function(JST,Marionette){
 			this.listenTo(this.subCollectionView,"childview:item:edit", this.editItem);
 			this.listenTo(this.subCollectionView,"childview:item:editPwd", this.editItemPwd);
 			this.listenTo(this.subCollectionView,"childview:item:delete", this.deleteItem);
+			this.listenTo(this.subCollectionView,"childview:item:forgotten", this.forgottenItem);
 			this.showChildView('body', this.subCollectionView);
 		},
 
@@ -122,6 +124,10 @@ define(["jst","marionette"], function(JST,Marionette){
 
 		deleteItem:function(childView){
 			this.trigger("item:delete",childView);
+		},
+
+		forgottenItem:function(childView){
+			this.trigger("item:forgotten",childView);
 		},
 
 		flash: function(itemModel){

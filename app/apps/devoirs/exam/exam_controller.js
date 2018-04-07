@@ -48,7 +48,7 @@ define([
 											fct_show_tex();
 										}
 									}).fail(function(response){
-										alert("An unprocessed error happened. Please try again!");
+										alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/017]");
 									});
 								}).fail(function(message){
 									alert(message);
@@ -73,10 +73,10 @@ define([
 										view.options.locked = !locked;
 										view.render();
 									}).fail(function(response){
-										alert("Une erreur inconnue s'est produite. Réessayez !");
+										alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/018]");
 									});
 								} else {
-									alert("Une erreur inconnue s'est produite. Réessayez !");
+									alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code x/019]");
 								}
 							});
 

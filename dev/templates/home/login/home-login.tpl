@@ -17,6 +17,7 @@
 					<input type="password" class="form-control" name="pwd" id="user-pwd" placeholder="Entrez un mot de passe">
 				</div>
 			</div>
+			<button class="btn btn-warning js-forgotten">Mot de passe oublié</button>
 			<button class="btn btn-primary js-submit">Valider</button>
 			<div id="messages"></div>
 		</form>

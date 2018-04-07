@@ -44,7 +44,7 @@ define([
 											alert("Vous devez vous (re)connecter !");
 											app.trigger("home:logout");
 										} else {
-											alert("Erreur inconnue. Essayez à nouveau !");
+											alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/001]");
 										}
 									}
 								});

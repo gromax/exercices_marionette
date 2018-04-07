@@ -262,14 +262,22 @@ class users
 
     public function forgottenWithEmail()
     {
-        $data = json_decode(file_get_contents("php://input"),true);
-        if (isset($data['identifiant']))
+        if (isset($_POST['email']))
         {
-            $identifiant = $data['identifiant'];
-            $id = User::emailExists($identifiant);
+            $email = $_POST['email'];
+            $id = User::emailExists($email);
 
             if ($id!==false) {
-                return $this->forgotten(User::getObject($id));
+                $user = User::getObject($id);
+                if ($user!==null)
+                {
+                    return $this->forgotten($user);
+                }
+                else
+                {
+                    EC::set_error_code(404);
+                    return false;
+                }
             }
             else
             {
@@ -277,31 +285,19 @@ class users
                 return false;
             }
         }
-    }
-
-    public function forgottenWithId()
-    {
-        $id = (integer) $this->params['id'];
-        $user = User::getObject($id);
-        if ($user!==null)
-        {
-            return $this->forgotten($user);
-        }
         else
         {
-            EC::set_error_code(404);
+            EC::set_error_code(501);
             return false;
         }
     }
-
 
     private function forgotten($user)
     {
         $key = $user->initKey();
         if ($key!==null)
         {
-            $params = $user->toArray();
-            send_html_mail($params['email'],"Mot de passe oublié","<b>".NOM_SITE.".</b> Vous avez oublié votre mot de passe. Suivez ce lien pour pour modifier votre mot de passe : <a href='".PATH_TO_SITE."/#reinit:$key'>Réinitialisation du mot de passe</a>.");
+            send_html_mail($user->identifiant(),"Mot de passe oublié","<b>".NOM_SITE.".</b> Vous avez oublié votre mot de passe. Suivez ce lien pour pour modifier votre mot de passe : <a href='".PATH_TO_SITE."/#forgotten:$key'>Réinitialisation du mot de passe</a>.");
             return array("message"=>"Email envoyé.");
         }
         else

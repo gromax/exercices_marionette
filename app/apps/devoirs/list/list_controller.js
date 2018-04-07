@@ -61,7 +61,7 @@ define([
 											view.trigger("dialog:close");
 											app.trigger("home:logout");
 										} else {
-											alert("Une erreur inconnue s'est produite. Réessayez !");
+											alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/020]");
 										}
 									}
 								}).always(function(){
@@ -96,29 +96,32 @@ define([
 									alert("Vous devez vous (re)connecter !");
 									app.trigger("home:logout");
 								} else {
-									alert("Une erreur inconnue s'est produite. Réessayez !");
+									alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/021]");
 								}
 							}).always(function(){
 								app.trigger("header:loading", false);
 							});
 						} else {
-							alert("Une erreur inconnue s'est produite. Réessayez !");
+							alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code x/022]");
 						}
 					});
 
 					listItemsView.on("item:delete", function(childView,e){
 						var model = childView.model;
 						var idFiche = model.get("id");
-						var destroyRequest = model.destroy();
-						app.trigger("header:loading", true);
-						$.when(destroyRequest).done(function(){
-							childView.remove();
-							channel.request("fiche:destroy:update", idFiche);
-						}).fail(function(response){
-							alert("Erreur. Essayez à nouveau !");
-						}).always(function(){
-							app.trigger("header:loading", false);
-						});
+						if (confirm("Supprimer le devoir « "+model.get("nom")+" » ?")) {
+							var destroyRequest = model.destroy();
+							app.trigger("header:loading", true);
+							$.when(destroyRequest).done(function(){
+								childView.remove();
+								channel.request("fiche:destroy:update", idFiche);
+							}).fail(function(response){
+								alert("Erreur. Essayez à nouveau !");
+							}).always(function(){
+								app.trigger("header:loading", false);
+							});
+						}
+
 					});
 
 					app.regions.getRegion('main').show(listItemsLayout);

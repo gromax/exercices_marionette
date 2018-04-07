@@ -503,6 +503,14 @@ define [], () ->
 				keyWords:["probabilités","binomiale","normale", "Intervalle de fluctuation","TSTL"]
 				options: {}
 			}
+			{
+				id:57
+				filename: "exo0057"
+				title:"Aire sous une courbe"
+				description:"La courbe d'une fonction est donnée. Il faut déterminer l'aire sous la courbe."
+				keyWords:["Intégrale","Analyse","Primitive", "TSTL"]
+				options: {}
+			}
 		]
 		get: (id) ->
 			idExo = Number id

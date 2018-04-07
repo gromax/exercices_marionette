@@ -76,7 +76,7 @@ define([
 											view.trigger("dialog:close");
 											app.trigger("home:logout");
 										} else {
-											alert("Erreur inconnue. Essayez à nouveau !");
+											alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/030]");
 										}
 									}
 								});
@@ -116,7 +116,7 @@ define([
 											view.trigger("dialog:close");
 											app.trigger("home:logout");
 										} else {
-											alert("Erreur inconnue. Essayez à nouveau !");
+											alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/031]");
 										}
 									}
 								}).always(function(){
@@ -157,7 +157,7 @@ define([
 												view.trigger("dialog:close");
 												app.trigger("home:logout");
 											} else {
-												alert("Erreur inconnue. Essayez à nouveau !");
+												alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/032]");
 											}
 										}
 									}).always(function(){
@@ -175,16 +175,35 @@ define([
 					usersListView.on("item:delete", function(childView,e){
 						var model = childView.model;
 						var idUser = model.get("id");
-						var destroyRequest = model.destroy();
-						app.trigger("header:loading", true);
-						$.when(destroyRequest).done(function(){
-							childView.remove();
-							channel.request("user:destroy:update", idUser);
-						}).fail(function(response){
-							alert("Erreur. Essayez à nouveau !");
-						}).always(function(){
-							app.trigger("header:loading", false);
-						});
+						if (confirm("Supprimer le compte de « "+model.get("nomComplet")+" » ?")){
+							var destroyRequest = model.destroy();
+							app.trigger("header:loading", true);
+							$.when(destroyRequest).done(function(){
+								childView.remove();
+								channel.request("user:destroy:update", idUser);
+							}).fail(function(response){
+								alert("Erreur. Essayez à nouveau !");
+							}).always(function(){
+								app.trigger("header:loading", false);
+							});
+						}
+					});
+
+
+					usersListView.on("item:forgotten", function(childView,e){
+						var model = childView.model;
+						var email = model.get("email");
+						if (confirm("Envoyer un mail de réinitialisation à « "+model.get("nomComplet")+" » ?")){
+							app.trigger("header:loading", true);
+							sendingMail = channel.request("forgotten:password", email);
+							sendingMail.always(function(){
+								app.trigger("header:loading", false);
+							}).done(function(response){
+								childView.flash("success");
+							}).fail(function(response){
+								alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/034]");
+							});
+						}
 					});
 
 					app.regions.getRegion('main').show(usersListLayout);

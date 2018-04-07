@@ -125,26 +125,20 @@ class session
         );
     }
 
-    protected function reinitMDP()
+    public function reinitMDP()
     {
-        $data = json_decode(file_get_contents("php://input"),true);
-        if (isset($data['key']))
+        $key = $this->params["key"];
+        Logged::tryConnexionOnInitMDP($key);
+        $uLog = Logged::getConnectedUser();
+        if ($uLog->connexionOk())
         {
-            $key = $data['key'];
-            Logged::tryConnexionOnInitMDP($key);
-            $uLog = Logged::getConnectedUser();
-            if ($uLog->connexionOk())
-            {
-                return $data = $this->getData($uLog);
-            }
-            else
-            {
-                EC::set_error_code(401);
-                return false;
-            }
+            return $data = $this->getData($uLog);
         }
-        EC::set_error_code(501);
-        return false;
+        else
+        {
+            EC::set_error_code(401);
+            return false;
+        }
     }
 
 

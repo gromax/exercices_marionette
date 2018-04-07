@@ -12,6 +12,6 @@
 		<a href="#user:<%- id %>/password" class="btn btn-secondary btn-sm js-editPwd" role="button"><i class="fa fa-key" title="Modifier"></i></a>		<!-- Bouton suppression -->
 		<button type="button" class="btn btn-danger btn-sm js-delete"><i class="fa fa-trash" aria-hidden="true" title="Supprimer"></i></button>
 		<!-- Bouton mdp oublié -->
-		<button type="button" class="btn btn-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Mot de passe oublié"><i class="fa fa-envelope" aria-hidden="true"></i></span></button>
+		<button type="button" class="btn btn-secondary btn-sm js-forgotten" data-toggle="tooltip" data-placement="top" title="Mot de passe oublié"><i class="fa fa-envelope" aria-hidden="true"></i></span></button>
 	</div>
 </td>

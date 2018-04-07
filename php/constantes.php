@@ -17,7 +17,7 @@
 	// mails
 	define("PSEUDO_FROM","Exercices de maths");
 	define("EMAIL_FROM","noreply@goupill.fr");
-	define("PATH_TO_SITE","exercices.goupill.fr");
+	define("PATH_TO_SITE","exos.goupill.fr");
 	define("NOM_SITE","Exercices de maths sur goupill.fr");
 
 	// Calcul de notes

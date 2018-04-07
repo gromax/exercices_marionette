@@ -7,7 +7,8 @@ define([
 	"apps/common/not_found",
 	"apps/home/show/devoirs_list_eleve_view",
 	"apps/home/show/eleve_view_layout",
-	"apps/home/show/unfinished_message"
+	"apps/home/show/unfinished_message",
+	"apps/home/show/forgotten_key_view"
 ], function(
 	app,
 	Marionette,
@@ -17,7 +18,8 @@ define([
 	NotFound,
 	ListEleveView,
 	EleveViewLayout,
-	UnfinishedView
+	UnfinishedView,
+	ForgottenKeyView
 ){
 	var Controller = Marionette.Object.extend({
 		channelName: "entities",
@@ -106,6 +108,19 @@ define([
 					app.trigger("header:loading", false);
 				});
 			});
+		},
+
+		showLogOnForgottenKey: function(success){
+			if (success){
+				var view = new ForgottenKeyView();
+				view.on("forgotten:reinitMDP:click", function(){
+					app.trigger("user:editPwd",null);
+				});
+				app.regions.getRegion('main').show(view);
+			} else {
+				var view = new AlertView({ title:"Clé introuvable !", message:"L'adresse que vous avez saisie n'est pas valable."});
+				app.regions.getRegion('main').show(view);
+			}
 		}
 	});
 

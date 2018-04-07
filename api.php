@@ -22,8 +22,6 @@ $router->addRule('api/session', 'session', 'fetch', 'GET'); // Session active
 $router->addRule('api/session', 'session', 'insert', 'POST'); // Tentative de connexion
 $router->addRule('api/session/:id', 'session', 'delete', 'DELETE'); // Déconnexion
 $router->addRule('api/session/test', 'session', 'logged', 'GET'); // Vérifie l'état de connexion
-$router->addRule('api/session/keylog', 'session', 'reinitMDP', 'POST'); // Essaie de se connecter avec une clé de réinit
-$router->addRule('api/session/initpwd', 'users', 'forgottenWithEmail', 'POST'); // Demande d'envoyer un mail
 
 // users
 $router->addRule('api/users/:id', 'users', 'fetch', 'GET');
@@ -77,6 +75,9 @@ $router->addRule('api/eleveData', 'data', 'eleveFetch', 'GET');
 $router->addRule('api/customData/:asks', 'data', 'customFetch', 'GET');
 $router->addRule('api/me', 'data', 'fetchMe', 'GET');
 
+// forgotten
+$router->addRule('api/forgotten', 'users', 'forgottenWithEmail', 'POST');
+$router->addRule('api/forgotten/:key', 'session', 'reinitMDP', 'GET'); // Essaie de se connecter avec une clé de réinit
 
 $response = $router->load();
 EC::header(); // Doit être en premier !

@@ -56,6 +56,7 @@ define(["marionette","app"], function(Marionette,app){
 
 		editUserPwd: function(id){
 			var auth = app.Auth;
+			var id = id || auth.get("id");
 			if(auth.get("id") == id) {
 				app.Ariane.reset([]);
 				require(["apps/users/edit/edit_controller"], function(editController){

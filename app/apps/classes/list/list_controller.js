@@ -61,7 +61,7 @@ define([
 											view.trigger("dialog:close");
 											app.trigger("home:logout");
 										} else {
-											alert("Erreur inconnue. Essayez à nouveau !");
+											alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/002]");
 										}
 									}
 								});
@@ -100,7 +100,7 @@ define([
 											view.trigger("dialog:close");
 											app.trigger("home:logout");
 										} else {
-											alert("Erreur inconnue. Essayez à nouveau !");
+											alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/003]");
 										}
 									}
 								});

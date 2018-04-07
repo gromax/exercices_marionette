@@ -96,7 +96,7 @@ define([
 											alert("Vous devez vous (re)connecter !");
 											app.trigger("home:logout");
 										} else {
-											alert("Erreur inconnue. Essayez à nouveau !");
+											alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/004]");
 										}
 									}
 								}).always(function(){
@@ -194,7 +194,7 @@ define([
 											alert("Vous devez vous (re)connecter !");
 											app.trigger("home:logout");
 										} else {
-											alert("Erreur inconnue. Essayez à nouveau !");
+											alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/005]");
 										}
 									}
 								}).always(function(){
@@ -237,13 +237,13 @@ define([
 												addExerciceView.trigger("dialog:close");
 												app.trigger("home:logout");
 											} else {
-												alert("Erreur inconnue. Essayez à nouveau !");
+												alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/006]");
 											}
 										}).always(function(){
 											app.trigger("header:loading", false);
 										});
 									} else {
-										alert("An unprocessed error happened. Please try again!");
+										alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code x/007]");
 									}
 								});
 
@@ -333,14 +333,14 @@ define([
 										alert("Vous devez vous (re)connecter !");
 										app.trigger("home:logout");
 									} else {
-										alert("Erreur inconnue. Essayez à nouveau !");
+										alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/008]");
 									}
 								}).always(function(){
 									app.trigger("header:loading", false);
 								});
 							} else {
 								childview.flash("danger");
-								alert("Une erreur inconnue s'est produite. Réessayez !");
+								alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code x/009]");
 							}
 						});
 
@@ -433,13 +433,13 @@ define([
 											alert("Vous devez vous (re)connecter !");
 											app.trigger("home:logout");
 										} else {
-											alert("Erreur inconnue. Essayez à nouveau !");
+											alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/010]");
 										}
 									}).always(function(){
 										app.trigger("header:loading", false);
 									});
 								} else {
-									alert("An unprocessed error happened. Please try again!");
+									alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code x/011]");
 								}
 
 							});
@@ -531,7 +531,7 @@ define([
 												alert("Vous devez vous (re)connecter !");
 												app.trigger("home:logout");
 											} else {
-												alert("Erreur inconnue. Essayez à nouveau !");
+												alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/012]");
 											}
 										}
 									}).always(function(){
@@ -560,13 +560,13 @@ define([
 										alert("Vous devez vous (re)connecter !");
 										app.trigger("home:logout");
 									} else {
-										alert("Erreur inconnue. Essayez à nouveau !");
+										alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/013]");
 									}
 								}).always(function(){
 									app.trigger("header:loading", false);
 								});
 							} else {
-								alert("Une erreur inconnue s'est produite. Réessayez !");
+								alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code x/014]");
 							}
 						});
 
@@ -587,7 +587,7 @@ define([
 									$.when(savingItem).done(function(){
 										exams.add(newExam);
 									}).fail(function(response){
-										alert("An unprocessed error happened. Please try again!");
+										alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code x/015]");
 									});
 
 								}).fail(function(response){
@@ -598,7 +598,7 @@ define([
 										if (_.isArray(response.messages)) {
 											alert(response.messages.join("\n"));
 										} else {
-											alert("Une erreur inconnue s'est produite. Réessayez !");
+											alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/016]");
 										}
 									}
 								}).always(function(){

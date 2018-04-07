@@ -3,13 +3,20 @@ define(["marionette","app","jst", "backbone.syphon"], function(Marionette,app,JS
 		template: window.JST["home/login/home-login"],
 
 		events: {
-			"click button.js-submit": "submitClicked"
+			"click button.js-submit": "submitClicked",
+			"click button.js-forgotten": "forgottenClicked"
 		},
 
 		submitClicked: function(e){
 			e.preventDefault();
 			var data = Backbone.Syphon.serialize(this);
 			this.trigger("form:submit", data);
+		},
+
+		forgottenClicked: function(e){
+			e.preventDefault();
+			var data = Backbone.Syphon.serialize(this);
+			this.trigger("login:forgotten", data.identifiant);
 		},
 
 		onFormDataInvalid: function(errors){

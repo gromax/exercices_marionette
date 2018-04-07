@@ -44,10 +44,35 @@ define(["marionette","app"], function(Marionette,app){
 						showController.showHome();
 					});
 				}).fail(function(response){
-					alert("An unprocessed error happened. Please try again!");
+					alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/024]");
 				});
 			}
 		},
+
+		forgotten: function(key){
+			if (app.Auth.get("logged_in")) {
+				app.trigger("notFound");
+			} else {
+				app.Ariane.reset([{text:"Réinitialisation de mot de passe"}]);
+				app.trigger("header:loading", true);
+				require(["apps/home/show/show_controller"], function(showController){
+					var fetching = app.Auth.getWithForgottenKey(key);
+					$.when(fetching).done(function(){
+						showController.showLogOnForgottenKey(true);
+					}).fail(function(response){
+						if (response.status==401) {
+							showController.showLogOnForgottenKey(false);
+						} else {
+							alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/034]");
+						}
+					}).always(function(){
+						app.trigger("header:loading", false);
+					});
+
+				});
+			}
+
+		}
 
 	};
 
@@ -74,10 +99,12 @@ define(["marionette","app"], function(Marionette,app){
 	var Router = Marionette.AppRouter.extend({
 		controller: API,
 		appRoutes: {
+			"" : "showHome",
 			"home" : "showHome",
 			"login" : "showLogin",
 			"logout" : "logout",
 			"rejoindre-une-classe": "showSignin",
+			"forgotten::key": "forgotten"
 		}
 	});
 

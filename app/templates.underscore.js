@@ -934,7 +934,7 @@ this["JST"]["devoirs/list/devoir-list"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
-__p += '<thead>\n\t<tr>\n\t\t<th>#</th>\n\t\t<th>Nom</th>\n\t\t<th>Professeur</th>\n\t\t<th><i class="fa fa-clock-o"></i></th>\n\t\t<th width="170px"></th><!-- bouton visible/invisible|bouton actif/inactif|lien vers liste aUF|bouton d\'édition|bouton de suppression -->\n\t</tr>\n</thead>\n<tbody>\n</tbody>\n';
+__p += '<thead>\n\t<tr>\n\t\t<th><a href="" class="js-sort" name="id">#</a></th>\n\t\t<th><a href="" class="js-sort" name="nom">Nom</a></th>\n\t\t<th><a href="" class="js-sort" name="nomOwner">Professeur</a></th>\n\t\t<th><a href="" class="js-sort" name="date"><i class="fa fa-clock-o" aria-hidden="true"></i></a></th>\n\t\t<th width="170px"></th><!-- bouton visible/invisible|bouton actif/inactif|lien vers liste aUF|bouton d\'édition|bouton de suppression -->\n\t</tr>\n</thead>\n<tbody>\n</tbody>\n';
 
 }
 return __p
@@ -1530,7 +1530,7 @@ this["JST"]["home/login/home-login"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
-__p += '<div class="card">\n\t<div class="card-header">\n\t\tConnexion\n\t</div>\n\t<div class="card-body">\n\t\t<form>\n\t\t\t<div class="form-group row">\n\t\t\t\t<label for="user-identifiant" class="col-form-label col-sm-3">Email</label>\n\t\t\t\t<div class="col-sm-9">\n\t\t\t\t\t<input type="email" class="form-control" name="identifiant" id="user-identifiant" placeholder="Entrez un email" value="">\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class="form-group row">\n\t\t\t\t<label for="user-pwd" class="col-form-label col-sm-3">Mot de passe</label>\n\t\t\t\t<div class="col-sm-9">\n\t\t\t\t\t<input type="password" class="form-control" name="pwd" id="user-pwd" placeholder="Entrez un mot de passe">\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<button class="btn btn-primary js-submit">Valider</button>\n\t\t\t<div id="messages"></div>\n\t\t</form>\n\t</div>\n</div>\n';
+__p += '<div class="card">\n\t<div class="card-header">\n\t\tConnexion\n\t</div>\n\t<div class="card-body">\n\t\t<form>\n\t\t\t<div class="form-group row">\n\t\t\t\t<label for="user-identifiant" class="col-form-label col-sm-3">Email</label>\n\t\t\t\t<div class="col-sm-9">\n\t\t\t\t\t<input type="email" class="form-control" name="identifiant" id="user-identifiant" placeholder="Entrez un email" value="">\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class="form-group row">\n\t\t\t\t<label for="user-pwd" class="col-form-label col-sm-3">Mot de passe</label>\n\t\t\t\t<div class="col-sm-9">\n\t\t\t\t\t<input type="password" class="form-control" name="pwd" id="user-pwd" placeholder="Entrez un mot de passe">\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<button class="btn btn-warning js-forgotten">Mot de passe oublié</button>\n\t\t\t<button class="btn btn-primary js-submit">Valider</button>\n\t\t\t<div id="messages"></div>\n\t\t</form>\n\t</div>\n</div>\n';
 
 }
 return __p
@@ -1592,6 +1592,16 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
 __p += '<div class="jumbotron">\n\t<h1>Bienvenue !</h1>\n\n\t<p>Vous êtes administrateur du site. Vous pouvez exécuter une des commandes suivantes :</p>\n\n\t<div class="list-group">\n\t<a type="button" class="list-group-item list-group-item-action disabled" href="#Connexions"><i class="fa fa-sign-in" aria-hidden="true"></i> Connexions</a>\n\n\t<a type="button" class="list-group-item list-group-item-action js-users" href="#users"><i class="fa fa-users" aria-hidden="true"></i> Voir les utilisateurs</a>\n\n\t<a type="button" class="list-group-item list-group-item-action js-classes" href="#classes"><i class="fa fa-graduation-cap" aria-hidden="true"></i> Voir les classes</a>\n\n\t<a type="button" class="list-group-item list-group-item-action js-exercices" href="#exercices"><i class="fa fa-files-o" aria-hidden="true"></i> Voir les exercices</a>\n\n\t<a type="button" class="list-group-item list-group-item-action js-devoirs" href="#Devoirs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Voir les devoirs</a>\n\t</div>\n</div>\n';
+
+}
+return __p
+};
+
+this["JST"]["home/show/home-forgotten-key"] = function(obj) {
+obj || (obj = {});
+var __t, __p = '', __e = _.escape;
+with (obj) {
+__p += '<div class="jumbotron">\n\t<h1>Bienvenue !</h1>\n\t<p>Vous êtes maintenant connecté(e).</p>\n\t<hr class="my-4">\n\t<p> <a class="btn btn-danger btn-lg js-reinit-mdp" href="#" role="button">Réinitialisez votre mot de passe !</a></p>\n</div>\n';
 
 }
 return __p
@@ -1734,7 +1744,7 @@ __e( rank ) +
 __e( id ) +
 '/edit" class="btn btn-secondary btn-sm js-edit" role="button"><i class="fa fa-pencil" title="Modifier"></i></a>\n\t\t<!-- Bouton de mot de passe -->\n\t\t<a href="#user:' +
 __e( id ) +
-'/password" class="btn btn-secondary btn-sm js-editPwd" role="button"><i class="fa fa-key" title="Modifier"></i></a>\t\t<!-- Bouton suppression -->\n\t\t<button type="button" class="btn btn-danger btn-sm js-delete"><i class="fa fa-trash" aria-hidden="true" title="Supprimer"></i></button>\n\t\t<!-- Bouton mdp oublié -->\n\t\t<button type="button" class="btn btn-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Mot de passe oublié"><i class="fa fa-envelope" aria-hidden="true"></i></span></button>\n\t</div>\n</td>\n';
+'/password" class="btn btn-secondary btn-sm js-editPwd" role="button"><i class="fa fa-key" title="Modifier"></i></a>\t\t<!-- Bouton suppression -->\n\t\t<button type="button" class="btn btn-danger btn-sm js-delete"><i class="fa fa-trash" aria-hidden="true" title="Supprimer"></i></button>\n\t\t<!-- Bouton mdp oublié -->\n\t\t<button type="button" class="btn btn-secondary btn-sm js-forgotten" data-toggle="tooltip" data-placement="top" title="Mot de passe oublié"><i class="fa fa-envelope" aria-hidden="true"></i></span></button>\n\t</div>\n</td>\n';
 
 }
 return __p

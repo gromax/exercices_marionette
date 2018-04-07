@@ -3,14 +3,14 @@ define(["jst","marionette","spin.jquery"], function(JST,Marionette){
 		tag:"div",
 		template: window.JST["common/alert-view"],
 		className: function(){
-			return "alert alert-"+this.options.type;
+			return "alert alert-"+(this.options.type || "danger");
 		},
 
 		initialize: function(options){
 			var options = options || {};
 			this.title = options.title || "Erreur !";
 			this.message = options.message || "Erreur inconnue. Reessayez !";
-			this.type = options.type || "danger;"
+			this.type = options.type || "danger";
 		},
 
 		serializeData: function(){

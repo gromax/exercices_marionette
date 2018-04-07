@@ -477,6 +477,13 @@ define([], function() {
         description: "Dans le cadre de l'approximation d'une loi Binomiale par une loi Normale, calculer un intervalle de fluctuation asymptotique et prendre une décision.",
         keyWords: ["probabilités", "binomiale", "normale", "Intervalle de fluctuation", "TSTL"],
         options: {}
+      }, {
+        id: 57,
+        filename: "exo0057",
+        title: "Aire sous une courbe",
+        description: "La courbe d'une fonction est donnée. Il faut déterminer l'aire sous la courbe.",
+        keyWords: ["Intégrale", "Analyse", "Primitive", "TSTL"],
+        options: {}
       }
     ],
     get: function(id) {
