@@ -21,6 +21,9 @@ define(["jst","marionette"], function(JST,Marionette){
 		serializeData: function(){
 			data = _.clone(this.model.attributes);
 			data.note = this.model.calcNote(this.exofiches, this.faits);
+			if (_.has(data,"ficheActive")) {
+				data.actif = data.actif && data.ficheActive;
+			}
 			return data;
 		},
 

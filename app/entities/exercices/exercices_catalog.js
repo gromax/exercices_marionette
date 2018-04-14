@@ -314,7 +314,7 @@ define([], function() {
       }, {
         id: 39,
         filename: "exo0039",
-        title: "* Associer tableaux de variations et fonctions du second degré",
+        title: "Associer tableaux de variations et fonctions du second degré",
         description: "Cinq paraboles et cinq fonctions du second degré sont données. À chaque fonction, il faut attribuer le tableau qui lui correspond.",
         keyWords: ["Analyse", "Fonction", "Tableau de variation", "Forme canonique", "Second degré", "Seconde"],
         options: {}

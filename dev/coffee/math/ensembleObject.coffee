@@ -21,6 +21,7 @@
 		toString: -> (String(op) for op in @_operands).join(@type)
 		getOperands: -> @_operands
 		toEquation: -> new Equation(@operands[0], @operands[1])
+
 	class Equation extends MObject
 		constructor: (gauche, droite)->
 			@gauche = @affectation gauche

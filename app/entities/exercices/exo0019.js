@@ -1,7 +1,7 @@
-define(["utils/math", "utils/help"], function(mM, help) {
+define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, help, colors, TabSignApi) {
   return {
     init: function(inputs) {
-      var a, a_is_plus, b, c, ensemble_solution, goodTab, im, ineq, ineqSign, poly, polyTex, racines, re, sol_is_ext, sol_xor, tabS1, tabS2, tabX, x1, x2;
+      var a, a_is_plus, b, c, ensemble_solution, goodTab, im, ineq, ineqSign, poly, polyTex, racines, re, sol_is_ext, sol_xor, tabS1, tabS2, tabX, tabs, x1, x2;
       if ((typeof inputs.a !== "undefined") && (typeof inputs.b !== "undefined") && (typeof inputs.c !== "undefined") && (typeof inputs.ineq !== "undefined")) {
         a = Number(inputs.a);
         b = Number(inputs.b);
@@ -50,7 +50,6 @@ define(["utils/math", "utils/help"], function(mM, help) {
       racines = mM.polynome.solve.exact(poly, {
         y: 0
       });
-      console.log(racines);
       switch (racines.length) {
         case 1:
           if (sol_xor) {
@@ -74,6 +73,17 @@ define(["utils/math", "utils/help"], function(mM, help) {
           tabS1 = ",-,";
           tabS2 = ",+,";
       }
+      tabs = [
+        (TabSignApi.make(tabX, {
+          hauteur_ligne: 25,
+          color: colors.html(0),
+          texColor: colors.tex(0)
+        })).addSignLine(tabS1), (TabSignApi.make(tabX, {
+          hauteur_ligne: 25,
+          color: colors.html(1),
+          texColor: colors.tex(1)
+        })).addSignLine(tabS2)
+      ];
       if (sol_is_ext) {
         ensemble_solution.inverse();
       }
@@ -84,11 +94,21 @@ define(["utils/math", "utils/help"], function(mM, help) {
       }
       ineqSign = ["<", ">", "\\leqslant", "\\geqslant"];
       polyTex = poly.tex();
-      return [polyTex + " " + ineqSign[ineq] + " 0", polyTex, poly, racines, ensemble_solution];
+      return [polyTex + " " + ineqSign[ineq] + " 0", polyTex, poly, racines, ensemble_solution, tabs, goodTab];
     },
     getBriques: function(inputs, options) {
-      var ensemble_solution, ineqTex, poly, polyTex, racines, ref;
-      ref = this.init(inputs), ineqTex = ref[0], polyTex = ref[1], poly = ref[2], racines = ref[3], ensemble_solution = ref[4];
+      var ensemble_solution, goodTab, ineqTex, initTabs, poly, polyTex, racines, ref, tabs;
+      ref = this.init(inputs), ineqTex = ref[0], polyTex = ref[1], poly = ref[2], racines = ref[3], ensemble_solution = ref[4], tabs = ref[5], goodTab = ref[6];
+      initTabs = function($container) {
+        var initOneTab;
+        initOneTab = function(tab) {
+          var $el;
+          $el = $("<div></div>");
+          $container.append($el);
+          return tab.render($el[0]);
+        };
+        return _.each(tabs, initOneTab);
+      };
       return [
         {
           bareme: 20,
@@ -143,7 +163,36 @@ define(["utils/math", "utils/help"], function(mM, help) {
             }
           ]
         }, {
-          bareme: 40,
+          bareme: 20,
+          title: "Tableau de signe",
+          items: [
+            {
+              type: "text",
+              rank: 1,
+              ps: ["Choisissez le tableau de signe correspondant à &nbsp; $f(x)=" + polyTex + "$."]
+            }, {
+              type: "def",
+              rank: 2,
+              renderingFunctions: [initTabs]
+            }, {
+              type: "color-choice",
+              rank: 3,
+              name: "it",
+              list: [
+                {
+                  rank: goodTab,
+                  text: "Bon tableau"
+                }
+              ],
+              maxValue: 1
+            }, {
+              type: "validation",
+              rank: 4,
+              clavier: []
+            }
+          ]
+        }, {
+          bareme: 20,
           title: "Ensemble solution",
           items: [
             {
@@ -176,7 +225,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
         return {
           type: "enumerate",
           enumi: "1",
-          children: ["Donnez les racines de &nbsp; $polyTex$", "Déduisez-en l'ensemble solution de &nbsp; $ineqTex$."]
+          children: ["Donnez les racines de &nbsp; $polyTex$", "Faites le tableau de signe de &nbsp; $polyTex$", "Déduisez-en l'ensemble solution de &nbsp; $ineqTex$."]
         };
       };
       return {
@@ -199,7 +248,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
         return {
           type: "enumerate",
           enumi: "1",
-          children: ["Donnez les racines de $polyTex$", "Déduisez-en l'ensemble solution de $ineqTex$."]
+          children: ["Donnez les racines de $polyTex$", "Faites le tableau de signe de $polyTex$", "Déduisez-en l'ensemble solution de $ineqTex$."]
         };
       };
       return {

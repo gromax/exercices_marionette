@@ -1,4 +1,4 @@
-define ["utils/math", "utils/help", "utils/colors", "utils/tabVar"], (mM, help, colors, TabVarApi) ->
+define ["utils/math", "utils/help", "utils/colors", "utils/tab"], (mM, help, colors, TabVarApi) ->
 	# id:39
 	# title:"Associer tableaux de variations et fonctions du second degré"
 	# description:"Cinq paraboles et cinq fonctions du second degré sont données. À chaque fonction, il faut attribuer le tableau qui lui correspond."

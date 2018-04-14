@@ -1,4 +1,4 @@
-define ["utils/math","utils/help"], (mM, help) ->
+define ["utils/math","utils/help", "utils/colors", "utils/tab"], (mM, help, colors, TabSignApi) ->
 #	id:19
 #	title:"Inéquation du second degré"
 #	description:"Il faut résoudre une inéquation du second degré."
@@ -35,7 +35,6 @@ define ["utils/math","utils/help"], (mM, help) ->
 			sol_is_ext = (a_is_plus is ((ineq is 1) or (ineq is 3))) # ensemble à l'extérieur des racines
 			sol_xor = ((ineq >= 2) isnt sol_is_ext) # On construit l'ensemble solution en prenant d'abord l'espace à l'intérieur des racines. Si sol_is_ext, il faudra inverser l'ensemble. Dans l'ensemble initial, on prend donc les racines si : * ext et strict (alors les racines ne seront pas dans la sol) * int et large (alors les racines y seront), c'est donc un xor qu'il faut faire
 			racines = mM.polynome.solve.exact poly, { y:0 }
-			console.log racines
 			# on prépare les tableaux de signes
 			switch racines.length
 				when 1
@@ -54,6 +53,10 @@ define ["utils/math","utils/help"], (mM, help) ->
 					tabX = ["$-\\infty$", "$+\\infty$"]
 					tabS1 = ",-,"
 					tabS2 = ",+,"
+			tabs = [
+				(TabSignApi.make(tabX, {hauteur_ligne:25, color:colors.html(0), texColor:colors.tex(0)})).addSignLine(tabS1)
+				(TabSignApi.make(tabX, {hauteur_ligne:25, color:colors.html(1), texColor:colors.tex(1)})).addSignLine(tabS2)
+			]
 			if sol_is_ext then ensemble_solution.inverse()
 			if a_is_plus then goodTab = 1
 			else goodTab=0
@@ -66,10 +69,19 @@ define ["utils/math","utils/help"], (mM, help) ->
 				poly
 				racines
 				ensemble_solution
+				tabs
+				goodTab
 			]
 
 		getBriques: (inputs, options) ->
-			[ineqTex, polyTex, poly, racines, ensemble_solution] = @init(inputs)
+			[ineqTex, polyTex, poly, racines, ensemble_solution, tabs, goodTab] = @init(inputs)
+
+			initTabs = ($container)->
+				initOneTab = (tab) ->
+					$el = $("<div></div>")
+					$container.append($el)
+					tab.render $el[0]
+				_.each(tabs, initOneTab)
 
 			[
 				{
@@ -140,7 +152,40 @@ define ["utils/math","utils/help"], (mM, help) ->
 					]
 				}
 				{
-					bareme:40
+					bareme:20
+					title: "Tableau de signe"
+					items:[
+						{
+							type:"text"
+							rank: 1
+							ps:[
+								"Choisissez le tableau de signe correspondant à &nbsp; $f(x)=#{polyTex}$."
+							]
+						}
+						{
+							type: "def"
+							rank: 2
+							renderingFunctions:[
+								initTabs
+							]
+
+						}
+						{
+							type:"color-choice"
+							rank: 3
+							name:"it"
+							list: [{rank: goodTab, text:"Bon tableau"}]
+							maxValue:1
+						}
+						{
+							type: "validation"
+							rank: 4
+							clavier: []
+						}
+					]
+				}
+				{
+					bareme:20
 					title: "Ensemble solution"
 					items:[
 						{
@@ -177,6 +222,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 					enumi: "1"
 					children: [
 						"Donnez les racines de &nbsp; $polyTex$"
+						"Faites le tableau de signe de &nbsp; $polyTex$"
 						"Déduisez-en l'ensemble solution de &nbsp; $ineqTex$."
 					]
 				}
@@ -201,6 +247,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 					enumi: "1"
 					children: [
 						"Donnez les racines de $polyTex$"
+						"Faites le tableau de signe de $polyTex$"
 						"Déduisez-en l'ensemble solution de $ineqTex$."
 					]
 				}

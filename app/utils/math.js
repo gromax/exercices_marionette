@@ -5914,7 +5914,7 @@
 
       TokenOperator.getRegex = function(type) {
         if (type === "number") {
-          return "[\\+\\-\\/\\^÷]";
+          return "[\\+\\-\\/\\^÷;]";
         } else {
           return "[\\+\\-\\/\\^;=∪∩÷]";
         }
@@ -6025,11 +6025,16 @@
       };
 
       TokenFunction.prototype.execute = function(stack) {
-        var op1, op2;
+        var col, ops;
         if (this.name === "frac") {
-          op2 = stack.pop();
-          op1 = stack.pop();
-          return MultiplyNumber.makeDiv(op1, op2);
+          col = stack.pop();
+          if (col instanceof Collection) {
+            ops = col.getOperands();
+            if (ops.length === 2) {
+              return MultiplyNumber.makeDiv(ops[0], ops[1]);
+            }
+          }
+          return new RealNumber();
         } else {
           return FunctionNumber.make(this.name, stack.pop());
         }
@@ -6043,6 +6048,7 @@
 
       function TokenParenthesis(token) {
         this.type = token;
+        this.ouvrant = this.type === "(" || this.type === "{";
       }
 
       TokenParenthesis.prototype.toString = function() {
@@ -6058,19 +6064,19 @@
       };
 
       TokenParenthesis.prototype.acceptOperOnLeft = function() {
-        return this.type === "(";
+        return this.ouvrant;
       };
 
       TokenParenthesis.prototype.acceptOperOnRight = function() {
-        return this.type === ")";
+        return !this.ouvrant;
       };
 
       TokenParenthesis.prototype.isOpeningParenthesis = function() {
-        return this.type === "(";
+        return this.ouvrant;
       };
 
       TokenParenthesis.prototype.isClosingParenthesis = function() {
-        return this.type === ")";
+        return !this.ouvrant;
       };
 
       return TokenParenthesis;
@@ -6092,7 +6098,7 @@
         if ((typeof type === "string") && !(type === "ensemble")) {
           return null;
         } else {
-          return "[\\[\\]\\{\\}]";
+          return "[\\[\\]]";
         }
       };
 
@@ -6106,11 +6112,7 @@
 
       TokenEnsembleDelimiter.prototype.setOuvrant = function(newValue) {
         this.ouvrant = newValue;
-        if (((this.delimiterType === "{") && !this.ouvrant) || ((this.delimiterType === "}") && this.ouvrant)) {
-          return false;
-        } else {
-          return true;
-        }
+        return true;
       };
 
       TokenEnsembleDelimiter.prototype.execute = function(stack) {
@@ -6166,7 +6168,7 @@
         }
       },
       parse: function(expression, type, info) {
-        var buildArray, matchList, output, rpn, strToken, tokensList;
+        var buildArray, correctedTokensList, createToken, matchList, openedEnsemble, output, rpn, strToken, tokensList;
         if (this.initOk === false) {
           this.initParse();
         }
@@ -6174,68 +6176,79 @@
           expression = expression.replace(/\\\\/g, " ");
           expression = expression.replace(/left/g, " ");
           expression = expression.replace(/right/g, " ");
+          expression = expression.replace(/\}\{/g, ";");
           expression = expression.replace(/²/g, "^2 ");
           expression = expression.replace(/−/g, "-");
         }
         matchList = expression.match(this.globalRegex);
         if (matchList != null) {
-          tokensList = this.correction((function() {
+          openedEnsemble = false;
+          createToken = function(Tokens, tokenString, type, info) {
+            var aa, len, oToken, regex, tok, tokenStringRegex;
+            for (aa = 0, len = Tokens.length; aa < len; aa++) {
+              oToken = Tokens[aa];
+              if (!(typeof (tokenStringRegex = oToken.getRegex(type)) === "string")) {
+                continue;
+              }
+              regex = new RegExp(tokenStringRegex, 'i');
+              if (regex.test(tokenString)) {
+                tok = new oToken(tokenString);
+                if (tok instanceof TokenEnsembleDelimiter) {
+                  tok.setOuvrant(openedEnsemble = !openedEnsemble);
+                }
+                return tok;
+              }
+            }
+            info.messages.push("'" + tokenString + "' n'est pas valide pour un(e) " + (this.typeToStr(type)));
+            return null;
+          };
+          tokensList = (function() {
             var aa, len, results;
             results = [];
             for (aa = 0, len = matchList.length; aa < len; aa++) {
               strToken = matchList[aa];
-              results.push(this.createToken(strToken, type, info));
+              results.push(createToken(this.Tokens, strToken, type, info));
             }
             return results;
-          }).call(this), info);
-          switch (false) {
-            case tokensList !== null:
-              return false;
-            case tokensList.length !== 0:
-              info.messages.push("Liste de tokens vide");
-              return false;
-            default:
-              rpn = this.buildReversePolishNotation(tokensList);
-              buildArray = this.buildObject(rpn);
-              output = buildArray.pop();
-              switch (false) {
-                case !(buildArray.length > 0):
-                  info.messages.push("La pile n'est pas vide");
-                  return false;
-                case !((type === "ensemble") && (output instanceof EnsembleObject)):
-                  return output;
-                case !((type === "number") && (output instanceof NumberObject)):
-                  return output;
-                case !((type === "equation") && (output instanceof Equation)):
-                  return output;
-                default:
-                  info.messages.push("Le résultat ne correspond pas à un(e) '" + (this.typeToStr(type)) + "'");
-                  return false;
-              }
+          }).call(this);
+          if (openedEnsemble) {
+            info.messages.push("Ensemble ouvert mais pas refermé");
+            return false;
+          } else {
+            correctedTokensList = this.correction(tokensList, info);
+            switch (false) {
+              case correctedTokensList !== null:
+                return false;
+              case correctedTokensList.length !== 0:
+                info.messages.push("Liste de tokens vide");
+                return false;
+              default:
+                rpn = this.buildReversePolishNotation(correctedTokensList);
+                buildArray = this.buildObject(rpn);
+                output = buildArray.pop();
+                switch (false) {
+                  case !(buildArray.length > 0):
+                    info.messages.push("La pile n'est pas vide");
+                    return false;
+                  case !((type === "ensemble") && (output instanceof EnsembleObject)):
+                    return output;
+                  case !((type === "number") && (output instanceof NumberObject)):
+                    return output;
+                  case !((type === "equation") && (output instanceof Equation)):
+                    return output;
+                  default:
+                    info.messages.push("Le résultat ne correspond pas à un(e) '" + (this.typeToStr(type)) + "'");
+                    return false;
+                }
+            }
           }
         } else {
           info.messages.push("Vide !");
           return false;
         }
       },
-      createToken: function(tokenString, type, info) {
-        var aa, len, oToken, ref, regex, tokenStringRegex;
-        ref = this.Tokens;
-        for (aa = 0, len = ref.length; aa < len; aa++) {
-          oToken = ref[aa];
-          if (!(typeof (tokenStringRegex = oToken.getRegex(type)) === "string")) {
-            continue;
-          }
-          regex = new RegExp(tokenStringRegex, 'i');
-          if (regex.test(tokenString)) {
-            return new oToken(tokenString);
-          }
-        }
-        info.messages.push("'" + tokenString + "' n'est pas valide pour un(e) " + (this.typeToStr(type)));
-        return null;
-      },
       correction: function(tokens, info) {
-        var aa, droite, gauche, len, oToken, openedEnsemble, stack, token;
+        var droite, gauche, oToken, stack;
         if (((function() {
           var aa, len, results;
           results = [];
@@ -6247,24 +6260,6 @@
           }
           return results;
         })()).length > 0) {
-          return null;
-        }
-        openedEnsemble = false;
-        for (aa = 0, len = tokens.length; aa < len; aa++) {
-          token = tokens[aa];
-          if (token instanceof TokenEnsembleDelimiter) {
-            if (!token.setOuvrant(openedEnsemble = !openedEnsemble)) {
-              if (openedEnsemble) {
-                info.messages.push(token.delimeterType + " ne peut pas ouvrir un ensemble");
-              } else {
-                info.messages.push(token.delimeterType + " ne peut pas fermer un ensemble");
-              }
-              return null;
-            }
-          }
-        }
-        if (openedEnsemble) {
-          info.messages.push("Ensemble ouvert mais pas refermé");
           return null;
         }
         gauche = void 0;

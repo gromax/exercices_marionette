@@ -6,6 +6,8 @@
 	<button class="btn btn-default js-clavier" type="button" title="Infini" name="infini">$\infty$</button>
 		<% break; case "sqrt": %>
 	<button class="btn btn-default js-clavier" type="button" title="Racine carrée" name="sqrt">$\sqrt{x}$</button>
+		<% break; case "pow": %>
+	<button class="btn btn-default js-clavier" type="button" title="Puissance" name="pow">$x^y$</button>
 		<% break; case "pi": %>
 	<button class="btn btn-default js-clavier" type="button" title="Pi" name="pi">$\pi$</button>
 		<% break; case "sqr": %>

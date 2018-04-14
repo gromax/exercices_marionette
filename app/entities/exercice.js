@@ -46,7 +46,7 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
         case typeof modelData.verification !== "function":
           this.verification = modelData.verification;
           break;
-        case modelData.type !== "input":
+        case !(modelData.type === "input" || modelData.type === "latex-input"):
           this.verification = Functions_helpers.inputVerification;
           break;
         case modelData.type !== "radio":
@@ -78,7 +78,7 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
         case typeof modelData.answerProcessing !== "function":
           this.answerProcessing = modelData.answerProcessing;
           break;
-        case modelData.type !== "input":
+        case !(modelData.type === "input" || modelData.type === "latex-input"):
           this.answerProcessing = Functions_helpers.inputAnswerProcessing;
           break;
         case modelData.type !== "radio":
@@ -360,15 +360,20 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
       };
     },
     inputVerification: function(answers_data) {
-      var N, answer_data, bads, closests, customMessage, customMessageFunction, errorItem, errors, it, it_good, items, j, k, l, lefts, len, len1, len2, len3, m, model_data, note, ref, ref1, ref2, ref3, sol, stringAnswer, title, type, verifResponse, verif_results;
+      var N, answer_data, answer_text, bads, closests, customMessage, customMessageFunction, errorItem, errors, it, it_good, items, j, k, l, lefts, len, len1, len2, len3, m, model_data, note, ref, ref1, ref2, ref3, sol, stringAnswer, title, type, verifResponse, verif_results;
       note = 0;
       model_data = this.attributes;
       answer_data = answers_data[model_data.name];
       title = model_data.corectionTag || model_data.tag || model_data.name;
+      if (this.get("type") === "latex-input") {
+        answer_text = "$" + answer_data.answer + "$";
+      } else {
+        answer_text = "<i>" + answer_data.answer + "</i>";
+      }
       items = [
         {
           type: "normal",
-          text: "<b>" + title + " &nbsp; \:</b>&emsp; Vous avez répondu &nbsp; <i>" + answer_data.answer + "</i>"
+          text: "<b>" + title + " &nbsp; \:</b>&emsp; Vous avez répondu &nbsp; " + answer_text
         }
       ];
       if (Array.isArray(answer_data.processedAnswer)) {

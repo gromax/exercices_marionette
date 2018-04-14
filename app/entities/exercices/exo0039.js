@@ -1,4 +1,4 @@
-define(["utils/math", "utils/help", "utils/colors", "utils/tabVar"], function(mM, help, colors, TabVarApi) {
+define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, help, colors, TabVarApi) {
   return {
     init: function(inputs) {
       var cano, cas, i, item, items, j, len, liste, max, poly, tab, tabX, tabs, variations, xA, xB, yA, yB;

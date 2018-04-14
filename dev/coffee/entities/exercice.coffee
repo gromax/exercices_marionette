@@ -34,7 +34,7 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 			switch
 				when typeof modelData.verification is "function"
 					@verification = modelData.verification
-				when modelData.type is "input"
+				when modelData.type is "input" or modelData.type is "latex-input"
 					@verification = Functions_helpers.inputVerification
 				when modelData.type is "radio"
 					@verification = Functions_helpers.radioVerification
@@ -49,7 +49,7 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 			switch
 				when typeof modelData.answerProcessing is "function"
 					@answerProcessing = modelData.answerProcessing
-				when modelData.type is "input"
+				when modelData.type is "input" or modelData.type is "latex-input"
 					@answerProcessing = Functions_helpers.inputAnswerProcessing
 				when modelData.type is "radio"
 					@answerProcessing = Functions_helpers.radioAnswerProcessing
@@ -293,9 +293,13 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 			answer_data = answers_data[model_data.name]
 
 			title = model_data.corectionTag || model_data.tag || model_data.name
+			if (@get("type") is "latex-input")
+				answer_text = "$#{answer_data.answer}$"
+			else
+				answer_text = "<i>#{answer_data.answer}</i>"
 			items = [{
 				type:"normal"
-				text:"<b>#{title} &nbsp; \:</b>&emsp; Vous avez répondu &nbsp; <i>#{answer_data.answer}</i>"
+				text:"<b>#{title} &nbsp; \:</b>&emsp; Vous avez répondu &nbsp; #{answer_text}"
 			}]
 
 			if Array.isArray(answer_data.processedAnswer)

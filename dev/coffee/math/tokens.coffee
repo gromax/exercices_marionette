@@ -46,7 +46,7 @@
 		constructor: (@opType) ->
 		toString: -> @opType
 		@getRegex: (type) ->
-			if type is "number" then "[\\+\\-\\/\\^÷]"
+			if type is "number" then "[\\+\\-\\/\\^÷;]"
 			else "[\\+\\-\\/\\^;=∪∩÷]"
 		setOpposite: ->
 			@opType = "0-"
@@ -93,36 +93,39 @@
 		operateOnRight: -> true
 		execute: (stack) ->
 			if @name is "frac"
-				op2 = stack.pop()
-				op1 = stack.pop()
-				MultiplyNumber.makeDiv( op1, op2 )
+				col = stack.pop()
+				if col instanceof Collection
+					ops = col.getOperands()
+					if ops.length is 2
+						return MultiplyNumber.makeDiv( ops[0], ops[1] )
+				new RealNumber()
 			else FunctionNumber.make(@name, stack.pop())
 
 	class TokenParenthesis extends TokenObject
 		constructor: (token) ->
 			@type = token
+			@ouvrant = @type is "(" or @type is "{"
 		toString: -> @type
 		@getRegex: (type) ->
 			if type is "ensemble" then "[\\(\\)]"
 			else "[\\(\\{\\[\\]\\}\\)]"
-		acceptOperOnLeft: -> @type is "("
-		acceptOperOnRight: -> @type is ")"
-		isOpeningParenthesis: -> @type is "("
-		isClosingParenthesis: -> @type is ")"
+		acceptOperOnLeft: -> @ouvrant
+		acceptOperOnRight: -> not @ouvrant
+		isOpeningParenthesis: -> @ouvrant
+		isClosingParenthesis: -> not @ouvrant
 	class TokenEnsembleDelimiter extends TokenObject
 		constructor: (@delimiterType) ->
 			@ouvrant = false
 		toString : -> @delimiterType
 		@getRegex: (type) ->
 			if (typeof type is "string") and not(type is "ensemble") then null
-			else "[\\[\\]\\{\\}]"
+			else "[\\[\\]]"
 		acceptOperOnLeft: -> @ouvrant
 		acceptOperOnRight: -> not @ouvrant
 		setOuvrant: (newValue) ->
 			@ouvrant = newValue
 			# On renvoie false en cas d'erreur
-			if ((@delimiterType is "{") and not(@ouvrant)) or ((@delimiterType is "}") and (@ouvrant)) then false
-			else true
+			true
 		execute: (stack) ->
 			if not @ouvrant
 				ops = []

@@ -36,6 +36,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 
 		getBriques: (inputs,options) ->
 			[fct, a, b, integrale, variable] = @init(inputs, options)
+			#console.log integrale
 			[
 				{
 					bareme: 100

@@ -21,58 +21,62 @@
 				expression = expression.replace /\\\\/g, " "
 				expression = expression.replace /left/g, " "
 				expression = expression.replace /right/g, " "
+				# Dans le cas d'un frac, on aurait un {}{} qui est intercepté comme ()()
+				# La correction intégrerait alors automatiquement un * entre les deux...
+				# Les {} ne sont utilisées que pour du latex
+				# donc on peut remplacer }{ par ; ce qui créera une collection qui sera interceptée par frac
+				expression = expression.replace /\}\{/g, ";"
 				# Les élèves utilisent la touche ²
 				expression = expression.replace /²/g, "^2 "
 				# Dans certains cas, le - est remplacé par un autre caractère plus long
 				expression = expression.replace /−/g, "-"
 			matchList = expression.match(@globalRegex)
 			if matchList?
-				tokensList = @correction ( @createToken(strToken,type, info) for strToken in matchList ) , info
-				switch
-					when tokensList is null then false
-					when tokensList.length is 0
-						info.messages.push "Liste de tokens vide"
-						false
-					else
-						rpn = @buildReversePolishNotation tokensList
-						buildArray = @buildObject(rpn)
-						output = buildArray.pop()
-						# On vérifie que la sortie a la bonne forme
-						switch
-							when buildArray.length>0
-								info.messages.push "La pile n'est pas vide"
-								false
-							when (type is "ensemble") and (output instanceof EnsembleObject) then output
-							when (type is "number") and (output instanceof NumberObject) then output
-							when (type is "equation") and (output instanceof Equation) then output
-							else
-								info.messages.push "Le résultat ne correspond pas à un(e) '#{@typeToStr(type)}'"
-								false
+				openedEnsemble = false # préparation pour un parse d'ensemble
+				createToken = (Tokens,tokenString, type, info)->
+					# tous les tokens doivent être reconnus
+					# Une erreur crée un null qui lors de la correction provoquera l'erreur du parse
+					for oToken in Tokens when typeof (tokenStringRegex = oToken.getRegex(type)) is "string"
+						regex = new RegExp(tokenStringRegex,'i')
+						if regex.test(tokenString)
+							tok = new oToken(tokenString)
+							if tok instanceof TokenEnsembleDelimiter
+								tok.setOuvrant(openedEnsemble = not openedEnsemble)
+							return tok
+					info.messages.push "'#{tokenString}' n'est pas valide pour un(e) #{@typeToStr(type)}"
+					null
+				tokensList = ( createToken(@Tokens, strToken,type, info) for strToken in matchList )
+				if openedEnsemble
+					info.messages.push "Ensemble ouvert mais pas refermé"
+					false
+				else
+					correctedTokensList = @correction tokensList , info
+					switch
+						when correctedTokensList is null then false
+						when correctedTokensList.length is 0
+							info.messages.push "Liste de tokens vide"
+							false
+						else
+							rpn = @buildReversePolishNotation correctedTokensList
+							buildArray = @buildObject(rpn)
+							output = buildArray.pop()
+							# On vérifie que la sortie a la bonne forme
+							switch
+								when buildArray.length>0
+									info.messages.push "La pile n'est pas vide"
+									false
+								when (type is "ensemble") and (output instanceof EnsembleObject) then output
+								when (type is "number") and (output instanceof NumberObject) then output
+								when (type is "equation") and (output instanceof Equation) then output
+								else
+									info.messages.push "Le résultat ne correspond pas à un(e) '#{@typeToStr(type)}'"
+									false
 			else
 				info.messages.push "Vide !"
 				false
-		createToken: (tokenString,type, info) ->
-			# tous les tokens doivent être reconnus
-			# Une erreur crée un null qui lors de la correction provoquera l'erreur du parse
-			for oToken in @Tokens when typeof (tokenStringRegex = oToken.getRegex(type)) is "string"
-				regex = new RegExp(tokenStringRegex,'i')
-				if regex.test(tokenString) then return new oToken(tokenString)
-			info.messages.push "'#{tokenString}' n'est pas valide pour un(e) #{@typeToStr(type)}"
-			null
 		correction: (tokens, info) ->
 			if ( oToken for oToken in tokens when not(oToken instanceof TokenObject) ).length>0 then return null
 			# Vérification des bons positionnement des délimiters d'ensembles
-			openedEnsemble = false
-			for token in tokens when token instanceof TokenEnsembleDelimiter
-				# On fixe le type, ouvrant fermant, et en cas d'erreur on sort
-				unless token.setOuvrant(openedEnsemble = not openedEnsemble)
-					if openedEnsemble then info.messages.push "#{token.delimeterType} ne peut pas ouvrir un ensemble"
-					else info.messages.push "#{token.delimeterType} ne peut pas fermer un ensemble"
-					return null
-			if openedEnsemble
-				info.messages.push "Ensemble ouvert mais pas refermé"
-				return null
-
 			gauche = undefined
 			droite = tokens.shift()
 			stack = []

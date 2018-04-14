@@ -16,9 +16,10 @@ requirejs.config({
 		//popper:"https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min",
 		popper:"../vendor/popper.js/dist/umd/popper.min",
 		bootstrap:"../vendor/bootstrap/dist/js/bootstrap",
-		jst:"../app/templates.underscore",
+		jst:"./templates.underscore",
 		mathjax: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML",
 		jsxgraph: "https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.6/jsxgraphcore",
+		mathquill: "../vendor/mathquill-0.10.1/mathquill.min"
 	},
 
 	shim: {
@@ -34,6 +35,13 @@ requirejs.config({
 		marionette: {
 			deps: ["backbone"],
 			exports: "Marionette"
+		},
+		mathquill: {
+			deps: ["jquery"],
+			exports:"MQ",
+			init: function(){
+				window.MQ = window.MathQuill.getInterface(1);
+			}
 		},
 		popper:{
 			exports: "popper.js"

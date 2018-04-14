@@ -32,18 +32,19 @@
 							ps: enonce
 						}
 						{
-							type: "input"
+							type: "latex-input"
 							rank: 2
 							waited:"number"
 							tag:"$AB$"
 							name:"AB"
 							description:"Distance AB"
 							good:gAB
+							formes:"RACINE"
 						}
 						{
 							type: "validation"
 							rank: 3
-							clavier: ["aide", "sqrt"]
+							clavier: ["aide", "sqrt", "pow"]
 						}
 						{
 							type: "aide"

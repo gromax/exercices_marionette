@@ -1115,6 +1115,16 @@ __e( name ) +
 '" placeholder="' +
 __e( description ) +
 '" value="">\n\t</div>\n</div>\n\n';
+ break; case "latex-input": ;
+__p += '\n<div class="form-group row">\n\t<label for="exo-' +
+__e( name ) +
+'" class="col-sm-2 col-form-label">' +
+__e( tag ) +
+'</label>\n\t<div class="col-sm-10">\n\t\t<span class="js-mathquill" style="width:90%;"></span>\n\t\t<input type="hidden" id="exo-' +
+__e( name ) +
+'" name="' +
+__e( name ) +
+'" value="">\n\t</div>\n</div>\n\n';
  break; case "radio": ;
 __p += '\n\t';
  _.each(radio,function(subItem,key){
@@ -1201,6 +1211,24 @@ __p += '\n\t<li class="list-group-item list-group-item-info">' +
 __p += '\n</ul>\n\n';
  } ;
 __p += '\n';
+
+}
+return __p
+};
+
+this["JST"]["exercices/common/brique-latex-input"] = function(obj) {
+obj || (obj = {});
+var __t, __p = '', __e = _.escape;
+with (obj) {
+__p += '<div class="form-group row">\n\t<label for="exo-' +
+__e( name ) +
+'" class="col-sm-2 col-form-label">' +
+__e( tag ) +
+'</label>\n\t<div class="col-sm-10">\n\t\t<span class="js-mathquill" style="width:95%;"></span>\n\t\t<input type="hidden" id="exo-' +
+__e( name ) +
+'" name="' +
+__e( name ) +
+'" value="">\n\t</div>\n</div>\n';
 
 }
 return __p
@@ -1355,6 +1383,8 @@ __p += '\n\t<button class="btn btn-info js-clavier" type="button" title="Aide" n
 __p += '\n\t<button class="btn btn-default js-clavier" type="button" title="Infini" name="infini">$\\infty$</button>\n\t\t';
  break; case "sqrt": ;
 __p += '\n\t<button class="btn btn-default js-clavier" type="button" title="Racine carrée" name="sqrt">$\\sqrt{x}$</button>\n\t\t';
+ break; case "pow": ;
+__p += '\n\t<button class="btn btn-default js-clavier" type="button" title="Puissance" name="pow">$x^y$</button>\n\t\t';
  break; case "pi": ;
 __p += '\n\t<button class="btn btn-default js-clavier" type="button" title="Pi" name="pi">$\\pi$</button>\n\t\t';
  break; case "sqr": ;
@@ -1530,7 +1560,7 @@ this["JST"]["home/login/home-login"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
-__p += '<div class="card">\n\t<div class="card-header">\n\t\tConnexion\n\t</div>\n\t<div class="card-body">\n\t\t<form>\n\t\t\t<div class="form-group row">\n\t\t\t\t<label for="user-identifiant" class="col-form-label col-sm-3">Email</label>\n\t\t\t\t<div class="col-sm-9">\n\t\t\t\t\t<input type="email" class="form-control" name="identifiant" id="user-identifiant" placeholder="Entrez un email" value="">\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class="form-group row">\n\t\t\t\t<label for="user-pwd" class="col-form-label col-sm-3">Mot de passe</label>\n\t\t\t\t<div class="col-sm-9">\n\t\t\t\t\t<input type="password" class="form-control" name="pwd" id="user-pwd" placeholder="Entrez un mot de passe">\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<button class="btn btn-warning js-forgotten">Mot de passe oublié</button>\n\t\t\t<button class="btn btn-primary js-submit">Valider</button>\n\t\t\t<div id="messages"></div>\n\t\t</form>\n\t</div>\n</div>\n';
+__p += '<div class="card">\n\t<div class="card-header">\n\t\tConnexion\n\t</div>\n\t<div class="card-body">\n\t\t<form>\n\t\t\t<div class="form-group row">\n\t\t\t\t<label for="user-identifiant" class="col-form-label col-sm-3">Email</label>\n\t\t\t\t<div class="col-sm-9">\n\t\t\t\t\t<input type="email" class="form-control" name="identifiant" id="user-identifiant" placeholder="Entrez un email" value="">\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div class="form-group row">\n\t\t\t\t<label for="user-pwd" class="col-form-label col-sm-3">Mot de passe</label>\n\t\t\t\t<div class="col-sm-9">\n\t\t\t\t\t<input type="password" class="form-control" name="pwd" id="user-pwd" placeholder="Entrez un mot de passe">\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<button type="submit" class="btn btn-primary js-submit">Valider</button>\n\t\t\t<button class="btn btn-warning js-forgotten">Mot de passe oublié</button>\n\t\t\t<div id="messages"></div>\n\t\t</form>\n\t</div>\n</div>\n';
 
 }
 return __p

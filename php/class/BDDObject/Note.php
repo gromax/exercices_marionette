@@ -27,7 +27,10 @@ final class Note
 		if(isset($params['aEF'])) $this->aEF = $params['aEF'];
 		if(isset($params['aUF'])) $this->aUF = $params['aUF'];
 		if(isset($params['finished'])) $this->finished = (integer) $params['finished'];
-		if(isset($params['note'])) $this->note = (integer) $params['note'];
+		if(isset($params['note'])) {
+			$this->note = (integer) $params['note'];
+			if ($this->note > 100) $this->note = 100;
+		}
 		if(isset($params['inputs'])) $this->inputs = (string) $params['inputs'];
 		if(isset($params['answers'])) $this->answers = (string) $params['answers'];
 		if(isset($params['date'])) $this->date=$params['date'];
