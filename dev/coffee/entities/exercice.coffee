@@ -290,16 +290,24 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 		inputVerification: (answers_data) ->
 			note = 0
 			model_data=@attributes
+			that = @
 			answer_data = answers_data[model_data.name]
 
+			userExpression = (entry)->
+				# entry est string ou info
+				# en fonction du type d'input on affiche en latex ou pas
+				if entry.tex?
+					return "$#{entry.tex}$"
+				if entry.expression? then entry = entry.expression
+				if that.get("type") == "latex-input"
+					return "$#{entry}$"
+				else
+					return "<i>#{entry}</i>"
+
 			title = model_data.corectionTag || model_data.tag || model_data.name
-			if (@get("type") is "latex-input")
-				answer_text = "$#{answer_data.answer}$"
-			else
-				answer_text = "<i>#{answer_data.answer}</i>"
 			items = [{
 				type:"normal"
-				text:"<b>#{title} &nbsp; \:</b>&emsp; Vous avez répondu &nbsp; #{answer_text}"
+				text:"<b>#{title} &nbsp; \:</b>&emsp; Vous avez répondu &nbsp; #{userExpression(answer_data.answer)}"
 			}]
 
 			if Array.isArray(answer_data.processedAnswer)
@@ -329,15 +337,16 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 								# Un objet good a été associé à cette réponse utilisateur
 								verifResponse = mM.verif[sol.info.type](sol.info, sol.good, model_data)
 								note += verifResponse.note/N
+
 								switch
 									when verifResponse.note is 1
-										items.push { type:"success", text:"<i>#{sol.info.expression}</i> &nbsp; est une bonne réponse." }
+										items.push { type:"success", text:"$#{sol.info.tex}$ &nbsp; est une bonne réponse." }
 									when verifResponse.note > 0
 										if verifResponse.errors.length>0
-											items.push { type:"warning", text:"<i>#{sol.info.expression}</i> &nbsp; est accepté, mais :" }
+											items.push { type:"warning", text:"#{userExpression(sol.info)} &nbsp; est accepté, mais :" }
 											items.push({ type:"warning", text:errorItem }) for errorItem in verifResponse.errors
 										else
-											items.push { type:"warning", text:"<i>#{sol.info.expression}</i> &nbsp; est accepté mais la réponse peut être améliorée." }
+											items.push { type:"warning", text:"#{userExpression(sol.info)} &nbsp; est accepté mais la réponse peut être améliorée." }
 									else
 										bads.push sol.info.expression
 										lefts.push sol.good
@@ -359,13 +368,13 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 					{ note, errors } = mM.verif[type](answer_data.processedAnswer, model_data.good, model_data)
 				switch
 					when note is 1
-						items.push { type:"success", text:"<i>#{answer_data.answer}</i> &nbsp; est une bonne réponse."}
+						items.push { type:"success", text:"#{userExpression(answer_data.answer)} &nbsp; est une bonne réponse."}
 					when note>0
 						if errors.length>0
-							items.push { type:"warning", text:"<i>#{answer_data.answer}</i> &nbsp; est accepté, mais :" }
+							items.push { type:"warning", text:"#{userExpression(answer_data.answer)} &nbsp; est accepté, mais :" }
 							items.push({ type:"warning", text:errorItem }) for errorItem in errors
 						else
-							items.push { type:"warning", text:"<i>#{answer_data.answer}</i> &nbsp; est accepté mais la réponse peut être améliorée." }
+							items.push { type:"warning", text:"#{userExpression(answer_data.answer)} &nbsp; est accepté mais la réponse peut être améliorée." }
 					else
 						items.push { type:"error", text:"Mauvaise réponse." }
 						if errors.length>0

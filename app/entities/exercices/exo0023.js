@@ -33,13 +33,13 @@ define(["utils/math", "utils/help"], function(mM, help) {
               rank: 1,
               ps: ["On considère une fonction une fonction &nbsp; $f$ &nbsp; dérivable sur &nbsp; $\\mathbb{R}$.", "$\\mathcal{C}$ &nbsp; est sa courbe représentative dans un repère.", "On sait que &nbsp; $f\\left(" + xAtex + "\\right) = " + yAtex + "$ &nbsp; et &nbsp; $f'\\left(" + xAtex + "\\right) = " + (droite.m().tex()) + "$.", "Donnez l'équation de la tangente &nbsp; $\\mathcal{T}$ &nbsp; à la courbe &nbsp; $\\mathcal{C}$ &nbsp; en l'abscisse &nbsp; $" + xAtex + "$."]
             }, {
-              type: "input",
+              type: "latex-input",
               rank: 2,
               waited: "number",
               tag: "$\\mathcal{T}$",
               answerPreprocessing: function(userValue) {
                 var pattern, result;
-                pattern = /y\s*=([\s*+-\/0-9a-zA-Z]+)/;
+                pattern = /y\s*=([^=]+)/;
                 result = pattern.exec(userValue);
                 if (result) {
                   return {

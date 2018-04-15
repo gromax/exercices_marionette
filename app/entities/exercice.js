@@ -360,20 +360,29 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
       };
     },
     inputVerification: function(answers_data) {
-      var N, answer_data, answer_text, bads, closests, customMessage, customMessageFunction, errorItem, errors, it, it_good, items, j, k, l, lefts, len, len1, len2, len3, m, model_data, note, ref, ref1, ref2, ref3, sol, stringAnswer, title, type, verifResponse, verif_results;
+      var N, answer_data, bads, closests, customMessage, customMessageFunction, errorItem, errors, it, it_good, items, j, k, l, lefts, len, len1, len2, len3, m, model_data, note, ref, ref1, ref2, ref3, sol, stringAnswer, that, title, type, userExpression, verifResponse, verif_results;
       note = 0;
       model_data = this.attributes;
+      that = this;
       answer_data = answers_data[model_data.name];
+      userExpression = function(entry) {
+        if (entry.tex != null) {
+          return "$" + entry.tex + "$";
+        }
+        if (entry.expression != null) {
+          entry = entry.expression;
+        }
+        if (that.get("type") === "latex-input") {
+          return "$" + entry + "$";
+        } else {
+          return "<i>" + entry + "</i>";
+        }
+      };
       title = model_data.corectionTag || model_data.tag || model_data.name;
-      if (this.get("type") === "latex-input") {
-        answer_text = "$" + answer_data.answer + "$";
-      } else {
-        answer_text = "<i>" + answer_data.answer + "</i>";
-      }
       items = [
         {
           type: "normal",
-          text: "<b>" + title + " &nbsp; \:</b>&emsp; Vous avez répondu &nbsp; " + answer_text
+          text: "<b>" + title + " &nbsp; \:</b>&emsp; Vous avez répondu &nbsp; " + (userExpression(answer_data.answer))
         }
       ];
       if (Array.isArray(answer_data.processedAnswer)) {
@@ -419,14 +428,14 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
                   case verifResponse.note !== 1:
                     items.push({
                       type: "success",
-                      text: "<i>" + sol.info.expression + "</i> &nbsp; est une bonne réponse."
+                      text: "$" + sol.info.tex + "$ &nbsp; est une bonne réponse."
                     });
                     break;
                   case !(verifResponse.note > 0):
                     if (verifResponse.errors.length > 0) {
                       items.push({
                         type: "warning",
-                        text: "<i>" + sol.info.expression + "</i> &nbsp; est accepté, mais :"
+                        text: (userExpression(sol.info)) + " &nbsp; est accepté, mais :"
                       });
                       ref1 = verifResponse.errors;
                       for (k = 0, len1 = ref1.length; k < len1; k++) {
@@ -439,7 +448,7 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
                     } else {
                       items.push({
                         type: "warning",
-                        text: "<i>" + sol.info.expression + "</i> &nbsp; est accepté mais la réponse peut être améliorée."
+                        text: (userExpression(sol.info)) + " &nbsp; est accepté mais la réponse peut être améliorée."
                       });
                     }
                     break;
@@ -496,14 +505,14 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
           case note !== 1:
             items.push({
               type: "success",
-              text: "<i>" + answer_data.answer + "</i> &nbsp; est une bonne réponse."
+              text: (userExpression(answer_data.answer)) + " &nbsp; est une bonne réponse."
             });
             break;
           case !(note > 0):
             if (errors.length > 0) {
               items.push({
                 type: "warning",
-                text: "<i>" + answer_data.answer + "</i> &nbsp; est accepté, mais :"
+                text: (userExpression(answer_data.answer)) + " &nbsp; est accepté, mais :"
               });
               for (l = 0, len2 = errors.length; l < len2; l++) {
                 errorItem = errors[l];
@@ -515,7 +524,7 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
             } else {
               items.push({
                 type: "warning",
-                text: "<i>" + answer_data.answer + "</i> &nbsp; est accepté mais la réponse peut être améliorée."
+                text: (userExpression(answer_data.answer)) + " &nbsp; est accepté mais la réponse peut être améliorée."
               });
             }
             break;

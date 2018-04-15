@@ -35,12 +35,12 @@ define ["utils/math", "utils/help"], (mM, help) ->
 							]
 						}
 						{
-							type: "input"
+							type: "latex-input"
 							rank: 2
 							waited: "number"
 							tag:"$\\mathcal{T}$"
 							answerPreprocessing:(userValue)->
-								pattern =/y\s*=([\s*+-/0-9a-zA-Z]+)/
+								pattern =/y\s*=([^=]+)/
 								result = pattern.exec(userValue)
 								if result
 									{ processed:result[1], error:false }
