@@ -1647,6 +1647,16 @@ __p += '<div class="jumbotron">\n\t<h1>Bienvenue !</h1>\n\t<p>Ce site propose de
 return __p
 };
 
+this["JST"]["home/show/home-prof"] = function(obj) {
+obj || (obj = {});
+var __t, __p = '', __e = _.escape;
+with (obj) {
+__p += '<div class="jumbotron">\n\t<h1>Bienvenue !</h1>\n\n\t<p>Vous êtes <b>professeur</b>. Vous pouvez exécuter une des commandes suivantes :</p>\n\n\t<div class="list-group">\n\t\t<a type="button" class="list-group-item list-group-item-action js-users" href="#users"><i class="fa fa-users" aria-hidden="true"></i> Voir vos élèves</a>\n\n\t\t<a type="button" class="list-group-item list-group-item-action js-classes" href="#classes"><i class="fa fa-graduation-cap" aria-hidden="true"></i> Voir vos classes</a>\n\n\t\t<a type="button" class="list-group-item list-group-item-action js-devoirs" href="#Devoirs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Voir vos devoirs</a>\n\t</div>\n</div>\n';
+
+}
+return __p
+};
+
 this["JST"]["home/show/not-found"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape;

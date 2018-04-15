@@ -3,6 +3,7 @@ define([
 	"marionette",
 	"apps/common/alert_view",
 	"apps/home/show/admin_view",
+	"apps/home/show/prof_view",
 	"apps/home/show/off_view",
 	"apps/common/not_found",
 	"apps/home/show/devoirs_list_eleve_view",
@@ -14,6 +15,7 @@ define([
 	Marionette,
 	AlertView,
 	AdminView,
+	ProfView,
 	OffView,
 	NotFound,
 	ListEleveView,
@@ -33,6 +35,10 @@ define([
 					break;
 				case "Admin":
 					var view = new AdminView();
+					app.regions.getRegion('main').show(view);
+					break;
+				case "Prof":
+					var view = new ProfView();
 					app.regions.getRegion('main').show(view);
 					break;
 				case "Élève":

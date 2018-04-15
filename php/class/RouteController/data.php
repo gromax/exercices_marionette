@@ -85,15 +85,36 @@ class data
         {
             $output = array();
             if (in_array("exofiches", $asks)){
-                $output["exofiches"] = ExoFiche::getList(array("idUser"=>$uLog->getId()));
+                $answer = ExoFiche::getList(array("idUser"=>$uLog->getId()));
+                if (isset($answer["error"]) && $answer["error"]) {
+                    EC::addError($answer["message"]);
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $output["exofiches"] = $answer;
+                }
             }
 
             if (in_array("userfiches", $asks)){
-                $output["userfiches"] = AssoUF::getList(array("idUser"=> $uLog->getId() ));
+                $answer = AssoUF::getList(array("idUser"=> $uLog->getId() ));
+                if (isset($answer["error"]) && $answer["error"]) {
+                    EC::addError($answer["message"]);
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $output["userfiches"] = $answer;
+                }
             }
 
             if (in_array("faits", $asks)){
-                $output["faits"] = Note::getList(array("idUser"=>$uLog->getId()));
+                $answer =  Note::getList(array("idUser"=>$uLog->getId()));
+                if (isset($answer["error"]) && $answer["error"]) {
+                    EC::addError($answer["message"]);
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $output["faits"] = $answer;
+                }
             }
 
             return $output;
@@ -103,7 +124,14 @@ class data
         {
             $output = array();
             if (in_array("fiches", $asks)){
-                $output["fiches"] = Fiche::getList(array("owner"=> $uLog->getId() ));
+                $answer = Fiche::getList(array("owner"=> $uLog->getId() ));
+                if (isset($answer["error"]) && $answer["error"]) {
+                    EC::addError($answer["message"]);
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $output["fiches"] = Fiche::getList(array("owner"=> $uLog->getId() ));
+                }
             }
 
             if (in_array("userfiches", $asks)){
@@ -111,19 +139,48 @@ class data
             }
 
             if (in_array("exofiches", $asks)){
-                $output["exofiches"] = ExoFiche::getList(array("idOwner"=>$uLog->getId()));
+                $answer = ExoFiche::getList(array("idOwner"=>$uLog->getId()));
+                if (isset($answer["error"]) && $answer["error"]) {
+                    EC::addError($answer["message"]);
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $output["exofiches"] = $answer;
+                }
             }
 
             if (in_array("faits", $asks)){
-                $output["faits"] = Note::getList(array("idOwner"=>$uLog->getId()));
+                $answer = Note::getList(array("idOwner"=>$uLog->getId()));
+                if (isset($answer["error"]) && $answer["error"]) {
+                    EC::addError($answer["message"]);
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $output["faits"] = $answer;
+                }
+
             }
 
             if (in_array("users", $asks)){
-                $output["users"] = User::getList(array('classes'=>array_keys( $uLog->ownerOf() )));
+                $answer = User::getList(array('classes'=>array_keys( $uLog->ownerOf() )));
+                if (isset($answer["error"]) && $answer["error"]) {
+                    EC::addError($answer["message"]);
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $output["users"] = $answer;
+                }
             }
 
             if (in_array("exams", $asks)){
-                $output["exams"] = Exam::getList(array('idOwner'=>$uLog->getId()));
+                $answer = Exam::getList(array('idOwner'=>$uLog->getId()));
+                if (isset($answer["error"]) && $answer["error"]) {
+                    EC::addError($answer["message"]);
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $output["exams"] = $answer;
+                }
             }
 
             return $output;
@@ -133,28 +190,71 @@ class data
         if ($uLog->isAdmin()) {
             $output = array();
             if (in_array("fiches", $asks)){
-                $output["fiches"] = Fiche::getList();
+                $answer = Fiche::getList();
+                if (isset($answer["error"]) && $answer["error"]) {
+                    EC::addError($answer["message"]);
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $output["fiches"] = $answer;
+                }
             }
 
             if (in_array("userfiches", $asks)){
-                $output["userfiches"] = AssoUF::getList();
+                $answer = AssoUF::getList();
+                if (isset($answer["error"]) && $answer["error"]) {
+                    EC::addError($answer["message"]);
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $output["userfiches"] = $answer;
+                }
             }
 
             if (in_array("exofiches", $asks)){
-                $output["exofiches"] = ExoFiche::getList();
+                $answer = ExoFiche::getList();
+                if (isset($answer["error"]) && $answer["error"]) {
+                    EC::addError($answer["message"]);
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $output["exofiches"] = $answer;
+                }
             }
 
             if (in_array("faits", $asks)){
-                $output["faits"] = Note::getList();
+                $answer = Note::getList();
+                if (isset($answer["error"]) && $answer["error"]) {
+                    EC::addError($answer["message"]);
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $output["faits"] = $answer;
+                }
             }
 
             if (in_array("users", $asks)){
-                if ($uLog->isRoot()) $output["users"] = User::getList(array('ranks'=>array(User::RANK_ADMIN, User::RANK_ELEVE, User::RANK_PROF)));
-                else $output["users"] = User::getList(array('ranks'=>array(User::RANK_ELEVE, User::RANK_PROF)));
+                if ($uLog->isRoot()) $answer = User::getList(array('ranks'=>array(User::RANK_ADMIN, User::RANK_ELEVE, User::RANK_PROF)));
+                else $answer = User::getList(array('ranks'=>array(User::RANK_ELEVE, User::RANK_PROF)));
+
+                if (isset($answer["error"]) && $answer["error"]) {
+                    EC::addError($answer["message"]);
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $output["users"] = $answer;
+                }
             }
 
             if (in_array("exams", $asks)){
-                $output["exams"] = Exam::getList();
+                $answer = Exam::getList();
+                if (isset($answer["error"]) && $answer["error"]) {
+                    EC::addError($answer["message"]);
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $output["exams"] = $answer;
+                }
             }
 
             return $output;
