@@ -11,7 +11,6 @@
 			switch type
 				when "number" then "nombre"
 				when "ensemble" then "ensemble"
-				when "equation" then "équation"
 				else "(#{type} ?)"
 		parse: (expression,type, info) ->
 			if @initOk is false then @initParse()
@@ -67,7 +66,6 @@
 									false
 								when (type is "ensemble") and (output instanceof EnsembleObject) then output
 								when (type is "number") and (output instanceof NumberObject) then output
-								when (type is "equation") and (output instanceof Equation) then output
 								else
 									info.messages.push "Le résultat ne correspond pas à un(e) '#{@typeToStr(type)}'"
 									false
@@ -178,7 +176,6 @@
 					switch
 						when @config.type is "number" then value = new RealNumber()
 						when @config.type is "ensemble" then value = new Ensemble()
-						when @config.type is "equation" then value = new Equation(null,null)
 						else value = new MObject()
 			if value instanceof MObject
 				# Cas où on a fourni directement un objet pour suivi de simplifications

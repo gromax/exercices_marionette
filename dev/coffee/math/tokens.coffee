@@ -47,7 +47,7 @@
 		toString: -> @opType
 		@getRegex: (type) ->
 			if type is "number" then "[\\+\\-\\/\\^÷;]"
-			else "[\\+\\-\\/\\^;=∪∩÷]"
+			else "[\\+\\-\\/\\^;∪∩÷]"
 		setOpposite: ->
 			@opType = "0-"
 			@
@@ -59,7 +59,6 @@
 				when (@opType is "+") or (@opType is "-") then 6
 				when @opType is "∩" then 5
 				when @opType is "∪" then 4
-				when @opType is "=" then 2
 				else 1
 		acceptOperOnLeft: -> @opType is "0-"
 		operateOnLeft: -> @opType isnt "0-"
@@ -78,7 +77,6 @@
 					when @opType is "÷" then MultiplyNumber.makeDiv( @operand1, @operand2 )
 					when @opType is "^" then PowerNumber.make( @operand1, @operand2 )
 					when @opType is ";" then new Collection(";", [@operand1, @operand2] )
-					when @opType is "=" then new Equation(@operand1, @operand2)
 					when @opType is "∪" then new Union( @operand1, @operand2 )
 					when @opType is "∩" then new Intersection( @operand1, @operand2 )
 					else new RealNumber()

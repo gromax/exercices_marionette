@@ -291,7 +291,6 @@
 				return new Droite2D [ a,b,c ]
 			fromNumber: (num) -> new Droite2D(num)
 		}
-		equation: (membregauche, membredroite) -> new Equation( @toNumber(membregauche), @toNumber(membredroite) )
 		polynome: {
 			make:(params) ->
 				# Produit un objet polynome
@@ -443,10 +442,9 @@
 		p:{
 			type: (goodObject,params) ->
 				if (typeof params isnt "object") or (params is null) then params = {}
-				if not(params.type in ["ensemble", "number", "equation"])
+				if not(params.type in ["ensemble", "number"])
 					switch
 						when goodObject instanceof EnsembleObject then params.type = "ensemble" # On attend un ensemble
-						when goodObject instanceof Equation then params.type = "equation" # On attend une équation
 						when typeof goodObject is "number" then params.type = "number"
 						else params.type = "number"	# A défaut, on attend un nombre
 				params
@@ -465,15 +463,6 @@
 				if typeof user isnt "string" then return { info:null, error:"Erreur inconnue !"}
 				if user is "" then return { info:null, error:"Ne doit pas être vide" }
 				switch type
-					when "liste:equation"
-						if user is "∅" then return { info:[], error: false }
-						liste = user.split(";")
-						infos = ( new ParseInfo(item, {type:"equation"}) for item in liste)
-						invalids = (inf for inf in infos when inf.valid is false)
-						if invalids.length>0
-							return { info:infos, error:"Saisie invalide" }
-						else
-							return { info:infos, error: false }
 					when "liste:number"
 						if user is "∅" then return { info:[], error: false }
 						liste = user.split(";")
@@ -485,10 +474,6 @@
 							return { info:infos, error: false }
 					when "ensemble"
 						info = new ParseInfo(user, {type:"ensemble"})
-						if info.valid then return { info:info, error:false }
-						else return { info:info, error: info.messages }
-					when "equation"
-						info = new ParseInfo(user, {type:"equation"})
 						if info.valid then return { info:info, error:false }
 						else return { info:info, error: info.messages }
 					else
@@ -605,20 +590,7 @@
 					note: if ok then 1 else 0
 					errors: ["La bonne réponse était &nbsp; $#{goodObject.tex()}$"]
 				}
-			equation: (userInfo,goodObject,params) ->
-				# fonction de vérification des exercices pour les equation
-				# La sortie bareme est un facteur / 1
-				# Il faut alors sortir le calcul de la note et vérifier les custom correc
-				# userInfo = Parse du string retourné par l'utilisateur
-				# goodObject = bonne valeur. Un objet Equation
-				# params = objet de paramètres dont les possibilités sont données ci-dessous
 
-				ok = goodObject.isEqual userInfo.object
-				{
-					note: if ok then 1 else 0
-					ok:ok								# ok = true -> la réponse s'affiche en vert avec éventuellement une remarque
-					formeOk : true						# La forme est ok par défaut
-				}
 			def: (user, goodObject, params) ->
 				{
 					note: 0
