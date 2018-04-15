@@ -298,7 +298,12 @@ class users
         if ($key!==null)
         {
             send_html_mail($user->identifiant(),"Mot de passe oublié","<b>".NOM_SITE.".</b> Vous avez oublié votre mot de passe. Suivez ce lien pour pour modifier votre mot de passe : <a href='".PATH_TO_SITE."/#forgotten:$key'>Réinitialisation du mot de passe</a>.");
-            return array("message"=>"Email envoyé.");
+            $uLog=Logged::getConnectedUser();
+            if ($uLog->isAdmin() || $user->isMyTeacher($uLog)){
+                return array("message"=>"Email envoyé.", "key"=>$key);
+            } else {
+                return array("message"=>"Email envoyé.");
+            }
         }
         else
         {
