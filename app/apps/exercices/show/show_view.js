@@ -56,10 +56,11 @@ define([
 		},
 	});
 
-	var LatexInputItemView = Marionette.View.extend({
+	var InputItemView = Marionette.View.extend({
 		className: "card-body",
-		template: window.JST["exercices/common/brique-latex-input"],
+		template: window.JST["exercices/common/input"],
 		triggers:{
+			"focusin input": "form:input:focusin",
 			"focusin textarea": "form:input:focusin"
 		},
 
@@ -86,24 +87,33 @@ define([
 
 		onRender: function(){
 			var that = this;
-			var $answerSpan = $(".js-mathquill",this.$el);
-			var name = this.model.get("name");
-			var mathField = window.MQ.MathField($answerSpan[0], {
-				spaceBehavesLikeTab: true,
-				autoCommands: 'pi theta sqrt',
-				autoOperatorNames: 'sin cos',
-				handlers: {
-					edit: function() { // useful event handlers
-						if (mathField){ // Pas défini à l'initialisation
-							$("#exo-"+name).val(mathField.latex());
-						}
-					},
-					enter: function() {
-						that.trigger("form:submit");
+			var format = this.model.get("format");
+			if (format){
+				var fctMQ = function(item){
+					if (item.latex && item.name){
+						var $answerSpan = $("#mq-exo-"+item.name,that.$el);
+						var mathField = window.MQ.MathField($answerSpan[0], {
+							spaceBehavesLikeTab: true,
+							autoCommands: 'pi theta sqrt',
+							autoOperatorNames: 'sin cos',
+							handlers: {
+								edit: function() { // useful event handlers
+									if (mathField){ // Pas défini à l'initialisation
+										$("#exo-"+name).val(mathField.latex());
+									}
+								},
+								enter: function() {
+									that.trigger("form:submit");
+								}
+							}
+						});
+						return [item.name, mathField];
+					} else {
+						return false;
 					}
 				}
-			});
-			this.mathField = mathField;
+				this.mathFields = _.object(_.compact(_.map(format,fctMQ)));
+			}
 			MathJax.Hub.Queue(["Typeset",MathJax.Hub,this.$el[0]]);
 		},
 
@@ -253,8 +263,8 @@ define([
 				case "color-list":
 					return ColorListItemView;
 					break;
-				case "latex-input":
-					return LatexInputItemView;
+				case "input":
+					return InputItemView;
 					break;
 				default:
 					return BriqueItemView;
@@ -316,11 +326,31 @@ define([
 			} else {
 				if (!this.currentFocus) {
 					// On cherche le premier input
-					this.currentFocus = this.itemsView.children.find(function(item){ return (item.model.get("type") == "input") || (item.model.get("type") == "latex-input")});
+					var view = this.itemsView.children.find(function(item){ return (item.model.get("type") == "input") });
+					if (view) {
+						// On cherche le premier input
+						var format = view.model.get("format");
+						if (format){
+							var it = _.first(_.filter(format, function(item){ if (item.name) return true; else return false; }));
+							if (it){
+								if (it.latex){
+									var $node = view.$el.find("textarea");
+								} else {
+									var $node = view.$el.find("input");
+								}
+							}
+						} else {
+							// On envoie dans le premier input
+							var $node = view.$el.find("input");
+						}
+						if ($node) {
+							this.currentFocus = { view: view, node:$node[0] };
+						}
+					}
 				}
 				if (this.currentFocus){
-					if (this.currentFocus.model.get("type") == "input") {
-						$inp = this.currentFocus.$el.find("input");
+					if (this.currentFocus.node.tagName == "INPUT") {
+						$inp = $(this.currentFocus.node);
 						var pos = $inp[0].selectionStart;
 						var pEnd = $inp[0].selectionEnd;
 						var currentText = $inp.val();
@@ -340,31 +370,40 @@ define([
 						}
 					} else {
 						// Dans ce cas c'est un latex-input
-						var mf = this.currentFocus.mathField;
-						switch(cible){
-							case "sqrt":
-								mf.cmd('\\sqrt');
-								mf.focus();
-								break;
-							case "pow":
-								mf.cmd("^");
-								mf.focus();
-								break;
-							case "pi":
-								mf.cmd("\\pi");
-								mf.focus();
-								break;
+						var id = $(this.currentFocus.node).parent().parent().attr('id');
+						var mfs = this.currentFocus.view.mathFields;
+						var mf = _.find(mfs, function(item,key){
+							if (id == "mq-exo-"+key){
+								return true;
+							} else {
+								return false;
+							}
+						});
+
+						if (mf){
+							switch(cible){
+								case "sqrt":
+									mf.cmd('\\sqrt');
+									mf.focus();
+									break;
+								case "pow":
+									mf.cmd("^");
+									mf.focus();
+									break;
+								case "pi":
+									mf.cmd("\\pi");
+									mf.focus();
+									break;
+							}
 						}
 					}
 				}
 			}
-
-
 			return false;
 		},
 
 		onInputFocus: function(childview, e){
-			this.currentFocus = childview;
+			this.currentFocus = { view: childview, node:e.currentTarget };
 		},
 
 		formSubmit: function(e){

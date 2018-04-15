@@ -20,7 +20,14 @@ define(["utils/math", "utils/help"], function(mM, help) {
               rank: 1,
               ps: enonce
             }, {
-              type: "latex-input",
+              type: "input",
+              format: [
+                {
+                  latex: true,
+                  cols: 10,
+                  name: "AB"
+                }
+              ],
               rank: 2,
               waited: "number",
               tag: "$AB$",

@@ -94,7 +94,13 @@ define ["utils/math","utils/help"], (mM, help) ->
 							rank: 2
 							tag:"$I_F$"
 							name:"IF"
-							description:"IF à 0,01 près"
+							format:[
+								{text:"[", cols:1, class:"text-right h3"}
+								{ name:"low", cols:2 }
+								{ text:";", cols:1, class:"text-center h3"}
+								{ name:"high", cols:2 }
+								{ text:"]", cols:1, class:"h3"}
+							]
 							good:IF
 							waited:"ensemble"
 							tolerance:0.005
