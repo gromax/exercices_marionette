@@ -5,7 +5,7 @@
     slice = [].slice;
 
   define([], function() {
-    var Collection, ComplexeNumber, DECIMAL_MAX_PRECISION, DECIMAL_SEPARATOR, Droite2D, ERROR_MIN, Ensemble, EnsembleObject, Equation, FloatNumber, FunctionNumber, InftyNumber, Intersection, MODULO_LETTER, MObject, Monome, MultiplyNumber, NumberObject, ParseInfo, ParseManager, PlusNumber, Polynome, PolynomeMaker, PowerNumber, Proba, RadicalNumber, RationalNumber, RealNumber, SOLVE_MAX_PRECISION, SimpleNumber, Suite, SymbolManager, TokenEnsembleDelimiter, TokenFunction, TokenNumber, TokenObject, TokenOperator, TokenParenthesis, TokenVariable, Trigo, Union, Vector, arrayIntersect, erreurManager, extractSquarePart, fixNumber, grecques, in_array, isArray, isInfty, isInteger, mM, mergeObj, numToStr, signatures_comparaison, union_arrays;
+    var Collection, ComplexeNumber, DECIMAL_MAX_PRECISION, DECIMAL_SEPARATOR, Droite2D, ERROR_MIN, Ensemble, EnsembleObject, FloatNumber, FunctionNumber, InftyNumber, Intersection, MODULO_LETTER, MObject, Monome, MultiplyNumber, NumberObject, ParseInfo, ParseManager, PlusNumber, Polynome, PolynomeMaker, PowerNumber, Proba, RadicalNumber, RationalNumber, RealNumber, SOLVE_MAX_PRECISION, SimpleNumber, Suite, SymbolManager, TokenEnsembleDelimiter, TokenFunction, TokenNumber, TokenObject, TokenOperator, TokenParenthesis, TokenVariable, Trigo, Union, Vector, arrayIntersect, erreurManager, extractSquarePart, fixNumber, grecques, in_array, isArray, isInfty, isInteger, mM, mergeObj, numToStr, signatures_comparaison, union_arrays;
     grecques = ["alpha", "beta", "delta", "psi", "pi", "theta", "phi", "xi", "rho", "epsilon", "omega", "nu", "mu", "gamma", "Alpha", "Beta", "Delta", "Psi", "Pi", "Theta", "Phi", "Xi", "Rho", "Epsilon", "Omega", "Nu", "Mu", "Gamma"];
     DECIMAL_SEPARATOR = ',';
     DECIMAL_MAX_PRECISION = 10;
@@ -5004,121 +5004,7 @@
         return this._operands;
       };
 
-      Collection.prototype.toEquation = function() {
-        return new Equation(this.operands[0], this.operands[1]);
-      };
-
       return Collection;
-
-    })(MObject);
-    Equation = (function(superClass) {
-      extend(Equation, superClass);
-
-      function Equation(gauche, droite) {
-        this.gauche = this.affectation(gauche);
-        this.droite = this.affectation(droite);
-      }
-
-      Equation.prototype.affectation = function(value) {
-        if (value instanceof NumberObject) {
-          return value;
-        } else {
-          return new RealNumber();
-        }
-      };
-
-      Equation.prototype.simplify = function(infos, developp) {
-        if (infos == null) {
-          infos = null;
-        }
-        if (developp == null) {
-          developp = false;
-        }
-        this.gauche = this.gauche.simplify(infos, developp);
-        this.droite = this.droite.simplify(infos, developp);
-        return this;
-      };
-
-      Equation.prototype.reduct = function() {
-        if (this._reduct == null) {
-          this._reduct = this.gauche.toClone().am(this.droite, true).simplify(null, true);
-        }
-        return this._reduct;
-      };
-
-      Equation.prototype.toClone = function() {
-        var md, mg;
-        mg = this.gauche.toClone();
-        md = this.droite.toClone();
-        return new Equation(mg, md, this.isValid);
-      };
-
-      Equation.prototype.tex = function(config) {
-        return (this.gauche.tex(config)) + " = " + (this.droite.tex(config));
-      };
-
-      Equation.prototype.toString = function() {
-        return this.gauche + " = " + this.droite;
-      };
-
-      Equation.prototype.isEqual = function(other) {
-        var eq1, eq2, norm1, norm2;
-        if (!(other instanceof Equation)) {
-          return false;
-        }
-        eq1 = this.reduct();
-        norm1 = this.normalize(eq1);
-        if (norm1 === null) {
-          return false;
-        }
-        eq2 = other.reduct();
-        norm2 = this.normalize(eq2, norm1.signature);
-        if (norm2 === null) {
-          return false;
-        }
-        return eq1.toClone().md(norm2.factor, false).am(eq2.toClone().md(norm1.factor, false), true).developp().simplify(null, false).isNul();
-      };
-
-      Equation.prototype.distance = function(other) {
-        if (this.isEqual(other)) {
-          return 0;
-        } else {
-          return 1;
-        }
-      };
-
-      Equation.prototype.normalize = function(nObj, signature) {
-        var aa, len, op, ref, sign;
-        if (typeof signature !== "string") {
-          signature = null;
-        }
-        switch (false) {
-          case !(nObj instanceof PlusNumber):
-            ref = nObj.getOperands();
-            for (aa = 0, len = ref.length; aa < len; aa++) {
-              op = ref[aa];
-              sign = op.signature();
-              if ((sign === signature) || (signature === null) && (sign !== "1") && (sign !== "N/A") && (op.isFunctionOf().length > 0)) {
-                return {
-                  signature: sign,
-                  factor: op.toClone().extractFactor()
-                };
-              }
-            }
-            break;
-          case !(nObj instanceof NumberObject):
-            sign = nObj.signature();
-            if ((sign === signature) || (signature === null) && (sign !== "1") && (sign !== "N/A") && (nObj.isFunctionOf().length > 0)) {
-              return {
-                signature: sign,
-                factor: nObj.toClone().extractFactor()
-              };
-            }
-        }
-        return null;
-      };
-
-      return Equation;
 
     })(MObject);
     EnsembleObject = (function(superClass) {
@@ -5916,7 +5802,7 @@
         if (type === "number") {
           return "[\\+\\-\\/\\^÷;]";
         } else {
-          return "[\\+\\-\\/\\^;=∪∩÷]";
+          return "[\\+\\-\\/\\^;∪∩÷]";
         }
       };
 
@@ -5939,8 +5825,6 @@
             return 5;
           case this.opType !== "∪":
             return 4;
-          case this.opType !== "=":
-            return 2;
           default:
             return 1;
         }
@@ -5980,8 +5864,6 @@
               return PowerNumber.make(this.operand1, this.operand2);
             case this.opType !== ";":
               return new Collection(";", [this.operand1, this.operand2]);
-            case this.opType !== "=":
-              return new Equation(this.operand1, this.operand2);
             case this.opType !== "∪":
               return new Union(this.operand1, this.operand2);
             case this.opType !== "∩":
@@ -6161,8 +6043,6 @@
             return "nombre";
           case "ensemble":
             return "ensemble";
-          case "equation":
-            return "équation";
           default:
             return "(" + type + " ?)";
         }
@@ -6233,8 +6113,6 @@
                   case !((type === "ensemble") && (output instanceof EnsembleObject)):
                     return output;
                   case !((type === "number") && (output instanceof NumberObject)):
-                    return output;
-                  case !((type === "equation") && (output instanceof Equation)):
                     return output;
                   default:
                     info.messages.push("Le résultat ne correspond pas à un(e) '" + (this.typeToStr(type)) + "'");
@@ -6404,9 +6282,6 @@
                 break;
               case this.config.type !== "ensemble":
                 value = new Ensemble();
-                break;
-              case this.config.type !== "equation":
-                value = new Equation(null, null);
                 break;
               default:
                 value = new MObject();
@@ -9387,9 +9262,6 @@
           return new Droite2D(num);
         }
       },
-      equation: function(membregauche, membredroite) {
-        return new Equation(this.toNumber(membregauche), this.toNumber(membredroite));
-      },
       polynome: {
         make: function(params) {
           var a, coeffs, config, indice, roots, x;
@@ -9658,13 +9530,10 @@
           if ((typeof params !== "object") || (params === null)) {
             params = {};
           }
-          if (!((ref = params.type) === "ensemble" || ref === "number" || ref === "equation")) {
+          if (!((ref = params.type) === "ensemble" || ref === "number")) {
             switch (false) {
               case !(goodObject instanceof EnsembleObject):
                 params.type = "ensemble";
-                break;
-              case !(goodObject instanceof Equation):
-                params.type = "equation";
                 break;
               case typeof goodObject !== "number":
                 params.type = "number";
@@ -9704,48 +9573,6 @@
             };
           }
           switch (type) {
-            case "liste:equation":
-              if (user === "∅") {
-                return {
-                  info: [],
-                  error: false
-                };
-              }
-              liste = user.split(";");
-              infos = (function() {
-                var aa, len, results;
-                results = [];
-                for (aa = 0, len = liste.length; aa < len; aa++) {
-                  item = liste[aa];
-                  results.push(new ParseInfo(item, {
-                    type: "equation"
-                  }));
-                }
-                return results;
-              })();
-              invalids = (function() {
-                var aa, len, results;
-                results = [];
-                for (aa = 0, len = infos.length; aa < len; aa++) {
-                  inf = infos[aa];
-                  if (inf.valid === false) {
-                    results.push(inf);
-                  }
-                }
-                return results;
-              })();
-              if (invalids.length > 0) {
-                return {
-                  info: infos,
-                  error: "Saisie invalide"
-                };
-              } else {
-                return {
-                  info: infos,
-                  error: false
-                };
-              }
-              break;
             case "liste:number":
               if (user === "∅") {
                 return {
@@ -9791,22 +9618,6 @@
             case "ensemble":
               info = new ParseInfo(user, {
                 type: "ensemble"
-              });
-              if (info.valid) {
-                return {
-                  info: info,
-                  error: false
-                };
-              } else {
-                return {
-                  info: info,
-                  error: info.messages
-                };
-              }
-              break;
-            case "equation":
-              info = new ParseInfo(user, {
-                type: "equation"
               });
               if (info.valid) {
                 return {
@@ -9922,20 +9733,339 @@
             errors: ["La bonne réponse était &nbsp; $" + (goodObject.tex()) + "$"]
           };
         },
-        equation: function(userInfo, goodObject, params) {
-          var ok;
-          ok = goodObject.isEqual(userInfo.object);
-          return {
-            note: ok ? 1 : 0,
-            ok: ok,
-            formeOk: true
-          };
-        },
         def: function(user, goodObject, params) {
           return {
             note: 0,
             ok: false,
             formeOk: false
+          };
+        }
+      },
+      verification: {
+        numberValidation: function(userString) {
+          var info;
+          switch (false) {
+            case typeof userString === "string":
+              return {
+                processed: false,
+                user: userString,
+                error: "Erreur inconnue !"
+              };
+            case userString !== "":
+              return {
+                processed: false,
+                user: userString,
+                error: "Ne doit pas être vide"
+              };
+            default:
+              info = new ParseInfo(userString, {
+                type: "number"
+              });
+              if (info.valid) {
+                return {
+                  processed: info,
+                  user: userString,
+                  error: false
+                };
+              } else {
+                return {
+                  processed: info,
+                  user: userString,
+                  error: info.messages
+                };
+              }
+          }
+        },
+        isSame: function(processedAnswer, goodObject, parameters) {
+          var approx, config, default_config, erreur, errors, filtered_parameters, goodMessage, keysFilter, note, ref;
+          if (typeof goodObject === "number") {
+            goodObject = new RealNumber(goodObject);
+          }
+          default_config = {
+            formes: null,
+            p_forme: 0.75,
+            tolerance: 0,
+            approx: 0.1,
+            p_approx: 0.5,
+            arrondi: null,
+            p_arrondi: 0.5,
+            p_modulo: 0.5,
+            symbols: null,
+            custom: false
+          };
+          keysFilter = ["formes", "p_forme", "tolerance", "approx", "p_approx", "arrondi", "p_arrondi", "p_modulo", "symbols", "custom", "goodTex"];
+          filtered_parameters = _.pick.apply(_, [parameters].concat(slice.call(keysFilter)));
+          config = _.extend(default_config, filtered_parameters);
+          erreur = erreurManager.main(goodObject, processedAnswer.object, config.symbols);
+          note = 0;
+          errors = [];
+          switch (false) {
+            case typeof config.arrondi !== "number":
+              approx = Math.pow(10, config.arrondi);
+              if ((erreur.exact || erreur.float && ((erreur.ordre <= config.arrondi) || (erreur.p_user <= config.arrondi))) && !erreur.moduloError) {
+                if (!erreur.float) {
+                  errors.push({
+                    type: "warning",
+                    text: "Approximation sous forme décimale attendue."
+                  });
+                }
+                if (!(erreur.approx_ok || erreur.exact)) {
+                  errors.push({
+                    type: "warning",
+                    text: "Il faut arrondir au " + approx + " le plus proche."
+                  });
+                }
+                if (erreur.p_user < config.arrondi) {
+                  errors.push({
+                    type: "warning",
+                    text: "Vous donnez trop de décimales."
+                  });
+                }
+                if (errors.length > 0) {
+                  goodMessage = {
+                    type: "warning",
+                    text: "$" + processedAnswer.tex + "$ &nbsp; est acceptée mais peut être amélioré."
+                  };
+                  note = config.p_arrondi;
+                } else {
+                  goodMessage = {
+                    type: "success",
+                    text: "$" + processedAnswer.tex + "$ &nbsp; est une bonne réponse."
+                  };
+                  note = 1;
+                }
+              } else {
+                if (!erreur.float) {
+                  errors.push({
+                    type: "warning",
+                    text: "Approximation sous forme décimale attendue."
+                  });
+                }
+                goodMessage = {
+                  type: "error",
+                  text: "La bonne réponse était &nbsp; $" + (numToStr(mM.float(goodObject), -config.arrondi)) + "$"
+                };
+              }
+              break;
+            case !(erreur.exact || erreur.float && (erreur.ecart <= config.tolerance)):
+              note = 1;
+              if (!processedAnswer.forme(config.formes)) {
+                note *= config.p_forme;
+                errors.push({
+                  type: "warning",
+                  text: "Vous devez simplifier votre résultat."
+                });
+              }
+              if (erreur.moduloError) {
+                note *= config.p_modulo;
+                errors.push({
+                  type: "warning",
+                  text: "Le bon modulo était &nbsp; $k\\cdot " + erreur.moduloError + "$"
+                });
+              }
+              if (errors.length > 0) {
+                goodMessage = {
+                  type: "warning",
+                  text: "$" + processedAnswer.tex + "$ &nbsp; est acceptée mais peut être amélioré."
+                };
+              } else {
+                goodMessage = {
+                  type: "success",
+                  text: "$" + processedAnswer.tex + "$ &nbsp; est une bonne réponse."
+                };
+              }
+              break;
+            case !(erreur.float && erreur.approx_ok && (erreur.ecart <= config.approx) && !erreur.moduloError):
+              errors.push({
+                type: "warning",
+                text: "Vous avez donné une approximation. Il faut donner une valeur exacte."
+              });
+              note = config.p_approx;
+              goodMessage = {
+                type: "warning",
+                text: "$" + processedAnswer.tex + "$ &nbsp; est acceptée mais peut être amélioré."
+              };
+              break;
+            default:
+              goodMessage = {
+                type: "error",
+                text: "La bonne réponse était &nbsp; $" + ((ref = config.goodTex) != null ? ref : goodObject.tex()) + "$"
+              };
+          }
+          return {
+            note: note,
+            errors: errors,
+            goodMessage: goodMessage
+          };
+        },
+        all: function(processedAnswerList, goodObjectList, parameters) {
+          var N, aa, bads, closests, errors, goodMessage, it, lefts, len, messages, note, ref, sol, stringAnswer, stringBads, stringLefts, verifResponse;
+          note = 0;
+          errors = [];
+          goodMessage = false;
+          if (processedAnswerList.length === 0) {
+            if (goodObjectList.length === 0) {
+              goodMessage = {
+                type: "success",
+                text: "$\\varnothing$ &nbsp; est une bonne réponse"
+              };
+              note = 1;
+            } else {
+              stringAnswer = ((function() {
+                var aa, len, results;
+                results = [];
+                for (aa = 0, len = goodObjectList.length; aa < len; aa++) {
+                  it = goodObjectList[aa];
+                  results.push("$" + (it.tex()) + "$");
+                }
+                return results;
+              })()).join("&nbsp; ; &nbsp;");
+              goodMessage = {
+                type: "error",
+                text: "Vous auriez dû donner &nbsp; " + stringAnswer + "."
+              };
+            }
+          } else {
+            if (goodObjectList.length === 0) {
+              goodMessage = {
+                type: "error",
+                text: "La bonne réponse était &nbsp; $\\varnothing$."
+              };
+            } else {
+              ref = mM.tri(processedAnswerList, goodObjectList), closests = ref.closests, lefts = ref.lefts;
+              bads = [];
+              N = Math.max(goodObjectList.length, processedAnswerList.length);
+              messages = [];
+              for (aa = 0, len = closests.length; aa < len; aa++) {
+                sol = closests[aa];
+                if (sol.good != null) {
+                  verifResponse = mM.verification.isSame(sol.info, sol.good, parameters);
+                  note += verifResponse.note / N;
+                  if (verifResponse.note === 0) {
+                    bads.push(sol.info);
+                    lefts.push(sol.good);
+                  } else {
+                    errors = errors.concat(verifResponse.errors);
+                  }
+                } else {
+                  bads.push(sol.info);
+                }
+              }
+              if (bads.length > 0) {
+                stringBads = ((function() {
+                  var ab, len1, results;
+                  results = [];
+                  for (ab = 0, len1 = bads.length; ab < len1; ab++) {
+                    it = bads[ab];
+                    results.push("$" + it.tex + "$");
+                  }
+                  return results;
+                })()).join("&nbsp; ; &nbsp;");
+                errors.push({
+                  type: "error",
+                  text: "Ces solutions que vous donnez sont fausses: &nbsp;" + stringBads + "."
+                });
+              }
+              if (lefts.length > 0) {
+                stringLefts = ((function() {
+                  var ab, len1, results;
+                  results = [];
+                  for (ab = 0, len1 = lefts.length; ab < len1; ab++) {
+                    it = lefts[ab];
+                    results.push("$" + (it.tex()) + "$");
+                  }
+                  return results;
+                })()).join("&nbsp; ; &nbsp;");
+                errors.push({
+                  type: "error",
+                  text: "Vous n'avez pas donné ces solutions : &nbsp;" + stringLefts + "."
+                });
+              }
+            }
+          }
+          return {
+            note: note,
+            errors: errors,
+            goodMessage: goodMessage
+          };
+        },
+        some: function(processedAnswerList, goodObjectList, parameters) {
+          var N, aa, bads, closests, errors, goodMessage, it, lefts, len, messages, note, ref, sol, stringAnswer, stringBads, verifResponse;
+          note = 0;
+          errors = [];
+          goodMessage = false;
+          if (!_.isArray(processedAnswerList)) {
+            processedAnswerList = _.compact([processedAnswerList]);
+          }
+          if (processedAnswerList.length === 0) {
+            if (goodObjectList.length === 0) {
+              goodMessage = {
+                type: "success",
+                text: "$\\varnothing$ &nbsp; est une bonne réponse"
+              };
+              note = 1;
+            } else {
+              stringAnswer = ((function() {
+                var aa, len, results;
+                results = [];
+                for (aa = 0, len = goodObjectList.length; aa < len; aa++) {
+                  it = goodObjectList[aa];
+                  results.push("$" + (it.tex()) + "$");
+                }
+                return results;
+              })()).join(" ; ");
+              goodMessage = {
+                type: "error",
+                text: "Vous auriez dû donner &nbsp; " + stringAnswer + "."
+              };
+            }
+          } else {
+            if (goodObjectList.length === 0) {
+              goodMessage = {
+                type: "error",
+                text: "La bonne réponse était &nbsp; $\\varnothing$."
+              };
+            } else {
+              ref = mM.tri(processedAnswerList, goodObjectList), closests = ref.closests, lefts = ref.lefts;
+              bads = [];
+              N = processedAnswerList.length;
+              messages = [];
+              for (aa = 0, len = closests.length; aa < len; aa++) {
+                sol = closests[aa];
+                if (sol.good != null) {
+                  verifResponse = mM.verification.isSame(sol.info, sol.good, parameters);
+                  note += verifResponse.note / N;
+                  if (verifResponse.note === 0) {
+                    bads.push(sol.info);
+                    lefts.push(sol.good);
+                  } else {
+                    errors = errors.concat(verifResponse.errors);
+                  }
+                } else {
+                  bads.push(sol.info);
+                }
+              }
+              if (bads.length > 0) {
+                stringBads = ((function() {
+                  var ab, len1, results;
+                  results = [];
+                  for (ab = 0, len1 = bads.length; ab < len1; ab++) {
+                    it = bads[ab];
+                    results.push("$" + it.tex + "$");
+                  }
+                  return results;
+                })()).join("&nbsp; ; &nbsp;");
+                errors.push({
+                  type: "error",
+                  text: "Ces solutions que vous donnez sont fausses: &nbsp;" + stringBads + "."
+                });
+              }
+            }
+          }
+          return {
+            note: note,
+            errors: errors,
+            goodMessage: goodMessage
           };
         }
       }

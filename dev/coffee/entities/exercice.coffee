@@ -29,53 +29,7 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 			_.reduce(baremes, iteratee, 0)
 	}
 
-	BriqueItem = Backbone.Model.extend {
-		initialize: (modelData) ->
-			switch
-				when typeof modelData.verification is "function"
-					@verification = modelData.verification
-				when modelData.type is "input" or modelData.type is "latex-input"
-					@verification = Functions_helpers.inputVerification
-				when modelData.type is "radio"
-					@verification = Functions_helpers.radioVerification
-				when modelData.type is "color-choice"
-					@verification = Functions_helpers.color_choiceVerification
-				when modelData.type is "validation"
-					@verification = () -> { toTrash:@ }
-				when modelData.type is "aide"
-					@verification = () -> { toTrash:@ }
-				else
-					@verification = () -> null
-			switch
-				when typeof modelData.answerProcessing is "function"
-					@answerProcessing = modelData.answerProcessing
-				when modelData.type is "input" or modelData.type is "latex-input"
-					@answerProcessing = Functions_helpers.inputAnswerProcessing
-				when modelData.type is "radio"
-					@answerProcessing = Functions_helpers.radioAnswerProcessing
-				when modelData.type is "color-choice"
-					@answerProcessing = Functions_helpers.color_choiceAnswerProcessing
-				else
-					@answerProcessing = Functions_helpers.defaultAnswerProcess
-			if typeof modelData.answerPreprocessing is "function"
-				@answerPreprocessing = modelData.answerPreprocessing
-
-		parse:(data)->
-			switch data.type
-				when "input"
-					parsedData = _.extend({
-						description : ""
-						waited: "number"
-						arrondi : false
-						formes : null
-						custom: if typeof data.customVerif is "function" then data.customVerif else null
-						tolerance : false
-					}, data)
-				else
-					parsedData = data
-			parsedData
-	}
-
+	BriqueItem = Backbone.Model
 	BriqueItemsCollection = Backbone.Collection.extend {
 		model: BriqueItem
 		comparator: "rank"
@@ -92,42 +46,128 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 			return data
 
 		verification: (data)->
-			verif_processing = (model)->
-				verif = model.verification(data)
-				if typeof (post = verif?.post) is "function"
-					verif.post = { item: model, post:post }
-				verif
+			verif_processing = (verifItem)->
+				switch
+					when typeof verifItem is "function"
+						out = verifItem(data)
+					when verifItem.type is "all"
+						out = mM.verification.all(data[verifItem.name].processed, verifItem.good, verifItem.parameters)
+						stringAnswer = _.pluck(data[verifItem.name].processed, "tex").join(" &nbsp; ; &nbsp; ")
+						list = [{ type:"normal", text:"Vous avez répondu &nbsp; $#{stringAnswer}$" }]
+						if out.goodMessage then list.push out.goodMessage
+						out.add = {
+							type:"ul"
+							list: list.concat(out.errors)
+						}
+						if verifItem.rank? then out.add.rank = verifItem.rank
+					when verifItem.type is "some"
+						out = mM.verification.some(data[verifItem.name].processed, verifItem.good, verifItem.parameters)
+						stringAnswer = _.pluck(data[verifItem.name].processed, "tex").join(" &nbsp; ; &nbsp; ")
+						list = [
+							{ type:"normal", text:"Vous avez répondu &nbsp; $#{stringAnswer}$" }
+						]
+						if out.goodMessage then list.push out.goodMessage
+						out.add = {
+							type:"ul"
+							list: list.concat(out.errors)
+						}
+						if verifItem.rank? then out.add.rank = verifItem.rank
+					when verifItem.radio?
+						name = verifItem.name
+						tag = verifItem.tag ? name
+						p = data[name].processed
+						g = verifItem.good
+						out = {
+							add: {
+								type: "ul"
+								list: [{
+									type:"normal"
+									text:"<b>#{tag} &nbsp; :</b>&emsp; Vous avez répondu &nbsp; #{verifItem.radio[p]}."
+								}]
+							}
+						}
 
-			verif = _.map(@get("items").models, verif_processing )
+						if p is g
+							out.note = 1
+							out.add.list.push {
+								type:"success"
+								text:"C'est la bonne réponse."
+							}
+						else
+							out.note = 0
+							out.add.list.push {
+								type:"error"
+								text:"La bonne réponse était &nbsp; #{verifItem.radio[g]}."
+							}
+						if verifItem.rank? then out.add.rank = verifItem.rank
+					else
+						out = mM.verification.isSame(data[verifItem.name].processed, verifItem.good, verifItem.parameters)
+						tag = verifItem.tag ? verifItem.name
+						list = [
+							{ type:"normal", text:"<b>#{tag}</b> &nbsp; :</b>&emsp; Vous avez répondu &nbsp; $#{data[verifItem.name].processed.tex}$" }
+						]
+						list.push out.goodMessage
+						out.add = {
+							type:"ul"
+							list: list.concat(out.errors)
+						}
+						if verifItem.rank? then out.add.rank = verifItem.rank
+				out
 
-			customBriqueVerifFunction = @get("custom_verification_message")
-			if (typeof customBriqueVerifFunction is "function") && (customAdd = customBriqueVerifFunction(data))
-				verif.push customAdd
-
-			# Le verif produit de simple items json, comme le font les exercices
-			add_json = _.flatten(_.compact(_.pluck(verif, "add")))
+			verif = _.map(@get("verifications"), verif_processing )
 
 			# posts : fonctions à éxécuter après le render (a priori pour une fonction déjà traitée)
 			posts = _.compact(_.pluck(verif, "post"))
 			# On convertit ces json en BriqueItems
-			add_models = _.map(add_json, (item)-> new BriqueItem(item, {parse:true}))
+			add_models = _.map(_.flatten(_.compact(_.pluck(verif, "add"))), (item)-> new BriqueItem(item))
 			notes = _.filter(_.pluck(verif,"note"), (item)-> typeof item is "number" )
 			sum = (it,memo) -> it+memo
-			note = _.reduce(notes, sum) / notes.length
-			{ toTrash: _.compact(_.pluck(verif, "toTrash")), add:add_models, posts:posts, note:note }
+			note = _.reduce(notes, sum, 0) / notes.length
+			{ add:add_models, posts:posts, note:note }
 
 		checkIfNeedValidation: () -> @get("items").where({type:"validation"}).length > 0
 
 		validation:(data) ->
-			reduce_fct = (memo,item) ->
-				if item isnt null
-					_.extend(memo, item)
+			fct_iteratee = (val, key) ->
+				if (userValue = data[key])?
+					switch
+						when val is "liste"
+							if userValue is "∅"
+								processed = []
+								error = false
+							else
+								liste = userValue.split(";")
+								verifs = (mM.verification.numberValidation(it) for it in liste)
+								errors = _.flatten(_.compact(_.pluck(verifs, "error")))
+								if errors.length>0 then error = false
+								else error = errors
+								processed = _.pluck(verifs,"processed")
+							{
+								processed: processed
+								user: userValue
+								error: error
+							}
+						when val is "number"
+							mM.verification.numberValidation(userValue)
+						when result=/radio:([0-9]+)/.exec(val)
+							result = Number(result[1])
+							p = Number userValue
+							if p<0 or p>result
+								error = "La réponse n'est pas dans la liste"
+							else
+								error = false
+							{
+								processed: p
+								user: userValue
+								error:error
+							}
+						when typeof val is "function"
+							val(userValue)
+						else
+							{ processed:false, user:userValue, error:"Aucun type de validation défini !"}
 				else
-					memo
-			list = _.map(@get("items").models, (model)-> model.answerProcessing(data))
-			# On produit un objet avec { clé objet erreur }
-			_.reduce(list, reduce_fct, {})
-
+					{ processed:false, user:"?", error: "Réponse manquante !" }
+			_.mapObject(@get("validations"), fct_iteratee)
 
 		# La fonction go me crée du soucis :
 		# Si j'appelle go dans un contexte d'initialisation de l'exercice
@@ -205,10 +245,13 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 			# sinon un objet contenant { name:string, answer:string, tout autre attribut utile pour le modèle }
 			# ou { name:string , error: string } en cas d'erreur
 			data = data ? {}
-			name = @get("name")
+			waited = @get("waited")
 			out = {}
+
+			name = @get("name")
 			if (userValue = data[name])?
-				waited = @get("waited")
+				# Correspond au cas où il y a effectivement un input correspondant
+
 				error = false
 				processedAnswer = false
 				if userValue is "" then error = "Ne doit pas être vide"
@@ -223,6 +266,34 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 					out[name] = {
 						processedAnswer: processedAnswer
 						answer: data[name]
+					}
+				else
+					out[name] = {
+						error: error
+					}
+			else if (format = @get("format"))?
+				names = _.compact(_.pluck(format,"name"))
+				fct_iteratee = (item) ->
+					[ item, data[item]?"" ]
+				userValues = originalUserValues = _.object(names,_.map(names, (item)-> data[item] ? ""))
+
+				if _.compact(_.values(userValues)).length < names.length
+					error = "Aucun champ ne doit être vide"
+				else
+					error = false
+					if typeof @answerPreprocessing is "function"
+						{ processed, error } = @answerPreprocessing(userValues)
+						if error is false then userValues = processed
+					if error is false
+						validateList = (mM.p.validate(uV, waited) for uV in _.values(userValues))
+						error = _.compact(_.pluck(validateList, "error"))
+						if error.length is 0
+							error = false
+							processedAnswers = _.object(names, _.pluck(validateList, "info"))
+				if error is false
+					out[name] = {
+						processedAnswer: processedAnswers
+						answer: originalUserValues
 					}
 				else
 					out[name] = {
@@ -296,13 +367,17 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 			userExpression = (entry)->
 				# entry est string ou info
 				# en fonction du type d'input on affiche en latex ou pas
-				if entry.tex?
-					return "$#{entry.tex}$"
-				if entry.expression? then entry = entry.expression
-				if that.get("type") == "latex-input"
-					return "$#{entry}$"
+
+				if typeof (customExpr = that.get("customUserExpression")) is "function"
+					return customExpr(entry)
 				else
-					return "<i>#{entry}</i>"
+					if entry.tex?
+						return "$#{entry.tex}$"
+					if entry.expression? then entry = entry.expression
+					if that.get("type") == "latex-input"
+						return "$#{entry}$"
+					else
+						return "<i>#{entry}</i>"
 
 			title = model_data.corectionTag || model_data.tag || model_data.name
 			items = [{
@@ -310,43 +385,44 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 				text:"<b>#{title} &nbsp; \:</b>&emsp; Vous avez répondu &nbsp; #{userExpression(answer_data.answer)}"
 			}]
 
-			if Array.isArray(answer_data.processedAnswer)
-				# On attendait une liste de valeurs
-				if answer_data.processedAnswer.length is 0
+			# Fonction de vérif dans le cas où on attend une liste de valeurs
+			fct_for_list = (answersList, goodList) ->
+				itNote = 0
+				if answersList.length is 0
 					# L'utilisateur a répondu ensemble vide
-					if (model_data.good.length is 0)
+					if (goodList.length is 0)
 						# La réponse était ensemble vide, c'est donc une bonne réponse
 						items.push { type:"success", text:"Bonne réponse" }
-						note = 1
+						itNote = 1
 					else
 						# La bonne réponse n'était pas vide
-						stringAnswer = ( "$#{it.tex()}$" for it in model_data.good).join(" ; ")
+						stringAnswer = ( "$#{it.tex()}$" for it in goodList).join(" ; ")
 						items.push { type:"error", text:"Vous auriez dû donner #{stringAnswer}" }
 				else
 					# L'utilisateur a donné plusieurs réponses
-					if (model_data.good.length is 0)
+					if (goodList.length is 0)
 						# La réponse était ensemble vide, L'utilisateur s'est donc trompé
 						items.push { type:"error", text:"La bonne réponse était $\\varnothing$." }
 					else
 						# Il faut faire le tri pour associer deux à deux user et good
-						{ closests, lefts } = mM.tri answer_data.processedAnswer, model_data.good
+						{ closests, lefts } = mM.tri answersList, goodList
 						bads = []
-						N = model_data.good.length
+						N = goodList.length
 						for sol in closests
 							if sol.good?
 								# Un objet good a été associé à cette réponse utilisateur
-								verifResponse = mM.verif[sol.info.type](sol.info, sol.good, model_data)
-								note += verifResponse.note/N
+								verifResponse = mM.verif[sol.info.type](sol.info, sol.good, model_data) # model_data contient les params de verification comme tolerance
+								itNote += verifResponse.note/N
 
 								switch
 									when verifResponse.note is 1
 										items.push { type:"success", text:"$#{sol.info.tex}$ &nbsp; est une bonne réponse." }
 									when verifResponse.note > 0
 										if verifResponse.errors.length>0
-											items.push { type:"warning", text:"#{userExpression(sol.info)} &nbsp; est accepté, mais :" }
+											items.push { type:"warning", text:"$#{sol.info.tex} &nbsp; est accepté, mais :" }
 											items.push({ type:"warning", text:errorItem }) for errorItem in verifResponse.errors
 										else
-											items.push { type:"warning", text:"#{userExpression(sol.info)} &nbsp; est accepté mais la réponse peut être améliorée." }
+											items.push { type:"warning", text:"$#{sol.info.tex}$ &nbsp; est accepté mais la réponse peut être améliorée." }
 									else
 										bads.push sol.info.expression
 										lefts.push sol.good
@@ -354,35 +430,59 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 								bads.push sol.info.expression
 						if bads.length>0 then items.push { type:"error", text:"Ces solutions que vous donnez sont fausses : #{bads.join(" ; ")}" }
 						if lefts.length>0 then items.push { type:"error",text:"Vous n'avez pas donné ces solutions : #{ ("$#{it.tex()}$" for it in lefts).join(" ; ") }" }
-			else
-				# On attend une réponse simple
-				# mais on peut avoir proposé plusieurs réponses possibles
-				type = answer_data.processedAnswer.type
-				if Array.isArray(model_data.good)
+				itNote
+
+
+			# Fonction de vérif dans le cas où on attend une liste simple
+			fct_simple = (answer, good) ->
+				type = answer.type
+				if Array.isArray(good)
 					# Dans ce cas, on teste tous les cas et on prend la meilleure pondération
-					verif_results = ( mM.verif[type](answer_data.processedAnswer, it_good, model_data ) for it_good in model_data.good)
+					verif_results = ( mM.verif[type](answer, it_good, model_data ) for it_good in good)
 					# On trie pour extraire le résultat donnant la pondération la plus haute
 					{ note, errors } = _.max(verif_results, (item)-> item.note )
 				else
 					# C'est une réponse simple
-					{ note, errors } = mM.verif[type](answer_data.processedAnswer, model_data.good, model_data)
+					{ note, errors } = mM.verif[type](answer, good, model_data)
 				switch
 					when note is 1
-						items.push { type:"success", text:"#{userExpression(answer_data.answer)} &nbsp; est une bonne réponse."}
+						items.push { type:"success", text:"$#{answer.tex}$ &nbsp; est une bonne réponse."}
 					when note>0
 						if errors.length>0
-							items.push { type:"warning", text:"#{userExpression(answer_data.answer)} &nbsp; est accepté, mais :" }
+							items.push { type:"warning", text:"$#{answer.tex}$ &nbsp; est accepté, mais :" }
 							items.push({ type:"warning", text:errorItem }) for errorItem in errors
 						else
-							items.push { type:"warning", text:"#{userExpression(answer_data.answer)} &nbsp; est accepté mais la réponse peut être améliorée." }
+							items.push { type:"warning", text:"$#{answer.tex}$ &nbsp; est accepté mais la réponse peut être améliorée." }
 					else
-						items.push { type:"error", text:"Mauvaise réponse." }
+						items.push { type:"error", text:"$#{answer.tex}$ &nbsp; est une mauvaise réponse." }
 						if errors.length>0
 							items.push({ type:"warning", text:errorItem }) for errorItem in errors
-				customMessageFunction = @get("custom_verification_message")
-				if (typeof customMessageFunction is "function") && (customMessage = customMessageFunction(answers_data))
-					if customMessage.note then note += customMessage.note
-					items.push customMessage
+				note
+
+			fct_aiguillage = (answer, good) ->
+				if Array.isArray(answer)
+					return fct_for_list(answer, good)
+				else
+					note = fct_simple(answer, good)
+					customMessageFunction = that.get("custom_verification_message")
+					if (typeof customMessageFunction is "function") && (customMessage = customMessageFunction(answers_data))
+						if customMessage.note then note += customMessage.note
+						items.push customMessage
+					return note
+
+
+			# Cas où on a fourni une liste de réponses
+			if typeof answer_data.answer is "object"
+				# C'est un cas avec plusieurs élément
+				N = _.size(answer_data.answer)
+				list = _.map(answer_data.processedAnswer, (it, key)-> return { answer:it, good:model_data.good[key]} )
+				fct_iteratee = (memo,item)-> return memo+fct_aiguillage(item.answer, item.good)/N
+				note = _.reduce(list, fct_iteratee,0)
+			else
+				# C'est un cas simple
+				fct_aiguillage(answer_data.processedAnswer, model_data.good)
+
+
 			{
 				toTrash:@
 				note:note

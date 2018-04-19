@@ -153,14 +153,14 @@ define([
 					// Traitement après vérif
 					// Dans le but d'enchaîner le traitement initial d'un exercice sauvegardé
 					// la fonction renvoie le nouveau focus
-					var traitement_final = function(bv,m,v){
+					var traitement_final = function(bv,m,v,tT){
 						// bv = brique_view => La brique d'exercice dans laquelle s'effectue la vérif
 						// m = model => le model associé à la brique
 						// v = verifs => le résultats des vérifications menées selon les réponse utilisateur aux questions de cette brique
 
 						pied.set("note",Math.ceil(note));
 						// Suppression des items d'input
-						_.each(v.toTrash, function(item){ bv.removeItem(item); });
+						_.each(tT, function(it){ it.remove(); });
 						// Ajout des items de correction
 						m.get("items").add(v.add);
 						// La brique est marquée comme terminée
@@ -177,8 +177,16 @@ define([
 						var model = brique_view.model;
 
 						var model_validation = model.validation(data);
-						var validation_error = _.some(model_validation, function(item){ return _.has(item, "error"); })
-						if (validation_error === false) {
+
+
+						var validation_errors = _.compact( _.pluck(_.values( model_validation), "error" ) )
+						if (validation_errors.length == 0) {
+							var toTrash = brique_view.itemsView.children.filter(function(it){
+								var toTrash = it.model.get("toTrash");
+								var def = it.defaultToTrash;
+								return (toTrash === true) || (toTrash !== false) &&  def;
+							});
+
 							var verifs = model.verification(model_validation);
 							// calcul de la note
 							note = verifs.note*model.get("bareme")*100/baremeTotal + note;
@@ -195,7 +203,7 @@ define([
 											function(item){ return item.get("items").where({type:"validation"}); }
 										)
 									),
-									verifs.toTrash
+									toTrash
 								).length ==0 ;
 
 								// le paramètre save sera une fonction prenant (note, answers, inputs, finished) en argument
@@ -214,11 +222,11 @@ define([
 										alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/023]");
 									});
 								} else {
-									traitement_final(brique_view, model, verifs);
+									traitement_final(brique_view, model, verifs, toTrash);
 								}
 							} else {
 								// On ne sauvegarde pas, on exécuter directement le traitement final
-								traitement_final(brique_view, model, verifs);
+								traitement_final(brique_view, model, verifs, toTrash);
 							}
 						} else {
 							brique_view.onFormDataInvalid(model_validation);

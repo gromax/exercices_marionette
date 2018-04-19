@@ -1102,50 +1102,6 @@ __p += '\n<p class="card-text">' +
 ((__t = ( p )) == null ? '' : __t) +
 '</p>\n\t';
  }) ;
-__p += '\n';
- break; case "input": ;
-__p += '\n<div class="form-group row">\n\t<label for="exo-' +
-__e( name ) +
-'" class="col-sm-2 col-form-label">' +
-__e( tag ) +
-'</label>\n\t<div class="col-sm-10">\n\t\t<input type="text" class="form-control" id="exo-' +
-__e( name ) +
-'" name="' +
-__e( name ) +
-'" placeholder="' +
-__e( description ) +
-'" value="">\n\t</div>\n</div>\n\n';
- break; case "latex-input": ;
-__p += '\n<div class="form-group row">\n\t<label for="exo-' +
-__e( name ) +
-'" class="col-sm-2 col-form-label">' +
-__e( tag ) +
-'</label>\n\t<div class="col-sm-10">\n\t\t<span class="js-mathquill" style="width:90%;"></span>\n\t\t<input type="hidden" id="exo-' +
-__e( name ) +
-'" name="' +
-__e( name ) +
-'" value="">\n\t</div>\n</div>\n\n';
- break; case "radio": ;
-__p += '\n\t';
- _.each(radio,function(subItem,key){
-		var radio_id = ""+Math.random()
-	;
-__p += '\n<div class="form-check">\n\t<input class="form-check-input" type="radio" id="radio' +
-__e( radio_id ) +
-'" name="' +
-__e( name ) +
-'" value="' +
-__e( key ) +
-'" ';
- if (key==0){ ;
-__p += 'checked';
- } ;
-__p += ' >\n\t<label class="form-check-label" for="radio' +
-__e( radio_id ) +
-'">\n\t\t' +
-__e( subItem ) +
-'\n\t</label>\n</div>\n\t';
- }) ;
 __p += '\n\n';
  break; case "ul": ;
 __p += '\n<ul class="list-group list-group-flush">\n';
@@ -1333,21 +1289,25 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
-__p += '<div class="form-group row">\n\t<label class="col-sm-2 col-form-label">' +
-__e( tag ) +
-'</label>\n\t';
+__p += '<div class="form-group row">\n\t';
  if (typeof format == "undefined") { // format de base ;
-__p += '\n\t\t<div class="col-sm-10">\n\t\t\t<input type="text" class="form-control" id="exo-' +
+__p += '\n\t<label class="col-sm-2 col-form-label">' +
+__e( tag ) +
+'</label>\n\t<div class="col-sm-10">\n\t\t<input type="text" class="form-control" id="exo-' +
 __e( name ) +
 '" name="' +
 __e( name ) +
-'" placeholder="' +
+'" ';
+ if (typeof description != "undefined") { ;
+__p += ' placeholder="' +
 __e( description ) +
-'" value="">\n\t\t</div>\n\t';
+'" ';
+ } ;
+__p += ' value="">\n\t</div>\n\t';
  } else {
 		// format est un tableau d'objets { cols, name, class, text, latex }
 		_.each(format, function(item){ ;
-__p += '\n\t\t<div class="col-sm-' +
+__p += '\n\t<div class="col-sm-' +
 __e( item.cols ) +
 ' ' +
 __e( item.class ) +
@@ -1355,26 +1315,32 @@ __e( item.class ) +
 
 			if (item.name) {
 				if (item.latex) { ;
-__p += '\n\t\t\t\t\t<span class="js-mathquill" id="mq-exo-' +
-__e( name ) +
-'" style="width:100%;"></span>\n\t\t\t\t\t<input type="hidden" id="exo-' +
-__e( name ) +
+__p += '\n\t\t<span class="js-mathquill" id="mq-exo-' +
+__e( item.name ) +
+'" style="width:100%;"></span>\n\t\t<input type="hidden" id="exo-' +
+__e( item.name ) +
 '" name="' +
-__e( name ) +
-'" value="">\n\t\t\t\t';
+__e( item.name ) +
+'" value="" ';
+ if(item.description) { ;
+__p += ' placeholder="' +
+__e( item.description ) +
+'" ';
+ } ;
+__p += ' >\n\t\t\t\t';
  } else { ;
-__p += '\n\t\t\t<input type="text" class="form-control" id="exo-' +
+__p += '\n\t\t<input type="text" class="form-control" id="exo-' +
 __e( item.name ) +
 '" name="' +
 __e( item.name ) +
 '" value="">\n\t\t\t\t';
  }
 			} else { ;
-__p += '\n\t\t\t<span>' +
-__e( item.text ) +
-'</span>\n\t\t\t';
+__p += '\n\t\t' +
+((__t = ( item.text )) == null ? '' : __t) +
+'\n\t\t\t';
  }
-		;
+	;
 __p += '</div>';
 
 		});
@@ -1456,6 +1422,37 @@ __e( note ) +
  } else { ;
 __p += '\n<div class="card text-white bg-danger">\n<p class="card-text">L\'exercice n\'est pas terminé.</p>\n</div>\n';
  } ;
+__p += '\n';
+
+}
+return __p
+};
+
+this["JST"]["exercices/common/radio"] = function(obj) {
+obj || (obj = {});
+var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
+function print() { __p += __j.call(arguments, '') }
+with (obj) {
+
+ _.each(radio,function(subItem,key){
+	var radio_id = ""+Math.random()
+;
+__p += '\n<div class="form-check">\n\t<input class="form-check-input" type="radio" id="radio' +
+__e( radio_id ) +
+'" name="' +
+__e( name ) +
+'" value="' +
+__e( key ) +
+'" ';
+ if (key==0){ ;
+__p += 'checked';
+ } ;
+__p += ' >\n\t<label class="form-check-label" for="radio' +
+__e( radio_id ) +
+'">\n\t\t' +
+__e( subItem ) +
+'\n\t</label>\n</div>\n';
+ }) ;
 __p += '\n';
 
 }

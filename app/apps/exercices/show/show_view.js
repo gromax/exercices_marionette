@@ -9,30 +9,34 @@ define([
 	Marionette,
 	MathJax
 ){
-	var BriqueItemView = Marionette.View.extend({
+	var DefaultItemView = Marionette.View.extend({
 		className: "card-body",
 		template: window.JST["exercices/common/brique-item"],
-		triggers:{
-			"focusin input": "form:input:focusin",
-		},
 
 		onFormDataInvalid: function(data){
 			var model = this.model;
 			var name = model.get("name");
 			if (name) {
+				var $el = this.$el;
 				// On retire un éventuel message d'erreur antérieur
-				this.$el.find(".js-validation-error").each(function(){
+				$el.find(".js-validation-error").each(function(){
 					$(this).remove();
 				});
 
 				var validation_item = data[name]
 				if (validation_item && validation_item.error) {
 					// Il y a une erreur qu'il faut afficher
-					this.$el.addClass("bg-danger text-white");
-					this.$el.append("<small class='js-validation-error'><i class='fa fa-exclamation-triangle'></i> "+validation_item.error+"</small>");
+					$el.addClass("bg-danger text-white");
+					if (_.isArray(validation_item.error)) {
+						_.each(validation_item.error, function(item){
+							$el.append("<small class='js-validation-error'><i class='fa fa-exclamation-triangle'></i> "+item+"</small>");
+						});
+					} else {
+						$el.append("<small class='js-validation-error'><i class='fa fa-exclamation-triangle'></i> "+validation_item.error+"</small>");
+					}
 				} else {
 					// Pas d'erreur, on efface l'éventuel formatage erreur
-					this.$el.removeClass("bg-danger text-white");
+					$el.removeClass("bg-danger text-white");
 				}
 			}
 		},
@@ -56,33 +60,17 @@ define([
 		},
 	});
 
-	var InputItemView = Marionette.View.extend({
-		className: "card-body",
+	var RadioItemView = DefaultItemView.extend({
+		template: window.JST["exercices/common/radio"],
+		defaultToTrash: true
+	});
+
+	var InputItemView = DefaultItemView.extend({
 		template: window.JST["exercices/common/input"],
+		defaultToTrash: true,
 		triggers:{
 			"focusin input": "form:input:focusin",
 			"focusin textarea": "form:input:focusin"
-		},
-
-		onFormDataInvalid: function(data){
-			var model = this.model;
-			var name = model.get("name");
-			if (name) {
-				// On retire un éventuel message d'erreur antérieur
-				this.$el.find(".js-validation-error").each(function(){
-					$(this).remove();
-				});
-
-				var validation_item = data[name]
-				if (validation_item && validation_item.error) {
-					// Il y a une erreur qu'il faut afficher
-					this.$el.addClass("bg-danger text-white");
-					this.$el.append("<small class='js-validation-error'><i class='fa fa-exclamation-triangle'></i> "+validation_item.error+"</small>");
-				} else {
-					// Pas d'erreur, on efface l'éventuel formatage erreur
-					this.$el.removeClass("bg-danger text-white");
-				}
-			}
 		},
 
 		onRender: function(){
@@ -99,7 +87,7 @@ define([
 							handlers: {
 								edit: function() { // useful event handlers
 									if (mathField){ // Pas défini à l'initialisation
-										$("#exo-"+name).val(mathField.latex());
+										$("#exo-"+item.name).val(mathField.latex());
 									}
 								},
 								enter: function() {
@@ -116,20 +104,12 @@ define([
 			}
 			MathJax.Hub.Queue(["Typeset",MathJax.Hub,this.$el[0]]);
 		},
-
-		remove: function(){
-			this.model.destroy();
-			Marionette.View.prototype.remove.call(this);
-		},
-
-		execPost: function(fct){
-			fct();
-		},
 	});
 
 	var ColorChoiceItemView = Marionette.View.extend({
 		className: "card-body",
 		template: window.JST["exercices/common/color-choice-item"],
+		defaultToTrash: true,
 		triggers:{
 			"click a.list-group-item-action":"choice:click:item",
 		},
@@ -199,6 +179,7 @@ define([
 	var ValidationItemView = Marionette.View.extend({
 		className: "card-body",
 		template: window.JST["exercices/common/validation-item"],
+		defaultToTrash: true,
 		triggers:{
 			"click button.js-submit" : "form:submit",
 			"mousedown button.js-clavier" : "form:clavier:click",
@@ -266,8 +247,11 @@ define([
 				case "input":
 					return InputItemView;
 					break;
+				case "radio":
+					return RadioItemView;
+					break;
 				default:
-					return BriqueItemView;
+					return DefaultItemView;
 			}
 		},
 	});
@@ -431,10 +415,23 @@ define([
 		},
 
 		onFormDataInvalid: function(data){
-			this.itemsView.children.each(function(childview){
-				if (childview.onFormDataInvalid) {
-					childview.onFormDataInvalid(data);
+			var $el = this.$el;
+			$el.find(".js-validation-error").each(function(){
+				$(this).remove();
+			});
+
+			_.each(data, function(value,key){
+				if (value.error){
+					$item = $("[name='"+key+"']").closest(".card-body");
+					if (_.isArray(value.error)){
+						_.each(value.error, function(er){
+							$item.append("<span class='js-validation-error badge badge-pill badge-danger'><i class='fa fa-exclamation-triangle'></i> "+er+"</span>");
+						});
+					} else {
+						$item.append("<span class='js-validation-error badge badge-pill badge-danger'><i class='fa fa-exclamation-triangle'></i> "+value.error+"</span>");
+					}
 				}
+
 			});
 		},
 

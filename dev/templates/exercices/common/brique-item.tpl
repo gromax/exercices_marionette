@@ -2,34 +2,6 @@
 	<% _(ps).each(function(p){ %>
 <p class="card-text"><%= p %></p>
 	<% }) %>
-<% break; case "input": %>
-<div class="form-group row">
-	<label for="exo-<%- name %>" class="col-sm-2 col-form-label"><%- tag %></label>
-	<div class="col-sm-10">
-		<input type="text" class="form-control" id="exo-<%- name %>" name="<%- name %>" placeholder="<%- description %>" value="">
-	</div>
-</div>
-
-<% break; case "latex-input": %>
-<div class="form-group row">
-	<label for="exo-<%- name %>" class="col-sm-2 col-form-label"><%- tag %></label>
-	<div class="col-sm-10">
-		<span class="js-mathquill" style="width:90%;"></span>
-		<input type="hidden" id="exo-<%- name %>" name="<%- name %>" value="">
-	</div>
-</div>
-
-<% break; case "radio": %>
-	<% _.each(radio,function(subItem,key){
-		var radio_id = ""+Math.random()
-	%>
-<div class="form-check">
-	<input class="form-check-input" type="radio" id="radio<%- radio_id %>" name="<%- name %>" value="<%- key %>" <% if (key==0){ %>checked<% } %> >
-	<label class="form-check-label" for="radio<%- radio_id %>">
-		<%- subItem %>
-	</label>
-</div>
-	<% }) %>
 
 <% break; case "ul": %>
 <ul class="list-group list-group-flush">

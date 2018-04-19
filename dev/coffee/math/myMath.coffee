@@ -598,4 +598,224 @@
 					formeOk : false						# La forme est ok par défaut
 				}
 		}
+
+		verification: {
+			numberValidation: (userString) ->
+				switch
+					when typeof userString isnt "string"
+						{ processed:false,  user:userString, error:"Erreur inconnue !"}
+					when userString is ""
+						{ processed:false, user:userString, error:"Ne doit pas être vide" }
+					else
+						info = new ParseInfo(userString, {type:"number"})
+						if info.valid
+							{ processed:info, user:userString, error:false }
+						else
+							{ processed:info, user:userString, error: info.messages }
+
+			isSame: (processedAnswer, goodObject, parameters)->
+				if typeof goodObject is "number" then goodObject = new RealNumber(goodObject)
+				# Fonction de vérification des exercices pour les numberObject ou number
+				# La sortie bareme est un facteur / 1
+				# processedAnswer = Parse du string retourné par l'utilisateur
+				# goodObject = bonne valeur. Un NumberObject
+				# params = objet de paramètres dont les possibilités sont données ci-dessous
+				default_config = {
+					formes:null		# forme autorisées. Par ex : { racine:true, fraction:true } ou encore "FRACTION"
+					p_forme:0.75		# pondération pour une forme pas suffisemment simplifiée
+					tolerance:0		# Une approximation dans la tolérance est considérée comme juste et n'est pas signalée
+					approx:0.1		# Une approximation est tolérée mais signalée comme fausse
+					p_approx:0.5	# Pondération si le résultat n'est qu'approximatif et dans la tolérance
+					arrondi:null	# Si on demande un arrondi, on précise ici une puissance (-2 pour 0.01 par ex.)
+					p_arrondi:0.5	# Pondération si arrondi demandé et mal fait
+					p_modulo:0.5	# Pondération si le modulo est faux
+					symbols:null	# liste de symboles
+					custom:false	# fonction custom
+				}
+
+				keysFilter = [
+					"formes"
+					"p_forme"
+					"tolerance"
+					"approx"
+					"p_approx"
+					"arrondi"
+					"p_arrondi"
+					"p_modulo"
+					"symbols"
+					"custom"
+					"goodTex"
+				]
+
+				filtered_parameters = _.pick(parameters, keysFilter...)
+				config = _.extend default_config, filtered_parameters
+
+				erreur = erreurManager.main(goodObject,processedAnswer.object,config.symbols)
+				# erreur = objet produit par la fonction mM.erreur et contenant les infos :
+				# - exact = true/false : valeur exacte
+				# - float = true/false : valeur décimale
+				# - approx_ok:true/false : approximation correctement faite
+				# - ecart:ecart = nombre
+				# - moduloError = false/tex : en cas d'erreur, on envoie le tex du modulo demandé
+				# - p_user = nombre entier : puissance du dernier chiffre significatif
+
+				note = 0
+				errors=[]		# liste des messages d'erreur
+
+				switch
+					when typeof config.arrondi is "number"
+						# On exige un arrondi.
+						# On envisage pas le cas d'un modulo, donc si l'utilisateur en a mis un, c'est faux
+						approx = Math.pow(10,config.arrondi)
+
+						# On vérifie d'abord qu'on est juste au moins dans l'approx
+						# Une difficulté : Si la réponse attendue est ,4,10236 à 0,01. L'utilisateur répond 4,10 ou 4,1 ce qui est
+						# pris identique pour la machine et peut provoquer une erreur
+						if (erreur.exact or erreur.float and ((erreur.ordre<=config.arrondi) or (erreur.p_user<=config.arrondi))) and not erreur.moduloError
+
+							# Maintenant on peut vérifier si l'utilisateur respecte le format
+							if not erreur.float
+								errors.push { type:"warning", text:"Approximation sous forme décimale attendue." }
+							if not(erreur.approx_ok or erreur.exact)
+								errors.push { type:"warning", text:"Il faut arrondir au #{approx} le plus proche." }
+							if erreur.p_user<config.arrondi
+								errors.push { type:"warning", text:"Vous donnez trop de décimales." }
+							if errors.length>0
+								goodMessage = { type:"warning", text:"$#{processedAnswer.tex}$ &nbsp; est acceptée mais peut être amélioré." }
+								note = config.p_arrondi
+							else
+								goodMessage = { type:"success", text:"$#{processedAnswer.tex}$ &nbsp; est une bonne réponse." }
+								note = 1
+						else
+							if not erreur.float
+								errors.push { type:"warning", text:"Approximation sous forme décimale attendue." }
+							goodMessage = { type:"error", text:"La bonne réponse était &nbsp; $#{ numToStr(mM.float(goodObject), -config.arrondi)}$" }
+					when erreur.exact or erreur.float and (erreur.ecart<=config.tolerance)
+						# Résultat exact ou dans la tolérance
+						note = 1
+						if not processedAnswer.forme(config.formes)
+							note *= config.p_forme
+							errors.push { type:"warning", text:"Vous devez simplifier votre résultat." }
+						if erreur.moduloError
+							note *= config.p_modulo
+							errors.push { type:"warning", text:"Le bon modulo était &nbsp; $k\\cdot #{erreur.moduloError}$" }
+						if errors.length>0
+							goodMessage = { type:"warning", text:"$#{processedAnswer.tex}$ &nbsp; est acceptée mais peut être amélioré." }
+						else
+							goodMessage = { type:"success", text:"$#{processedAnswer.tex}$ &nbsp; est une bonne réponse." }
+					when erreur.float and erreur.approx_ok and (erreur.ecart<=config.approx) and not erreur.moduloError
+						errors.push { type:"warning", text:"Vous avez donné une approximation. Il faut donner une valeur exacte." }
+						note = config.p_approx
+						goodMessage = { type:"warning", text:"$#{processedAnswer.tex}$ &nbsp; est acceptée mais peut être amélioré." }
+					else
+						goodMessage = { type:"error", text:"La bonne réponse était &nbsp; $#{ config.goodTex ? goodObject.tex()}$" }
+				# Retour :
+				{
+					note: note
+					errors: errors
+					goodMessage: goodMessage
+				}
+
+			all : (processedAnswerList, goodObjectList, parameters) ->
+				note = 0
+				errors = []
+				goodMessage = false
+
+				if processedAnswerList.length is 0
+					# L'utilisateur a répondu ensemble vide
+					if (goodObjectList.length is 0)
+						# La réponse était ensemble vide, c'est donc une bonne réponse
+						goodMessage = { type:"success", text:"$\\varnothing$ &nbsp; est une bonne réponse" }
+						note = 1
+					else
+						# La bonne réponse n'était pas vide
+						stringAnswer = ( "$#{it.tex()}$" for it in goodObjectList).join("&nbsp; ; &nbsp;")
+						goodMessage = { type:"error", text:"Vous auriez dû donner &nbsp; #{stringAnswer}." }
+				else
+					# L'utilisateur a donné plusieurs réponses
+					if (goodObjectList.length is 0)
+						# La réponse était ensemble vide, L'utilisateur s'est donc trompé
+						goodMessage = { type:"error", text:"La bonne réponse était &nbsp; $\\varnothing$." }
+					else
+						# Il faut faire le tri pour associer deux à deux user et good
+						{ closests, lefts } = mM.tri processedAnswerList, goodObjectList
+						bads = []
+						N = Math.max(goodObjectList.length, processedAnswerList.length)
+						messages = []
+						for sol in closests
+							if sol.good?
+								# Un objet good a été associé à cette réponse utilisateur
+								verifResponse = mM.verification.isSame(sol.info, sol.good, parameters)
+								note += verifResponse.note/N
+								if verifResponse.note is 0
+									bads.push sol.info
+									lefts.push sol.good
+								else
+									errors = errors.concat(verifResponse.errors)
+							else
+								bads.push sol.info
+						if bads.length>0
+							stringBads = ( "$#{it.tex}$" for it in bads).join("&nbsp; ; &nbsp;")
+							errors.push { type:"error", text: "Ces solutions que vous donnez sont fausses: &nbsp;#{stringBads}." }
+						if lefts.length>0
+							stringLefts = ( "$#{it.tex()}$" for it in lefts).join("&nbsp; ; &nbsp;")
+							errors.push { type:"error", text: "Vous n'avez pas donné ces solutions : &nbsp;#{stringLefts}." }
+				# Retour :
+				{
+					note: note
+					errors: errors
+					goodMessage: goodMessage
+				}
+
+			some: (processedAnswerList, goodObjectList, parameters) ->
+				note = 0
+				errors = []
+				goodMessage = false
+				if not _.isArray(processedAnswerList)
+					processedAnswerList = _.compact([processedAnswerList])
+				if processedAnswerList.length is 0
+					# L'utilisateur a répondu ensemble vide
+					if (goodObjectList.length is 0)
+						# La réponse était ensemble vide, c'est donc une bonne réponse
+						goodMessage = { type:"success", text:"$\\varnothing$ &nbsp; est une bonne réponse" }
+						note = 1
+					else
+						# La bonne réponse n'était pas vide
+						stringAnswer = ( "$#{it.tex()}$" for it in goodObjectList).join(" ; ")
+						goodMessage = { type:"error", text:"Vous auriez dû donner &nbsp; #{stringAnswer}." }
+				else
+					# L'utilisateur a donné plusieurs réponses
+					if (goodObjectList.length is 0)
+						# La réponse était ensemble vide, L'utilisateur s'est donc trompé
+						goodMessage = { type:"error", text:"La bonne réponse était &nbsp; $\\varnothing$." }
+					else
+						# Il faut faire le tri pour associer deux à deux user et good
+						{ closests, lefts } = mM.tri processedAnswerList, goodObjectList
+						bads = []
+						N = processedAnswerList.length
+						messages = []
+						for sol in closests
+							if sol.good?
+								# Un objet good a été associé à cette réponse utilisateur
+								verifResponse = mM.verification.isSame(sol.info, sol.good, parameters)
+								note += verifResponse.note/N
+								if verifResponse.note is 0
+									bads.push sol.info
+									lefts.push sol.good
+								else
+									errors = errors.concat(verifResponse.errors)
+							else
+								bads.push sol.info
+						if bads.length>0
+							stringBads = ( "$#{it.tex}$" for it in bads).join("&nbsp; ; &nbsp;")
+							errors.push { type:"error", text: "Ces solutions que vous donnez sont fausses: &nbsp;#{stringBads}." }
+
+				# Retour :
+				{
+					note: note
+					errors: errors
+					goodMessage: goodMessage
+				}
+
+		}
 	}

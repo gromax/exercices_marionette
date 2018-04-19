@@ -17,7 +17,10 @@ define ["utils/math","utils/help"], (mM, help) ->
 
 			if (typeof inputs.nf is "undefined") then nf = inputs.nf = Math.min(Math.round(Xhigh)+mM.alea.real({min:-2, max:2}), n)
 			else nf = Number inputs.nf
-			IF = mM.ensemble.intervalle "[", mM.misc.toPrecision(Xlow/n,2), mM.misc.toPrecision(Xhigh/n,2), "]"
+			IF = {
+				low: mM.misc.toPrecision(Xlow/n,2)
+				high: mM.misc.toPrecision(Xhigh/n,2)
+			}
 
 			[
 				p
@@ -53,27 +56,45 @@ define ["utils/math","utils/help"], (mM, help) ->
 						{
 							type:"input"
 							rank: 2
-							tag:"$E(X)=$"
+							tag:"$E(X) =$"
 							name:"esp"
 							description:"Espérance à 0,01 près"
-							good:esp
-							waited:"number"
-							arrondi:-2
 						}
 						{
 							type:"input"
 							rank: 3
-							tag:"$\\sigma(X)$"
+							tag:"$\\sigma(X) =$"
 							name:"std"
 							description:"Écart-type à 0,01 près"
-							good:std
-							waited:"number"
-							arrondi:-2
 						}
 						{
 							type:"validation"
 							rank: 4
 							clavier:[]
+						}
+					]
+
+					validations:{
+						esp:"number"
+						std:"number"
+					}
+
+					verifications:[
+						{
+							name: "esp"
+							tag:"$E(X)$"
+							good:esp
+							parameters: {
+								arrondi: -2
+							}
+						}
+						{
+							name: "std"
+							good: std
+							tag:"$\\sigma(X)$"
+							parameters: {
+								arrondi: -2
+							}
 						}
 					]
 				}
@@ -92,24 +113,41 @@ define ["utils/math","utils/help"], (mM, help) ->
 						{
 							type:"input"
 							rank: 2
-							tag:"$I_F$"
-							name:"IF"
 							format:[
-								{text:"[", cols:1, class:"text-right h3"}
+								{ text: "$I_F =$", cols:2, class:"text-right" }
+								{ text:"[", cols:1, class:"text-right h3"}
 								{ name:"low", cols:2 }
 								{ text:";", cols:1, class:"text-center h3"}
 								{ name:"high", cols:2 }
 								{ text:"]", cols:1, class:"h3"}
 							]
-							good:IF
-							waited:"ensemble"
-							tolerance:0.005
 						}
 						{
 							type:"validation"
 							rank: 4
 							clavier:[]
 						}
+					]
+					validations:{
+						low:"number"
+						high:"number"
+					}
+					verifications: [
+						(pData)->
+							verLow = mM.verification.isSame(pData.low.processed, IF.low, { arrondi:-3 })
+							verHigh = mM.verification.isSame(pData.high.processed, IF.high, { arrondi:-3 })
+							verLow.goodMessage.text = "Borne gauche : "+verLow.goodMessage.text
+							verHigh.goodMessage.text = "Borne droite : "+verHigh.goodMessage.text
+							{
+								note: (verLow.note+verHigh.note)/2
+								add: {
+									type: "ul"
+									list: [{
+										type:"normal"
+										text: "Vous avez répondu &nbsp; $I_F=\\left[#{pData.low.processed.tex} ; #{pData.high.processed.tex}\\right]$"
+									}].concat(verLow.errors, [verLow.goodMessage], verHigh.errors, [verHigh.goodMessage])
+								}
+							}
 					]
 				}
 				{
@@ -133,7 +171,6 @@ define ["utils/math","utils/help"], (mM, help) ->
 								"Accepter"
 								"Refuser"
 							]
-							good: if (nf>=Xlow) and (nf<=Xhigh) then 0 else 1
 						}
 						{
 							type:"validation"
@@ -141,6 +178,18 @@ define ["utils/math","utils/help"], (mM, help) ->
 							clavier:[]
 						}
 					]
+					validations: {
+						d: "radio:1"
+					}
+					verifications: [
+						{
+							name:"d"
+							radio: [ "Accepter", "Refuser" ]
+							good: if (nf>=Xlow) and (nf<=Xhigh) then 0 else 1
+						}
+					]
+
+
 				}
 			]
 

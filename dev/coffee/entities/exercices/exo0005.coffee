@@ -28,29 +28,33 @@
 					items:[
 						{
 							type: "text"
-							rank: 1
 							ps: enonce
 						}
 						{
 							type: "input"
-							format: [latex: true, cols:10, name:"AB"]
-							rank: 2
-							waited:"number"
-							tag:"$AB$"
-							name:"AB"
-							description:"Distance AB"
-							good:gAB
-							formes:"RACINE"
+							format: [
+								{ text: "$AB =$", cols:2, class:"text-right" }
+								{ latex: true, cols:10, name:"AB"}
+							]
 						}
 						{
 							type: "validation"
-							rank: 3
 							clavier: ["aide", "sqrt", "pow"]
 						}
 						{
 							type: "aide"
-							rank: 4
-							list: help.geometrie.analytique.distance.concat help.interface.sqrt
+							list: help.geometrie.analytique.distance
+						}
+					]
+					validations:{
+						"AB": "number"
+					}
+					verifications:[
+						{
+							name: "AB"
+							tag:"$AB$"
+							good: gAB
+							parameters: { formes:"RACINE" }
 						}
 					]
 				}

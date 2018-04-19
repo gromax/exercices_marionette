@@ -30,7 +30,10 @@ define(["utils/math", "utils/help"], function(mM, help) {
       } else {
         nf = Number(inputs.nf);
       }
-      IF = mM.ensemble.intervalle("[", mM.misc.toPrecision(Xlow / n, 2), mM.misc.toPrecision(Xhigh / n, 2), "]");
+      IF = {
+        low: mM.misc.toPrecision(Xlow / n, 2),
+        high: mM.misc.toPrecision(Xhigh / n, 2)
+      };
       return [p, n, esp, std, Xlow, Xhigh, nf, IF];
     },
     getBriques: function(inputs, options) {
@@ -48,25 +51,40 @@ define(["utils/math", "utils/help"], function(mM, help) {
             }, {
               type: "input",
               rank: 2,
-              tag: "$E(X)=$",
+              tag: "$E(X) =$",
               name: "esp",
-              description: "Espérance à 0,01 près",
-              good: esp,
-              waited: "number",
-              arrondi: -2
+              description: "Espérance à 0,01 près"
             }, {
               type: "input",
               rank: 3,
-              tag: "$\\sigma(X)$",
+              tag: "$\\sigma(X) =$",
               name: "std",
-              description: "Écart-type à 0,01 près",
-              good: std,
-              waited: "number",
-              arrondi: -2
+              description: "Écart-type à 0,01 près"
             }, {
               type: "validation",
               rank: 4,
               clavier: []
+            }
+          ],
+          validations: {
+            esp: "number",
+            std: "number"
+          },
+          verifications: [
+            {
+              name: "esp",
+              tag: "$E(X)$",
+              good: esp,
+              parameters: {
+                arrondi: -2
+              }
+            }, {
+              name: "std",
+              good: std,
+              tag: "$\\sigma(X)$",
+              parameters: {
+                arrondi: -2
+              }
             }
           ]
         }, {
@@ -80,10 +98,12 @@ define(["utils/math", "utils/help"], function(mM, help) {
             }, {
               type: "input",
               rank: 2,
-              tag: "$I_F$",
-              name: "IF",
               format: [
                 {
+                  text: "$I_F =$",
+                  cols: 2,
+                  "class": "text-right"
+                }, {
                   text: "[",
                   cols: 1,
                   "class": "text-right h3"
@@ -102,14 +122,40 @@ define(["utils/math", "utils/help"], function(mM, help) {
                   cols: 1,
                   "class": "h3"
                 }
-              ],
-              good: IF,
-              waited: "ensemble",
-              tolerance: 0.005
+              ]
             }, {
               type: "validation",
               rank: 4,
               clavier: []
+            }
+          ],
+          validations: {
+            low: "number",
+            high: "number"
+          },
+          verifications: [
+            function(pData) {
+              var verHigh, verLow;
+              verLow = mM.verification.isSame(pData.low.processed, IF.low, {
+                arrondi: -3
+              });
+              verHigh = mM.verification.isSame(pData.high.processed, IF.high, {
+                arrondi: -3
+              });
+              verLow.goodMessage.text = "Borne gauche : " + verLow.goodMessage.text;
+              verHigh.goodMessage.text = "Borne droite : " + verHigh.goodMessage.text;
+              return {
+                note: (verLow.note + verHigh.note) / 2,
+                add: {
+                  type: "ul",
+                  list: [
+                    {
+                      type: "normal",
+                      text: "Vous avez répondu &nbsp; $I_F=\\left[" + pData.low.processed.tex + " ; " + pData.high.processed.tex + "\\right]$"
+                    }
+                  ].concat(verLow.errors, [verLow.goodMessage], verHigh.errors, [verHigh.goodMessage])
+                }
+              };
             }
           ]
         }, {
@@ -125,12 +171,21 @@ define(["utils/math", "utils/help"], function(mM, help) {
               rank: 2,
               tag: "Décision",
               name: "d",
-              radio: ["Accepter", "Refuser"],
-              good: (nf >= Xlow) && (nf <= Xhigh) ? 0 : 1
+              radio: ["Accepter", "Refuser"]
             }, {
               type: "validation",
               rank: 3,
               clavier: []
+            }
+          ],
+          validations: {
+            d: "radio:1"
+          },
+          verifications: [
+            {
+              name: "d",
+              radio: ["Accepter", "Refuser"],
+              good: (nf >= Xlow) && (nf <= Xhigh) ? 0 : 1
             }
           ]
         }
