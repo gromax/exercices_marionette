@@ -16,6 +16,29 @@ define(["jst","marionette", "mathjax", "backbone.syphon"], function(JST, Marione
 			this.render();
 			this.$el.find(".card").each(function(){ MathJax.Hub.Queue(["Typeset",MathJax.Hub,this]); });
 		},
+
+		onRender: function(){
+			var that = this;
+			var graphs = this.model.get("graphs");
+			if (graphs){
+				this.$el.find(".jxgbox").each(function(){
+					var $el = $(this);
+					// Astuce bricoleuse sans laquelle le width() renvoir systématiquement 0
+					setTimeout(function(){
+						$el.height($el.width());
+					},0);
+				});
+				this.graphs = {}
+				require(["jsxgraph"], function(){
+					_.each(graphs, function(val, key){
+						that.graphs[key] = JXG.JSXGraph.initBoard(key, val.params);
+						if (typeof val.init == "function"){
+							val.init(that.graphs[key])
+						}
+					});
+				});
+			}
+		}
 	});
 
 	var ListExerciceView = Marionette.CollectionView.extend({

@@ -153,10 +153,12 @@ define([
 					// Traitement après vérif
 					// Dans le but d'enchaîner le traitement initial d'un exercice sauvegardé
 					// la fonction renvoie le nouveau focus
-					var traitement_final = function(bv,m,v,tT){
+					var traitement_final = function(bv,m,v,tT, mV){
 						// bv = brique_view => La brique d'exercice dans laquelle s'effectue la vérif
 						// m = model => le model associé à la brique
 						// v = verifs => le résultats des vérifications menées selon les réponse utilisateur aux questions de cette brique
+						// tT = toTrash => liste des items à supprimer
+						// mV = model_validation => les données utilisateur traitées
 
 						pied.set("note",Math.ceil(note));
 						// Suppression des items d'input
@@ -169,7 +171,7 @@ define([
 						// recherche du prochain focus
 						var focusedBrique = MAJ_briques(view);
 						// Exécution de traitemens posts typiquement sur un graphique
-						bv.execPosts(v.posts);
+						bv.execPostVerification(mV);
 						return focusedBrique;
 					}
 
@@ -222,11 +224,11 @@ define([
 										alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/023]");
 									});
 								} else {
-									traitement_final(brique_view, model, verifs, toTrash);
+									traitement_final(brique_view, model, verifs, toTrash, model_validation);
 								}
 							} else {
 								// On ne sauvegarde pas, on exécuter directement le traitement final
-								traitement_final(brique_view, model, verifs, toTrash);
+								traitement_final(brique_view, model, verifs, toTrash, model_validation);
 							}
 						} else {
 							brique_view.onFormDataInvalid(model_validation);

@@ -4744,7 +4744,7 @@
       };
 
       ComplexeNumber.prototype.float = function(decimals) {
-        if (isReal()) {
+        if (this.isReal()) {
           return this._reel.float(decimals);
         } else {
           return NaN;
@@ -5792,6 +5792,9 @@
 
       function TokenOperator(opType) {
         this.opType = opType;
+        if (this.opType === "cdot") {
+          this.opType = "*";
+        }
       }
 
       TokenOperator.prototype.toString = function() {
@@ -5800,9 +5803,9 @@
 
       TokenOperator.getRegex = function(type) {
         if (type === "number") {
-          return "[\\+\\-\\/\\^÷;]";
+          return "[\\+\\-\\/\\^÷;]|cdot";
         } else {
-          return "[\\+\\-\\/\\^;∪∩÷]";
+          return "[\\+\\-\\/\\^;∪∩÷]|cdot";
         }
       };
 
@@ -9459,7 +9462,7 @@
           for (i = aa = 0, len = goods.length; aa < len; i = ++aa) {
             item = goods[i];
             results.push({
-              value: item,
+              value: mM.toNumber(item),
               rank: i,
               d: []
             });
@@ -9968,11 +9971,11 @@
               }
               if (lefts.length > 0) {
                 stringLefts = ((function() {
-                  var ab, len1, results;
+                  var ab, len1, ref1, results;
                   results = [];
                   for (ab = 0, len1 = lefts.length; ab < len1; ab++) {
                     it = lefts[ab];
-                    results.push("$" + (it.tex()) + "$");
+                    results.push("$" + ((ref1 = typeof it.tex === "function" ? it.tex() : void 0) != null ? ref1 : it) + "$");
                   }
                   return results;
                 })()).join("&nbsp; ; &nbsp;");
@@ -9990,7 +9993,7 @@
           };
         },
         some: function(processedAnswerList, goodObjectList, parameters) {
-          var N, aa, bads, closests, errors, goodMessage, it, lefts, len, messages, note, ref, sol, stringAnswer, stringBads, verifResponse;
+          var N, aa, bads, closests, errors, goodMessage, goods, it, lefts, len, messages, note, ref, sol, stringAnswer, stringBads, stringGoods, stringLefts, verifResponse;
           note = 0;
           errors = [];
           goodMessage = false;
@@ -10030,6 +10033,7 @@
               bads = [];
               N = processedAnswerList.length;
               messages = [];
+              goods = [];
               for (aa = 0, len = closests.length; aa < len; aa++) {
                 sol = closests[aa];
                 if (sol.good != null) {
@@ -10039,11 +10043,27 @@
                     bads.push(sol.info);
                     lefts.push(sol.good);
                   } else {
+                    goods.push(sol.info);
                     errors = errors.concat(verifResponse.errors);
                   }
                 } else {
                   bads.push(sol.info);
                 }
+              }
+              if (goods.length > 0) {
+                stringGoods = ((function() {
+                  var ab, len1, results;
+                  results = [];
+                  for (ab = 0, len1 = goods.length; ab < len1; ab++) {
+                    it = goods[ab];
+                    results.push("$" + it.tex + "$");
+                  }
+                  return results;
+                })()).join("&nbsp; ; &nbsp;");
+                goodMessage = {
+                  type: "success",
+                  text: "Bonne(s) réponse(s) : &nbsp; " + stringGoods
+                };
               }
               if (bads.length > 0) {
                 stringBads = ((function() {
@@ -10059,6 +10079,21 @@
                   type: "error",
                   text: "Ces solutions que vous donnez sont fausses: &nbsp;" + stringBads + "."
                 });
+                if (!goodMessage) {
+                  stringLefts = ((function() {
+                    var ab, len1, ref1, results;
+                    results = [];
+                    for (ab = 0, len1 = lefts.length; ab < len1; ab++) {
+                      it = lefts[ab];
+                      results.push("$" + ((ref1 = typeof it.tex === "function" ? it.tex() : void 0) != null ? ref1 : it) + "$");
+                    }
+                    return results;
+                  })()).join("&nbsp; ; &nbsp;");
+                  goodMessage = {
+                    type: "error",
+                    text: "Réponse(s) possible(s) : &nbsp; " + stringLefts
+                  };
+                }
               }
             }
           }

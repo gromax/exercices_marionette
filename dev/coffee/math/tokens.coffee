@@ -44,10 +44,11 @@
 		operand1: null
 		operand2: null
 		constructor: (@opType) ->
+			if @opType is "cdot" then @opType = "*"
 		toString: -> @opType
 		@getRegex: (type) ->
-			if type is "number" then "[\\+\\-\\/\\^÷;]"
-			else "[\\+\\-\\/\\^;∪∩÷]"
+			if type is "number" then "[\\+\\-\\/\\^÷;]|cdot"
+			else "[\\+\\-\\/\\^;∪∩÷]|cdot"
 		setOpposite: ->
 			@opType = "0-"
 			@

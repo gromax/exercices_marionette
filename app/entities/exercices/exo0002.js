@@ -6,36 +6,56 @@ define(["utils/math", "utils/help"], function(mM, help) {
       return [
         {
           bareme: 100,
-          title: "Coordonnées de $M$",
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["On se place dans un repère $(O;I,J)$", "On donne deux points $" + (A.texLine()) + "$ et $" + (B.texLine()) + "$.", "Il faut déterminer les coordonnées de $M$, milieu de $[AB]$."]
             }, {
               type: "input",
-              rank: 2,
-              tag: "$x_M$",
-              name: "xM",
-              description: "Abscisse de M",
-              good: gM.x,
-              waited: "number"
-            }, {
-              type: "input",
-              rank: 3,
-              tag: "$y_M$",
-              name: "yM",
-              description: "Ordonnée de M",
-              good: gM.y,
-              waited: "number"
+              format: [
+                {
+                  text: "M (",
+                  cols: 3,
+                  "class": "text-right h4"
+                }, {
+                  name: "xM",
+                  cols: 2,
+                  latex: true
+                }, {
+                  text: ";",
+                  cols: 1,
+                  "class": "text-center h4"
+                }, {
+                  name: "yM",
+                  cols: 2,
+                  latex: true
+                }, {
+                  text: ")",
+                  cols: 1,
+                  "class": "h4"
+                }
+              ]
             }, {
               type: "validation",
-              rank: 4,
               clavier: ["aide"]
             }, {
               type: "aide",
-              rank: 5,
               list: help.geometrie.analytique.milieu
+            }
+          ],
+          validations: {
+            xM: "number",
+            yM: "number"
+          },
+          verifications: [
+            {
+              name: "xM",
+              tag: "$x_M$",
+              good: gM.x
+            }, {
+              name: "yM",
+              tag: "$y_M$",
+              good: gM.y
             }
           ]
         }

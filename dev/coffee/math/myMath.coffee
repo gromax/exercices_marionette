@@ -414,7 +414,7 @@
 		tri: (users,goods) ->
 			# users est un tableau d'objets ParseInfo
 			# goods est un tableau d'objets (idem)
-			goodsObj = ( { value: item, rank:i, d:[] } for item,i in goods )
+			goodsObj = ( { value: mM.toNumber(item), rank:i, d:[] } for item,i in goods )
 			# on détecte les modulos sur les users
 			usersObj = []
 			for userInfo, i in users when userInfo instanceof ParseInfo
@@ -661,7 +661,6 @@
 
 				note = 0
 				errors=[]		# liste des messages d'erreur
-
 				switch
 					when typeof config.arrondi is "number"
 						# On exige un arrondi.
@@ -758,7 +757,7 @@
 							stringBads = ( "$#{it.tex}$" for it in bads).join("&nbsp; ; &nbsp;")
 							errors.push { type:"error", text: "Ces solutions que vous donnez sont fausses: &nbsp;#{stringBads}." }
 						if lefts.length>0
-							stringLefts = ( "$#{it.tex()}$" for it in lefts).join("&nbsp; ; &nbsp;")
+							stringLefts = ( "$#{it.tex?() ? it}$" for it in lefts).join("&nbsp; ; &nbsp;")
 							errors.push { type:"error", text: "Vous n'avez pas donné ces solutions : &nbsp;#{stringLefts}." }
 				# Retour :
 				{
@@ -794,6 +793,7 @@
 						bads = []
 						N = processedAnswerList.length
 						messages = []
+						goods = []
 						for sol in closests
 							if sol.good?
 								# Un objet good a été associé à cette réponse utilisateur
@@ -803,13 +803,20 @@
 									bads.push sol.info
 									lefts.push sol.good
 								else
+									goods.push sol.info
 									errors = errors.concat(verifResponse.errors)
 							else
 								bads.push sol.info
+						if goods.length>0
+							stringGoods = ( "$#{it.tex}$" for it in goods).join("&nbsp; ; &nbsp;")
+							goodMessage = { type:"success", text:"Bonne(s) réponse(s) : &nbsp; #{stringGoods}" }
 						if bads.length>0
 							stringBads = ( "$#{it.tex}$" for it in bads).join("&nbsp; ; &nbsp;")
 							errors.push { type:"error", text: "Ces solutions que vous donnez sont fausses: &nbsp;#{stringBads}." }
-
+							if not goodMessage
+								# Il n'y a que des mauvaise réponse, il faut les préciser
+								stringLefts = ( "$#{it.tex?() ? it}$" for it in lefts).join("&nbsp; ; &nbsp;")
+								goodMessage = { type:"error", text:"Réponse(s) possible(s) : &nbsp; #{stringLefts}" }
 				# Retour :
 				{
 					note: note

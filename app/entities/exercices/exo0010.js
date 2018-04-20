@@ -59,24 +59,36 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["On considère le trinôme &nbsp; $P(x)=" + (poly.tex()) + "$.", "Donnez le discriminant &nbsp; $\\Delta$ &nbsp; de ce trinôme."]
             }, {
               type: "input",
-              rank: 2,
-              waited: "number",
-              tag: "$\\Delta =$",
-              name: "delta",
-              description: "Discriminant",
-              good: poly.discriminant()
+              format: [
+                {
+                  text: "$\\Delta =$",
+                  cols: 2,
+                  "class": "text-right"
+                }, {
+                  name: "delta",
+                  cols: 10,
+                  latex: true
+                }
+              ]
             }, {
               type: "validation",
-              rank: 3,
-              clavier: ["aide"]
+              clavier: ["aide", "sqrt", "pow"]
             }, {
               type: "aide",
-              rank: 4,
               list: help.trinome.discriminant
+            }
+          ],
+          validations: {
+            delta: "number"
+          },
+          verifications: [
+            {
+              name: "delta",
+              tag: "$\\Delta$",
+              good: poly.discriminant()
             }
           ]
         }, {
@@ -85,26 +97,40 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["Donnez les racines de &nbsp; $P(x)$ &nbsp; dans $\\mathbb{" + (dansR ? "R" : "C") + "}$.", "Autrement dit, donnez les solutions de &npsp; $" + (poly.tex()) + " = 0$", "Séparez les solutions par ;", "Si aucune solution, entrez ∅"]
             }, {
               type: "input",
-              rank: 2,
-              waited: "liste:number",
-              tag: "$\\mathcal{S}$",
+              format: [
+                {
+                  text: "$\\mathcal{S} = $",
+                  cols: 2,
+                  "class": "text-right"
+                }, {
+                  name: "solutions",
+                  cols: 10,
+                  latex: true
+                }
+              ]
+            }, {
+              type: "validation",
+              clavier: ["empty", "sqrt", "aide"]
+            }, {
+              type: "aide",
+              list: help.trinome.racines
+            }
+          ],
+          validations: {
+            solutions: "liste"
+          },
+          verifications: [
+            {
               name: "solutions",
+              type: "all",
+              tag: "$\\mathcal{S}$",
               good: mM.polynome.solve.exact(poly, {
                 y: 0,
                 imaginaire: !dansR
               })
-            }, {
-              type: "validation",
-              rank: 3,
-              clavier: ["empty", "sqrt", "aide"]
-            }, {
-              type: "aide",
-              rank: 4,
-              list: help.trinome.racines
             }
           ]
         }

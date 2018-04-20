@@ -7,8 +7,9 @@ define ["utils/math"], (mM) ->
 	# debug : tex à faire
 
 	return {
+		max: 10
 		init: (inputs) ->
-			max = 10
+			max = @max
 			decimals = 2
 			# Initialisation du polynome
 			poly = null
@@ -34,10 +35,10 @@ define ["utils/math"], (mM) ->
 			yi = mM.float poly, { x:xi, decimals:decimals }
 			ya = mM.float poly, { x:xa, decimals:decimals }
 			antecedents = mM.polynome.solve.numeric poly, { bornes:{min:-max, max:max}, decimals:decimals, y:ya }
-
 			[ poly, xi, yi, xa, ya, antecedents ]
 
 		getBriques: (inputs, options) ->
+			max= @max
 			[ poly, xi, yi, xa, ya, antecedents ] = @init(inputs)
 			str_antecedents = ( mM.misc.numToStr(x,1) for x in antecedents)
 
@@ -109,14 +110,12 @@ define ["utils/math"], (mM) ->
 							rank: 5
 							name:"i"
 							tag:"Image"
-							good: yi
-							tolerance: .2
 						}
 						{
 							type: "text"
 							rank: 6
 							ps:[
-								"Donnez un antécédent (un seul !) de #{mM.misc.numToStr(ya)} à 0,2 près."
+								"Donnez un antécédent de #{mM.misc.numToStr(ya)} à 0,2 près."
 							]
 						}
 						{
@@ -124,32 +123,135 @@ define ["utils/math"], (mM) ->
 							rank: 7
 							name:"a"
 							tag:"Antécédent"
-							good: antecedents
-							tolerance: .2
 						}
 						{
 							type:"validation"
 							rank: 8
-							clavier:[]
+						}
+					]
+					validations:{
+						i:"number"
+						a:"liste"
+					}
+					verifications:[
+						{
+							name:"i"
+							rank:5
+							tag:"Image"
+							good:yi
+							parameters: { tolerance:.2 }
+						}
+						{
+							name:"a"
+							rank:7
+							tag:"Antécédent"
+							type:"some"
+							good:antecedents
+							parameters:{ tolerance: .2 }
 						}
 					]
 				}
 			]
 
-		tex: (data) ->
-			# en chantier
-			if not isArray(data) then data = [ data ]
-			out = []
-			for itemData,i in data
-				courbe = { color:"blue", expr:itemData.values.poly.toClone().simplify().toString().replace(/,/g,'.').replace(/x/g,'(\\x)') }
-				xi = itemData.values.xi
-				ya = itemData.values.ya
-				questions = Handlebars.templates["tex_enumerate"] { items:["Donnez l'image de #{xi}", "Donnez le(s) antécédent(s) de #{ya}"] }
-				# Calcul de la taille
-				graphique = Handlebars.templates["tex_courbes"] { index:i+1, max:@max, courbes:[ courbe ], scale:.4*@max/10 }
-				out.push {
-					title:@title
-					contents: [graphique, questions]
+		getExamBriques: (inputs_list,options) ->
+			max = @max
+			that = @
+			graphs = {}
+			fct_item = (inputs, index) ->
+				[ poly, xi, yi, xa, ya, antecedents ] = that.init(inputs)
+				id = "jsx"+Math.random()
+				fctGraph = (x) -> mM.float(poly, {x:x})
+
+				graphs[id] = {
+					params: {
+						axis:true
+						grid:true
+						boundingbox:[-max,max,max,-max]
+						keepaspectratio: true
+					}
+					init: (graph) ->
+						curve = graph.create('functiongraph', [ fctGraph, -max, max ], { strokeWidth:3 })
+						graph.create('point',[ -max, fctGraph(-max) ],{fixed:true, fillColor:'blue', strokeColor:'blue', withlabel:false, size:4})
+						graph.create('point',[ max, fctGraph(max) ],{fixed:true, fillColor:'blue', strokeColor:'blue', withlabel:false, size:4})
 				}
-			out
+				return {
+					children: [
+						{
+							type: "text"
+							children:[
+								"On considère la fonction &nbsp; $f$ &nbsp; défnie sur l'intervalle &nbsp; $[#{-max};#{max}]$ par la courbe :"
+							]
+						}
+						{
+							type:"graphique"
+							divId: id
+						}
+						{
+							type: "enumerate"
+							enumi:"1"
+							children: [
+								"Donnez l'image de #{xi} par &nbsp; $f$"
+								"Donnez un antécédent de #{mM.misc.numToStr(ya)} par &nbsp; $f$"
+							]
+						}
+					]
+				}
+
+			return {
+				children: [
+					{
+						type: "subtitles"
+						enumi: "A"
+						refresh:true
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+				graphs: graphs
+			}
+
+		getTex: (inputs_list, options) ->
+			that = @
+			max = @max
+			fct_item = (inputs, index) ->
+				[ poly, xi, yi, xa, ya, antecedents ] = that.init(inputs,options)
+				return [
+					"On considère la fonction $f$ défnie sur l'intervalle $[#{-max};#{max}]$ par la courbe :"
+					{
+						type:"tikz"
+						left: -max
+						bottom: -max
+						right: max
+						top: max
+						index: index+1
+						axes:[1,1]
+						courbes:[
+							{
+								color:'blue'
+								expression:String(poly).replace /x/g, '(/x)'
+							}
+						]
+					}
+					{
+						type: "enumerate",
+						children: [
+							"Donnez l'image de #{xi} par $f$"
+							"Donnez un antécédent de #{mM.misc.numToStr(ya)} par $f$"
+						]
+					}
+				]
+
+
+			if inputs_list.length is 1
+				return fct_item(inputs_list[0],0)
+			else
+				return {
+					children: [
+						{
+							type: "enumerate"
+							enumi: "A"
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
+
 	}

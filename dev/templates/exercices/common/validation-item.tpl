@@ -1,6 +1,7 @@
 <div class="btn-group" role"group">
-	<% _(clavier).each( function(subitem){ %>
-		<% switch(subitem) { case "aide" : %>
+<% if (typeof clavier != "undefined") {
+	_(clavier).each( function(subitem){
+		switch(subitem) { case "aide" : %>
 	<button class="btn btn-info js-clavier" type="button" title="Aide" name="aide" ><i class="fa fa-question-circle-o"></i></button>
 		<% break; case "infini": %>
 	<button class="btn btn-default js-clavier" type="button" title="Infini" name="infini">$\infty$</button>
@@ -20,7 +21,8 @@
 	<button class="btn btn-default js-clavier" type="button" title="Intersection" name="intersection">$\cap$</button>
 		<% break; case "reels": %>
 	<button class="btn btn-default js-clavier" type="button" title="Ensemble des réels" name="reels">$\mathbb{R}$</button>
-		<% } %>
-	<% })%>
+		<% }
+	})
+} %>
 	<button type="submit" class="btn btn-default js-submit">Valider</button>
 </div>

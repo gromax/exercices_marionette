@@ -1977,7 +1977,7 @@
 			new ComplexeNumber(@_reel.floatify(), @_imaginaire.floatify())
 		approx: (decimals) -> new ComplexeNumber @_reel.approx(decimals), @_imaginaire.floatify(decimals)
 		float: (decimals) ->
-			if (isReal()) then @_reel.float(decimals)
+			if (@isReal()) then @_reel.float(decimals)
 			else NaN
 		toClone: () -> new ComplexeNumber(@_reel, @_imaginaire)
 		isNul: () -> @_reel.isNul() and @_imaginaire.isNul()

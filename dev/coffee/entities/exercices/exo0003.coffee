@@ -11,11 +11,9 @@
 			[
 				{
 					bareme:100
-					title:"Coordonnées de $A'$"
 					items:[
 						{
 							type:"text"
-							rank: 1
 							ps: [
 								"On se place dans un repère $(O;I,J)$."
 								"On donne deux points $#{A.texLine()}$ et $#{B.texLine()}$."
@@ -24,31 +22,37 @@
 						}
 						{
 							type:"input"
-							rank: 2
-							tag: "$x_{A'}$"
-							name: "xAp"
-							description: "Abscisse de A'"
-							good: gAp.x
-							waited: "number"
-						}
-						{
-							type:"input"
-							rank: 3
-							tag: "$y_{A'}$"
-							name: "yAp"
-							description: "Ordonnée de A'"
-							good: gAp.y
-							waited: "number"
+							format:[
+								{ text:"A' (", cols:3, class:"text-right h4"}
+								{ name:"xAp", cols:2, latex:true }
+								{ text:";", cols:1, class:"text-center h4"}
+								{ name:"yAp", cols:2, latex:true }
+								{ text:")", cols:1, class:"h4"}
+							]
 						}
 						{
 							type:"validation"
-							rank: 4
 							clavier: ["aide"]
 						}
 						{
 							type:"aide"
-							rank: 5
 							list:help.geometrie.analytique.symetrique
+						}
+					]
+					validations:{
+						xAp: "number"
+						yAp: "number"
+					}
+					verifications:[
+						{
+							name: "xAp"
+							tag:"$x_{A'}$"
+							good:gAp.x
+						}
+						{
+							name: "yAp"
+							tag:"$y_{A'}$"
+							good:gAp.y
 						}
 					]
 				}

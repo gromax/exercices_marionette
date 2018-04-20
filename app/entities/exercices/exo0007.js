@@ -3,7 +3,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
     m: -7,
     M: 7,
     init: function(inputs) {
-      var a, antecedents, b, borne_inf, borne_sup, c, d, fct, i, j, results, tabx, taby, x, xa, xi, ya, yi;
+      var a, antecedents, b, borne_inf, borne_sup, c, d, fct, i, j, results, tabx, taby, x, xa, xi, ya;
       borne_inf = this.m;
       borne_sup = this.M;
       if (typeof inputs.a === "undefined") {
@@ -57,7 +57,8 @@ define(["utils/math", "utils/help"], function(mM, help) {
       fct = function(x) {
         return ((((a * x) + b) * x) + c) * x + d;
       };
-      yi = ya = tabx = (function() {
+      ya = fct(xa);
+      tabx = (function() {
         results = [];
         for (var j = borne_inf; borne_inf <= borne_sup ? j <= borne_sup : j >= borne_sup; borne_inf <= borne_sup ? j++ : j--){ results.push(j); }
         return results;
@@ -82,7 +83,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
         }
         return results1;
       })();
-      return [xi, fct(xi), xa, fct(xa), tabx, taby, antecedents];
+      return [xi, fct(xi), xa, ya, tabx, taby, antecedents];
     },
     getBriques: function(inputs, options) {
       var antecedents, ref, tabx, taby, xa, xi, ya, yi;
@@ -117,15 +118,13 @@ define(["utils/math", "utils/help"], function(mM, help) {
             }, {
               type: "text",
               rank: 5,
-              ps: ["Donnez un antécédent (un seul !) de " + ya + " par &nbsp; $f$."]
+              ps: ["Donnez un antécédent de " + ya + " par &nbsp; $f$."]
             }, {
               type: "input",
               rank: 6,
-              waited: "number",
               tag: "Antécédent",
               description: "Antécédent de " + ya,
-              name: "a",
-              good: antecedents
+              name: "a"
             }, {
               type: "validation",
               rank: 7,
@@ -134,6 +133,24 @@ define(["utils/math", "utils/help"], function(mM, help) {
               type: "aide",
               rank: 8,
               list: help.fonction.image_antecedent
+            }
+          ],
+          validations: {
+            i: "number",
+            a: "liste"
+          },
+          verifications: [
+            {
+              name: "i",
+              rank: 4,
+              tag: "Image",
+              good: yi
+            }, {
+              name: "a",
+              rank: 6,
+              type: "some",
+              tag: "Antécédent",
+              good: antecedents
             }
           ]
         }
@@ -160,7 +177,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
             }, {
               type: "enumerate",
               enumi: "1",
-              children: ["Donnez l'image de " + xi + " par &nbsp; $f$", "Donnez un antécédent de " + ya + " par &nbsp; $f$"]
+              children: ["Donnez l'image de " + xi + " par &nbsp; $f$", "Donnez un antécédent de " + (mM.misc.numToStr(ya)) + " par &nbsp; $f$"]
             }
           ]
         };
@@ -193,7 +210,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
             lignes: [tabx, taby]
           }, {
             type: "enumerate",
-            children: ["Donnez l'image de " + xi + " par $f$", "Donnez un antécédent de " + ya + " par $f$"]
+            children: ["Donnez l'image de " + xi + " par $f$", "Donnez un antécédent de " + (mM.misc.numToStr(ya)) + " par $f$"]
           }
         ];
       };

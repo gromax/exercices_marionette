@@ -57,7 +57,7 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
       return data;
     },
     verification: function(data) {
-      var add_models, note, notes, posts, sum, verif, verif_processing;
+      var add_models, note, notes, sum, verif, verif_processing;
       verif_processing = function(verifItem) {
         var g, list, name, out, p, ref, ref1, stringAnswer, tag;
         switch (false) {
@@ -66,7 +66,11 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
             break;
           case verifItem.type !== "all":
             out = mM.verification.all(data[verifItem.name].processed, verifItem.good, verifItem.parameters);
-            stringAnswer = _.pluck(data[verifItem.name].processed, "tex").join(" &nbsp; ; &nbsp; ");
+            if (data[verifItem.name].processed.length === 0) {
+              stringAnswer = "\\varnothing";
+            } else {
+              stringAnswer = _.pluck(data[verifItem.name].processed, "tex").join("$ &nbsp; ; &nbsp; $");
+            }
             list = [
               {
                 type: "normal",
@@ -86,7 +90,11 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
             break;
           case verifItem.type !== "some":
             out = mM.verification.some(data[verifItem.name].processed, verifItem.good, verifItem.parameters);
-            stringAnswer = _.pluck(data[verifItem.name].processed, "tex").join(" &nbsp; ; &nbsp; ");
+            if (data[verifItem.name].processed.length === 0) {
+              stringAnswer = "\\varnothing";
+            } else {
+              stringAnswer = _.pluck(data[verifItem.name].processed, "tex").join("$ &nbsp; ; &nbsp; $");
+            }
             list = [
               {
                 type: "normal",
@@ -158,7 +166,6 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
         return out;
       };
       verif = _.map(this.get("verifications"), verif_processing);
-      posts = _.compact(_.pluck(verif, "post"));
       add_models = _.map(_.flatten(_.compact(_.pluck(verif, "add"))), function(item) {
         return new BriqueItem(item);
       });
@@ -171,7 +178,6 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
       note = _.reduce(notes, sum, 0) / notes.length;
       return {
         add: add_models,
-        posts: posts,
         note: note
       };
     },
@@ -183,11 +189,11 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
     validation: function(data) {
       var fct_iteratee;
       fct_iteratee = function(val, key) {
-        var error, errors, it, liste, p, processed, result, userValue, verifs;
+        var error, errors, it, liste, p, processed, result, userValue, v, verifs;
         if ((userValue = data[key]) != null) {
           switch (false) {
             case val !== "liste":
-              if (userValue === "∅") {
+              if (userValue === "∅" || userValue === "\\varnothing") {
                 processed = [];
                 error = false;
               } else {
@@ -203,9 +209,9 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
                 })();
                 errors = _.flatten(_.compact(_.pluck(verifs, "error")));
                 if (errors.length > 0) {
-                  error = false;
-                } else {
                   error = errors;
+                } else {
+                  error = false;
                 }
                 processed = _.pluck(verifs, "processed");
               }
@@ -216,6 +222,26 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
               };
             case val !== "number":
               return mM.verification.numberValidation(userValue);
+            case val !== "real":
+              if (typeof userValue === "string") {
+                v = Number(userValue.trim().replace('.', ","));
+              } else {
+                v = Number(userValue);
+              }
+              if (isNaN(v)) {
+                return {
+                  processed: false,
+                  user: userValue,
+                  error: "Vous devez entrer un nombre"
+                };
+              } else {
+                return {
+                  processed: v,
+                  user: userValue,
+                  error: false
+                };
+              }
+              break;
             case !(result = /radio:([0-9]+)/.exec(val)):
               result = Number(result[1]);
               p = Number(userValue);
@@ -297,121 +323,6 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
         return null;
       }
     },
-    radioAnswerProcessing: function(data) {
-      var name, out, radioItems, userValue;
-      data = data != null ? data : {};
-      name = this.get("name");
-      out = {};
-      if ((userValue = data[name]) != null) {
-        userValue = Number(userValue);
-        radioItems = this.get("radio");
-        if (userValue < radioItems.length) {
-          out[name] = {
-            processedAnswer: userValue,
-            answer: userValue
-          };
-        } else {
-          out[name] = {
-            error: "La réponse n'est pas dans la liste."
-          };
-        }
-      } else {
-        out[name] = {
-          error: "Vous devez donner une réponse"
-        };
-      }
-      return out;
-    },
-    inputAnswerProcessing: function(data) {
-      var error, fct_iteratee, format, info, name, names, originalUserValues, out, processed, processedAnswer, processedAnswers, ref, ref1, ref2, uV, userValue, userValues, validateList, waited;
-      data = data != null ? data : {};
-      waited = this.get("waited");
-      out = {};
-      name = this.get("name");
-      if ((userValue = data[name]) != null) {
-        error = false;
-        processedAnswer = false;
-        if (userValue === "") {
-          error = "Ne doit pas être vide";
-        } else {
-          if (typeof this.answerPreprocessing === "function") {
-            ref = this.answerPreprocessing(userValue), processed = ref.processed, error = ref.error;
-            if (error === false) {
-              userValue = processed;
-            }
-          }
-          if (error === false) {
-            ref1 = mM.p.validate(userValue, waited), info = ref1.info, error = ref1.error;
-            if (error === false) {
-              processedAnswer = info;
-            }
-          }
-        }
-        if (error === false) {
-          out[name] = {
-            processedAnswer: processedAnswer,
-            answer: data[name]
-          };
-        } else {
-          out[name] = {
-            error: error
-          };
-        }
-      } else if ((format = this.get("format")) != null) {
-        names = _.compact(_.pluck(format, "name"));
-        fct_iteratee = function(item) {
-          return [item, typeof data[item] === "function" ? data[item]("") : void 0];
-        };
-        userValues = originalUserValues = _.object(names, _.map(names, function(item) {
-          var ref2;
-          return (ref2 = data[item]) != null ? ref2 : "";
-        }));
-        if (_.compact(_.values(userValues)).length < names.length) {
-          error = "Aucun champ ne doit être vide";
-        } else {
-          error = false;
-          if (typeof this.answerPreprocessing === "function") {
-            ref2 = this.answerPreprocessing(userValues), processed = ref2.processed, error = ref2.error;
-            if (error === false) {
-              userValues = processed;
-            }
-          }
-          if (error === false) {
-            validateList = (function() {
-              var j, len, ref3, results;
-              ref3 = _.values(userValues);
-              results = [];
-              for (j = 0, len = ref3.length; j < len; j++) {
-                uV = ref3[j];
-                results.push(mM.p.validate(uV, waited));
-              }
-              return results;
-            })();
-            error = _.compact(_.pluck(validateList, "error"));
-            if (error.length === 0) {
-              error = false;
-              processedAnswers = _.object(names, _.pluck(validateList, "info"));
-            }
-          }
-        }
-        if (error === false) {
-          out[name] = {
-            processedAnswer: processedAnswers,
-            answer: originalUserValues
-          };
-        } else {
-          out[name] = {
-            error: error
-          };
-        }
-      } else {
-        out[name] = {
-          name: name,
-          error: "Vous devez donner une réponse"
-        };
-      }
-      return out;
-    },
     color_choiceAnswerProcessing: function(data) {
       var i, j, nVal, name, out, ref, userValue, values;
       data = data != null ? data : {};
@@ -432,276 +343,6 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
       }
       out[name] = values.join(";");
       return out;
-    },
-    radioVerification: function(answers_data) {
-      var answer_data, items, model_data, note, title;
-      note = 0;
-      model_data = this.attributes;
-      answer_data = answers_data[model_data.name];
-      title = model_data.corectionTag || model_data.tag || model_data.name;
-      items = [
-        {
-          type: "normal",
-          text: "<b>" + title + " &nbsp; \:</b>&emsp; Vous avez répondu &nbsp; " + model_data.radio[answer_data.processedAnswer]
-        }
-      ];
-      if (answer_data.processedAnswer === model_data.good) {
-        note = 1;
-        items.push({
-          type: "success",
-          text: "C'est la bonne réponse."
-        });
-      } else {
-        note = 0;
-        items.push({
-          type: "error",
-          text: "La bonne réponse était &nbsp; " + model_data.radio[model_data.good] + "."
-        });
-      }
-      return {
-        toTrash: this,
-        note: note,
-        add: {
-          type: "ul",
-          rank: this.get("rank"),
-          list: items
-        }
-      };
-    },
-    inputVerification: function(answers_data) {
-      var N, answer_data, fct_aiguillage, fct_for_list, fct_iteratee, fct_simple, items, list, model_data, note, that, title, userExpression;
-      note = 0;
-      model_data = this.attributes;
-      that = this;
-      answer_data = answers_data[model_data.name];
-      userExpression = function(entry) {
-        var customExpr;
-        if (typeof (customExpr = that.get("customUserExpression")) === "function") {
-          return customExpr(entry);
-        } else {
-          if (entry.tex != null) {
-            return "$" + entry.tex + "$";
-          }
-          if (entry.expression != null) {
-            entry = entry.expression;
-          }
-          if (that.get("type") === "latex-input") {
-            return "$" + entry + "$";
-          } else {
-            return "<i>" + entry + "</i>";
-          }
-        }
-      };
-      title = model_data.corectionTag || model_data.tag || model_data.name;
-      items = [
-        {
-          type: "normal",
-          text: "<b>" + title + " &nbsp; \:</b>&emsp; Vous avez répondu &nbsp; " + (userExpression(answer_data.answer))
-        }
-      ];
-      fct_for_list = function(answersList, goodList) {
-        var N, bads, closests, errorItem, it, itNote, j, k, lefts, len, len1, ref, ref1, sol, stringAnswer, verifResponse;
-        itNote = 0;
-        if (answersList.length === 0) {
-          if (goodList.length === 0) {
-            items.push({
-              type: "success",
-              text: "Bonne réponse"
-            });
-            itNote = 1;
-          } else {
-            stringAnswer = ((function() {
-              var j, len, results;
-              results = [];
-              for (j = 0, len = goodList.length; j < len; j++) {
-                it = goodList[j];
-                results.push("$" + (it.tex()) + "$");
-              }
-              return results;
-            })()).join(" ; ");
-            items.push({
-              type: "error",
-              text: "Vous auriez dû donner " + stringAnswer
-            });
-          }
-        } else {
-          if (goodList.length === 0) {
-            items.push({
-              type: "error",
-              text: "La bonne réponse était $\\varnothing$."
-            });
-          } else {
-            ref = mM.tri(answersList, goodList), closests = ref.closests, lefts = ref.lefts;
-            bads = [];
-            N = goodList.length;
-            for (j = 0, len = closests.length; j < len; j++) {
-              sol = closests[j];
-              if (sol.good != null) {
-                verifResponse = mM.verif[sol.info.type](sol.info, sol.good, model_data);
-                itNote += verifResponse.note / N;
-                switch (false) {
-                  case verifResponse.note !== 1:
-                    items.push({
-                      type: "success",
-                      text: "$" + sol.info.tex + "$ &nbsp; est une bonne réponse."
-                    });
-                    break;
-                  case !(verifResponse.note > 0):
-                    if (verifResponse.errors.length > 0) {
-                      items.push({
-                        type: "warning",
-                        text: "$" + sol.info.tex + " &nbsp; est accepté, mais :"
-                      });
-                      ref1 = verifResponse.errors;
-                      for (k = 0, len1 = ref1.length; k < len1; k++) {
-                        errorItem = ref1[k];
-                        items.push({
-                          type: "warning",
-                          text: errorItem
-                        });
-                      }
-                    } else {
-                      items.push({
-                        type: "warning",
-                        text: "$" + sol.info.tex + "$ &nbsp; est accepté mais la réponse peut être améliorée."
-                      });
-                    }
-                    break;
-                  default:
-                    bads.push(sol.info.expression);
-                    lefts.push(sol.good);
-                }
-              } else {
-                bads.push(sol.info.expression);
-              }
-            }
-            if (bads.length > 0) {
-              items.push({
-                type: "error",
-                text: "Ces solutions que vous donnez sont fausses : " + (bads.join(" ; "))
-              });
-            }
-            if (lefts.length > 0) {
-              items.push({
-                type: "error",
-                text: "Vous n'avez pas donné ces solutions : " + (((function() {
-                  var l, len2, results;
-                  results = [];
-                  for (l = 0, len2 = lefts.length; l < len2; l++) {
-                    it = lefts[l];
-                    results.push("$" + (it.tex()) + "$");
-                  }
-                  return results;
-                })()).join(" ; "))
-              });
-            }
-          }
-        }
-        return itNote;
-      };
-      fct_simple = function(answer, good) {
-        var errorItem, errors, it_good, j, k, len, len1, ref, ref1, type, verif_results;
-        type = answer.type;
-        if (Array.isArray(good)) {
-          verif_results = (function() {
-            var j, len, results;
-            results = [];
-            for (j = 0, len = good.length; j < len; j++) {
-              it_good = good[j];
-              results.push(mM.verif[type](answer, it_good, model_data));
-            }
-            return results;
-          })();
-          ref = _.max(verif_results, function(item) {
-            return item.note;
-          }), note = ref.note, errors = ref.errors;
-        } else {
-          ref1 = mM.verif[type](answer, good, model_data), note = ref1.note, errors = ref1.errors;
-        }
-        switch (false) {
-          case note !== 1:
-            items.push({
-              type: "success",
-              text: "$" + answer.tex + "$ &nbsp; est une bonne réponse."
-            });
-            break;
-          case !(note > 0):
-            if (errors.length > 0) {
-              items.push({
-                type: "warning",
-                text: "$" + answer.tex + "$ &nbsp; est accepté, mais :"
-              });
-              for (j = 0, len = errors.length; j < len; j++) {
-                errorItem = errors[j];
-                items.push({
-                  type: "warning",
-                  text: errorItem
-                });
-              }
-            } else {
-              items.push({
-                type: "warning",
-                text: "$" + answer.tex + "$ &nbsp; est accepté mais la réponse peut être améliorée."
-              });
-            }
-            break;
-          default:
-            items.push({
-              type: "error",
-              text: "$" + answer.tex + "$ &nbsp; est une mauvaise réponse."
-            });
-            if (errors.length > 0) {
-              for (k = 0, len1 = errors.length; k < len1; k++) {
-                errorItem = errors[k];
-                items.push({
-                  type: "warning",
-                  text: errorItem
-                });
-              }
-            }
-        }
-        return note;
-      };
-      fct_aiguillage = function(answer, good) {
-        var customMessage, customMessageFunction;
-        if (Array.isArray(answer)) {
-          return fct_for_list(answer, good);
-        } else {
-          note = fct_simple(answer, good);
-          customMessageFunction = that.get("custom_verification_message");
-          if ((typeof customMessageFunction === "function") && (customMessage = customMessageFunction(answers_data))) {
-            if (customMessage.note) {
-              note += customMessage.note;
-            }
-            items.push(customMessage);
-          }
-          return note;
-        }
-      };
-      if (typeof answer_data.answer === "object") {
-        N = _.size(answer_data.answer);
-        list = _.map(answer_data.processedAnswer, function(it, key) {
-          return {
-            answer: it,
-            good: model_data.good[key]
-          };
-        });
-        fct_iteratee = function(memo, item) {
-          return memo + fct_aiguillage(item.answer, item.good) / N;
-        };
-        note = _.reduce(list, fct_iteratee, 0);
-      } else {
-        fct_aiguillage(answer_data.processedAnswer, model_data.good);
-      }
-      return {
-        toTrash: this,
-        note: note,
-        add: {
-          type: "ul",
-          rank: this.get("rank"),
-          list: items
-        }
-      };
     },
     color_choiceVerification: function(answers_data) {
       var answers, colors, correcList, fct, it, list, name, note;

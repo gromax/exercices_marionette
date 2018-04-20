@@ -11,6 +11,11 @@ define ["utils/math"], (mM) ->
 
 	return {
 		max: 11
+
+		init: (inputs) ->
+			max=@max
+			return ( mM.alea.vector({ name:name, def:inputs, values:[{min:-max+1, max:max-1}]}).save(inputs) for name in ["A", "B", "C", "D", "E"] )
+
 		getBriques: (inputs, options) ->
 			max = @max
 			iPts = @init(inputs)
@@ -21,7 +26,6 @@ define ["utils/math"], (mM) ->
 				strPts = ("$#{pt.texLine()}$" for pt in iPts).join(", &nbsp;")
 				briqueEnnonce = {
 					type: "text"
-					rank: 1
 					ps: [
 						"On se place dans le repère &nbsp; $(O;I,J)$."
 						"Vous devez placer les point suivants :"
@@ -33,7 +37,6 @@ define ["utils/math"], (mM) ->
 				strNames = ("$#{pt.name}$" for pt in iPts).join(", &nbsp;")
 				briqueEnnonce = {
 					type: "text"
-					rank: 1
 					ps: [
 						"On se place dans le plan complexe."
 						"Vous devez placer les point  : &nbsp; #{strNames} &nbsp; dont les affixes sont :"
@@ -51,9 +54,7 @@ define ["utils/math"], (mM) ->
 						briqueEnnonce
 						{
 							type:"jsxgraph"
-							rank: 2
 							divId: "jsx#{Math.random()}"
-							name: ["xA", "yA", "xB", "yB", "xC", "yC", "xD", "yD", "xE", "yE"]
 							params: {
 								axis:true
 								grid:true
@@ -68,58 +69,67 @@ define ["utils/math"], (mM) ->
 								out["x"+p.name] = p.X() for p in graph.points
 								out["y"+p.name] = p.Y() for p in graph.points
 								out
-							verification: (answers_data) ->
-								note = 0
-								messages = []
+							postVerification: (view, data)->
+								for pt in view.graph.points
+									pt.setAttribute {fixed:true}
 								for pt in iPts
+									name=pt.name
 									g_x = mM.float(pt.x)
 									g_y = mM.float(pt.y)
-									a_x = Number answers_data["x"+pt.name]
-									a_y = Number answers_data["y"+pt.name]
-									d2 = (a_x-g_x)*(a_x-g_x)+(a_y-g_y)*(a_y-g_y)
-									if d2<0.2
-										# Le point est assez près
-										messages.push {
-											type: "success"
-											text: "Le point #{pt.name} est bien placé."
-										}
-										note += .2
-									else
-										# Le point est trop loin
-										messages.push {
-											type: "error"
-											text: "Le point #{pt.name} est mal placé."
-										}
-								{
-									note: note
-									add:[
-										{
-											type:"ul"
-											rank: 3
-											list: messages
-										}
-									]
-									post: (graph)->
-										for pt in graph.points
-											pt.setAttribute {fixed:true}
-										for pt in iPts
-											name=pt.name
-											g_x = mM.float(pt.x)
-											g_y = mM.float(pt.y)
-											graph.create 'point',[g_x,g_y], {name:name, fixed:true, size:4, color:'green'}
-								}
+									view.graph.create 'point',[g_x,g_y], {name:name, fixed:true, size:4, color:'green'}
 						}
 						{
 							type: "validation"
-							rank: 3
-							clavier: []
 						}
+					]
+					validations:{
+						xA: "real"
+						yA: "real"
+						xB: "real"
+						yB: "real"
+						xC: "real"
+						yC: "real"
+						xD: "real"
+						yD: "real"
+						xE: "real"
+						yE: "real"
+					}
+					verifications:[
+						(data)->
+							note = 0
+							messages = []
+							for pt in iPts
+								g_x = mM.float(pt.x)
+								g_y = mM.float(pt.y)
+								a_x = data["x"+pt.name].processed
+								a_y = data["y"+pt.name].processed
+								d2 = (a_x-g_x)*(a_x-g_x)+(a_y-g_y)*(a_y-g_y)
+								if d2<0.2
+									# Le point est assez près
+									messages.push {
+										type: "success"
+										text: "Le point #{pt.name} est bien placé."
+									}
+									note += .2
+								else
+									# Le point est trop loin
+									messages.push {
+										type: "error"
+										text: "Le point #{pt.name} est mal placé."
+									}
+							{
+								note: note
+								add:[
+									{
+										type:"ul"
+										list: messages
+									}
+								]
+							}
+
 					]
 				}
 			]
 
-		init: (inputs) ->
-			max=@max
-			return ( mM.alea.vector({ name:name, def:inputs, values:[{min:-max+1, max:max-1}]}).save(inputs) for name in ["A", "B", "C", "D", "E"] )
 
 	}

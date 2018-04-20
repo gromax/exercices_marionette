@@ -588,7 +588,7 @@ __e( id ) +
 __e( nom ) +
 ' - n' +
 __e( id ) +
-' }\n\\lhead{}\n\\rhead{}\n\\renewcommand{\\headrulewidth}{0.5mm}\n\\renewcommand{\\footrulewidth}{0.5mm}\n\\cfoot{Page \\thepage /\\pageref{LastPage}}\n\\pagestyle{fancy}\n%--------------------------------------\n\\usepackage{pstricks-add} % tracé de courbes\n\\usepackage{tikz}\n\\usepackage{tkz-tab}\n\\usetikzlibrary{arrows}\n\\usepackage{enumerate}\n\\usepackage{fancybox} % Pour les encadrés\n\\usepackage{gensymb}\n\n\\newcounter{numexo} %Création d\'un compteur qui s\'appelle numexo\n\\setcounter{numexo}{0} %initialisation du compteur\n\\newcommand{\\exercice}[1]{\n\t\\addtocounter{numexo}{1}\n\t\\setlength {\\fboxrule }{1pt}\n\t\\vspace{5mm}\n\t\\hspace{-1cm}\\fcolorbox{black}{black!10}{\\textbf{Exo \\,\\thenumexo\\,} }\\hspace{5mm}#1\n\t\\vspace{5mm}\n}\n\n\\frenchbsetup{StandardItemLabels=true} % bullets pour les items\n\\newcommand{\\D}{\\mathcal{D}}\n\\newcommand{\\R}{\\mathbb{R}}\n\\begin{document}\n\\raggedcolumns\n\\begin{multicols}{2}\n';
+' }\n\\lhead{}\n\\rhead{}\n\\renewcommand{\\headrulewidth}{0.5mm}\n\\renewcommand{\\footrulewidth}{0.5mm}\n\\cfoot{Page \\thepage /\\pageref{LastPage}}\n\\pagestyle{fancy}\n%--------------------------------------\n\\usepackage{pstricks-add} % tracé de courbes\n\\usepackage{tikz}\n\\usepackage{tkz-tab}\n\\usetikzlibrary{arrows}\n\\usepackage{enumerate}\n\\usepackage{fancybox} % Pour les encadrés\n\\usepackage{gensymb}\n\\usepackage[np]{numprint}\n\n\\newcounter{numexo} %Création d\'un compteur qui s\'appelle numexo\n\\setcounter{numexo}{0} %initialisation du compteur\n\\newcommand{\\exercice}[1]{\n\t\\addtocounter{numexo}{1}\n\t\\setlength {\\fboxrule }{1pt}\n\t\\vspace{5mm}\n\t\\hspace{-1cm}\\fcolorbox{black}{black!10}{\\textbf{Exo \\,\\thenumexo\\,} }\\hspace{5mm}#1\n\t\\vspace{5mm}\n}\n\n\\frenchbsetup{StandardItemLabels=true} % bullets pour les items\n\\newcommand{\\D}{\\mathcal{D}}\n\\newcommand{\\R}{\\mathbb{R}}\n\\begin{document}\n\\raggedcolumns\n\\begin{multicols}{2}\n';
 
 	var letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	var recursive_fct = function(el, index){
@@ -614,6 +614,95 @@ __p += '\n\t' +
 '\\\\\n\t\\hline\n';
 }); ;
 __p += '\\end{tabular}\n\\end{center}\n';
+					break;
+				case "tikz":;
+__p += '\n\\begin{center}\n\\begin{tikzpicture}[scale=';
+ if (el.scale){ ;
+__p +=
+__e( el.scale );
+ } else { ;
+__p += '1';
+ } ;
+__p += ', >=stealth]';
+
+if (el.index) { ;
+__p += '\n\\draw (' +
+__e( el.left ) +
+',' +
+__e( el.top ) +
+') node[below right,color=white,fill=black]{\\textbf{' +
+__e( el.index ) +
+' }};';
+ } ;
+__p += '\n\\draw [color=black, line width=.1pt] (' +
+__e( el.left ) +
+' , ' +
+__e( el.top ) +
+') grid[step=';
+ if(el.step){;
+__p +=
+__e(el.step );
+ } else { ;
+__p += '1';
+ } ;
+__p += '] (' +
+__e( el.right ) +
+', ' +
+__e( el.top ) +
+');\n';
+ if (el.axes){ ;
+__p += '\\draw[line width=1pt] (0,0) node[below left, fill=white]{$O$} (' +
+__e( el.axes[0] ) +
+',-2pt) node[below, fill=white]{\\np{' +
+__e( el.axes[0] ) +
+'}} --++(0,4pt) (-2pt,' +
+__e( el.axes[1] ) +
+') node[left, fill=white]{\\np{' +
+__e( el.axes[1] ) +
+'}}--++(4pt,0);\n\\draw[line width=1.5pt](' +
+__e( el.left ) +
+',0)--(' +
+__e( el.right ) +
+',0) (0,' +
+__e( el.bottom ) +
+')--(0,' +
+__e( el.top ) +
+');\n';
+ }
+if (el.Ouv){ ;
+__p += '\\draw[line width=1pt] (0,0) node[below left, fill=white]{$O$} (.5,0) node[below, fill=white]{\\vec{u}} (0,.5) node[left, fill=white]{\\vec{v}}\n\\draw[line width=1.5pt, <->](0,1)|-(1,0);\n';
+ }
+if (el.courbes) {;
+__p += '\n\\begin{scope}\n\\clip (' +
+__e( el.left ) +
+',' +
+__e( el.bottom ) +
+') rectangle (' +
+__e( el.right ) +
+', ' +
+__e( el.top ) +
+');\n';
+ _.each(el.courbes, function(itCourbe){
+;
+__p += '\t\\draw[line width=2pt, color=';
+ if (itCourbe.color) { ;
+__p +=
+__e( itCourbe.color );
+ } else { ;
+__p += 'black';
+ } ;
+__p += ' ] plot[smooth, domain=' +
+__e( itCourbe.left | el.left ) +
+':' +
+__e( itCourbe.right | el.right ) +
+'](\\x,{' +
+__e( itCourbe.expression ) +
+'});\n';
+ });
+;
+__p += '\\end{scope}';
+ } ;
+__p += '\n\\end{tikzpicture}\n\\end{center}\n';
 					break;
 				case "enumerate": ;
 __p += '\n\\begin{enumerate}';
@@ -773,6 +862,13 @@ __e( enumi[el.enumi][sub_index] ) +
 __p += '</li>\n\t';
  }) ;
 __p += '\n</ul>\n';
+
+					break;
+				case "graphique":
+;
+__p += '<div id="' +
+__e( el.divId ) +
+'" class="jxgbox" style="width:100%; height:10px;"></div>\n';
 
 					break;
 				case "tableau":
@@ -1464,10 +1560,10 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
-__p += '<div class="btn-group" role"group">\n\t';
- _(clavier).each( function(subitem){ ;
-__p += '\n\t\t';
- switch(subitem) { case "aide" : ;
+__p += '<div class="btn-group" role"group">\n';
+ if (typeof clavier != "undefined") {
+	_(clavier).each( function(subitem){
+		switch(subitem) { case "aide" : ;
 __p += '\n\t<button class="btn btn-info js-clavier" type="button" title="Aide" name="aide" ><i class="fa fa-question-circle-o"></i></button>\n\t\t';
  break; case "infini": ;
 __p += '\n\t<button class="btn btn-default js-clavier" type="button" title="Infini" name="infini">$\\infty$</button>\n\t\t';
@@ -1487,9 +1583,9 @@ __p += '\n\t<button class="btn btn-default js-clavier" type="button" title="Unio
 __p += '\n\t<button class="btn btn-default js-clavier" type="button" title="Intersection" name="intersection">$\\cap$</button>\n\t\t';
  break; case "reels": ;
 __p += '\n\t<button class="btn btn-default js-clavier" type="button" title="Ensemble des réels" name="reels">$\\mathbb{R}$</button>\n\t\t';
- } ;
-__p += '\n\t';
- });
+ }
+	})
+} ;
 __p += '\n\t<button type="submit" class="btn btn-default js-submit">Valider</button>\n</div>\n';
 
 }

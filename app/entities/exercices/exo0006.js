@@ -1,6 +1,29 @@
 define(["utils/math"], function(mM) {
   return {
     max: 11,
+    init: function(inputs) {
+      var max, name;
+      max = this.max;
+      return (function() {
+        var i, len, ref, results;
+        ref = ["A", "B", "C", "D", "E"];
+        results = [];
+        for (i = 0, len = ref.length; i < len; i++) {
+          name = ref[i];
+          results.push(mM.alea.vector({
+            name: name,
+            def: inputs,
+            values: [
+              {
+                min: -max + 1,
+                max: max - 1
+              }
+            ]
+          }).save(inputs));
+        }
+        return results;
+      })();
+    },
     getBriques: function(inputs, options) {
       var briqueEnnonce, displayedPts, iPts, initGraph, max, name, optA, pt, ref, strNames, strPts;
       max = this.max;
@@ -36,7 +59,6 @@ define(["utils/math"], function(mM) {
         })()).join(", &nbsp;");
         briqueEnnonce = {
           type: "text",
-          rank: 1,
           ps: ["On se place dans le repère &nbsp; $(O;I,J)$.", "Vous devez placer les point suivants :", strPts + "."]
         };
       } else {
@@ -60,7 +82,6 @@ define(["utils/math"], function(mM) {
         })()).join(", &nbsp;");
         briqueEnnonce = {
           type: "text",
-          rank: 1,
           ps: ["On se place dans le plan complexe.", "Vous devez placer les point  : &nbsp; " + strNames + " &nbsp; dont les affixes sont :", strPts + "."]
         };
       }
@@ -88,9 +109,7 @@ define(["utils/math"], function(mM) {
           items: [
             briqueEnnonce, {
               type: "jsxgraph",
-              rank: 2,
               divId: "jsx" + (Math.random()),
-              name: ["xA", "yA", "xB", "yB", "xC", "yC", "xD", "yD", "xE", "yE"],
               params: {
                 axis: true,
                 grid: true,
@@ -113,96 +132,84 @@ define(["utils/math"], function(mM) {
                 }
                 return out;
               },
-              verification: function(answers_data) {
-                var a_x, a_y, d2, g_x, g_y, i, len, messages, note;
-                note = 0;
-                messages = [];
-                for (i = 0, len = iPts.length; i < len; i++) {
-                  pt = iPts[i];
+              postVerification: function(view, data) {
+                var g_x, g_y, i, j, len, len1, ref1, results;
+                ref1 = view.graph.points;
+                for (i = 0, len = ref1.length; i < len; i++) {
+                  pt = ref1[i];
+                  pt.setAttribute({
+                    fixed: true
+                  });
+                }
+                results = [];
+                for (j = 0, len1 = iPts.length; j < len1; j++) {
+                  pt = iPts[j];
+                  name = pt.name;
                   g_x = mM.float(pt.x);
                   g_y = mM.float(pt.y);
-                  a_x = Number(answers_data["x" + pt.name]);
-                  a_y = Number(answers_data["y" + pt.name]);
-                  d2 = (a_x - g_x) * (a_x - g_x) + (a_y - g_y) * (a_y - g_y);
-                  if (d2 < 0.2) {
-                    messages.push({
-                      type: "success",
-                      text: "Le point " + pt.name + " est bien placé."
-                    });
-                    note += .2;
-                  } else {
-                    messages.push({
-                      type: "error",
-                      text: "Le point " + pt.name + " est mal placé."
-                    });
-                  }
+                  results.push(view.graph.create('point', [g_x, g_y], {
+                    name: name,
+                    fixed: true,
+                    size: 4,
+                    color: 'green'
+                  }));
                 }
-                return {
-                  note: note,
-                  add: [
-                    {
-                      type: "ul",
-                      rank: 3,
-                      list: messages
-                    }
-                  ],
-                  post: function(graph) {
-                    var j, k, len1, len2, ref1, results;
-                    ref1 = graph.points;
-                    for (j = 0, len1 = ref1.length; j < len1; j++) {
-                      pt = ref1[j];
-                      pt.setAttribute({
-                        fixed: true
-                      });
-                    }
-                    results = [];
-                    for (k = 0, len2 = iPts.length; k < len2; k++) {
-                      pt = iPts[k];
-                      name = pt.name;
-                      g_x = mM.float(pt.x);
-                      g_y = mM.float(pt.y);
-                      results.push(graph.create('point', [g_x, g_y], {
-                        name: name,
-                        fixed: true,
-                        size: 4,
-                        color: 'green'
-                      }));
-                    }
-                    return results;
-                  }
-                };
+                return results;
               }
             }, {
-              type: "validation",
-              rank: 3,
-              clavier: []
+              type: "validation"
+            }
+          ],
+          validations: {
+            xA: "real",
+            yA: "real",
+            xB: "real",
+            yB: "real",
+            xC: "real",
+            yC: "real",
+            xD: "real",
+            yD: "real",
+            xE: "real",
+            yE: "real"
+          },
+          verifications: [
+            function(data) {
+              var a_x, a_y, d2, g_x, g_y, i, len, messages, note;
+              note = 0;
+              messages = [];
+              for (i = 0, len = iPts.length; i < len; i++) {
+                pt = iPts[i];
+                g_x = mM.float(pt.x);
+                g_y = mM.float(pt.y);
+                a_x = data["x" + pt.name].processed;
+                a_y = data["y" + pt.name].processed;
+                d2 = (a_x - g_x) * (a_x - g_x) + (a_y - g_y) * (a_y - g_y);
+                if (d2 < 0.2) {
+                  messages.push({
+                    type: "success",
+                    text: "Le point " + pt.name + " est bien placé."
+                  });
+                  note += .2;
+                } else {
+                  messages.push({
+                    type: "error",
+                    text: "Le point " + pt.name + " est mal placé."
+                  });
+                }
+              }
+              return {
+                note: note,
+                add: [
+                  {
+                    type: "ul",
+                    list: messages
+                  }
+                ]
+              };
             }
           ]
         }
       ];
-    },
-    init: function(inputs) {
-      var max, name;
-      max = this.max;
-      return (function() {
-        var i, len, ref, results;
-        ref = ["A", "B", "C", "D", "E"];
-        results = [];
-        for (i = 0, len = ref.length; i < len; i++) {
-          name = ref[i];
-          results.push(mM.alea.vector({
-            name: name,
-            def: inputs,
-            values: [
-              {
-                min: -max + 1,
-                max: max - 1
-              }
-            ]
-          }).save(inputs));
-        }
-        return results;
-      })();
     }
   };
 });

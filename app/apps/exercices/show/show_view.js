@@ -55,8 +55,11 @@ define([
 			Marionette.View.prototype.remove.call(this);
 		},
 
-		execPost: function(fct){
-			fct();
+		execPostVerification: function(data){
+			var post = this.model.get("postVerification");
+			if (typeof post == "function") {
+				post(this, data);
+			}
 		},
 	});
 
@@ -196,7 +199,7 @@ define([
 
 	});
 
-	var JsxgraphItemView = Marionette.View.extend({
+	var JsxgraphItemView = DefaultItemView.extend({
 		className: "card-body text-center",
 		template: window.JST["exercices/common/jsxgraph-item"],
 
@@ -221,10 +224,6 @@ define([
 					_.each(fcts, function(item){ item(that.graph); });
 				}
 			});
-		},
-
-		execPost: function(fct){
-			fct(this.graph);
 		},
 	});
 
@@ -366,6 +365,10 @@ define([
 
 						if (mf){
 							switch(cible){
+								case "empty":
+									mf.cmd('\\varnothing');
+									mf.focus();
+									break;
 								case "sqrt":
 									mf.cmd('\\sqrt');
 									mf.focus();
@@ -458,15 +461,13 @@ define([
 			});
 		},
 
-		execPosts: function(list){
-			var that =  this;
-			_.each(list, function(item){
-				var itemBrique =item.item;
-				var childview = that.itemsView.children.findByModel(itemBrique);
-				if (childview) {
-					childview.execPost(item.post);
-				}
+		execPostVerification: function(data){
+			var list = this.itemsView.children.filter(function(item){
+				return item.model.has("postVerification")
 			})
+			_.each(list, function(item){
+				item.execPostVerification(data);
+			});
 		}
 	});
 

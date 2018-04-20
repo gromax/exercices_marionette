@@ -51,6 +51,10 @@
 </ul>
 <%
 					break;
+				case "graphique":
+%><div id="<%- el.divId %>" class="jxgbox" style="width:100%; height:10px;"></div>
+<%
+					break;
 				case "tableau":
 %><div class="table-responsive">
 	<table class="table table-bordered">

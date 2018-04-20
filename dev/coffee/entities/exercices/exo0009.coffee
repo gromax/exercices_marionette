@@ -24,7 +24,6 @@ define ["utils/math","utils/help"], (mM, help) ->
 					items:[
 						{
 							type: "text"
-							rank: 1
 							ps: [
 								"On considère une fonction affine &nbsp; $f$ &nbsp; telle que &nbsp; $#{A.texFunc("f")}$ &nbsp; et &nbsp; $#{B.texFunc("f")}$."
 								"On sait que &nbsp; $f(x)=a\\cdot x+b$. Vous devez donner &nbsp; $a$ &nbsp; et &nbsp; $b$."
@@ -32,38 +31,54 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type: "input"
-							rank: 2
-							waited:"number"
 							tag:"$a$"
 							name:"a"
 							description:"Valeur de a"
-							good:droite.m()
-							custom_verification_message: (answer_data)->
-								if not(droite.m().isOne()) and mM.float(mM.exec([answer_data["a"].processedAnswer.object, droite.m(), "*"])) is 1
-									return {
-										type:"warning"
-										text:"Vous avez calculé &nbsp; $\\frac{#{B.x}-#{A.x}}{#{B.y}-#{A.y}}$ &nbsp; au lieu de &nbsp; $\\frac{#{B.y}-#{A.y}}{#{B.x}-#{A.x}}$."
-									}
-								else return null
 						}
 						{
 							type: "input"
-							rank: 3
-							waited:"number"
 							tag:"$b$"
 							name:"b"
 							description:"Valeur de b"
-							good:droite.p()
 						}
 						{
 							type: "validation"
-							rank: 4
 							clavier: ["aide"]
 						}
 						{
 							type: "aide"
-							rank: 5
 							list: help.fonction.affine.expression
+						}
+					]
+					validations:{
+						a:"number"
+						b:"number"
+					}
+					verifications:[
+						{
+							name: "a"
+							tag:"$a$"
+							good:droite.m()
+						}
+						(data)->
+							if not(droite.m().isOne()) and mM.float(mM.exec([data["a"].processed.object, droite.m(), "*"])) is 1
+								{
+									add: {
+										type:"ul"
+										list:[
+											{
+												type:"warning"
+												text:"Vous avez calculé &nbsp; $\\frac{\\Delta x}{\\Delta y}$ &nbsp; au lieu de &nbsp; $\\frac{\\Delta y}{\\Delta x}$."
+											}
+										]
+									}
+								}
+							else
+								null
+						{
+							name: "b"
+							tag:"$b$"
+							good:droite.p()
 						}
 					]
 				}

@@ -30,8 +30,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 
 			fct = (x) -> ((((a*x)+b)*x)+c)*x+d
 
-			yi =
-			ya =
+			ya = fct(xa)
 			# Calcul des valeurs du tableau de variation
 			tabx = [borne_inf..borne_sup]
 			taby = ( fct(x) for x in tabx)
@@ -41,7 +40,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 				xi
 				fct(xi)
 				xa
-				fct(xa)
+				ya
 				tabx
 				taby
 				antecedents
@@ -93,17 +92,15 @@ define ["utils/math","utils/help"], (mM, help) ->
 							type:"text"
 							rank:5
 							ps:[
-								"Donnez un antécédent (un seul !) de #{ya} par &nbsp; $f$."
+								"Donnez un antécédent de #{ya} par &nbsp; $f$."
 							]
 						}
 						{
 							type:"input"
 							rank:6
-							waited: "number"
 							tag:"Antécédent"
 							description:"Antécédent de #{ya}"
 							name: "a"
-							good: antecedents
 						}
 						{
 							type:"validation"
@@ -114,6 +111,25 @@ define ["utils/math","utils/help"], (mM, help) ->
 							type: "aide"
 							rank:8
 							list: help.fonction.image_antecedent
+						}
+					]
+					validations:{
+						i:"number"
+						a:"liste"
+					}
+					verifications:[
+						{
+							name:"i"
+							rank:4
+							tag:"Image"
+							good:yi
+						}
+						{
+							name:"a"
+							rank:6
+							type:"some"
+							tag:"Antécédent"
+							good:antecedents
 						}
 					]
 				}
@@ -148,7 +164,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 							enumi:"1"
 							children: [
 								"Donnez l'image de #{xi} par &nbsp; $f$"
-								"Donnez un antécédent de #{ya} par &nbsp; $f$"
+								"Donnez un antécédent de #{mM.misc.numToStr(ya)} par &nbsp; $f$"
 							]
 						}
 					]
@@ -188,7 +204,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 						type: "enumerate",
 						children: [
 							"Donnez l'image de #{xi} par $f$"
-							"Donnez un antécédent de #{ya} par $f$"
+							"Donnez un antécédent de #{mM.misc.numToStr(ya)} par $f$"
 						]
 					}
 				]
