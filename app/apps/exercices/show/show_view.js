@@ -109,56 +109,32 @@ define([
 		},
 	});
 
-	var ColorChoiceItemView = Marionette.View.extend({
-		className: "card-body",
+	var ColorChoiceItemView = DefaultItemView.extend({
 		template: window.JST["exercices/common/color-choice-item"],
 		defaultToTrash: true,
 		triggers:{
 			"click a.list-group-item-action":"choice:click:item",
 		},
 
-		onRender: function(){
-			MathJax.Hub.Queue(["Typeset",MathJax.Hub,this.$el[0]]);
-		},
-
-		onFormDataInvalid: function(data){
-			// Normalement, la seule erreur est qu'on n'a pas tout coché
-			var model = this.model;
-			var name = model.get("name");
-			if (name) {
-				// On retire un éventuel message d'erreur antérieur
-				this.$el.find(".js-validation-error").each(function(){
-					$(this).remove();
-				});
-
-				var validation_item = data[name]
-				if (validation_item && validation_item.error) {
-					// Il y a une erreur qu'il faut afficher
-					this.$el.append("<small class='js-validation-error text-danger'><i class='fa fa-exclamation-triangle'></i> "+validation_item.error+"</small>");
-				}
-			}
-		},
-
-		remove: function(){
-			this.model.destroy();
-			Marionette.View.prototype.remove.call(this);
-		},
-
 		onChoiceClickItem: function(view, e){
 			var $el = $(e.currentTarget);
-			var maxValue = this.model.get("maxValue")
+			var index = Number($el.attr("index"));
+			var name = this.model.get("name");
+			var maxValue = this.model.get("maxValue");
 			if (maxValue) {
 				nVal = maxValue+1
 			} else {
 				var nVal = this.model.get("list").length
 			}
-			var $inp = $el.find("input").first();
+			var $inp = $("input[name='"+name+"']");
 			var $square = $el.find("i.fa-square").first();
-			var v = Number($inp.val())+1;
+			var values = $inp.val().split(";");
+			var v = Number( values[index] )+1;
 			if (v>=nVal) {
 				v=0;
 			}
-			$inp.val(v);
+			values[index]=v;
+			$inp.val(values.join(";"));
 			require(["utils/colors"], function(colors){
 				$square.css({ color: colors.html(v)});
 			});

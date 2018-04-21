@@ -8,11 +8,11 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
       options: {}
     },
     getBriquesUntilFocus: function() {
-      var b, briques, j, len, output;
+      var b, briques, i, len, output;
       output = [];
       briques = this.get("briquesCollection").models;
-      for (j = 0, len = briques.length; j < len; j++) {
-        b = briques[j];
+      for (i = 0, len = briques.length; i < len; i++) {
+        b = briques[i];
         if (!(b.get("done") === false)) {
           continue;
         }
@@ -59,13 +59,13 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
     verification: function(data) {
       var add_models, note, notes, sum, verif, verif_processing;
       verif_processing = function(verifItem) {
-        var g, list, name, out, p, ref, ref1, stringAnswer, tag;
+        var answers, colors, correcList, fct, g, index, it, items, list, name, note, out, p, ref, ref1, stringAnswer, tag, ver;
         switch (false) {
           case typeof verifItem !== "function":
             out = verifItem(data);
             break;
           case verifItem.type !== "all":
-            out = mM.verification.all(data[verifItem.name].processed, verifItem.good, verifItem.parameters);
+            ver = mM.verification.all(data[verifItem.name].processed, verifItem.good, verifItem.parameters);
             if (data[verifItem.name].processed.length === 0) {
               stringAnswer = "\\varnothing";
             } else {
@@ -77,19 +77,22 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
                 text: "Vous avez répondu &nbsp; $" + stringAnswer + "$"
               }
             ];
-            if (out.goodMessage) {
-              list.push(out.goodMessage);
+            if (ver.goodMessage) {
+              list.push(ver.goodMessage);
             }
-            out.add = {
-              type: "ul",
-              list: list.concat(out.errors)
+            out = {
+              note: ver.note,
+              add: {
+                type: "ul",
+                list: list.concat(ver.errors)
+              }
             };
             if (verifItem.rank != null) {
               out.add.rank = verifItem.rank;
             }
             break;
           case verifItem.type !== "some":
-            out = mM.verification.some(data[verifItem.name].processed, verifItem.good, verifItem.parameters);
+            ver = mM.verification.some(data[verifItem.name].processed, verifItem.good, verifItem.parameters);
             if (data[verifItem.name].processed.length === 0) {
               stringAnswer = "\\varnothing";
             } else {
@@ -101,12 +104,15 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
                 text: "Vous avez répondu &nbsp; $" + stringAnswer + "$"
               }
             ];
-            if (out.goodMessage) {
-              list.push(out.goodMessage);
+            if (ver.goodMessage) {
+              list.push(ver.goodMessage);
             }
-            out.add = {
-              type: "ul",
-              list: list.concat(out.errors)
+            out = {
+              note: ver.note,
+              add: {
+                type: "ul",
+                list: list.concat(ver.errors)
+              }
             };
             if (verifItem.rank != null) {
               out.add.rank = verifItem.rank;
@@ -145,19 +151,71 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
               out.add.rank = verifItem.rank;
             }
             break;
+          case verifItem.colors == null:
+            items = verifItem.colors;
+            name = verifItem.name;
+            answers = data[name].processed;
+            note = 0;
+            colors = require("utils/colors");
+            fct = function(it, index) {
+              var answer, good;
+              good = it.rank;
+              answer = answers[index];
+              if (answer === good) {
+                return {
+                  text: it.text,
+                  type: "success",
+                  color: colors.html(good),
+                  note: 1
+                };
+              } else {
+                return {
+                  text: it.text,
+                  type: "error",
+                  color: colors.html(answer),
+                  secondColor: colors.html(good),
+                  note: 0
+                };
+              }
+            };
+            correcList = (function() {
+              var i, len, results;
+              results = [];
+              for (index = i = 0, len = items.length; i < len; index = ++i) {
+                it = items[index];
+                results.push(fct(it, index));
+              }
+              return results;
+            })();
+            note = _.reduce(correcList, function(memo, it) {
+              return memo + it.note;
+            }, 0) / items.length;
+            out = {
+              note: note,
+              add: {
+                type: "color-list",
+                list: correcList
+              }
+            };
+            if (verifItem.rank != null) {
+              out.add.rank = verifItem.rank;
+            }
+            break;
           default:
-            out = mM.verification.isSame(data[verifItem.name].processed, verifItem.good, verifItem.parameters);
+            ver = mM.verification.isSame(data[verifItem.name].processed, verifItem.good, verifItem.parameters);
             tag = (ref1 = verifItem.tag) != null ? ref1 : verifItem.name;
             list = [
               {
                 type: "normal",
                 text: "<b>" + tag + "</b> &nbsp; :</b>&emsp; Vous avez répondu &nbsp; $" + data[verifItem.name].processed.tex + "$"
-              }
+              }, ver.goodMessage
             ];
-            list.push(out.goodMessage);
-            out.add = {
-              type: "ul",
-              list: list.concat(out.errors)
+            out = {
+              note: out.note,
+              add: {
+                type: "ul",
+                list: list.concat(ver.errors)
+              }
             };
             if (verifItem.rank != null) {
               out.add.rank = verifItem.rank;
@@ -188,6 +246,7 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
     },
     validation: function(data) {
       var fct_iteratee;
+      data = data != null ? data : {};
       fct_iteratee = function(val, key) {
         var error, errors, it, liste, p, processed, result, userValue, v, verifs;
         if ((userValue = data[key]) != null) {
@@ -199,10 +258,10 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
               } else {
                 liste = userValue.split(";");
                 verifs = (function() {
-                  var j, len, results;
+                  var i, len, results;
                   results = [];
-                  for (j = 0, len = liste.length; j < len; j++) {
-                    it = liste[j];
+                  for (i = 0, len = liste.length; i < len; i++) {
+                    it = liste[i];
                     results.push(mM.verification.numberValidation(it));
                   }
                   return results;
@@ -255,6 +314,42 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
                 user: userValue,
                 error: error
               };
+            case !(result = /color:([0-9]+)/.exec(val)):
+              processed = (function() {
+                var i, len, ref, results;
+                ref = userValue.split(";");
+                results = [];
+                for (i = 0, len = ref.length; i < len; i++) {
+                  it = ref[i];
+                  results.push(Number(it));
+                }
+                return results;
+              })();
+              error = ((function() {
+                var i, len, results;
+                results = [];
+                for (i = 0, len = processed.length; i < len; i++) {
+                  it = processed[i];
+                  if (isNaN(it) || it < 0 || it >= result) {
+                    results.push(it);
+                  }
+                }
+                return results;
+              })()).length > 0;
+              if (error) {
+                return {
+                  processed: false,
+                  user: userValue,
+                  error: "Vous devez attribuer toutes les couleurs"
+                };
+              } else {
+                return {
+                  processed: processed,
+                  user: userValue,
+                  error: false
+                };
+              }
+              break;
             case typeof val !== "function":
               return val(userValue);
             default:
@@ -290,7 +385,7 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
   });
   Functions_helpers = {
     defaultAnswerProcess: function(answers_data) {
-      var j, len, n, name, out;
+      var i, len, n, name, out;
       name = this.get("name");
       if ((name != null)) {
         out = {};
@@ -304,8 +399,8 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
             };
           }
         } else if (_.isArray(name)) {
-          for (j = 0, len = name.length; j < len; j++) {
-            n = name[j];
+          for (i = 0, len = name.length; i < len; i++) {
+            n = name[i];
             if (answers_data[n] != null) {
               out[n] = answers_data[n];
             } else {
@@ -322,77 +417,6 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
       } else {
         return null;
       }
-    },
-    color_choiceAnswerProcessing: function(data) {
-      var i, j, nVal, name, out, ref, userValue, values;
-      data = data != null ? data : {};
-      name = this.get("name");
-      nVal = this.get("list").length;
-      out = {};
-      values = [];
-      for (i = j = 0, ref = nVal - 1; 0 <= ref ? j <= ref : j >= ref; i = 0 <= ref ? ++j : --j) {
-        userValue = Number(data[name + i]);
-        if (userValue === -1) {
-          out[name] = {
-            error: "Vous devez attribuer toutes les couleurs."
-          };
-          return out;
-        } else {
-          values[i] = userValue;
-        }
-      }
-      out[name] = values.join(";");
-      return out;
-    },
-    color_choiceVerification: function(answers_data) {
-      var answers, colors, correcList, fct, it, list, name, note;
-      name = this.get("name");
-      answers = answers_data[name].split(";");
-      list = this.get("list");
-      note = 0;
-      colors = require("utils/colors");
-      fct = function(it) {
-        var answer, rank;
-        rank = it.rank;
-        answer = Number(answers[rank]);
-        if (answer === rank) {
-          return {
-            text: it.text,
-            type: "success",
-            color: colors.html(rank),
-            note: 1
-          };
-        } else {
-          return {
-            text: it.text,
-            type: "error",
-            color: colors.html(answer),
-            secondColor: colors.html(rank),
-            note: 0
-          };
-        }
-      };
-      correcList = (function() {
-        var j, len, results;
-        results = [];
-        for (j = 0, len = list.length; j < len; j++) {
-          it = list[j];
-          results.push(fct(it));
-        }
-        return results;
-      })();
-      note = _.reduce(correcList, function(memo, it) {
-        return memo + it.note;
-      }, 0) / list.length;
-      return {
-        toTrash: this,
-        note: note,
-        add: {
-          type: "color-list",
-          rank: this.get("rank"),
-          list: correcList
-        }
-      };
     }
   };
   API = {

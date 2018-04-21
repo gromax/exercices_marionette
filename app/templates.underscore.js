@@ -1315,16 +1315,20 @@ var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
 __p += '<div class="list-group">\n';
- _.each(list,function(item){ ;
-__p += '\n\t<a href="#" class="list-group-item list-group-item-action"><i class="fa fa-square fa-2x"></i> &nbsp; ' +
+ _.each(list,function(item,index){ ;
+__p += '\n\t<a href="#" class="list-group-item list-group-item-action" index=' +
+__e( index ) +
+' ><i class="fa fa-square fa-2x"></i> &nbsp; ' +
 ((__t = ( item.text )) == null ? '' : __t) +
-'<input type="hidden" name="' +
+'</a>\n';
+ });
+var stringDefault = _.map(list, function(item){ return -1 }).join(';');
+;
+__p += '\n<input type="hidden" name="' +
 __e( name ) +
-'' +
-__e( item.rank ) +
-'" value=-1></a>\n';
- }) ;
-__p += '\n</div>\n';
+'" value="' +
+__e( stringDefault ) +
+'">\n</div>\n';
 
 }
 return __p

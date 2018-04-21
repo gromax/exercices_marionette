@@ -51,20 +51,23 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 					when typeof verifItem is "function"
 						out = verifItem(data)
 					when verifItem.type is "all"
-						out = mM.verification.all(data[verifItem.name].processed, verifItem.good, verifItem.parameters)
+						ver = mM.verification.all(data[verifItem.name].processed, verifItem.good, verifItem.parameters)
 						if data[verifItem.name].processed.length is 0
 							stringAnswer = "\\varnothing"
 						else
 							stringAnswer = _.pluck(data[verifItem.name].processed, "tex").join("$ &nbsp; ; &nbsp; $")
 						list = [{ type:"normal", text:"Vous avez répondu &nbsp; $#{stringAnswer}$" }]
-						if out.goodMessage then list.push out.goodMessage
-						out.add = {
-							type:"ul"
-							list: list.concat(out.errors)
+						if ver.goodMessage then list.push ver.goodMessage
+						out = {
+							note: ver.note
+							add: {
+								type:"ul"
+								list: list.concat(ver.errors)
+							}
 						}
 						if verifItem.rank? then out.add.rank = verifItem.rank
 					when verifItem.type is "some"
-						out = mM.verification.some(data[verifItem.name].processed, verifItem.good, verifItem.parameters)
+						ver = mM.verification.some(data[verifItem.name].processed, verifItem.good, verifItem.parameters)
 						if data[verifItem.name].processed.length is 0
 							stringAnswer = "\\varnothing"
 						else
@@ -72,10 +75,13 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 						list = [
 							{ type:"normal", text:"Vous avez répondu &nbsp; $#{stringAnswer}$" }
 						]
-						if out.goodMessage then list.push out.goodMessage
-						out.add = {
-							type:"ul"
-							list: list.concat(out.errors)
+						if ver.goodMessage then list.push ver.goodMessage
+						out = {
+							note: ver.note
+							add: {
+								type:"ul"
+								list: list.concat(ver.errors)
+							}
 						}
 						if verifItem.rank? then out.add.rank = verifItem.rank
 					when verifItem.radio?
@@ -106,16 +112,48 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 								text:"La bonne réponse était &nbsp; #{verifItem.radio[g]}."
 							}
 						if verifItem.rank? then out.add.rank = verifItem.rank
+					when verifItem.colors?
+						items = verifItem.colors
+						name = verifItem.name
+						answers = data[name].processed
+						note = 0
+						colors = require("utils/colors")
+						fct = (it, index)->
+							good = it.rank
+							answer = answers[index]
+							if answer is good
+								# C'est la bonne réponse
+								return { text:it.text, type:"success", color:colors.html(good), note:1 }
+							else
+								# mauvaise réponse
+								return { text:it.text, type:"error", color:colors.html(answer), secondColor:colors.html(good), note:0 }
+						correcList = ( fct(it,index) for it,index in items )
+						note = _.reduce(
+							correcList,
+							(memo,it)-> return memo+it.note,
+							0
+						)/items.length
+						out = {
+							note:note
+							add: {
+								type: "color-list"
+								list: correcList
+							}
+						}
+						if verifItem.rank? then out.add.rank = verifItem.rank
 					else
-						out = mM.verification.isSame(data[verifItem.name].processed, verifItem.good, verifItem.parameters)
+						ver = mM.verification.isSame(data[verifItem.name].processed, verifItem.good, verifItem.parameters)
 						tag = verifItem.tag ? verifItem.name
 						list = [
 							{ type:"normal", text:"<b>#{tag}</b> &nbsp; :</b>&emsp; Vous avez répondu &nbsp; $#{data[verifItem.name].processed.tex}$" }
+							ver.goodMessage
 						]
-						list.push out.goodMessage
-						out.add = {
-							type:"ul"
-							list: list.concat(out.errors)
+						out = {
+							note: out.note
+							add: {
+								type:"ul"
+								list: list.concat(ver.errors)
+							}
 						}
 						if verifItem.rank? then out.add.rank = verifItem.rank
 				out
@@ -132,6 +170,7 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 		checkIfNeedValidation: () -> @get("items").where({type:"validation"}).length > 0
 
 		validation:(data) ->
+			data = data ? {}
 			fct_iteratee = (val, key) ->
 				if (userValue = data[key])?
 					switch
@@ -182,6 +221,21 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 								user: userValue
 								error:error
 							}
+						when result = /color:([0-9]+)/.exec(val)
+							processed = (Number(it) for it in userValue.split(";"))
+							error = (it for it in processed when isNaN(it) or it<0 or it>=result).length>0
+							if error
+								{
+									processed: false
+									user:userValue
+									error: "Vous devez attribuer toutes les couleurs"
+								}
+							else
+								{
+									processed: processed
+									user: userValue
+									error: false
+								}
 						when typeof val is "function"
 							val(userValue)
 						else
@@ -236,56 +290,7 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 				null
 
 
-		color_choiceAnswerProcessing: (data) ->
-			data = data ? {}
-			name = @get("name")
-			nVal = @get("list").length
-			out = {}
-			values = []
-			for i in [0..nVal-1]
-				userValue = Number(data[name+i])
-				if userValue is -1
-					out[name] = {
-						error : "Vous devez attribuer toutes les couleurs."
-					}
-					return out
-				else
-					values[i] = userValue
-			out[name] = values.join(";")
-			out
 
-
-
-		color_choiceVerification: (answers_data)->
-			name = @get("name")
-			answers = answers_data[name].split(";")
-			list = @get("list")
-			note = 0
-			colors = require("utils/colors")
-			fct = (it)->
-				rank = it.rank
-				answer = Number(answers[rank])
-				if answer is rank
-					# C'est la bonne réponse
-					return { text:it.text, type:"success", color:colors.html(rank), note:1 }
-				else
-					# mauvaise réponse
-					return { text:it.text, type:"error", color:colors.html(answer), secondColor:colors.html(rank), note:0 }
-			correcList = ( fct(it) for it in list )
-			note = _.reduce(
-				correcList,
-				(memo,it)-> return memo+it.note,
-				0
-			)/list.length
-			{
-				toTrash:@
-				note:note
-				add: {
-					type: "color-list"
-					rank: @get("rank")
-					list: correcList
-				}
-			}
 
 
 	API =

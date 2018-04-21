@@ -32,7 +32,6 @@ define ["utils/math","utils/help"], (mM, help) ->
 					items: [
 						{
 							type: "text"
-							rank: 1
 							ps: [
 								"On cherche les valeurs de &nbsp; $x$ &nbsp; et &nbsp; $y$ &nbsp; telles que &nbsp; $x+y=#{S.tex()}$ &nbsp; et &nbsp; $x\\cdot y =#{P.tex()}$."
 								"On sait que &nbsp; $x$ &nbsp; $y$ &nbsp; sont alors les solutions d'une équation du second degré."
@@ -41,36 +40,47 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type: "input"
-							rank: 2
-							waited: "number"
-							tag:"(E)"
-							answerPreprocessing:(userValue)->
-								pattern =/([^=]+)=\s*0/
-								result = pattern.exec(userValue)
-								if result
-									{ processed:result[1], error:false }
-								else
-									{ processed:userValue, error:"L'équation doit être de la forme ... = 0" }
-							name:"poly"
-							description:"Équation à résoudre"
-							good:poly.toNumberObject()
-							goodTex: "#{polyTex}=0"
-							developp:true
-							formes:"FRACTION"
+							format: [
+								{ text: "Équation :", cols:3, class:"text-right" }
+								{ latex: true, cols:7, name:"poly"}
+								{ text: "$= 0$", cols:2 }
+							]
 						}
 						{
 							type: "validation"
-							rank: 3
-							clavier: []
+							clavier: ["pow", "sqrt"]
 						}
 					]
+					validations:{
+						poly:"number"
+					}
+					verifications:[
+						(data) ->
+							params = {
+								goodTex: "#{polyTex}=0"
+								developp:true
+								formes:"FRACTION"
+							}
+							ver = mM.verification.isSame(data[verifItem.name].processed, poly.toNumberObject(), params)
+							list = [
+								{ type:"normal", text:"<b>Équation</b> &nbsp; :</b>&emsp; Vous avez répondu &nbsp; $#{data.poly.processed.tex} = 0$" }
+								ver.goodMessage
+							]
+							{
+								note: ver.note
+								add: {
+									type:"ul"
+									list: list.concat(ver.errors)
+								}
+							}
+					]
+
 				}
 				{
 					bareme:60
 					items: [
 						{
 							type: "text"
-							rank: 1
 							ps: [
 								"Donnez les solutions de &nbsp; $=#{polyTex} = 0$."
 								"Séparez les solutions par ; s'il y en a plusieurs."
@@ -79,22 +89,29 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type: "input"
-							rank: 2
-							waited: "liste:number"
-							tag:"$\\mathcal{S}$"
-							name:"solutions"
-							description:"Solutions"
-							good: racines
+							format: [
+								{ text:"$\\mathcal{S} = $", cols:2, class:"text-right" }
+								{ name:"solutions", cols:10, latex:true }
+							]
 						}
 						{
 							type: "validation"
-							rank: 3
 							clavier: ["empty", "sqrt", "aide"]
 						}
 						{
 							type: "aide"
-							rank: 4
 							list: help.trinome.racines
+						}
+					]
+					validations: {
+						solutions: "liste"
+					}
+					verifications:[
+						{
+							type:"all"
+							good: racines
+							name: "solutions"
+							tag: "$\\mathcal{S}$"
 						}
 					]
 				}

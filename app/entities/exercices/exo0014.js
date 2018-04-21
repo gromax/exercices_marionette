@@ -40,7 +40,7 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
         });
         pts.push([A, B, color]);
       }
-      return [items, pts];
+      return [_.shuffle(items), pts];
     },
     getBriques: function(inputs, options) {
       var initGraph, items, max, pts, ref;
@@ -65,11 +65,9 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["On vous donne 5 courbes et 5 fonctions affines.", "Vous devez dire à quelle fonction correspond chaque courbe.", "Cliquez sur les rectangles pour choisir la couleur de la courbe correspondant à chaque fonction, puis validez"]
             }, {
               type: "jsxgraph",
-              rank: 2,
               divId: "jsx" + (Math.random()),
               params: {
                 axis: true,
@@ -80,17 +78,23 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
               renderingFunctions: [initGraph]
             }, {
               type: "color-choice",
-              rank: 3,
               name: "it",
-              list: _.shuffle(items)
+              list: items
             }, {
               type: "validation",
-              rank: 4,
               clavier: ["aide"]
             }, {
               type: "aide",
-              rank: 5,
               list: help.fonction.affine.courbe
+            }
+          ],
+          validations: {
+            it: "color:5"
+          },
+          verifications: [
+            {
+              name: "it",
+              colors: items
             }
           ]
         }

@@ -19,7 +19,7 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 				items.push { rank:i, text:"$"+ mM.droite.par2pts(A,B).affineTex("","x",true)+"$" }
 				pts.push [A, B, color]
 
-			[items, pts]
+			[_.shuffle(items), pts]
 
 		getBriques: (inputs, options) ->
 			max = @max
@@ -34,7 +34,6 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 					items: [
 						{
 							type: "text"
-							rank: 1
 							ps: [
 								"On vous donne 5 courbes et 5 fonctions affines."
 								"Vous devez dire à quelle fonction correspond chaque courbe."
@@ -43,7 +42,6 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 						}
 						{
 							type:"jsxgraph"
-							rank: 2
 							divId: "jsx#{Math.random()}"
 							params: {
 								axis:true
@@ -58,19 +56,25 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 						}
 						{
 							type:"color-choice"
-							rank: 3
 							name:"it"
-							list: _.shuffle(items)
+							list: items
 						}
 						{
 							type: "validation"
-							rank: 4
 							clavier: ["aide"]
 						}
 						{
 							type: "aide"
-							rank: 5
 							list: help.fonction.affine.courbe
+						}
+					]
+					validations:{
+						it:"color:5"
+					}
+					verifications:[
+						{
+							name:"it"
+							colors:items
 						}
 					]
 				}

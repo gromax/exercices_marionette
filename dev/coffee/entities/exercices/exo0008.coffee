@@ -4,8 +4,6 @@ define ["utils/math"], (mM) ->
 	# description:"La courbe d'une fonction étant donnée, il faut déterminer un antécédent et une image."
 	# keyWords:["Fonctions","Antécédent","Image","Seconde"]
 
-	# debug : tex à faire
-
 	return {
 		max: 10
 		init: (inputs) ->

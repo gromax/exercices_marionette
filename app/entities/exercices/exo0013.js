@@ -1,5 +1,6 @@
 define(["utils/math"], function(mM) {
   return {
+    max: 10,
     init: function(inputs) {
       var A, B;
       A = mM.alea.vector({
@@ -20,7 +21,7 @@ define(["utils/math"], function(mM) {
     },
     getBriques: function(inputs, options) {
       var A, B, dmax, droite, initGraph, max, ref;
-      max = 10;
+      max = this.max;
       dmax = .3;
       ref = this.init(inputs), A = ref[0], B = ref[1], droite = ref[2];
       initGraph = function(graph) {
@@ -53,11 +54,9 @@ define(["utils/math"], function(mM) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["On considère la droite &nbsp; $\\mathcal{D}$ &nbsp; d'équation réduite &nbsp; $" + (droite.reduiteTex()) + "$.", "Placez les points &nbsp; $A$ &nbsp; et &nbsp; $B$ &nbsp; de sorte que &nbsp; $(AB) = \\mathcal{D}$."]
             }, {
               type: "jsxgraph",
-              rank: 2,
               divId: "jsx" + (Math.random()),
               name: ["xA", "yA", "xB", "yB"],
               params: {
@@ -82,89 +81,158 @@ define(["utils/math"], function(mM) {
                 }
                 return out;
               },
-              verification: function(answers_data) {
-                var dA, dAB, dB, messages, note, u;
-                note = 0;
-                u = {
-                  A: {
-                    x: Number(answers_data["xA"]),
-                    y: Number(answers_data["yA"])
-                  },
-                  B: {
-                    x: Number(answers_data["xB"]),
-                    y: Number(answers_data["yB"])
-                  }
-                };
-                dA = droite.float_distance(u.A.x, u.A.y);
-                dB = droite.float_distance(u.B.x, u.B.y);
-                dAB = Math.sqrt((u.A.x - u.B.x) ^ 2 + (u.A.y - u.B.y) ^ 2);
-                messages = [];
-                if (dA < dmax) {
-                  messages.push({
-                    type: "success",
-                    text: "Le point A est bien placé."
-                  });
-                  note += .5;
-                } else {
-                  messages.push({
-                    type: "error",
-                    text: "Le point A est mal placé."
+              postVerification: function(graph, data) {
+                var i, len, pt, ref1;
+                ref1 = graph.points;
+                for (i = 0, len = ref1.length; i < len; i++) {
+                  pt = ref1[i];
+                  pt.setAttribute({
+                    fixed: true,
+                    x: data["x" + pt.name].processed,
+                    y: data["y" + pt.name].processed
                   });
                 }
-                if ((dB < dmax) && (dAB < dmax) && (dA < dmax)) {
-                  messages.push({
-                    type: "success",
-                    text: "Le point B est bien placé, mais est trop proche de A."
-                  });
-                  note += .25;
-                } else if (dB < dmax) {
-                  messages.push({
-                    type: "success",
-                    text: "Le point B est bien placé."
-                  });
-                  note += .5;
-                } else {
-                  messages.push({
-                    type: "error",
-                    text: "Le point B est mal placé."
-                  });
-                }
-                return {
-                  note: note,
-                  add: [
-                    {
-                      type: "ul",
-                      rank: 3,
-                      list: messages
-                    }
-                  ],
-                  post: function(graph) {
-                    var i, len, pt, ref1;
-                    ref1 = graph.points;
-                    for (i = 0, len = ref1.length; i < len; i++) {
-                      pt = ref1[i];
-                      pt.setAttribute({
-                        fixed: true,
-                        x: u[pt.name].x,
-                        y: u[pt.name].y
-                      });
-                    }
-                    return graph.create('line', droite.float_2_points(max), {
-                      strokeColor: 'blue',
-                      strokeWidth: 2,
-                      fixed: true
-                    });
-                  }
-                };
+                return graph.create('line', droite.float_2_points(max), {
+                  strokeColor: 'blue',
+                  strokeWidth: 2,
+                  fixed: true
+                });
               }
             }, {
-              type: "validation",
-              rank: 3,
-              clavier: []
+              type: "validation"
+            }
+          ],
+          validations: {
+            xA: "real",
+            yA: "real",
+            xB: "real",
+            yB: "real"
+          },
+          verifications: [
+            function(data) {
+              var dA, dAB, dB, messages, note, u;
+              note = 0;
+              u = {
+                A: {
+                  x: data.xA.processed,
+                  y: data.yA.processed
+                },
+                B: {
+                  x: data.xB.processed,
+                  y: data.yB.processed
+                }
+              };
+              dA = droite.float_distance(u.A.x, u.A.y);
+              dB = droite.float_distance(u.B.x, u.B.y);
+              dAB = Math.sqrt((u.A.x - u.B.x) ^ 2 + (u.A.y - u.B.y) ^ 2);
+              messages = [];
+              if (dA < dmax) {
+                messages.push({
+                  type: "success",
+                  text: "Le point A est bien placé."
+                });
+                note += .5;
+              } else {
+                messages.push({
+                  type: "error",
+                  text: "Le point A est mal placé."
+                });
+              }
+              if ((dB < dmax) && (dAB < dmax) && (dA < dmax)) {
+                messages.push({
+                  type: "success",
+                  text: "Le point B est bien placé, mais est trop proche de A."
+                });
+                note += .25;
+              } else if (dB < dmax) {
+                messages.push({
+                  type: "success",
+                  text: "Le point B est bien placé."
+                });
+                note += .5;
+              } else {
+                messages.push({
+                  type: "error",
+                  text: "Le point B est mal placé."
+                });
+              }
+              return {
+                note: note,
+                add: [
+                  {
+                    type: "ul",
+                    list: messages
+                  }
+                ]
+              };
             }
           ]
         }
       ];
+    },
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, max, that;
+      max = this.max;
+      that = this;
+      fct_item = function(inputs, index) {
+        var A, B, droite, ref;
+        ref = that.init(inputs), A = ref[0], B = ref[1], droite = ref[2];
+        return "$" + (droite.reduiteTex()) + "$";
+      };
+      return {
+        children: [
+          {
+            type: "text",
+            children: ["Tracez dans un repère les droites dont les équations sont :"]
+          }, {
+            type: "enumerate",
+            refresh: true,
+            enumi: "1",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, max, that;
+      that = this;
+      max = this.max;
+      fct_item = function(inputs, index) {
+        var A, B, droite, ref;
+        ref = that.init(inputs), A = ref[0], B = ref[1], droite = ref[2];
+        return "$" + (droite.reduiteTex()) + "$";
+      };
+      if (inputs_list.length === 1) {
+        return {
+          children: [
+            "Tracez dans le repère la droite d'équation : " + (fct_item(inputs_list[0], 0)), {
+              type: "tikz",
+              left: -max,
+              bottom: -max,
+              right: max,
+              top: max,
+              axes: [1, 1]
+            }
+          ]
+        };
+      } else {
+        return {
+          children: [
+            "Tracez dans le repère les droites d'équations :", {
+              type: "enumerate",
+              enumi: "A",
+              children: _.map(inputs_list, fct_item)
+            }, {
+              type: "tikz",
+              left: -max,
+              bottom: -max,
+              right: max,
+              top: max,
+              axes: [1, 1]
+            }
+          ]
+        };
+      }
     }
   };
 });
