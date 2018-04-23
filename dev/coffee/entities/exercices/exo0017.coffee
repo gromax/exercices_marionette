@@ -4,21 +4,22 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 	# description:"Cinq paraboles sont données. On propose cinq fonctions du second degré dont on ne connait que le discriminant et le coefficient du terme de second degré. À chaque fonction, il faut attribuer la parabole qui la représente."
 	# keyWords:["Analyse","Fonction","Courbe","Affine","Seconde"]
 
-	# debug: tex à faire
-
-
 	return {
 		max: 6
 		init: (inputs) ->
 			max = @max
-			items = []
-			polys = []
 
 			# Les paraboles sont définies par sommet et point
 			liste = [{ap:false, d:-1}, {ap:false, d:0}, {ap:false, d:1}, {ap:true, d:-1}, {ap:true, d:0}, {ap:true, d:1}]
-			liste = _.shuffle(liste)
 
-			for i in [0..4]
+			if (inputs.ranks?)
+				ranks =(Number it for it in inputs.ranks.split(";"))
+			else
+				ranks = _.shuffle([0..5])
+				inputs.ranks = ranks.join(";")
+
+
+			iteratee = (i)->
 				if (typeof inputs["xA"+i] isnt "undefined")
 					xA = Number inputs["xA"+i]
 					yA = Number inputs["yA"+i]
@@ -54,19 +55,20 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 				a = mM.exec [ yB, yA, "-", xB, xA, "-", 2, "^", "/" ], { simplify:true }
 				poly = mM.exec [ a, "x", xA, "-", 2, "^", "*", yA, "+" ], { simplify:true }
 				delta = mM.exec [ -4, a, yA, "*", "*"], { simplify:true }
-				color = colors.html(i)
-
-				items.push { rank:i, text:"$\\Delta = #{delta.tex()}$ &nbsp; et &nbsp; $a = #{a.tex()}$"}
-				polys.push [poly, color]
-			[ items, polys ]
+				[
+					"$\\Delta = #{delta.tex()}$ &nbsp; et &nbsp; $a = #{a.tex()}$"
+					poly
+					ranks[i]
+				]
+			_.unzip((iteratee(i) for i in [0..5] when ranks[i]<5))
 		getBriques: (inputs, options) ->
 			max = @max
-			[items, polys] = @init(inputs)
+			[items, polys, ranks] = @init(inputs)
 
 			initGraph = (graph) ->
-				for p in polys
-					fct = (x) -> mM.float(p[0], {x:x})
-					graph.create('functiongraph', [ fct, -max, max ], { strokeWidth:3, strokeColor: p[1], fixed:true })
+				for p, i in polys
+					fct = (x) -> mM.float(p, {x:x})
+					graph.create('functiongraph', [ fct, -max, max ], { strokeWidth:3, strokeColor: colors.html(ranks[i]), fixed:true })
 
 			[
 				{
@@ -74,7 +76,6 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 					items:[
 						{
 							type: "text"
-							rank:1
 							ps: [
 								"On vous donne 5 cas de fonctions du second degré, donc de la forme &nbsp;& $f:x\\mapsto ax^2+bx+c$."
 								"On ne connaît que les valeurs de &nbsp; $\\Delta$ &nbsp; et de &nbsp; $a$."
@@ -83,7 +84,6 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 						}
 						{
 							type:"jsxgraph"
-							rank: 2
 							divId: "jsx#{Math.random()}"
 							params: {
 								axis:true
@@ -97,35 +97,120 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 						}
 						{
 							type:"color-choice"
-							rank: 3
 							name:"it"
-							list: _.shuffle(items)
+							list: items
 						}
 						{
 							type: "validation"
-							rank: 4
 							clavier: ["aide"]
 						}
 						{
 							type: "aide"
-							rank: 5
 							list: help.trinome.a_et_concavite_parabole.concat(help.trinome.delta_et_parabole)
+						}
+					]
+					validations:{
+						it:"color:5"
+					}
+					verifications:[
+						{
+							name:"it"
+							colors: ranks
+							items: items
 						}
 					]
 				}
 			]
 
-		tex: (data) ->
-			if not isArray(data) then data = [ data ]
-			out = []
-			for itemData,i in data
-				courbes = ( { color:item.color.tex, expr:item.obj.toClone().simplify().toString().replace(/,/g,'.').replace(/x/g,'(\\x)') } for item in itemData.polys )
-				arrayShuffle itemData.items
-				questions = Handlebars.templates["tex_enumerate"] { items:( item.title for item in itemData.items ) }
-				graphique = Handlebars.templates["tex_courbes"] { index:i+1, max:@max, courbes:courbes, scale:.5 }
-				out.push {
-					title:@title
-					contents:[graphique, questions]
+		getExamBriques: (inputs_list,options) ->
+			max = @max
+			that = @
+			graphs = {}
+			fct_item = (inputs, index) ->
+				[items, polys, ranks] = that.init(inputs)
+				id = "jsx"+Math.random()
+
+				graphs[id] = {
+					params: {
+						axis:true
+						grid:true
+						boundingbox:[-max,max,max,-max]
+						keepaspectratio: true
+					}
+					init: (graph) ->
+						for p, i in polys
+							fct = (x) -> mM.float(p, {x:x})
+							graph.create('functiongraph', [ fct, -max, max ], { strokeWidth:3, strokeColor: colors.html(ranks[i]), fixed:true })
 				}
-			out
+				return {
+					children: [
+						{
+							type: "text"
+							children:[
+								"On vous donne 5 cas de fonctions du second degré, donc de la forme &nbsp; $f:x\\mapsto ax^2+bx+c$."
+								"On ne connaît que les valeurs de &nbsp; $\\Delta$ &nbsp; et de &nbsp; $a$."
+							]
+						}
+						{
+							type:"graphique"
+							divId: id
+						}
+						{
+							type: "enumerate"
+							enumi:"a"
+							children: items
+						}
+					]
+				}
+
+			return {
+				children: [
+					{
+						type: "subtitles"
+						enumi: "A"
+						refresh:true
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+				graphs: graphs
+			}
+
+		getTex: (inputs_list, options) ->
+			that = @
+			max = @max
+			fct_item = (inputs, index) ->
+				[items, polys, ranks] = that.init(inputs,options)
+				return [
+					"On vous donne 5 cas de fonctions du second degré, donc de la forme $f:x\\mapsto ax^2+bx+c$."
+					"On ne connaît que les valeurs de $\\Delta$ et de $a$."
+					{
+						type:"tikz"
+						left: -max
+						bottom: -max
+						right: max
+						top: max
+						index: index+1
+						axes:[1,1]
+						courbes: ( { color:colors.tex(ranks[i]), expression:String(p).replace /x/g, '(/x)' } for p,i in polys)
+					}
+					{
+						type: "enumerate",
+						enumi: "a)"
+						children: items
+					}
+				]
+
+
+			if inputs_list.length is 1
+				return fct_item(inputs_list[0],0)
+			else
+				return {
+					children: [
+						{
+							type: "enumerate"
+							enumi: "A"
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
 	}

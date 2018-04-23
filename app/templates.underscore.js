@@ -701,7 +701,12 @@ __e( itCourbe.expression ) +
  });
 ;
 __p += '\\end{scope}';
- } ;
+ }
+if (el.misc) {;
+__p += '\n' +
+((__t = ( el.misc )) == null ? '' : __t);
+
+} ;
 __p += '\n\\end{tikzpicture}\n\\end{center}\n';
 					break;
 				case "enumerate": ;
@@ -1319,7 +1324,7 @@ __p += '<div class="list-group">\n';
 __p += '\n\t<a href="#" class="list-group-item list-group-item-action" index=' +
 __e( index ) +
 ' ><i class="fa fa-square fa-2x"></i> &nbsp; ' +
-((__t = ( item.text )) == null ? '' : __t) +
+((__t = ( item )) == null ? '' : __t) +
 '</a>\n';
  });
 var stringDefault = _.map(list, function(item){ return -1 }).join(';');

@@ -40,7 +40,6 @@ define ["utils/math","utils/help"], (mM, help) ->
 					items: [
 						{
 							type: "text"
-							rank: 1
 							ps: [
 								"Dans le repère ci-contre, on vous demande de tracer la courbe de la fonction &nbsp; $f$ &nbsp;:"
 								"$f:x\\mapsto\\left|#{droite.reduiteObject().tex()}\\right|$."
@@ -49,9 +48,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type:"jsxgraph"
-							rank: 2
 							divId: "jsx#{Math.random()}"
-							name: ["xA", "yA", "xB", "yB", "xC", "yC"]
 							params: {
 								axis:true
 								grid:true
@@ -66,59 +63,66 @@ define ["utils/math","utils/help"], (mM, help) ->
 								out["x"+p.name] = p.X() for p in graph.points
 								out["y"+p.name] = p.Y() for p in graph.points
 								out
-							verification: (answers_data) ->
-								dmax = .2
-								messages = []
-								note = 0
-								u = {}
-								for p in ["A", "B", "C"]
-									x = Number answers_data["x"+p]
-									y = Number answers_data["y"+p]
-									u[p] = { x:x, y:y }
-									if droite.float_y(x)>0 then d = droite.float_distance(x,y)
-									else d = droite.float_distance(x,-y)
-									if d<dmax
-										messages.push {
-											type: "success"
-											text: "Le point #{p} est bien placé."
-										}
-										note += .34
-									else
-										messages.push {
-											type: "error"
-											text: "Le point #{p} est mal placé."
-										}
-								if note>1 then note=1
+							postVerification:(view, data)->
+								graph = view.graph
+								for pt in graph.points
+									pt.setAttribute {fixed:true, x:u[pt.name].x, y:u[pt.name].y}
+								y1 = Math.abs(droite.float_y(-max))
+								y2 = Math.abs(droite.float_y(max))
+								x0 = droite.float_x(0)
+								graph.create('line',[[-max,y1],[x0,0]], {strokeColor:'blue',strokeWidth:2,fixed:true, straightLast:false})
+								graph.create('line',[[x0,0],[max,y2]], {strokeColor:'blue',strokeWidth:2,fixed:true, straightFirst:false})
+								graph.create('line',mM.float([[A.x,A.y],[B.x,B.y]]), {strokeColor:'blue',strokeWidth:1,fixed:true,dash:2})
 
-								{
-									note: note
-									add:[
-										{
-											type:"ul"
-											rank: 3
-											list: messages
-										}
-									]
-									post: (graph)->
-										for pt in graph.points
-											pt.setAttribute {fixed:true, x:u[pt.name].x, y:u[pt.name].y}
-										y1 = Math.abs(droite.float_y(-max))
-										y2 = Math.abs(droite.float_y(max))
-										x0 = droite.float_x(0)
-										graph.create('line',[[-max,y1],[x0,0]], {strokeColor:'blue',strokeWidth:2,fixed:true, straightLast:false})
-										graph.create('line',[[x0,0],[max,y2]], {strokeColor:'blue',strokeWidth:2,fixed:true, straightFirst:false})
-										graph.create('line',mM.float([[A.x,A.y],[B.x,B.y]]), {strokeColor:'blue',strokeWidth:1,fixed:true,dash:2})
-								}
 						}
 						{
 							type: "validation"
-							rank: 3
-							clavier: []
 						}
 					]
+					validations:{
+						xA:"real"
+						yA:"real"
+						xB:"real"
+						yB:"real"
+						xC:"real"
+						yC:"real"
+					}
+					verifications:[
+						(data) ->
+							dmax = .2
+							messages = []
+							note = 0
+							u = {}
+							for p in ["A", "B", "C"]
+								x = Number answers_data["x"+p]
+								y = Number answers_data["y"+p]
+								u[p] = { x:x, y:y }
+								if droite.float_y(x)>0 then d = droite.float_distance(x,y)
+								else d = droite.float_distance(x,-y)
+								if d<dmax
+									messages.push {
+										type: "success"
+										text: "Le point #{p} est bien placé."
+									}
+									note += .34
+								else
+									messages.push {
+										type: "error"
+										text: "Le point #{p} est mal placé."
+									}
+							if note>1 then note=1
+
+							{
+								note: note
+								add:{
+									type:"ul"
+									list: messages
+								}
+							}
+					]
+
 				}
 			]
-
 
 		getExamBriques: (inputs_list,options) ->
 			that = @

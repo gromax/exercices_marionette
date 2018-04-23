@@ -84,7 +84,10 @@ if (el.courbes) {%>
 <% _.each(el.courbes, function(itCourbe){
 %>	\draw[line width=2pt, color=<% if (itCourbe.color) { %><%- itCourbe.color %><% } else { %>black<% } %> ] plot[smooth, domain=<%- itCourbe.left | el.left %>:<%- itCourbe.right | el.right %>](\x,{<%- itCourbe.expression %>});
 <% });
-%>\end{scope}<% } %>
+%>\end{scope}<% }
+if (el.misc) {%>
+<%= el.misc %><%
+} %>
 \end{tikzpicture}
 \end{center}
 <%					break;

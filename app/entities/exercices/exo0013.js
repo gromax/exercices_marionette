@@ -19,7 +19,7 @@ define(["utils/math"], function(mM) {
       }).save(inputs);
       return [A, B, mM.droite.par2pts(A, B)];
     },
-    getBriques: function(inputs, options) {
+    getBriques: function(inputs, options, fixedSettings) {
       var A, B, dmax, droite, initGraph, max, ref;
       max = this.max;
       dmax = .3;
@@ -54,7 +54,7 @@ define(["utils/math"], function(mM) {
           items: [
             {
               type: "text",
-              ps: ["On considère la droite &nbsp; $\\mathcal{D}$ &nbsp; d'équation réduite &nbsp; $" + (droite.reduiteTex()) + "$.", "Placez les points &nbsp; $A$ &nbsp; et &nbsp; $B$ &nbsp; de sorte que &nbsp; $(AB) = \\mathcal{D}$."]
+              ps: fixedSettings.affine ? ["On considère la fonction affine &nbsp; $" + (droite.affineTex("f", "x")) + "$.", "Placez les points &nbsp; $A$ &nbsp; et &nbsp; $B$ &nbsp; de sorte que &nbsp; $(AB)$ &nbsp; soit la courbe représentative de la fonction."] : ["On considère la droite &nbsp; $\\mathcal{D}$ &nbsp; d'équation réduite &nbsp; $" + (droite.reduiteTex()) + "$.", "Placez les points &nbsp; $A$ &nbsp; et &nbsp; $B$ &nbsp; de sorte que &nbsp; $(AB) = \\mathcal{D}$."]
             }, {
               type: "jsxgraph",
               divId: "jsx" + (Math.random()),
@@ -81,9 +81,9 @@ define(["utils/math"], function(mM) {
                 }
                 return out;
               },
-              postVerification: function(graph, data) {
+              postVerification: function(view, data) {
                 var i, len, pt, ref1;
-                ref1 = graph.points;
+                ref1 = view.graph.points;
                 for (i = 0, len = ref1.length; i < len; i++) {
                   pt = ref1[i];
                   pt.setAttribute({
@@ -92,7 +92,7 @@ define(["utils/math"], function(mM) {
                     y: data["y" + pt.name].processed
                   });
                 }
-                return graph.create('line', droite.float_2_points(max), {
+                return view.graph.create('line', droite.float_2_points(max), {
                   strokeColor: 'blue',
                   strokeWidth: 2,
                   fixed: true
@@ -170,20 +170,24 @@ define(["utils/math"], function(mM) {
         }
       ];
     },
-    getExamBriques: function(inputs_list, options) {
+    getExamBriques: function(inputs_list, options, fixedSettings) {
       var fct_item, max, that;
       max = this.max;
       that = this;
       fct_item = function(inputs, index) {
         var A, B, droite, ref;
         ref = that.init(inputs), A = ref[0], B = ref[1], droite = ref[2];
-        return "$" + (droite.reduiteTex()) + "$";
+        if (fixedSettings.affine) {
+          return "$" + (droite.affineTex("f_{" + index + "}", "x")) + "$";
+        } else {
+          return "$" + (droite.reduiteTex()) + "$";
+        }
       };
       return {
         children: [
           {
             type: "text",
-            children: ["Tracez dans un repère les droites dont les équations sont :"]
+            children: [fixedSettings.affine ? "Tracez dans un repère les courbes des fonctions affines suivantes :" : "Tracez dans un repère les droites dont les équations sont :"]
           }, {
             type: "enumerate",
             refresh: true,
@@ -205,7 +209,7 @@ define(["utils/math"], function(mM) {
       if (inputs_list.length === 1) {
         return {
           children: [
-            "Tracez dans le repère la droite d'équation : " + (fct_item(inputs_list[0], 0)), {
+            fixedSettings.affine ? "Tracez dans le repère la courbe de la fonction définie par : " + (fct_item(inputs_list[0], 0)) : "Tracez dans le repère la droite d'équation : " + (fct_item(inputs_list[0], 0)), {
               type: "tikz",
               left: -max,
               bottom: -max,
@@ -218,7 +222,7 @@ define(["utils/math"], function(mM) {
       } else {
         return {
           children: [
-            "Tracez dans le repère les droites d'équations :", {
+            fixedSettings.affine ? "Tracez dans le repère les courbes des fonctions affines suivantes :" : "Tracez dans le repère les droites d'équations :", {
               type: "enumerate",
               enumi: "A",
               children: _.map(inputs_list, fct_item)

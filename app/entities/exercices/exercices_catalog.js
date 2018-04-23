@@ -101,25 +101,39 @@ define([], function() {
         options: {}
       }, {
         id: 12,
-        filename: "exo0012",
+        filename: "exo0013",
         title: "Tracer la courbe d'une fonction affine",
         description: "L'expression d'une fonction affine étant donnée, il faut tracer sa courbe dans un repère.",
         keyWords: ["Analyse", "Fonction", "Courbe", "Affine", "Seconde"],
-        options: {}
+        options: {},
+        fixedSettings: {
+          affine: true
+        }
       }, {
         id: 13,
         filename: "exo0013",
         title: "Tracer une droite dont on connaît l'équation réduite",
         description: "On donne l'équation réduite d'une droite. Il faut tracer cette droite.",
         keyWords: ["Géométrie", "Droite", "Équation", "Seconde"],
-        options: {}
+        options: {},
+        fixedSettings: {
+          affine: false
+        }
       }, {
         id: 14,
-        filename: "exo0014",
+        filename: "exo0015",
         title: "Associer droites et fonctions affines",
         description: "On donne cinq fonctions affines et cinq droites. Il faut associer chaque fonction affine avec la droite qui la représente.",
         keyWords: ["Analyse", "Fonction", "Courbe", "Affine", "Seconde"],
-        options: {}
+        options: {
+          n: {
+            tag: "Nombre de courbes",
+            options: ["3", "4", "5", "6", "7"]
+          }
+        },
+        fixedSettings: {
+          affine: true
+        }
       }, {
         id: 15,
         filename: "exo0015",
@@ -131,6 +145,9 @@ define([], function() {
             tag: "Nombre de courbes",
             options: ["3", "4", "5", "6", "7"]
           }
+        },
+        fixedSettings: {
+          affine: false
         }
       }, {
         id: 16,

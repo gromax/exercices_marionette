@@ -113,21 +113,21 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 							}
 						if verifItem.rank? then out.add.rank = verifItem.rank
 					when verifItem.colors?
-						items = verifItem.colors
+						items = verifItem.items
+						ranks = verifItem.colors
 						name = verifItem.name
 						answers = data[name].processed
 						note = 0
 						colors = require("utils/colors")
 						fct = (it, index)->
-							good = it.rank
 							answer = answers[index]
-							if answer is good
+							if answer is ranks[index]
 								# C'est la bonne réponse
-								return { text:it.text, type:"success", color:colors.html(good), note:1 }
+								return { text:it, type:"success", color:colors.html(answer), note:1 }
 							else
 								# mauvaise réponse
-								return { text:it.text, type:"error", color:colors.html(answer), secondColor:colors.html(good), note:0 }
-						correcList = ( fct(it,index) for it,index in items )
+								return { text:it, type:"error", color:colors.html(answer), secondColor:colors.html(ranks[index]), note:0 }
+						correcList = ( fct(it,index) for it, index in items )
 						note = _.reduce(
 							correcList,
 							(memo,it)-> return memo+it.note,
@@ -318,7 +318,7 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 				}
 
 				successCB = (exoController) ->
-					briques = exoController.getBriques(inputs, options)
+					briques = exoController.getBriques(inputs, options, itemData.fixedSettings)
 					# initBriques modifie inputs qui est un objet, donc pas de pb
 					collection = new BriquesCollection briques, { parse:true }
 					collection.parent = exo
@@ -342,9 +342,7 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 					when "exo0009" then require ["entities/exercices/exo0009"], successCB, failedCB
 					when "exo0010" then require ["entities/exercices/exo0010"], successCB, failedCB
 					when "exo0011" then require ["entities/exercices/exo0011"], successCB, failedCB
-					when "exo0012" then require ["entities/exercices/exo0012"], successCB, failedCB
 					when "exo0013" then require ["entities/exercices/exo0013"], successCB, failedCB
-					when "exo0014" then require ["entities/exercices/exo0014"], successCB, failedCB
 					when "exo0015" then require ["entities/exercices/exo0015"], successCB, failedCB
 					when "exo0016" then require ["entities/exercices/exo0016"], successCB, failedCB
 					when "exo0017" then require ["entities/exercices/exo0017"], successCB, failedCB

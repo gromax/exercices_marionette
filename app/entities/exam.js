@@ -49,7 +49,7 @@ define(["backbone.radio","entities/exercices/exercices_catalog", "jst"], functio
 
 					var successCB = function(exoController) {
 						if (typeof exoController.getExamBriques == "function" ) {
-							_.extend(item, exoController.getExamBriques(inputs,options))
+							_.extend(item, exoController.getExamBriques(inputs,options, exoData.fixedSettings))
 						} else {
 							item.message = "Cet exercice n'a pas de fonction Exam [#"+idE+"]";
 						}
@@ -118,7 +118,7 @@ define(["backbone.radio","entities/exercices/exercices_catalog", "jst"], functio
 					var briques = { children:[], message:false, title:exoInCatalog.title };
 
 					if (typeof exoController.getExamBriques == "function" ) {
-						_.extend(briques, exoController.getExamBriques(exo_data.inputs,options))
+						_.extend(briques, exoController.getExamBriques(exo_data.inputs,options, exoInCatalog.fixedSettings))
 					} else {
 						briques.message = "Cet exercice n'a pas de fonction Exam";
 					}
@@ -176,7 +176,7 @@ define(["backbone.radio","entities/exercices/exercices_catalog", "jst"], functio
 
 					var successCB = function(exoController) {
 						if (typeof exoController.getTex == "function" ) {
-							_.extend(item, exoController.getTex(inputs,options))
+							_.extend(item, exoController.getTex(inputs,options, exoData.fixedSettings))
 						} else {
 							item.message = "\\textcolor{red}{Cet exercice n'a pas de fonction Tex ["+idE+"]}";
 						}

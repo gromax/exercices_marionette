@@ -15,7 +15,7 @@ define ["utils/math"], (mM) ->
 				mM.droite.par2pts A,B
 			]
 
-		getBriques: (inputs, options) ->
+		getBriques: (inputs, options, fixedSettings) ->
 			max = @max
 			dmax = .3
 			[A, B, droite] = @init(inputs)
@@ -32,10 +32,16 @@ define ["utils/math"], (mM) ->
 					items:[
 						{
 							type:"text"
-							ps:[
-								"On considère la droite &nbsp; $\\mathcal{D}$ &nbsp; d'équation réduite &nbsp; $#{droite.reduiteTex()}$."
-								"Placez les points &nbsp; $A$ &nbsp; et &nbsp; $B$ &nbsp; de sorte que &nbsp; $(AB) = \\mathcal{D}$."
-							]
+							ps: if fixedSettings.affine
+								[
+									"On considère la fonction affine &nbsp; $#{droite.affineTex("f","x")}$."
+									"Placez les points &nbsp; $A$ &nbsp; et &nbsp; $B$ &nbsp; de sorte que &nbsp; $(AB)$ &nbsp; soit la courbe représentative de la fonction."
+								]
+							else
+								[
+									"On considère la droite &nbsp; $\\mathcal{D}$ &nbsp; d'équation réduite &nbsp; $#{droite.reduiteTex()}$."
+									"Placez les points &nbsp; $A$ &nbsp; et &nbsp; $B$ &nbsp; de sorte que &nbsp; $(AB) = \\mathcal{D}$."
+								]
 						}
 						{
 							type:"jsxgraph"
@@ -55,10 +61,10 @@ define ["utils/math"], (mM) ->
 								out["x"+p.name] = p.X() for p in graph.points
 								out["y"+p.name] = p.Y() for p in graph.points
 								out
-							postVerification: (graph, data)->
-								for pt in graph.points
+							postVerification: (view, data)->
+								for pt in view.graph.points
 									pt.setAttribute {fixed:true, x:data["x"+pt.name].processed, y: data["y"+pt.name].processed}
-								graph.create('line',droite.float_2_points(max), {strokeColor:'blue',strokeWidth:2,fixed:true})
+								view.graph.create('line',droite.float_2_points(max), {strokeColor:'blue',strokeWidth:2,fixed:true})
 						}
 						{
 							type:"validation"
@@ -122,20 +128,26 @@ define ["utils/math"], (mM) ->
 				}
 			]
 
-		getExamBriques: (inputs_list,options) ->
+		getExamBriques: (inputs_list,options, fixedSettings) ->
 			max = @max
 			that = @
 
 			fct_item = (inputs, index) ->
 				[A, B, droite] = that.init(inputs)
-				return "$#{droite.reduiteTex()}$"
+				if fixedSettings.affine
+					return "$#{droite.affineTex("f_{"+index+"}","x")}$"
+				else
+					return "$#{droite.reduiteTex()}$"
 
 			return {
 				children: [
 					{
 						type: "text",
 						children: [
-							"Tracez dans un repère les droites dont les équations sont :"
+							if fixedSettings.affine
+								"Tracez dans un repère les courbes des fonctions affines suivantes :"
+							else
+								"Tracez dans un repère les droites dont les équations sont :"
 						]
 					}
 					{
@@ -157,7 +169,10 @@ define ["utils/math"], (mM) ->
 			if inputs_list.length is 1
 				return {
 					children: [
-						"Tracez dans le repère la droite d'équation : #{fct_item(inputs_list[0],0)}"
+						if fixedSettings.affine
+							"Tracez dans le repère la courbe de la fonction définie par : #{fct_item(inputs_list[0],0)}"
+						else
+							"Tracez dans le repère la droite d'équation : #{fct_item(inputs_list[0],0)}"
 						{
 							type:"tikz"
 							left: -max
@@ -171,7 +186,10 @@ define ["utils/math"], (mM) ->
 			else
 				return {
 					children: [
-						"Tracez dans le repère les droites d'équations :"
+						if fixedSettings.affine
+							"Tracez dans le repère les courbes des fonctions affines suivantes :"
+						else
+							"Tracez dans le repère les droites d'équations :"
 						{
 							type: "enumerate"
 							enumi: "A"

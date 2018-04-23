@@ -59,7 +59,7 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
     verification: function(data) {
       var add_models, note, notes, sum, verif, verif_processing;
       verif_processing = function(verifItem) {
-        var answers, colors, correcList, fct, g, index, it, items, list, name, note, out, p, ref, ref1, stringAnswer, tag, ver;
+        var answers, colors, correcList, fct, g, index, it, items, list, name, note, out, p, ranks, ref, ref1, stringAnswer, tag, ver;
         switch (false) {
           case typeof verifItem !== "function":
             out = verifItem(data);
@@ -152,28 +152,28 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
             }
             break;
           case verifItem.colors == null:
-            items = verifItem.colors;
+            items = verifItem.items;
+            ranks = verifItem.colors;
             name = verifItem.name;
             answers = data[name].processed;
             note = 0;
             colors = require("utils/colors");
             fct = function(it, index) {
-              var answer, good;
-              good = it.rank;
+              var answer;
               answer = answers[index];
-              if (answer === good) {
+              if (answer === ranks[index]) {
                 return {
-                  text: it.text,
+                  text: it,
                   type: "success",
-                  color: colors.html(good),
+                  color: colors.html(answer),
                   note: 1
                 };
               } else {
                 return {
-                  text: it.text,
+                  text: it,
                   type: "error",
                   color: colors.html(answer),
-                  secondColor: colors.html(good),
+                  secondColor: colors.html(ranks[index]),
                   note: 0
                 };
               }
@@ -446,7 +446,7 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
         });
         successCB = function(exoController) {
           var briques, collection;
-          briques = exoController.getBriques(inputs, options);
+          briques = exoController.getBriques(inputs, options, itemData.fixedSettings);
           collection = new BriquesCollection(briques, {
             parse: true
           });
@@ -500,9 +500,6 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
             break;
           case "exo0013":
             require(["entities/exercices/exo0013"], successCB, failedCB);
-            break;
-          case "exo0014":
-            require(["entities/exercices/exo0014"], successCB, failedCB);
             break;
           case "exo0015":
             require(["entities/exercices/exo0015"], successCB, failedCB);

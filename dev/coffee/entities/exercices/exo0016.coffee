@@ -4,37 +4,43 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 	# description:"Cinq paraboles et cinq fonctions du second degré sont données. À chaque fonction, il faut attribuer la parabole qui la représente."
 	# keyWords:["Analyse","Fonction","Courbe","Second degré","Seconde"]
 
-	# debug: tex à faire
-
-
 	return {
 		max: 6
 		init: (inputs) ->
 			max = @max
-			items = []
-			polys = []
 			# Les paraboles sont définies par sommet et point
-			for i in [0..4]
+
+			if (inputs.ranks?)
+				ranks =(Number it for it in inputs.ranks.split(";"))
+			else
+				ranks = _.shuffle([0..4])
+				inputs.ranks = ranks.join(";")
+
+			iteratee=(i)->
 				A = mM.alea.vector({ name:"A#{i}", def:inputs, values:[{min:-max, max:max}] }).save(inputs)
 				B = mM.alea.vector({ name:"B#{i}", def:inputs, values:[{min:-max, max:max}], forbidden:[ {axe:"x", coords:A}, {axe:"y", coords:A} ] }).save(inputs)
 				# f est un flag 1 : forme canonique, 0 sinon
+
 				if inputs["f"+i]? then f = Number inputs["f"+i]
 				else
 					if cano = mM.alea.dice(1,3) then f = 1 else f = 0
 					inputs["f"+i] = String f
 				poly = mM.exec [ B.y, A.y, "-", B.x, A.x, "-", 2, "^", "/", "x", A.x, "-", 2, "^", "*", A.y, "+" ], { simplify:true, developp:f isnt 1 }
-				color = colors.html(i)
-				items.push { rank:i, text:"$x \\mapsto #{poly.tex()}$" }
-				polys.push [poly, color]
+				[
+					text:"$x \\mapsto #{poly.tex()}$"
+					poly
+					ranks[i]
+				]
+			_.unzip((iteratee(i) for i in [0..4]))
 
 		getBriques: (inputs, options) ->
 			max = @max
-			[items, polys] = @init(inputs)
+			[items, polys, ranks] = @init(inputs)
 
 			initGraph = (graph) ->
-				for p in polys
-					fct = (x) -> mM.float(p[0], {x:x})
-					graph.create('functiongraph', [ fct, -max, max ], { strokeWidth:3, strokeColor: p[1], fixed:true })
+				for p, i in polys
+					fct = (x) -> mM.float(p, {x:x})
+					graph.create('functiongraph', [ fct, -max, max ], { strokeWidth:3, strokeColor: colors.html(ranks[i]), fixed:true })
 
 			[
 				{
@@ -42,7 +48,6 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 					items: [
 						{
 							type: "text"
-							rank: 1
 							ps: [
 								"On vous donne 5 courbes et 5 fonctions du second degré."
 								"Vous devez dire à quelle fonction correspond chaque courbe."
@@ -51,7 +56,6 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 						}
 						{
 							type:"jsxgraph"
-							rank: 2
 							divId: "jsx#{Math.random()}"
 							params: {
 								axis:true
@@ -65,36 +69,121 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 						}
 						{
 							type:"color-choice"
-							rank: 3
 							name:"it"
-							list: _.shuffle(items)
+							list: items
 						}
 						{
 							type: "validation"
-							rank: 4
 							clavier: ["aide"]
 						}
 						{
 							type: "aide"
-							rank: 5
 							list: help.trinome.a_et_concavite_parabole.concat(help.trinome.canonique_et_parabole,help.trinome.c_et_parabole)
+						}
+					]
+					validations:{
+						it:"color:5"
+					}
+					verifications:[
+						{
+							name:"it"
+							items: items
+							colors: ranks
 						}
 					]
 				}
 			]
 
-		tex: (data) ->
-			# en chantier
-			if not isArray(data) then data = [ data ]
-			out = []
-			for itemData,i in data
-				courbes = ( { color:item.color.tex, expr:item.obj.toClone().simplify().toString().replace(/,/g,'.').replace(/x/g,'(\\x)') } for item in itemData.polys )
-				arrayShuffle itemData.items
-				questions = Handlebars.templates["tex_enumerate"] { items:( item.title for item in itemData.items ) }
-				graphique = Handlebars.templates["tex_courbes"] { index:i+1, max:@max, courbes:courbes, scale:.6*@max/6 }
-				out.push {
-					title:@title
-					contents:[graphique, questions]
+		getExamBriques: (inputs_list,options) ->
+			max = @max
+			that = @
+			graphs = {}
+			fct_item = (inputs, index) ->
+				[items, polys, ranks] = that.init(inputs)
+				id = "jsx"+Math.random()
+
+				graphs[id] = {
+					params: {
+						axis:true
+						grid:true
+						boundingbox:[-max,max,max,-max]
+						keepaspectratio: true
+					}
+					init: (graph) ->
+						for p, i in polys
+							fct = (x) -> mM.float(p, {x:x})
+							graph.create('functiongraph', [ fct, -max, max ], { strokeWidth:3, strokeColor: colors.html(ranks[i]), fixed:true })
 				}
-			out
+				return {
+					children: [
+						{
+							type: "text"
+							children:[
+								"On vous donne 5 courbes et 5 fonctions du second degré."
+								"Vous devez dire à quelle fonction correspond chaque courbe."
+							]
+						}
+						{
+							type:"graphique"
+							divId: id
+						}
+						{
+							type: "enumerate"
+							enumi:"a"
+							children: items
+						}
+					]
+				}
+
+			return {
+				children: [
+					{
+						type: "subtitles"
+						enumi: "A"
+						refresh:true
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+				graphs: graphs
+			}
+
+		getTex: (inputs_list, options) ->
+			that = @
+			max = @max
+			fct_item = (inputs, index) ->
+				[items, polys, ranks] = that.init(inputs,options)
+
+				return [
+					"On vous donne 5 courbes et 5 fonctions du second degré."
+					"Vous devez dire à quelle fonction correspond chaque courbe."
+					{
+						type:"tikz"
+						left: -max
+						bottom: -max
+						right: max
+						top: max
+						index: index+1
+						axes:[1,1]
+						courbes: ( { color:colors.tex(ranks[i]), expression:String(p).replace /x/g, '(/x)' } for p,i in polys)
+					}
+					{
+						type: "enumerate",
+						enumi: "a)"
+						children: items
+					}
+				]
+
+
+			if inputs_list.length is 1
+				return fct_item(inputs_list[0],0)
+			else
+				return {
+					children: [
+						{
+							type: "enumerate"
+							enumi: "A"
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
 	}

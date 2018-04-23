@@ -116,24 +116,28 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["On considère l'inéquation &nbsp; $" + ineqTex + "$.", "Commencez par donner le discriminant de &nbsp; $" + polyTex + "$."]
             }, {
               type: "input",
-              rank: 2,
-              waited: "number",
               name: "delta",
               tag: "$\\Delta$",
-              description: "Discriminant",
-              good: poly.discriminant()
+              description: "Discriminant"
             }, {
               type: "validation",
-              rank: 7,
               clavier: ["aide"]
             }, {
               type: "aide",
-              rank: 8,
               list: help.trinome.discriminant
+            }
+          ],
+          validations: {
+            delta: "number"
+          },
+          verifications: [
+            {
+              name: "delta",
+              tag: "$\\Delta$",
+              good: poly.discriminant()
             }
           ]
         }, {
@@ -142,24 +146,37 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["Donnez les racines de &nbsp; $" + polyTex + "$.", "Séparez les par ; s'il y en a plusieurs.", "Répondez &nbsp; $\\varnothing$ &nbsp; s'il n'y a pas de racines."]
             }, {
               type: "input",
-              rank: 2,
-              waited: "liste:number",
-              name: "racines",
-              tag: "Racines",
-              description: "Racines",
-              good: racines
+              format: [
+                {
+                  text: "Racines :",
+                  cols: 3,
+                  "class": "text-right"
+                }, {
+                  latex: true,
+                  cols: 7,
+                  name: "racines"
+                }
+              ]
             }, {
               type: "validation",
-              rank: 7,
-              clavier: ["empty", "aide"]
+              clavier: ["empty", "pow", "sqrt", "aide"]
             }, {
               type: "aide",
-              rank: 8,
               list: help.trinome.racines
+            }
+          ],
+          validations: {
+            racines: "liste"
+          },
+          verifications: [
+            {
+              name: "racines",
+              type: "all",
+              tag: "Racines",
+              good: racines
             }
           ]
         }, {
