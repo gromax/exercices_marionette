@@ -17,10 +17,11 @@ define ["utils/math","utils/help"], (mM, help) ->
 			[
 				poly.derivate().tex()
 				mM.exec [poly.toNumberObject(), "symbol:c", "+"]
+				poly.toNumberObject()
 			]
 
 		getBriques: (inputs,options) ->
-			[deriveeTex, poly] = @init(inputs)
+			[deriveeTex, poly, polySansC] = @init(inputs)
 
 			[
 				{
@@ -28,7 +29,6 @@ define ["utils/math","utils/help"], (mM, help) ->
 					items: [
 						{
 							type:"text"
-							rank:1
 							ps:[
 								"Soit &nbsp; $f(x) = #{deriveeTex}$"
 								"Donnez l'expression <b>générale</b> de &nbsp; $F$, fonction primitive de &nbsp; $f$ &nbsp; sur &nbsp; $\\mathbb{R}$."
@@ -37,28 +37,39 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type: "input"
-							rank:2
-							waited: "number"
-							tag: "$F(x)$"
-							name:"p"
-							description:"Expression de F"
-							good:poly
-							developp: true
-							alias: { c:["c", "C", "K"]}
-							custom_verification_message: (answer_data)->
-								p = answer_data["p"].processedAnswer.object
-								if mM.exec([poly, "symbol:c", "-", p, "-"], {simplify:true}).isNul()
-									return {
-										type:"warning"
-										text:"Vous avez oublié la constante $c$."
-										note:.5
-									}
-								else return null
+							format: [
+								{ text: "$F(x) =$", cols:2, class:"text-right" }
+								{ latex: true, cols:10, name:"p"}
+							]
 						}
 						{
 							type: "validation"
-							rank: 6
-							clavier: []
+						}
+					]
+					validations: {
+						p:{
+							alias: { c:["c", "C", "K"]}
+							developp: true
+						}
+					}
+					verifications:[
+						ver = mM.verification.isSame(data.p.processed, poly, { developp: true })
+						tag = verifItem.tag ? verifItem.name
+						if ver.note is 0
+							ver2 = mM.verification.isSame(data.p.processed, polySansC, { developp: true })
+							if ver2.note >0
+								ver = ver2
+								ver.errors.push["Vous avez oublié la constante &nbsp; $c$"]
+								ver.note = ver.note * .5
+						out = {
+							note: ver.note
+							add: {
+								type:"ul"
+								list: [
+									{ type:"normal", text:"<b>#{tag}</b> &nbsp; :</b>&emsp; Vous avez répondu &nbsp; $#{data[verifItem.name].processed.tex}$" }
+									ver.goodMessage
+								].conctat(ver.errors)
+							}
 						}
 					]
 				}
@@ -67,7 +78,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 		getExamBriques: (inputs_list,options) ->
 			that = @
 			fct_item = (inputs, index) ->
-				[deriveeTex, poly] = that.init(inputs,options)
+				[deriveeTex, poly, polySansC] = that.init(inputs,options)
 				return "$#{ deriveeTex }$"
 
 			return {
@@ -90,17 +101,24 @@ define ["utils/math","utils/help"], (mM, help) ->
 		getTex: (inputs_list, options) ->
 			that = @
 			fct_item = (inputs, index) ->
-				[deriveeTex, poly] = that.init(inputs,options)
-				return "$#{ deriveeTex }$"
+				[deriveeTex, poly, polySansC] = that.init(inputs,options)
+				return "$f(x) = #{ deriveeTex }$"
 
-			return {
-				children: [
-					"Pour chacune des fonctions suivantes, donnez l'expression générale d'une primitive."
-					{
-						type: "enumerate",
-						children: _.map(inputs_list, fct_item)
-					}
-				]
-			}
+			if inputs_list.length >0
+				return {
+					children: [
+						"Pour chacune des fonctions suivantes, donnez l'expression générale d'une primitive."
+						{
+							type: "enumerate",
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
+			else
+				return {
+					children: [
+						"Donnez l'expression générale d'une primitive de #{fct_item(inputs_list[0],0)}."
+					]
+				}
 
 	}

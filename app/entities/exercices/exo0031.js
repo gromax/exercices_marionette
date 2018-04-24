@@ -42,32 +42,47 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["On donne &nbsp; $\\alpha = " + (r.tex()) + "$ &nbsp; en radians.", "Il faut donner la mesure de &nbsp; $\\alpha$ &nbsp; en degrés.", "On donne &nbsp; $\\beta = " + (d.tex()) + "$ &nbsp; en degrés.", "Il faut donner la mesure de &nbsp; $\\beta$ &nbsp; en radians."]
             }, {
               type: "input",
-              rank: 2,
-              waited: "number",
               name: "rtd",
               tag: "$\\alpha$",
-              description: "Mesure en degrés",
-              good: gRtD
+              description: "Mesure en degrés"
             }, {
               type: "input",
-              rank: 3,
-              waited: "number",
-              name: "dtr",
-              tag: "$\\beta$",
-              description: "Mesure en radians",
-              good: gDtR
+              format: [
+                {
+                  text: "$\\beta =$",
+                  cols: 2,
+                  "class": "text-right"
+                }, {
+                  latex: true,
+                  cols: 10,
+                  name: "dtr"
+                }
+              ]
             }, {
               type: "validation",
-              rank: 4,
               clavier: ["aide", "pi"]
             }, {
               type: "aide",
               rank: 5,
               list: help.trigo.rad_deg.concat(help.trigo.pi)
+            }
+          ],
+          validations: {
+            rtd: "number",
+            dtr: "number"
+          },
+          verifications: [
+            {
+              name: "rtd",
+              tag: "$\\alpha$",
+              good: gRtD
+            }, {
+              name: "dtr",
+              tag: "$\\beta$",
+              good: gDtR
             }
           ]
         }

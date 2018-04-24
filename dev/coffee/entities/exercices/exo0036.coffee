@@ -30,14 +30,12 @@ define ["utils/math"], (mM) ->
 					items: [
 						{
 							type: "text"
-							rank: 1
 							ps: [
 								"Vous devez placer sur le cercle le point &nbsp; $M$ &nbsp; correspondant à la mesure &nbsp; $#{ang.tex()}$ &nbsp; en radians."
 							]
 						}
 						{
 							type:"jsxgraph"
-							rank: 2
 							divId: "jsx#{Math.random()}"
 							name: ["a"]
 							params: {
@@ -53,54 +51,50 @@ define ["utils/math"], (mM) ->
 								dU = Math.round (Math.acos graph.M.X())*180/Math.PI
 								if graph.M.Y()<0 then dU *= -1
 								{ a:dU }
-							verification: (answers_data) ->
-								user = Number answers_data.a
-								radU = user*Math.PI/180
+							postVerification: (view, data)->
+								graph = view.graph
+								radU = data.a.processed*Math.PI/180
 								radG = deg*Math.PI/180
-								ecart = Math.abs(deg-user)
-								ecart-=360 while ecart>=355
-								ok = (Math.abs(ecart)<=5)
-								if ok
-									{
-										note: 100
-										add:[
-											{
-												type:"ul"
-												rank: 3
-												list:[{
-													type:"success"
-													text: "$M$ &nbsp; est bien placé."
-												}]
-											}
-										]
-										post: (graph) ->
-											graph.removeObject graph.M
-											graph.create("point", [Math.cos(radU), Math.sin(radU)],{name:"M", fixed:true, size:4, color:'green'})
-									}
-								else
-									{
-										note: 0
-										add:[
-											{
-												type:"ul"
-												rank: 3
-												list:[{
-													type:"error"
-													text: "$M$ &nbsp; est mal placé."
-												}]
-											}
-										]
-										post: (graph) ->
-											graph.removeObject graph.M
-											graph.create("point", [Math.cos(radU), Math.sin(radU)],{name:"", fixed:true, size:4, color:'red'})
-											graph.create("point", [Math.cos(radG), Math.sin(radG)],{name:"M", fixed:true, size:4, color:'green'})
-									}
+								graph.removeObject graph.M
+								graph.create("point", [Math.cos(radU), Math.sin(radU)],{name:"", fixed:true, size:4, color:'red'})
+								graph.create("point", [Math.cos(radG), Math.sin(radG)],{name:"M", fixed:true, size:4, color:'green'})
 						}
 						{
 							type: "validation"
-							rank: 3
-							clavier: []
 						}
+					]
+					validations:{
+						a: "real"
+					}
+					verifications:[
+						(data) ->
+							user = Number answers_data.a
+							radU = user*Math.PI/180
+							ecart = Math.abs(deg-user)
+							ecart-=360 while ecart>180
+							if Math.abs(ecart)<=5
+								{
+									note: 1
+									add:{
+										type:"ul"
+										list:[{
+											type:"success"
+											text: "$M$ &nbsp; est bien placé."
+										}]
+									}
+								}
+							else
+								{
+									note: 0
+									add: {
+										type:"ul"
+										list:[{
+											type:"error"
+											text: "$M$ &nbsp; est mal placé."
+										}]
+									}
+								}
+
 					]
 				}
 			]
@@ -135,10 +129,20 @@ define ["utils/math"], (mM) ->
 				return "$#{ang.tex()}$"
 			return {
 				children: [
-					"Placez sur un cercle trigonométrique les points dont les mesures sont données en radians :"
+					"Placez sur le cercle trigonométrique les points dont les mesures sont données en radians :"
 					{
 						type: "enumerate",
 						children: _.map(inputs_list, fct_item)
+					}
+					{
+						type:"tikz"
+						left: -1.2
+						bottom: -1.2
+						right: 1.2
+						top: 1.2
+						axes:[1,1]
+						misc: "\\draw[line width=1pt] (0,0) circle(1);"
+						step:"step=0.1"
 					}
 				]
 			}

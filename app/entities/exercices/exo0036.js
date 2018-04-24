@@ -38,11 +38,9 @@ define(["utils/math"], function(mM) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["Vous devez placer sur le cercle le point &nbsp; $M$ &nbsp; correspondant à la mesure &nbsp; $" + (ang.tex()) + "$ &nbsp; en radians."]
             }, {
               type: "jsxgraph",
-              rank: 2,
               divId: "jsx" + (Math.random()),
               name: ["a"],
               params: {
@@ -62,78 +60,68 @@ define(["utils/math"], function(mM) {
                   a: dU
                 };
               },
-              verification: function(answers_data) {
-                var ecart, ok, radG, radU, user;
-                user = Number(answers_data.a);
-                radU = user * Math.PI / 180;
+              postVerification: function(view, data) {
+                var graph, radG, radU;
+                graph = view.graph;
+                radU = data.a.processed * Math.PI / 180;
                 radG = deg * Math.PI / 180;
-                ecart = Math.abs(deg - user);
-                while (ecart >= 355) {
-                  ecart -= 360;
-                }
-                ok = Math.abs(ecart) <= 5;
-                if (ok) {
-                  return {
-                    note: 100,
-                    add: [
-                      {
-                        type: "ul",
-                        rank: 3,
-                        list: [
-                          {
-                            type: "success",
-                            text: "$M$ &nbsp; est bien placé."
-                          }
-                        ]
-                      }
-                    ],
-                    post: function(graph) {
-                      graph.removeObject(graph.M);
-                      return graph.create("point", [Math.cos(radU), Math.sin(radU)], {
-                        name: "M",
-                        fixed: true,
-                        size: 4,
-                        color: 'green'
-                      });
-                    }
-                  };
-                } else {
-                  return {
-                    note: 0,
-                    add: [
-                      {
-                        type: "ul",
-                        rank: 3,
-                        list: [
-                          {
-                            type: "error",
-                            text: "$M$ &nbsp; est mal placé."
-                          }
-                        ]
-                      }
-                    ],
-                    post: function(graph) {
-                      graph.removeObject(graph.M);
-                      graph.create("point", [Math.cos(radU), Math.sin(radU)], {
-                        name: "",
-                        fixed: true,
-                        size: 4,
-                        color: 'red'
-                      });
-                      return graph.create("point", [Math.cos(radG), Math.sin(radG)], {
-                        name: "M",
-                        fixed: true,
-                        size: 4,
-                        color: 'green'
-                      });
-                    }
-                  };
-                }
+                graph.removeObject(graph.M);
+                graph.create("point", [Math.cos(radU), Math.sin(radU)], {
+                  name: "",
+                  fixed: true,
+                  size: 4,
+                  color: 'red'
+                });
+                return graph.create("point", [Math.cos(radG), Math.sin(radG)], {
+                  name: "M",
+                  fixed: true,
+                  size: 4,
+                  color: 'green'
+                });
               }
             }, {
-              type: "validation",
-              rank: 3,
-              clavier: []
+              type: "validation"
+            }
+          ],
+          validations: {
+            a: "real"
+          },
+          verifications: [
+            function(data) {
+              var ecart, radU, user;
+              user = Number(answers_data.a);
+              radU = user * Math.PI / 180;
+              ecart = Math.abs(deg - user);
+              while (ecart > 180) {
+                ecart -= 360;
+              }
+              if (Math.abs(ecart) <= 5) {
+                return {
+                  note: 1,
+                  add: {
+                    type: "ul",
+                    list: [
+                      {
+                        type: "success",
+                        text: "$M$ &nbsp; est bien placé."
+                      }
+                    ]
+                  }
+                };
+              } else {
+                return {
+                  note: 0,
+                  add: {
+                    type: "ul",
+                    list: [
+                      {
+                        type: "error",
+                        text: "$M$ &nbsp; est mal placé."
+                      }
+                    ]
+                  }
+                };
+              }
             }
           ]
         }
@@ -171,9 +159,18 @@ define(["utils/math"], function(mM) {
       };
       return {
         children: [
-          "Placez sur un cercle trigonométrique les points dont les mesures sont données en radians :", {
+          "Placez sur le cercle trigonométrique les points dont les mesures sont données en radians :", {
             type: "enumerate",
             children: _.map(inputs_list, fct_item)
+          }, {
+            type: "tikz",
+            left: -1.2,
+            bottom: -1.2,
+            right: 1.2,
+            top: 1.2,
+            axes: [1, 1],
+            misc: "\\draw[line width=1pt] (0,0) circle(1);",
+            step: "step=0.1"
           }
         ]
       };

@@ -162,6 +162,14 @@ define ["utils/math","utils/help"], (mM, help) ->
 						type: "enumerate",
 						children: _.map(inputs_list, fct_item)
 					}
+					{
+						type:"tikz"
+						left: -max
+						bottom: -max
+						right: max
+						top: max
+						axes:[1,1]
+					}
 				]
 			}
 	}

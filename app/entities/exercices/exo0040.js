@@ -39,20 +39,32 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["Soit &nbsp; $x=" + (expression.tex()) + "$.", "Donnez &nbsp; $x$ &nbsp; sous forme d'une fraction réduite."]
             }, {
               type: "input",
-              rank: 2,
-              waited: "number",
+              format: [
+                {
+                  text: "$x =$",
+                  cols: 2,
+                  "class": "text-right"
+                }, {
+                  latex: true,
+                  cols: 10,
+                  name: "x"
+                }
+              ]
+            }, {
+              type: "validation"
+            }
+          ],
+          validations: {
+            "x": "number"
+          },
+          verifications: [
+            {
               name: "x",
               tag: "$x$",
-              description: "Fraction réduite",
               good: expression.toClone().simplify()
-            }, {
-              type: "validation",
-              rank: 4,
-              clavier: []
             }
           ]
         }

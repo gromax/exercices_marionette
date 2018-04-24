@@ -38,34 +38,44 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["La variable aléatoire &nbsp; $X$ &nbsp; suit la <b>loi binomiale</b> de paramètres &nbsp; $n = " + n + "$ &nbsp; et &nbsp; $p = " + p + "\\,\\%$.", "<b>Remarque :</b> on note &nbsp; $\\mathcal{B}(" + n + "\\,;" + p + "\\,\\%)$ &nbsp; cette loi.", "Calculez les probabilités suivantes à 0,001 près."]
             }, {
               type: "input",
-              rank: 2,
               tag: "$p(X=" + inp.k + ")$",
               name: "pXegalK",
-              description: "Valeur à 0,001 près",
-              good: pXegalK_good,
-              waited: "number",
-              arrondi: -3
+              description: "Valeur à 0,001 près"
             }, {
               type: "input",
-              rank: 2,
               tag: "$p(X\\leqslant " + inp.k + ")$",
               name: "pXinfK",
-              description: "Valeur à 0,001 près",
-              good: pXinfK_good,
-              waited: "number",
-              arrondi: -3
+              description: "Valeur à 0,001 près"
             }, {
               type: "validation",
-              rank: 3,
               clavier: ["aide"]
             }, {
               type: "aide",
-              rank: 4,
               list: help.proba.binomiale.calculette
+            }
+          ],
+          validations: {
+            pXegalK: "number",
+            pXinfK: "number"
+          },
+          verifications: [
+            {
+              name: "pXegalK",
+              tag: "$p(X=" + inp.k + ")$",
+              good: pXegalK_good,
+              parameters: {
+                arrondi: -3
+              }
+            }, {
+              name: "pXinfK",
+              tag: "$p(X=" + inp.k + ")$",
+              good: pXinfK_good,
+              parameters: {
+                arrondi: -3
+              }
             }
           ]
         }

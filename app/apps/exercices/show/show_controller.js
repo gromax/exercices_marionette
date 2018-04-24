@@ -191,6 +191,7 @@ define([
 
 							var verifs = model.verification(model_validation);
 							// calcul de la note
+
 							note = verifs.note*model.get("bareme")*100/baremeTotal + note;
 
 							answersData = _.extend(answersData, data);

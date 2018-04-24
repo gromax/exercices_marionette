@@ -24,52 +24,65 @@
 					items: [
 						{
 							type:"text"
-							rank: 1
 							ps: [
-								"On considère la suite $(u_n)$ définie par #{expression} pour $n\\geqslant 0$."
+								"On considère la suite $(u_n)$ définie par &nbsp; #{expression} &nbsp; pour $n\\geqslant 0$."
 								"On demande de calculer les termes suivants :"
 							]
 						}
 						{
 							type: "input"
-							rank:2
-							waited: "number"
 							tag: "$u_0$"
 							name:"u0"
 							description:"Terme de rang 0"
-							good:u0
 						}
 						{
 							type: "input"
-							rank: 3
-							waited: "number"
 							tag: "$u_1$"
 							name: "u1"
 							description: "Terme de rang 1"
-							good: u1
 						}
 						{
 							type: "input"
-							rank: 4
-							waited: "number"
 							tag: "$u_2$"
 							name: "u2"
 							description: "Terme de rang 2"
-							good: u2
 						}
 						{
 							type: "input"
-							rank: 5
-							waited: "number"
 							tag: "$u_{10}$"
 							name: "u10"
 							description: "Terme de rang 10"
-							good: u10
 						}
 						{
 							type: "validation"
-							rank: 6
-							clavier: []
+						}
+					]
+					validations:{
+						u0:"number"
+						u1:"number"
+						u2:"number"
+						u10:"number"
+					}
+					verifications:[
+						{
+							name: "u0"
+							good: u0
+							tag: "$u_0$"
+						}
+						{
+							name: "u1"
+							good: u1
+							tag: "$u_1$"
+						}
+						{
+							name: "u2"
+							good: u2
+							tag: "$u_2$"
+						}
+						{
+							name: "u10"
+							good: u10
+							tag: "$u_{10}$"
 						}
 					]
 				}

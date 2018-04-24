@@ -43,7 +43,6 @@ define ["utils/math","utils/help"], (mM, help) ->
 					items: [
 						{
 							type:"text"
-							rank:1
 							ps:[
 								"Calculez l'intégrale : &nbsp; $\\displaystyle \\mathcal{I} = \\int_{#{a.tex()}}^{#{b.tex()}} \\left(#{fct.tex({variable:variable})}\\right)\\:\\text{d}#{variable}$"
 								"Remarque : Ces intégrales peuvent être négatives."
@@ -51,17 +50,24 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type: "input"
-							rank:2
-							waited: "number"
-							tag: "$\\mathcal{I}$"
-							name:"I"
-							description:"Intégrale"
-							good:integrale
+							format: [
+								{ text: "$\\mathcal{I}=$", cols:2, class:"text-right" }
+								{ latex: true, cols:10, name:"I"}
+							]
 						}
 						{
 							type: "validation"
-							rank: 6
-							clavier: []
+							clavier: ["pow", "sqrt"]
+						}
+					]
+					validations:{
+						I:"number"
+					}
+					verifications:[
+						{
+							name:"I"
+							tag: "$\\mathcal{I}$"
+							good: integrale
 						}
 					]
 				}

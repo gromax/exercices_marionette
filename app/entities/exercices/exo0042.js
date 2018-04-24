@@ -46,48 +46,66 @@ define(["utils/math"], function(mM) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["On considère la suite &nbsp; $(u_n)$ &nbsp; définie par &nbsp; $u_0=" + u0 + "$ &nbsp; et &nbsp; $u_{n+1}= " + formule + "$ &nbsp; pour &nbsp; $n\\geqslant 0$.", "On demande de calculer les termes suivants à 0,01 près :"]
             }, {
               type: "input",
-              rank: 2,
-              waited: "number",
               tag: "$u_1$",
               name: "u1",
-              description: "Terme de rang 1",
-              good: u1,
-              arrondi: -2
+              description: "Terme de rang 1"
             }, {
               type: "input",
-              rank: 3,
-              waited: "number",
               tag: "$u_2$",
               name: "u2",
-              description: "Terme de rang 2",
-              good: u2,
-              arrondi: -2
+              description: "Terme de rang 2"
             }, {
               type: "input",
-              rank: 4,
-              waited: "number",
               tag: "$u_3$",
               name: "u3",
-              description: "Terme de rang 3",
-              good: u3,
-              arrondi: -2
+              description: "Terme de rang 3"
             }, {
               type: "input",
-              rank: 5,
-              waited: "number",
               tag: "$u_{10}$",
               name: "u10",
-              description: "Terme de rang 10",
-              good: u10,
-              arrondi: -2
+              description: "Terme de rang 10"
             }, {
-              type: "validation",
-              rank: 6,
-              clavier: []
+              type: "validation"
+            }
+          ],
+          validations: {
+            u1: "number",
+            u2: "number",
+            u3: "number",
+            u10: "number"
+          },
+          verifications: [
+            {
+              name: "u1",
+              good: u1,
+              tag: "$u_1$",
+              parameters: {
+                arrondi: -2
+              }
+            }, {
+              name: "u2",
+              good: u2,
+              tag: "$u_2$",
+              parameters: {
+                arrondi: -2
+              }
+            }, {
+              name: "u3",
+              good: u3,
+              tag: "$u_3$",
+              parameters: {
+                arrondi: -2
+              }
+            }, {
+              name: "u10",
+              good: u10,
+              tag: "$u_{10}$",
+              parameters: {
+                arrondi: -2
+              }
             }
           ]
         }

@@ -5,6 +5,7 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 #	keyWords:["Intégrale","Analyse","Primitive", "TSTL"]
 
 	# debug : tex à faire
+	# debug : pas terminé
 
 	return {
 		max: 6

@@ -1,7 +1,7 @@
 define(["utils/math", "utils/help"], function(mM, help) {
   return {
     init: function(inputs) {
-      var ang, angRad, membreDroite, membreGauche, solutions, type;
+      var ab, ang, angPrinc, angPrincRad, angRad, membreDroite, membreGauche, solutions, type;
       if (inputs.ang != null) {
         ang = Number(inputs.ang);
       } else {
@@ -17,24 +17,31 @@ define(["utils/math", "utils/help"], function(mM, help) {
         inputs.type = type = mM.alea["in"](["cos", "sin"]);
       }
       angRad = mM.trigo.degToRad([ang]);
+      angPrinc = ang;
+      while (ab = Math.abs(angPrinc) > 180) {
+        angPrinc -= angPrinc / ab * 360;
+      }
+      if (angPrinc === -180) {
+        angPrinc = 180;
+      }
+      angPrincRad = mM.trigo.degToRad([angPrinc]);
       if (type === "cos") {
         membreGauche = mM.exec(["x", "cos"]).tex();
         membreDroite = mM.exec([angRad, "cos"]).tex();
         if ((Math.abs(ang) % 180) === 0) {
-          solutions = [mM.exec([angRad, 2, "pi", "*", "modulo"])];
+          solutions = [angPrincRad];
         } else {
-          solutions = [mM.exec([angRad, 2, "pi", "*", "modulo"]), mM.exec([angRad, "*-", 2, "pi", "*", "modulo"])];
+          solutions = [angPrincRad, mM.exec([angPrincRad, "*-"])];
         }
       } else {
         membreGauche = mM.exec(["x", "sin"]).tex();
         membreDroite = mM.exec([angRad, "sin"]).tex();
         if (((Math.abs(ang) + 90) % 180) === 0) {
-          solutions = [mM.exec([angRad, 2, "pi", "*", "modulo"])];
+          solutions = [angPrincRad];
         } else {
           solutions = [
-            mM.exec([angRad, 2, "pi", "*", "modulo"]), mM.exec(["pi", angRad, "-", 2, "#", "pi", "*", "*", "+"], {
-              simplify: true,
-              modulo: true
+            angPrincRad, mM.exec(["pi", angPrincRad, "-"], {
+              simplify: true
             })
           ];
         }
@@ -51,20 +58,34 @@ define(["utils/math", "utils/help"], function(mM, help) {
             {
               type: "text",
               rank: 1,
-              ps: ["Vous devez résoudre l'équation suivante :", "$" + membreGaucheTex + " = " + membreDroiteTex + "$", "S'il y a plusieurs solutions, séparez-les avec ;"]
+              ps: ["Vous devez résoudre l'équation suivante :", "$" + membreGaucheTex + " = " + membreDroiteTex + "$", "Donnez les solutions contenues dans l'intervalle &nbsp; $]-\\pi;\\pi]$", "S'il y a plusieurs solutions, séparez-les avec ;"]
             }, {
               type: "input",
-              rank: 2,
-              waited: "liste:number",
-              name: "solutions",
-              tag: "$\\mathcal{S}$",
-              description: "Solutions",
-              good: solutions,
-              moduloKey: "k"
+              format: [
+                {
+                  text: "$\\mathcal{S} =$",
+                  cols: 2,
+                  "class": "text-right"
+                }, {
+                  latex: true,
+                  cols: 10,
+                  name: "solutions"
+                }
+              ]
             }, {
               type: "validation",
-              rank: 4,
               clavier: ["empty", "pi"]
+            }
+          ],
+          validations: {
+            solutions: "liste"
+          },
+          verifications: [
+            {
+              name: "solutions",
+              type: "all",
+              good: solutions,
+              tag: "$\\mathcal{S}$"
             }
           ]
         }

@@ -1,8 +1,23 @@
 define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) {
   return {
     init: function(inputs) {
-      var c, i, item, items, j, len, o, q1, q2, u, u1, u2;
+      var i, it, item, items, q1, q2, ranks, u, u1, u2;
       items = [];
+      if ((inputs.ranks != null)) {
+        ranks = (function() {
+          var j, len, ref, results;
+          ref = inputs.ranks.split(";");
+          results = [];
+          for (j = 0, len = ref.length; j < len; j++) {
+            it = ref[j];
+            results.push(Number(it));
+          }
+          return results;
+        })();
+      } else {
+        ranks = _.shuffle([0, 1, 2, 3]);
+        inputs.ranks = ranks.join(";");
+      }
       if (inputs.q1 != null) {
         q1 = Number(inputs.q1);
       } else {
@@ -95,76 +110,59 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
         b: "u_{n+1}=" + (u.recurence().tex()),
         c: u.calc(0).tex()
       });
-      if (inputs.o != null) {
-        o = (function() {
-          var j, len, ref, results;
-          ref = inputs.o;
-          results = [];
-          for (j = 0, len = ref.length; j < len; j++) {
-            c = ref[j];
-            results.push(Number(c));
-          }
-          return results;
-        })();
-      } else {
-        o = _.shuffle([0, 1, 2, 3]);
-        inputs.o = o.join("");
-      }
-      for (i = j = 0, len = items.length; j < len; i = ++j) {
-        item = items[i];
-        item.rank = o[i];
-      }
       return [
         _.shuffle((function() {
-          var k, len1, results;
+          var j, len, results;
           results = [];
-          for (k = 0, len1 = items.length; k < len1; k++) {
-            item = items[k];
+          for (i = j = 0, len = items.length; j < len; i = ++j) {
+            item = items[i];
             results.push({
               type: "normal",
               text: "$" + item.a + "$",
-              color: colors.html(item.rank)
+              color: colors.html(ranks[i])
             });
           }
           return results;
-        })()), _.shuffle((function() {
-          var k, len1, results;
+        })()), (function() {
+          var j, len, results;
           results = [];
-          for (k = 0, len1 = items.length; k < len1; k++) {
-            item = items[k];
-            results.push({
-              text: "$" + item.b + "$ &nbsp; et &nbsp; $u_0=" + item.c + "$",
-              rank: item.rank
-            });
+          for (j = 0, len = items.length; j < len; j++) {
+            item = items[j];
+            results.push("$" + item.b + "$ &nbsp; et &nbsp; $u_0=" + item.c + "$");
           }
           return results;
-        })())
+        })(), ranks
       ];
     },
     getBriques: function(inputs, options) {
-      var liste_choix, liste_fixe, ref;
-      ref = this.init(inputs), liste_fixe = ref[0], liste_choix = ref[1];
+      var liste_choix, liste_fixe, ranks, ref;
+      ref = this.init(inputs), liste_fixe = ref[0], liste_choix = ref[1], ranks = ref[2];
       return [
         {
           bareme: 100,
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["On vous donee d'abord des suites données explicitement.", "Ensuite on vous donne des suites données par récurence.", "Associez-les en utilisant les boutons de la deuxième liste"]
             }, {
               type: "color-list",
-              rank: 2,
               list: liste_fixe
             }, {
               type: "color-choice",
-              rank: 3,
               name: "it",
               list: liste_choix
             }, {
-              type: "validation",
-              rank: 4,
-              clavier: []
+              type: "validation"
+            }
+          ],
+          validations: {
+            it: "color:4"
+          },
+          verifications: [
+            {
+              name: "it",
+              items: liste_choix,
+              colors: ranks
             }
           ]
         }
@@ -174,8 +172,8 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
       var fct_item, that;
       that = this;
       fct_item = function(inputs, index) {
-        var liste_choix, liste_fixe, ref;
-        ref = that.init(inputs, options), liste_fixe = ref[0], liste_choix = ref[1];
+        var liste_choix, liste_fixe, ranks, ref;
+        ref = that.init(inputs, options), liste_fixe = ref[0], liste_choix = ref[1], ranks = ref[2];
         return {
           children: [
             {
@@ -191,7 +189,7 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
               col2: {
                 type: "enumerate",
                 enumi: "1",
-                children: _.pluck(liste_choix, "text")
+                children: liste_choix
               }
             }
           ]
@@ -212,8 +210,8 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
       var fct_item, that;
       that = this;
       fct_item = function(inputs, index) {
-        var liste_choix, liste_fixe, ref;
-        ref = that.init(inputs, options), liste_fixe = ref[0], liste_choix = ref[1];
+        var liste_choix, liste_fixe, ranks, ref;
+        ref = that.init(inputs, options), liste_fixe = ref[0], liste_choix = ref[1], ranks = ref[2];
         return [
           "Associez les formes explicites et les formes récurrentes deux à deux.", {
             type: "multicols",
@@ -226,21 +224,27 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
               }, {
                 type: "enumerate",
                 enumi: "1",
-                children: _.pluck(liste_choix, "text")
+                children: liste_choix
               }
             ]
           }
         ];
       };
-      return {
-        children: [
-          {
-            type: "enumerate",
-            enumi: "A",
-            children: _.map(inputs_list, fct_item)
-          }
-        ]
-      };
+      if (inputs_list.length > 1) {
+        return {
+          children: [
+            {
+              type: "enumerate",
+              enumi: "A",
+              children: _.map(inputs_list, fct_item)
+            }
+          ]
+        };
+      } else {
+        return {
+          children: fct_item(inputs_list[0])
+        };
+      }
     }
   };
 });

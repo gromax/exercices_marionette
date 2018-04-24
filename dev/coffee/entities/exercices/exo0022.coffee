@@ -62,7 +62,6 @@
 					items: [
 						{
 							type: "text"
-							rank: 1
 							ps: [
 								"Développez l'expression suivante :"
 								"$P(x) = #{polyTex}$"
@@ -70,22 +69,31 @@
 						}
 						{
 							type: "input"
-							rank: 2
-							waited: "number"
-							tag:"$P(x)$"
-							name:"p"
-							description:"Expression développée"
-							good:polyDev
-							goodTex: polyDevTex
-							developp:true
+							format: [
+								{ text: "$P(x) =$", cols:2, class:"text-right" }
+								{ latex: true, cols:10, name:"p"}
+							]
 						}
 						{
 							type: "validation"
-							rank: 3
-							clavier: []
+							clavier: ["pow"]
 						}
 					]
 				}
+				validations: {
+					p:"number"
+				}
+				verifications: [
+					{
+						name:"p"
+						tag:"$P(x)$"
+						good: polyDev
+						goodTex: polyDevTex
+						parameters: {
+							developp: true
+						}
+					}
+				]
 			]
 
 		getExamBriques: (inputs_list,options) ->

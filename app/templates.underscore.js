@@ -638,12 +638,12 @@ __p += '\n\\draw [color=black, line width=.1pt] (' +
 __e( el.left ) +
 ' , ' +
 __e( el.top ) +
-') grid[step=';
+') grid[';
  if(el.step){;
 __p +=
 __e(el.step );
  } else { ;
-__p += '1';
+__p += 'step=1';
  } ;
 __p += '] (' +
 __e( el.right ) +

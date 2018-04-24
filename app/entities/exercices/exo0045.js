@@ -28,33 +28,36 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["Donnez &nbsp; $z$ &nbsp; sous sa <b>forme algébrique</b> &nbsp; $z = x+iy$ &nbsp; sachant que &nbsp; $|z|=" + (m.tex()) + "$ &nbsp; et &nbsp; $Arg(z) = " + (angleRad.tex()) + "$ &nbsp; <i>en radians</i>"]
             }, {
-              type: "ul",
-              rank: 2,
-              list: [
+              type: "input",
+              format: [
                 {
-                  type: "warning",
-                  text: "Attention, si vous écrivez &nbsp; $i\\sqrt{\\cdots}$, mettez une espace : i sqrt(...) ou le signe de multiplication : i*sqrt(...)"
+                  text: "$z =$",
+                  cols: 2,
+                  "class": "text-right"
+                }, {
+                  latex: true,
+                  cols: 10,
+                  name: "z"
                 }
               ]
             }, {
-              type: "input",
-              rank: 3,
-              waited: "number",
-              tag: "$z$",
-              name: "z",
-              description: "Forme x+iy",
-              good: z
-            }, {
               type: "validation",
-              rank: 6,
               clavier: ["aide", "sqrt"]
             }, {
               type: "aide",
-              rank: 7,
               list: help.complexes.trigo_alg
+            }
+          ],
+          validations: {
+            z: "number"
+          },
+          verifications: [
+            {
+              name: "z",
+              tag: "$z$",
+              good: z
             }
           ]
         }

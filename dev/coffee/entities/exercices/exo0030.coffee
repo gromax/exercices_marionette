@@ -8,6 +8,13 @@
 	return {
 		init: (inputs) ->
 			items=[]
+
+			if (inputs.ranks?)
+				ranks =(Number it for it in inputs.ranks.split(";"))
+			else
+				ranks = _.shuffle([0..3])
+				inputs.ranks = ranks.join(";")
+
 			if inputs.q1? then q1 = Number inputs.q1
 			else q1 = inputs.q1 = mM.alea.real( { values:{min:1, max:10}, sign:true } )
 			if inputs.q2? then q2 = Number inputs.q2
@@ -30,20 +37,14 @@
 			u=mM.suite.geometrique { premierTerme:{ valeur:u2, rang:0 }, raison:q2 }
 			items.push { a:"u_n=#{u.explicite().tex()}", b:"u_{n+1}=#{u.recurence().tex()}", c:u.calc(0).tex()}
 
-			if inputs.o? then o = ( Number c for c in inputs.o )
-			else
-				o = _.shuffle([0,1,2,3])
-				inputs.o = o.join("")
-			# On affecte le rang, ce qui revient à affecter les couleurs
-			item.rank = o[i] for item,i in items
-
 			[
-				_.shuffle ({ type: "normal", text:"$#{item.a}$", color:colors.html(item.rank)} for item in items)
-				_.shuffle ({ text:"$#{item.b}$ &nbsp; et &nbsp; $u_0=#{item.c}$", rank:item.rank } for item in items)
+				_.shuffle ({ type: "normal", text:"$#{item.a}$", color:colors.html(ranks[i]) } for item, i in items)
+				("$#{item.b}$ &nbsp; et &nbsp; $u_0=#{item.c}$" for item in items)
+				ranks
 			]
 
 		getBriques: (inputs, options) ->
-			[ liste_fixe, liste_choix ] = @init(inputs)
+			[ liste_fixe, liste_choix, ranks ] = @init(inputs)
 
 			[
 				{
@@ -51,7 +52,6 @@
 					items: [
 						{
 							type: "text"
-							rank: 1
 							ps: [
 								"On vous donee d'abord des suites données explicitement."
 								"Ensuite on vous donne des suites données par récurence."
@@ -60,19 +60,25 @@
 						}
 						{
 							type: "color-list"
-							rank: 2
 							list: liste_fixe
 						}
 						{
 							type: "color-choice"
-							rank: 3
 							name: "it"
 							list: liste_choix
 						}
 						{
 							type: "validation"
-							rank: 4
-							clavier: []
+						}
+					]
+					validations:{
+						it:"color:4"
+					}
+					verifications:[
+						{
+							name: "it"
+							items: liste_choix
+							colors: ranks
 						}
 					]
 				}
@@ -81,7 +87,7 @@
 		getExamBriques: (inputs_list,options) ->
 			that = @
 			fct_item = (inputs, index) ->
-				[ liste_fixe, liste_choix ] = that.init(inputs,options)
+				[ liste_fixe, liste_choix, ranks ] = that.init(inputs,options)
 				return {
 					children: [
 						{
@@ -100,7 +106,7 @@
 							col2:{
 								type: "enumerate"
 								enumi: "1"
-								children: _.pluck(liste_choix,"text")
+								children: liste_choix
 							}
 						}
 					]
@@ -120,7 +126,7 @@
 		getTex: (inputs_list,options) ->
 			that = @
 			fct_item = (inputs, index) ->
-				[ liste_fixe, liste_choix ] = that.init(inputs,options)
+				[ liste_fixe, liste_choix, ranks ] = that.init(inputs,options)
 				return [
 					"Associez les formes explicites et les formes récurrentes deux à deux."
 					{
@@ -135,21 +141,25 @@
 							{
 								type: "enumerate"
 								enumi: "1"
-								children: _.pluck(liste_choix,"text")
+								children: liste_choix
 							}
 						]
 					}
 				]
 
-
-			return {
-				children: [
-					{
-						type: "enumerate"
-						enumi: "A"
-						children: _.map(inputs_list, fct_item)
-					}
-				]
-			}
+			if inputs_list.length>1
+				return {
+					children: [
+						{
+							type: "enumerate"
+							enumi: "A"
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
+			else
+				return {
+					children: fct_item(inputs_list[0])
+				}
 
 	}

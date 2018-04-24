@@ -29,28 +29,34 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["Le 1 janvier 2010, on place la somme de " + c0 + " € sur un compte bancaire qui rapporte tous les ans " + (mM.misc.numToStr(r)) + "&nbsp;% d'intérêts composés.", "Soit &nbsp; $(C_n)$ &nbsp; la suite représentant le capital sur le compte au 1 janvier de l'année &nbsp; $2010+n$.", "Donnez le premier terme &nbsp; $C_0$ &nbsp; et la raison &nbsp; $q$ &nbsp; de la suite."]
             }, {
               type: "input",
-              rank: 2,
-              waited: "number",
               tag: "$C_0$",
               name: "c0",
-              description: "Premier terme",
-              good: c0
+              description: "Premier terme"
             }, {
               type: "input",
-              rank: 3,
-              waited: "number",
               tag: "$q$",
               name: "q",
-              description: "Raison",
-              good: q
+              description: "Raison"
             }, {
-              type: "validation",
-              rank: 6,
-              clavier: []
+              type: "validation"
+            }
+          ],
+          validations: {
+            c0: "number",
+            q: "number"
+          },
+          verifications: [
+            {
+              name: "c0",
+              tag: "$C_0$",
+              good: c0
+            }, {
+              name: "q",
+              tag: "$q$",
+              good: q
             }
           ]
         }, {
@@ -59,28 +65,34 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["Donnez le rang &nbsp; $n$ &nbsp; de l'année pour laquelle le capital aura doublé.", "Précisez l'année correspondante."]
             }, {
               type: "input",
-              rank: 2,
-              waited: "number",
               tag: "$n$",
               name: "n",
-              description: "Rang du doublement",
-              good: n
+              description: "Rang du doublement"
             }, {
               type: "input",
-              rank: 3,
-              waited: "number",
               tag: "Année",
               name: "a",
-              description: "Année du doublement",
-              good: 2010 + n
+              description: "Année du doublement"
             }, {
-              type: "validation",
-              rank: 6,
-              clavier: []
+              type: "validation"
+            }
+          ],
+          validations: {
+            n: "number",
+            a: "number"
+          },
+          verifications: [
+            {
+              name: "n",
+              tag: "$n$",
+              good: n
+            }, {
+              name: "a",
+              tag: "Année",
+              good: 2010 + n
             }
           ]
         }

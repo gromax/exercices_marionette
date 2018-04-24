@@ -174,7 +174,6 @@ define ["utils/math","utils/help"], (mM, help) ->
 					items:[
 						{
 							type: "text"
-							rank: 1
 							ps:[
 								"On considère l'équation : $#{ eqTex }$."
 								"Vous devez donner la ou les solutions de cette équations, si elles existent."
@@ -183,21 +182,29 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type: "ul"
-							rank: 2
 							list: _.map(infos,(item)-> { type:"warning", text:item } )
 						}
 						{
 							type: "input"
-							rank: 3
-							waited: "liste:number"
-							name:"solutions"
-							tag:"$\\mathcal{S}$"
-							good: goods
+							format: [
+								{ text: "$\\mathcal{S} =$", cols:2, class:"text-right" }
+								{ latex: true, cols:10, name:"solutions"}
+							]
 						}
 						{
 							type: "validation"
-							rank: 4
-							clavier: ["empty"]
+							clavier: ["empty", "sqrt", "pow"]
+						}
+					]
+					validations: {
+						solutions:"liste"
+					}
+					verifications:[
+						{
+							name:"solutions"
+							tag: "$\\mathcal{S}$"
+							type:"all"
+							good: goods
 						}
 					]
 				}

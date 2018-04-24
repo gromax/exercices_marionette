@@ -9901,8 +9901,8 @@
             goodMessage: goodMessage
           };
         },
-        all: function(processedAnswerList, goodObjectList, parameters) {
-          var N, aa, bads, closests, errors, goodMessage, it, lefts, len, messages, note, ref, sol, stringAnswer, stringBads, stringLefts, verifResponse;
+        areAll: function(processedAnswerList, goodObjectList, parameters) {
+          var N, aa, bads, closests, errors, goodMessage, goods, it, lefts, len, messages, note, ref, sol, stringAnswer, stringBads, stringGoods, stringLefts, verifResponse;
           note = 0;
           errors = [];
           goodMessage = false;
@@ -9937,6 +9937,7 @@
             } else {
               ref = mM.tri(processedAnswerList, goodObjectList), closests = ref.closests, lefts = ref.lefts;
               bads = [];
+              goods = [];
               N = Math.max(goodObjectList.length, processedAnswerList.length);
               messages = [];
               for (aa = 0, len = closests.length; aa < len; aa++) {
@@ -9948,11 +9949,27 @@
                     bads.push(sol.info);
                     lefts.push(sol.good);
                   } else {
+                    goods.push(sol.info);
                     errors = errors.concat(verifResponse.errors);
                   }
                 } else {
                   bads.push(sol.info);
                 }
+              }
+              if (goods.length > 0) {
+                stringGoods = ((function() {
+                  var ab, len1, results;
+                  results = [];
+                  for (ab = 0, len1 = goods.length; ab < len1; ab++) {
+                    it = goods[ab];
+                    results.push("$" + it.tex + "$");
+                  }
+                  return results;
+                })()).join("&nbsp; ; &nbsp;");
+                goodMessage = {
+                  type: "success",
+                  text: "Bonne(s) réponse(s) : &nbsp; " + stringGoods
+                };
               }
               if (bads.length > 0) {
                 stringBads = ((function() {
@@ -9992,7 +10009,7 @@
             goodMessage: goodMessage
           };
         },
-        some: function(processedAnswerList, goodObjectList, parameters) {
+        areSome: function(processedAnswerList, goodObjectList, parameters) {
           var N, aa, bads, closests, errors, goodMessage, goods, it, lefts, len, messages, note, ref, sol, stringAnswer, stringBads, stringGoods, stringLefts, verifResponse;
           note = 0;
           errors = [];

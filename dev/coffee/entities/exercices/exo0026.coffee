@@ -24,7 +24,6 @@
 					items: [
 						{
 							type: "text"
-							rank: 1
 							ps: [
 								"On se place dans un repère &nbsp; $(O;I,J)$."
 								"On donne deux points &nbsp; $#{A.texLine()}$ &nbsp; et &nbsp; $#{B.texLine()}$."
@@ -33,31 +32,39 @@
 						}
 						{
 							type: "input"
-							rank: 2
-							waited: "number"
 							name: "x"
 							description: "Abscisse du vecteur"
-							tag:"$x_{\\overrightarrow{AB}}$"
-							good: gAB.x
+							tag:"Abscisse"
 						}
 						{
 							type: "input"
-							rank: 3
-							waited: "number"
 							name: "y"
 							description: "Ordonnée du vecteur"
-							tag:"$y_{\\overrightarrow{AB}}$"
-							good: gAB.y
+							tag:"Ordonnée"
 						}
 						{
 							type: "validation"
-							rank: 4
 							clavier: ["aide"]
 						}
 						{
 							type: "aide"
-							rank: 5
 							list: help.vecteur.coordonnes
+						}
+					]
+					validations:{
+						x:"number"
+						y:"number"
+					}
+					verifications:[
+						{
+							name:"x"
+							tag:"Abscisse"
+							good:gAB.x
+						}
+						{
+							name:"y"
+							tag:"Ordonnée"
+							good:gAB.x
 						}
 					]
 				}

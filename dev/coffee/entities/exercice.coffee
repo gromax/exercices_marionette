@@ -51,7 +51,7 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 					when typeof verifItem is "function"
 						out = verifItem(data)
 					when verifItem.type is "all"
-						ver = mM.verification.all(data[verifItem.name].processed, verifItem.good, verifItem.parameters)
+						ver = mM.verification.areAll(data[verifItem.name].processed, verifItem.good, verifItem.parameters)
 						if data[verifItem.name].processed.length is 0
 							stringAnswer = "\\varnothing"
 						else
@@ -67,7 +67,7 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 						}
 						if verifItem.rank? then out.add.rank = verifItem.rank
 					when verifItem.type is "some"
-						ver = mM.verification.some(data[verifItem.name].processed, verifItem.good, verifItem.parameters)
+						ver = mM.verification.areSome(data[verifItem.name].processed, verifItem.good, verifItem.parameters)
 						if data[verifItem.name].processed.length is 0
 							stringAnswer = "\\varnothing"
 						else
@@ -149,7 +149,7 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 							ver.goodMessage
 						]
 						out = {
-							note: out.note
+							note: ver.note
 							add: {
 								type:"ul"
 								list: list.concat(ver.errors)
@@ -173,6 +173,11 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 			data = data ? {}
 			fct_iteratee = (val, key) ->
 				if (userValue = data[key])?
+					if typeof val is "object"
+						config = _.omit(val, "type")
+						val = val.type ? "number"
+					else
+						config = {}
 					switch
 						when val is "liste"
 							if userValue is "∅" or userValue is "\\varnothing"
@@ -180,7 +185,7 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 								error = false
 							else
 								liste = userValue.split(";")
-								verifs = (mM.verification.numberValidation(it) for it in liste)
+								verifs = (mM.verification.numberValidation(it, config) for it in liste)
 								errors = _.flatten(_.compact(_.pluck(verifs, "error")))
 								if errors.length>0 then error = errors
 								else error = false
@@ -191,7 +196,7 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 								error: error
 							}
 						when val is "number"
-							mM.verification.numberValidation(userValue)
+							mM.verification.numberValidation(userValue, config)
 						when val is "real"
 							if typeof userValue is "string"
 								v = Number(userValue.trim().replace '.', ",")
@@ -212,7 +217,7 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 						when result=/radio:([0-9]+)/.exec(val)
 							result = Number(result[1])
 							p = Number userValue
-							if p<0 or p>result
+							if p<0 or p>=result
 								error = "La réponse n'est pas dans la liste"
 							else
 								error = false
@@ -290,9 +295,6 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 				null
 
 
-
-
-
 	API =
 		getEntity: (id, options_for_this_instance, inputs) ->
 			inputs = inputs ? { }
@@ -349,7 +351,6 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 					when "exo0018" then require ["entities/exercices/exo0018"], successCB, failedCB
 					when "exo0019" then require ["entities/exercices/exo0019"], successCB, failedCB
 					when "exo0020" then require ["entities/exercices/exo0020"], successCB, failedCB
-					when "exo0021" then require ["entities/exercices/exo0021"], successCB, failedCB
 					when "exo0022" then require ["entities/exercices/exo0022"], successCB, failedCB
 					when "exo0023" then require ["entities/exercices/exo0023"], successCB, failedCB
 					when "exo0024" then require ["entities/exercices/exo0024"], successCB, failedCB

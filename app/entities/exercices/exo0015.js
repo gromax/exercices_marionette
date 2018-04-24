@@ -173,9 +173,6 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
         return {
           children: [
             {
-              type: "text",
-              children: sujet
-            }, {
               type: "graphique",
               divId: id
             }, {
@@ -189,6 +186,9 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
       return {
         children: [
           {
+            type: "text",
+            children: sujet
+          }, {
             type: "subtitles",
             enumi: "A",
             refresh: true,
@@ -199,11 +199,11 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
       };
     },
     getTex: function(inputs_list, options, fixedSettings) {
-      var fct_item, max, that;
+      var fct_item, max, sujet, that;
       that = this;
       max = this.max;
       fct_item = function(inputs, index) {
-        var d, droites, fct_droite_to_tex, i, items, pts, ranks, ref, sujet, tex;
+        var d, droites, fct_droite_to_tex, i, items, pts, ranks, ref, tex;
         ref = that.init(inputs, options, fixedSettings.affine), items = ref[0], pts = ref[1], droites = ref[2], ranks = ref[3];
         fct_droite_to_tex = function(d, index) {
           var color, x, y1, y2;
@@ -226,12 +226,7 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
           }
           return results;
         })()).join(" ") + "\\end{scope};";
-        if (fixedSettings.affine) {
-          sujet = ["On vous donne 5 courbes et 5 fonctions affines.", "Vous devez dire à quelle fonction correspond chaque courbe."];
-        } else {
-          sujet = ["On vous donne 5 droites et 5 équations de droites.", "Vous devez dire à quelle équation correspond chaque droite."];
-        }
-        return sujet.concat([
+        return [
           {
             type: "tikz",
             left: -max,
@@ -254,19 +249,31 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
               return results;
             })()
           }
-        ]);
+        ];
       };
       if (inputs_list.length === 1) {
-        return fct_item(inputs_list[0], 0);
-      } else {
+        if (fixedSettings.affine) {
+          sujet = ["On vous donne 5 courbes et 5 fonctions affines.", "Vous devez dire à quelle fonction correspond chaque courbe."];
+        } else {
+          sujet = ["On vous donne 5 droites et 5 équations de droites.", "Vous devez dire à quelle équation correspond chaque droite."];
+        }
         return {
-          children: [
+          children: sujet.concat(fct_item(inputs_list[0], 0))
+        };
+      } else {
+        if (fixedSettings.affine) {
+          sujet = ["Dans chaque cas, on vous donne 5 courbes et 5 fonctions affines.", "Vous devez dire à chaque fois quelle fonction correspond chaque courbe."];
+        } else {
+          sujet = ["Dans chaque cas, on vous donne 5 droites et 5 équations de droites.", "Vous devez dire à chaque fois quelle équation correspond chaque droite."];
+        }
+        return {
+          children: sujet.concat([
             {
               type: "enumerate",
               enumi: "A",
               children: _.map(inputs_list, fct_item)
             }
-          ]
+          ])
         };
       }
     }

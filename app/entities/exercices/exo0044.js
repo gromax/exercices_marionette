@@ -28,32 +28,54 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["Donnez le module et l'argument de &nbsp; $z=" + (z.tex()) + "$.", "<i>Donnez l'argument &nbsp; $\\theta$ &nbsp; en radians et en valeur principale, c'est à dire &nbsp; $-\\pi<\\theta\\leqslant \\pi$</i>."]
             }, {
               type: "input",
-              rank: 2,
-              waited: "number",
-              tag: "$|z|",
-              name: "m",
-              description: "Module de z",
-              good: m
+              format: [
+                {
+                  text: "$|z| =$",
+                  cols: 2,
+                  "class": "text-right"
+                }, {
+                  latex: true,
+                  cols: 10,
+                  name: "m"
+                }
+              ]
             }, {
               type: "input",
-              rank: 3,
-              waited: "number",
-              tag: "$\\theta",
-              name: "a",
-              description: "Argument de z",
-              good: angleRad
+              format: [
+                {
+                  text: "$\\theta =$",
+                  cols: 2,
+                  "class": "text-right"
+                }, {
+                  latex: true,
+                  cols: 10,
+                  name: "a"
+                }
+              ]
             }, {
               type: "validation",
-              rank: 4,
-              clavier: ["aide", "pi"]
+              clavier: ["aide", "pi", "sqrt"]
             }, {
               type: "aide",
-              rank: 5,
               list: help.complexes.argument.concat(help.complexes.module)
+            }
+          ],
+          validations: {
+            m: "number",
+            a: "number"
+          },
+          verifications: [
+            {
+              name: "m",
+              tag: "$|z|$",
+              good: m
+            }, {
+              name: "a",
+              tag: "$\\theta$",
+              good: angleRad
             }
           ]
         }

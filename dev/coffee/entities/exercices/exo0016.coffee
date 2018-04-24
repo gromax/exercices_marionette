@@ -154,8 +154,6 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 				[items, polys, ranks] = that.init(inputs,options)
 
 				return [
-					"On vous donne 5 courbes et 5 fonctions du second degré."
-					"Vous devez dire à quelle fonction correspond chaque courbe."
 					{
 						type:"tikz"
 						left: -max
@@ -175,10 +173,17 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 
 
 			if inputs_list.length is 1
-				return fct_item(inputs_list[0],0)
+				return {
+					children: [
+						"On vous donne 5 courbes et 5 fonctions du second degré."
+						"Vous devez dire à quelle fonction correspond chaque courbe."
+					].concat fct_item(inputs_list[0],0)
+				}
 			else
 				return {
 					children: [
+						"Dans chaque cas, on vous donne 5 courbes et 5 fonctions du second degré."
+						"Vous devez dire à chaque fois quelle fonction correspond chaque courbe."
 						{
 							type: "enumerate"
 							enumi: "A"

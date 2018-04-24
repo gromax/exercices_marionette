@@ -325,11 +325,9 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["On considère l'équation : $" + eqTex + "$.", "Vous devez donner la ou les solutions de cette équations, si elles existent.", "<i>S'il n'y a pas de solution, écrivez $\\varnothing$. s'il y a plusieurs solutions, séparez-les avec ;</i>"]
             }, {
               type: "ul",
-              rank: 2,
               list: _.map(infos, function(item) {
                 return {
                   type: "warning",
@@ -338,15 +336,31 @@ define(["utils/math", "utils/help"], function(mM, help) {
               })
             }, {
               type: "input",
-              rank: 3,
-              waited: "liste:number",
-              name: "solutions",
-              tag: "$\\mathcal{S}$",
-              good: goods
+              format: [
+                {
+                  text: "$\\mathcal{S} =$",
+                  cols: 2,
+                  "class": "text-right"
+                }, {
+                  latex: true,
+                  cols: 10,
+                  name: "solutions"
+                }
+              ]
             }, {
               type: "validation",
-              rank: 4,
-              clavier: ["empty"]
+              clavier: ["empty", "sqrt", "pow"]
+            }
+          ],
+          validations: {
+            solutions: "liste"
+          },
+          verifications: [
+            {
+              name: "solutions",
+              tag: "$\\mathcal{S}$",
+              type: "all",
+              good: goods
             }
           ]
         }

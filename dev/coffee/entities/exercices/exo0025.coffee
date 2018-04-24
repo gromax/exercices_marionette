@@ -23,7 +23,10 @@ define ["utils/math","utils/help"], (mM, help) ->
 			p_values = ( mM.misc.numToStr( mM.repartition.binomial(n,p/100,k),3 ) for k in k_values)
 			flow=Xlow/n
 			fhigh=Xhigh/n
-			IF = mM.ensemble.intervalle "[", mM.misc.toPrecision(flow,2), mM.misc.toPrecision(fhigh,2), "]"
+			IF = {
+				low: mM.misc.toPrecision(Xlow/n,2)
+				high: mM.misc.toPrecision(Xhigh/n,2)
+			}
 
 			[
 				p
@@ -41,11 +44,10 @@ define ["utils/math","utils/help"], (mM, help) ->
 
 			[
 				{
-					bareme:100
+					bareme:30
 					items:[
 						{
 							type:"text"
-							rank: 1
 							ps:[
 								"Une usine fabrique des tuyaux en caoutchouc."
 								"Le fabriquant affirme que #{p} % des tuyaux sont poreux."
@@ -55,27 +57,58 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type:"input"
-							rank: 2
 							tag:"$E(X)=$"
 							name:"esp"
 							description:"Espérance à 0,01 près"
-							good:n*p/100
-							waited:"number"
-							arrondi:-2
 						}
 						{
 							type:"input"
-							rank: 3
 							tag:"$\\sigma(X)$"
 							name:"std"
 							description:"Écart-type à 0,01 près"
-							good:Math.sqrt(n*p*(100-p))/100
-							waited:"number"
-							arrondi:-2
 						}
 						{
+							type: "validation"
+							clavier: ["aide"]
+						}
+						{
+							type:"aide"
+							list: [
+								"Épreuve élémentaire : Prélever un tuyau ; succès : Le tuyau est poreux ; probabilité du succès : &nbsp; $p=#{p}\\,\\%$"
+								"L'expérience est répétée &nbsp; $n=#{n}$ &nbsp; fois de façon indépendante (production assez importante)."
+								"$X$ &nbsp; est le nombre de succès (tuyaux poreux). On peut donc dire que &nbsp; $X$ &nbsp; suit une loi binomiale &nbsp; $\\mathcal{B}(#{n} ; #{p}\\,\\%)$."
+								"L'espérance est la valeur attendue. Si on a un fréquence &nbsp; $p\\,\\%$ &nbsp; de tuyaux poreux dans la production, si on prélève &nbsp; $n$ &nbsp; tuyaux, on s'attend à obtenir &nbsp; $E(X)=n\\times p$ &nbsp; tuyaux poreux en moyenne."
+							]
+						}
+					]
+					validations: {
+						esp:"number"
+						std:"number"
+					}
+					verifications: [
+						{
+							name:"esp"
+							tag:"$E(X)$"
+							good:n*p/100
+							parameters:{
+								arrondi:-2
+							}
+						}
+						{
+							name:"std"
+							tag:"$\\sigma(X)$"
+							good:Math.sqrt(n*p*(100-p))/100
+							parameters:{
+								arrondi:-2
+							}
+						}
+					]
+				}
+				{
+					bareme:40
+					items:[
+						{
 							type:"text"
-							rank: 4
 							ps:[
 								"On cherche les bornes de l'intervalle de fluctuation."
 								"Pour cela on va chercher &nbsp; $a$, c'est à dire la valeur de &nbsp; $k$ &nbsp; pour laquelle &nbsp; $P(X\\leqslant k)$ &nbsp; dépasse strictement &nbsp; $0,025=2,5\\,\\%$, et &nbsp; $b$, c'est à dire la valeur de &nbsp; $k$ &nbsp; pour laquelle &nbsp; $P(X\\leqslant k)$ &nbsp; dépasse ou atteint $0,975=97,5\\,\\%$."
@@ -85,7 +118,6 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type: "tableau"
-							rank: 5
 							entetes: false
 							lignes: [
 								_.flatten(["$k$", k_values])
@@ -94,37 +126,73 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type:"input"
-							rank: 4
-							tag:"$a$"
+							tag:"a"
 							name:"a"
-							description:"Borne inférieure"
-							good:Xlow
-							waited:"number"
+							description:"X minimum"
 						}
 						{
 							type:"input"
-							rank: 5
-							tag:"$b$"
+							tag:"b"
 							name:"b"
-							description:"Borne supérieure"
-							good:Xhigh
-							waited:"number"
+							description:"X maximum"
 						}
 						{
 							type:"input"
-							rank: 6
-							tag:"$I_F$"
-							name:"IF"
-							description:"Intervalle de fluctuation à 0,01 près"
-							good:IF
-							waited:"ensemble"
-							tolerance:0.005
+							format:[
+								{ text: "$I_F =$", cols:2, class:"text-right" }
+								{ text:"[", cols:1, class:"text-right h3"}
+								{ name:"l", cols:2 }
+								{ text:";", cols:1, class:"text-center h3"}
+								{ name:"h", cols:2 }
+								{ text:"]", cols:1, class:"h3"}
+							]
 						}
-
-
+						{
+							type:"validation"
+							clavier:["aide"]
+						}
+						{
+							type:"aide"
+							list: help.proba.binomiale.IF_1
+						}
+					]
+					validations:{
+						a: "number"
+						b: "number"
+						l: "number"
+						h: "number"
+					}
+					verifications:[
+						{
+							name:"a"
+							good:Xlow
+						}
+						{
+							name:"b"
+							good:Xhigh
+						}
+						(pData)->
+							verLow = mM.verification.isSame(pData.l.processed, IF.low, { arrondi:-3 })
+							verHigh = mM.verification.isSame(pData.h.processed, IF.high, { arrondi:-3 })
+							verLow.goodMessage.text = "Borne gauche : "+verLow.goodMessage.text
+							verHigh.goodMessage.text = "Borne droite : "+verHigh.goodMessage.text
+							{
+								note: (verLow.note+verHigh.note)/2
+								add: {
+									type: "ul"
+									list: [{
+										type:"normal"
+										text: "Vous avez répondu &nbsp; $I_F=\\left[#{pData.l.processed.tex} ; #{pData.h.processed.tex}\\right]$"
+									}].concat(verLow.errors, [verLow.goodMessage], verHigh.errors, [verHigh.goodMessage])
+								}
+							}
+					]
+				}
+				{
+					bareme: 30
+					items: [
 						{
 							type:"text"
-							rank: 7
 							ps:[
 								"On a obtenu #{nf} tuyaux poreux."
 								"Faut-il accepter ou rejeter l'affirmation du fabriquant ?"
@@ -132,33 +200,36 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type:"radio"
-							rank: 8
 							tag:"Décision"
 							name:"d"
 							radio:[
 								"Accepter"
 								"Refuser"
 							]
-							good: if (nf>=Xlow) and (nf<=Xhigh) then 0 else 1
 						}
 						{
 							type:"validation"
-							rank: 9
 							clavier:["aide"]
 						}
 						{
 							type:"aide"
-							rank: 10
 							list: [
-								"Épreuve élémentaire : Prélever un tuyau ; succès : Le tuyau est poreux ; probabilité du succès : &nbsp; $p=#{p}\\,\\%$"
-								"L'expérience est répétée &nbsp; $n=#{n}$ &nbsp; fois de façon indépendante (production assez importante)."
-								"$X$ &nbsp; est le nombre de succès (tuyaux poreux). On peut donc dire que &nbsp; $X$ &nbsp; suit une loi binomiale &nbsp; $\\mathcal{B}(#{n} ; #{p}\\,\\%)$."
-								"L'espérance est la valeur attendue. Si on a un fréquence &nbsp; $p\\,\\%$ &nbsp; de tuyaux poreux dans la production, si on prélève &nbsp; $n$ &nbsp; tuyaux, on s'attend à obtenir &nbsp; $E(X)=n\\times p$ &nbsp; tuyaux poreux en moyenne."
 								"Naturellement, le nombre de tuyau réellement obtenu dans un prélèvement va varier aléatoirement. Pour un résultat donné, pour savoir s'il est loin ou proche de la valeur attendue, on utilise l'écart-type qui se cacule : &nbsp; $\\sigma(X)=\\sqrt{np(1-p)}$. Jusqu'à &nbsp; $2\\sigma$, on est assez proche de la valeur espérée. Au-delà de &nbsp; $2\\sigma$, on est loin."
-							].concat(help.proba.binomiale.IF_1)
+							]
 						}
-
 					]
+					validations: {
+						d: "radio:2"
+					}
+					verifications: [
+						{
+							name:"d"
+							radio: [ "Accepter", "Refuser" ]
+							good: if (nf>=Xlow) and (nf<=Xhigh) then 0 else 1
+						}
+					]
+
+
 				}
 			]
 

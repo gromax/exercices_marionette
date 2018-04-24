@@ -117,7 +117,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
             }
           ],
           validations: {
-            v: "radio:1"
+            v: "radio:2"
           },
           verifications: [
             {

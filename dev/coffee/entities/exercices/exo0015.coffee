@@ -139,10 +139,6 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 				return {
 					children: [
 						{
-							type: "text"
-							children: sujet
-						}
-						{
 							type:"graphique"
 							divId: id
 						}
@@ -156,6 +152,10 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 
 			return {
 				children: [
+					{
+						type: "text"
+						children: sujet
+					}
 					{
 						type: "subtitles"
 						enumi: "A"
@@ -183,19 +183,7 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 						"\\draw[line width=1pt, #{color}] (#{-max-1},#{y1}) -- (#{max+1},#{y2});"
 				tex = "\\begin{scope}\\clip(#{-max},#{-max}) rectangle(#{max},#{max});"+(fct_droite_to_tex(d,index) for d,index in droites).join(" ")+"\\end{scope};"
 
-
-				if fixedSettings.affine
-					sujet = [
-						"On vous donne 5 courbes et 5 fonctions affines."
-						"Vous devez dire à quelle fonction correspond chaque courbe."
-					]
-				else
-					sujet = [
-						"On vous donne 5 droites et 5 équations de droites."
-						"Vous devez dire à quelle équation correspond chaque droite."
-					]
-
-				return sujet.concat [
+				return [
 					{
 						type:"tikz"
 						left: -max
@@ -215,10 +203,32 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 
 
 			if inputs_list.length is 1
-				return fct_item(inputs_list[0],0)
-			else
+				if fixedSettings.affine
+					sujet = [
+						"On vous donne 5 courbes et 5 fonctions affines."
+						"Vous devez dire à quelle fonction correspond chaque courbe."
+					]
+				else
+					sujet = [
+						"On vous donne 5 droites et 5 équations de droites."
+						"Vous devez dire à quelle équation correspond chaque droite."
+					]
 				return {
-					children: [
+					children: sujet.concat fct_item(inputs_list[0],0)
+				}
+			else
+				if fixedSettings.affine
+					sujet = [
+						"Dans chaque cas, on vous donne 5 courbes et 5 fonctions affines."
+						"Vous devez dire à chaque fois quelle fonction correspond chaque courbe."
+					]
+				else
+					sujet = [
+						"Dans chaque cas, on vous donne 5 droites et 5 équations de droites."
+						"Vous devez dire à chaque fois quelle équation correspond chaque droite."
+					]
+				return {
+					children: sujet.concat [
 						{
 							type: "enumerate"
 							enumi: "A"

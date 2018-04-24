@@ -600,14 +600,15 @@
 		}
 
 		verification: {
-			numberValidation: (userString) ->
+			numberValidation: (userString, inConfig) ->
 				switch
 					when typeof userString isnt "string"
 						{ processed:false,  user:userString, error:"Erreur inconnue !"}
 					when userString is ""
 						{ processed:false, user:userString, error:"Ne doit pas être vide" }
 					else
-						info = new ParseInfo(userString, {type:"number"})
+						config = _.extend({ type:"number", developp:true, toLowerCase:false }, inConfig ? {})
+						info = new ParseInfo(userString, config)
 						if info.valid
 							{ processed:info, user:userString, error:false }
 						else
@@ -715,7 +716,7 @@
 					goodMessage: goodMessage
 				}
 
-			all : (processedAnswerList, goodObjectList, parameters) ->
+			areAll : (processedAnswerList, goodObjectList, parameters) ->
 				note = 0
 				errors = []
 				goodMessage = false
@@ -739,6 +740,7 @@
 						# Il faut faire le tri pour associer deux à deux user et good
 						{ closests, lefts } = mM.tri processedAnswerList, goodObjectList
 						bads = []
+						goods = []
 						N = Math.max(goodObjectList.length, processedAnswerList.length)
 						messages = []
 						for sol in closests
@@ -750,9 +752,13 @@
 									bads.push sol.info
 									lefts.push sol.good
 								else
+									goods.push sol.info
 									errors = errors.concat(verifResponse.errors)
 							else
 								bads.push sol.info
+						if goods.length>0
+							stringGoods = ( "$#{it.tex}$" for it in goods).join("&nbsp; ; &nbsp;")
+							goodMessage = { type:"success", text:"Bonne(s) réponse(s) : &nbsp; #{stringGoods}" }
 						if bads.length>0
 							stringBads = ( "$#{it.tex}$" for it in bads).join("&nbsp; ; &nbsp;")
 							errors.push { type:"error", text: "Ces solutions que vous donnez sont fausses: &nbsp;#{stringBads}." }
@@ -766,7 +772,7 @@
 					goodMessage: goodMessage
 				}
 
-			some: (processedAnswerList, goodObjectList, parameters) ->
+			areSome: (processedAnswerList, goodObjectList, parameters) ->
 				note = 0
 				errors = []
 				goodMessage = false

@@ -46,24 +46,19 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["Une usine fabrique des pièces de laboratoire.", "Le fabriquant affirme que " + p + " % des pièces sont non conformes.", "On prélève au hasard " + n + " pièces dans la production.", "$X$ &nbsp; représente le nombre de pièces non conformes dans un échantillon.", "On sait que &nbsp; $X$ &nbsp; suit une loi &nbsp; $\\mathcal{B}(" + n + "\\,; " + p + "\\,\\%)$.", "Donnez les résultats des calculs suivants :"]
             }, {
               type: "input",
-              rank: 2,
               tag: "$E(X) =$",
               name: "esp",
               description: "Espérance à 0,01 près"
             }, {
               type: "input",
-              rank: 3,
               tag: "$\\sigma(X) =$",
               name: "std",
               description: "Écart-type à 0,01 près"
             }, {
-              type: "validation",
-              rank: 4,
-              clavier: []
+              type: "validation"
             }
           ],
           validations: {
@@ -93,11 +88,9 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["On choisit d'approximer la loi de &nbsp; $X$ &nbsp; par une loi normale.", "Déduisez-en l'intervalle de fluctuation asymptotique, au seuil de 95 %, de la fréquence de pièces non conformes dans un échantillon."]
             }, {
               type: "input",
-              rank: 2,
               format: [
                 {
                   text: "$I_F =$",
@@ -124,9 +117,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
                 }
               ]
             }, {
-              type: "validation",
-              rank: 4,
-              clavier: []
+              type: "validation"
             }
           ],
           validations: {
@@ -164,22 +155,18 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["On a obtenu " + nf + " pièces non conformes.", "Faut-il accepter ou rejeter l'affirmation du fabriquant ?"]
             }, {
               type: "radio",
-              rank: 2,
               tag: "Décision",
               name: "d",
               radio: ["Accepter", "Refuser"]
             }, {
-              type: "validation",
-              rank: 3,
-              clavier: []
+              type: "validation"
             }
           ],
           validations: {
-            d: "radio:1"
+            d: "radio:2"
           },
           verifications: [
             {

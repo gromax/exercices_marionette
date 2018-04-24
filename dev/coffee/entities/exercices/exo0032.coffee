@@ -25,7 +25,6 @@
 					items: [
 						{
 							type: "text"
-							rank: 1
 							ps: [
 								"On donne l'angle &nbsp; $\\alpha = #{ang.tex()}$ &nbsp; en radians."
 								"Vous devez donner la mesure principale de cet angle."
@@ -33,22 +32,28 @@
 						}
 						{
 							type: "input"
-							rank: 2
-							waited: "number"
-							name: "a"
-							tag:"$\\alpha$"
-							description:"Mesure principale"
-							good:p
+							format: [
+								{ text: "$\\alpha =$", cols:2, class:"text-right" }
+								{ latex: true, cols:10, name:"a"}
+							]
 						}
 						{
 							type: "validation"
-							rank: 4
 							clavier: ["aide", "pi"]
 						}
 						{
 							type: "aide"
-							rank: 5
 							list: help.trigo.radian.concat(help.trigo.pi, help.trigo.mesure_principale)
+						}
+					]
+					validations:{
+						"a": "number"
+					}
+					verifications:[
+						{
+							name: "a"
+							tag:"$\\alpha$"
+							good: p
 						}
 					]
 				}

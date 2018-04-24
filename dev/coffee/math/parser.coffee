@@ -162,7 +162,7 @@
 			@messages = [] # messages d'erreur
 			@context = "" # A modifier : mise dans un context particulier pour certaines simplifications
 			# config
-			@config = mergeObj({ developp:false, simplify:true, type:"number", toLowerCase:false, alias:false }, params)
+			@config = _.extend({ developp:false, simplify:true, type:"number", toLowerCase:false, alias:false }, params ? {})
 			@type = @config.type
 			if typeof value is "string"
 				@expression = value

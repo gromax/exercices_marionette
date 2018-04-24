@@ -65,7 +65,7 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
             out = verifItem(data);
             break;
           case verifItem.type !== "all":
-            ver = mM.verification.all(data[verifItem.name].processed, verifItem.good, verifItem.parameters);
+            ver = mM.verification.areAll(data[verifItem.name].processed, verifItem.good, verifItem.parameters);
             if (data[verifItem.name].processed.length === 0) {
               stringAnswer = "\\varnothing";
             } else {
@@ -92,7 +92,7 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
             }
             break;
           case verifItem.type !== "some":
-            ver = mM.verification.some(data[verifItem.name].processed, verifItem.good, verifItem.parameters);
+            ver = mM.verification.areSome(data[verifItem.name].processed, verifItem.good, verifItem.parameters);
             if (data[verifItem.name].processed.length === 0) {
               stringAnswer = "\\varnothing";
             } else {
@@ -211,7 +211,7 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
               }, ver.goodMessage
             ];
             out = {
-              note: out.note,
+              note: ver.note,
               add: {
                 type: "ul",
                 list: list.concat(ver.errors)
@@ -248,8 +248,14 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
       var fct_iteratee;
       data = data != null ? data : {};
       fct_iteratee = function(val, key) {
-        var error, errors, it, liste, p, processed, result, userValue, v, verifs;
+        var config, error, errors, it, liste, p, processed, ref, result, userValue, v, verifs;
         if ((userValue = data[key]) != null) {
+          if (typeof val === "object") {
+            config = _.omit(val, "type");
+            val = (ref = val.type) != null ? ref : "number";
+          } else {
+            config = {};
+          }
           switch (false) {
             case val !== "liste":
               if (userValue === "∅" || userValue === "\\varnothing") {
@@ -262,7 +268,7 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
                   results = [];
                   for (i = 0, len = liste.length; i < len; i++) {
                     it = liste[i];
-                    results.push(mM.verification.numberValidation(it));
+                    results.push(mM.verification.numberValidation(it, config));
                   }
                   return results;
                 })();
@@ -280,7 +286,7 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
                 error: error
               };
             case val !== "number":
-              return mM.verification.numberValidation(userValue);
+              return mM.verification.numberValidation(userValue, config);
             case val !== "real":
               if (typeof userValue === "string") {
                 v = Number(userValue.trim().replace('.', ","));
@@ -304,7 +310,7 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
             case !(result = /radio:([0-9]+)/.exec(val)):
               result = Number(result[1]);
               p = Number(userValue);
-              if (p < 0 || p > result) {
+              if (p < 0 || p >= result) {
                 error = "La réponse n'est pas dans la liste";
               } else {
                 error = false;
@@ -316,11 +322,11 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
               };
             case !(result = /color:([0-9]+)/.exec(val)):
               processed = (function() {
-                var i, len, ref, results;
-                ref = userValue.split(";");
+                var i, len, ref1, results;
+                ref1 = userValue.split(";");
                 results = [];
-                for (i = 0, len = ref.length; i < len; i++) {
-                  it = ref[i];
+                for (i = 0, len = ref1.length; i < len; i++) {
+                  it = ref1[i];
                   results.push(Number(it));
                 }
                 return results;
@@ -495,9 +501,6 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
           case "exo0011":
             require(["entities/exercices/exo0011"], successCB, failedCB);
             break;
-          case "exo0012":
-            require(["entities/exercices/exo0012"], successCB, failedCB);
-            break;
           case "exo0013":
             require(["entities/exercices/exo0013"], successCB, failedCB);
             break;
@@ -518,9 +521,6 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
             break;
           case "exo0020":
             require(["entities/exercices/exo0020"], successCB, failedCB);
-            break;
-          case "exo0021":
-            require(["entities/exercices/exo0021"], successCB, failedCB);
             break;
           case "exo0022":
             require(["entities/exercices/exo0022"], successCB, failedCB);

@@ -45,7 +45,6 @@ define ["utils/math","utils/help"], (mM, help) ->
 			items = [
 				{
 					type: "text"
-					rank: 1
 					ps:[
 						"La variable aléatoire &nbsp; $X$ &nbsp; suit la <b>loi uniforme</b> sur &nbsp; $[#{Xmin};#{Xmax}]$."
 						"<b>Remarque :</b> on note parfois &nbsp; $\\mathcal{U}([#{Xmin};#{Xmax}])$ &nbsp; cette loi."
@@ -53,52 +52,76 @@ define ["utils/math","utils/help"], (mM, help) ->
 				}
 				{
 					type: "input"
-					rank: 2
-					waited: "number"
 					tag: "$p(#{ens})$"
 					name: "pX"
 					description: "Valeur à 0,01 près"
-					good: (b-a)/(Xmax-Xmin)
-					arrondi: -2
 				}
 				{
 					type: "validation"
-					rank: 5
 					clavier: ["aide"]
 				}
 				{
 					type:"aide"
-					rank: 6
 					list: help.proba.binomiale.calculette
 				}
 			]
 
-			if calcE then items.push {
-				type: "input"
-				rank: 3
-				waited: "number"
-				tag: "$E(X)$"
-				name: "E"
-				description: "Espérance à 0,01 près"
-				good: (Xmin+Xmax)/2
-				arrondi: -2
+			validations = {
+				pX: "number"
 			}
 
-			if calcStd then items.push {
-				type: "input"
-				rank: 4
-				waited: "number"
-				tag: "$\\sigma(X)$"
-				name: "sig"
-				description: "Ecart-type à 0,01 près"
-				good: (Xmax-Xmin)/Math.sqrt(12)
-				arrondi: -2
-			}
+			verifications = [
+				{
+					name:"pX"
+					tag: "$p(#{ens})$"
+					good:(b-a)/(Xmax-Xmin)
+					parameters: {
+						arrondi: -2
+					}
+				}
+			]
+
+			if calcE
+				items.push {
+					type: "input"
+					tag: "$E(X)$"
+					name: "E"
+					description: "Espérance à 0,01 près"
+				}
+				validations.E = "number"
+				verifications.push {
+					name:"E"
+					tag: "$E(X)$"
+					good: (Xmin+Xmax)/2
+					parameters: {
+						arrondi: -2
+					}
+				}
+
+			if calcStd
+				items.push {
+					type: "input"
+					tag: "$\\sigma(X)$"
+					name: "sig"
+					description: "Ecart-type à 0,01 près"
+				}
+				validations.E = "number"
+				verifications.push {
+					name:"sig"
+					tag: "$\\sigma(X)$"
+					good: (Xmax-Xmin)/Math.sqrt(12)
+					parameters: {
+						arrondi: -2
+					}
+				}
+
 
 			[
 				{
 					bareme:100
 					items: items
+					validations: validations
+					verifications: verifications
 				}
 			]
 

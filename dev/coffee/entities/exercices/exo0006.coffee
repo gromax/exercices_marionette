@@ -7,8 +7,6 @@ define ["utils/math"], (mM) ->
 	#	a:{ tag:"complexes", options:["non", "oui"], def:0}
 	#}
 
-	# debug : tex à faire
-
 	return {
 		max: 11
 
@@ -131,5 +129,105 @@ define ["utils/math"], (mM) ->
 				}
 			]
 
+		getExamBriques: (inputs_list,options, fixedSettings) ->
+			max = @max
+			that = @
+			complexes = Number(options.a.value ? 0) is 1
+			fct_item = (inputs, index) ->
+				iPts = that.init(inputs)
+				if complexes
+					return ("$z_#{pt.name} = #{pt.affixe().tex()}$" for pt in iPts).join(", &nbsp;")
+				else
+					return ("$#{pt.texLine()}$" for pt in iPts).join(", &nbsp;")
+
+			return {
+				children: [
+					{
+						type: "text",
+						children: if complexes
+							[
+								"Dans chaque cas, on donne l'affixe des points &nbsp; $A$ &nbsp; à &nbsp;$E$."
+								"Placez ces points dans un plan complexe."
+							]
+						else
+							[
+								"Dans chaque cas, on donne l'affixe des points &nbsp; $A$ &nbsp; à &nbsp;$E$."
+								"Placez ces points dans un repère."
+							]
+					}
+					{
+						type: "enumerate",
+						refresh:true
+						enumi:"1",
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+		getTex: (inputs_list, options) ->
+			that = @
+			max = @max
+			complexes = Number(options.a.value ? 0) is 1
+			fct_item = (inputs, index) ->
+				iPts = that.init(inputs)
+				if complexes
+					return [
+						("$z_#{pt.name} = #{pt.affixe().tex()}$" for pt in iPts).join(", ")
+						{
+							type:"tikz"
+							left: -max
+							bottom: -max
+							right: max
+							top: max
+							Ouv: true
+						}
+					]
+				else
+					return [
+						("$#{pt.texLine()}$" for pt in iPts).join(", ")
+						{
+							type:"tikz"
+							left: -max
+							bottom: -max
+							right: max
+							top: max
+							axes:[1,1]
+						}
+					]
+
+			if inputs_list.length is 1
+				if complexes
+					sujet = [
+						"On donne l'affixe des points &nbsp; $A$ &nbsp; à &nbsp;$E$."
+						"Placez ces points dans un plan complexe."
+					]
+				else
+					sujet = [
+						"On donne l'affixe des points &nbsp; $A$ &nbsp; à &nbsp;$E$."
+						"Placez ces points dans un repère."
+					]
+				return {
+					children: sujet.concat fct_item(inputs_list[0],0)
+				}
+			else
+				if complexes
+					sujet = [
+						"Dans chaque cas, on donne l'affixe des points &nbsp; $A$ &nbsp; à &nbsp;$E$."
+						"Placez ces points dans un plan complexe."
+					]
+				else
+					sujet = [
+						"Dans chaque cas, on donne l'affixe des points &nbsp; $A$ &nbsp; à &nbsp;$E$."
+						"Places ces points dans un repère."
+					]
+				return {
+					children: sujet.concat [
+						{
+							type: "enumerate"
+							enumi: "1)"
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
 
 	}

@@ -32,7 +32,6 @@
 					items:[
 						{
 							type:"text"
-							rank: 1
 							ps:[
 								"On considère deux nombres complexes &nbsp; $z_1 = #{zA.tex()}$ &nbsp; et &nbsp; $z_2 = #{zB.tex()}$."
 								"Donnez les résultats des calculs suivants :"
@@ -40,52 +39,70 @@
 						}
 						{
 							type:"input"
-							rank: 2
 							tag:"$z_1 + z_2$"
 							name:"s"
 							description:"Somme"
-							good:gSomme
-							waited:"number"
 						}
 						{
 							type:"input"
-							rank: 3
 							tag:"$z_1\\times z_2$"
 							name:"p"
 							description:"Produit"
-							good:gProduit
-							waited:"number"
 						}
 						{
 							type:"input"
-							rank: 4
 							tag:"$\\frac{1}{z_1}$"
 							name:"i"
 							description:"Inverse"
-							good:gInverse
-							formes:"FRACTION"
-							waited:"number"
 						}
 						{
 							type:"input"
-							rank: 5
 							tag:"$\\frac{z_1}{z_2}$"
 							name:"q"
 							description:"Quotient"
-							good:gQuotient
-							formes:"FRACTION"
-							waited:"number"
 						}
 						{
 							type: "validation"
-							rank: 6
 							clavier:["aide"]
 						}
 
 						{
 							type:"aide"
-							rank: 7
 							list: help.complexes.basics
+						}
+					]
+					validations:{
+						s: "number"
+						p: "number"
+						i: "number"
+						q: "number"
+					}
+					verifications:[
+						{
+							name:"s"
+							tag:"$z_1 + z_2$"
+							good: gSomme
+						}
+						{
+							name:"p"
+							tag:"$z_1\\times z_2$"
+							good: gProduit
+						}
+						{
+							name:"i"
+							tag:"$\\frac{1}{z_1}$"
+							good: gInverse
+							parameters:{
+								formes:"FRACTION"
+							}
+						}
+						{
+							name:"q"
+							tag:"$\\frac{z_1}{z_2}$"
+							good: gQuotient
+							parameters:{
+								formes:"FRACTION"
+							}
 						}
 					]
 				}

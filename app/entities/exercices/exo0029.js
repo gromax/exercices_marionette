@@ -45,19 +45,34 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
-              ps: ["On considère l'équation : $" + eqTex + "$.", "Vous devez donner la ou les solutions de cette équations, si elles existent.", "<i>S'il n'y a pas de solution, écrivez $\\varnothing$. s'il y a plusieurs solutions, séparez-les avec ;</i>"]
+              ps: ["On considère l'équation : &nbsp; $" + eqTex + "$.", "Vous devez donner la ou les solutions de cette équations, si elles existent.", "S'il n'y a pas de solution, écrivez &nbsp; $\\varnothing$. s'il y a plusieurs solutions, séparez-les avec ;</i>"]
             }, {
               type: "input",
-              rank: 3,
-              waited: "liste:number",
-              name: "solutions",
-              tag: "$\\mathcal{S}$",
-              good: goods
+              format: [
+                {
+                  text: "$\\mathcal{S} =$",
+                  cols: 2,
+                  "class": "text-right"
+                }, {
+                  latex: true,
+                  cols: 10,
+                  name: "solutions"
+                }
+              ]
             }, {
               type: "validation",
-              rank: 4,
               clavier: ["empty"]
+            }
+          ],
+          validations: {
+            solutions: "liste"
+          },
+          verifications: [
+            {
+              name: "solutions",
+              type: "all",
+              good: goods,
+              tag: "$\\mathcal{S}$"
             }
           ]
         }

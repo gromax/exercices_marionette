@@ -43,7 +43,6 @@ define ["utils/math","utils/help"], (mM, help) ->
 					items:[
 						{
 							type:"text"
-							rank: 1
 							ps:[
 								"Une usine fabrique des pièces de laboratoire."
 								"Le fabriquant affirme que #{p} % des pièces sont non conformes."
@@ -55,22 +54,18 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type:"input"
-							rank: 2
 							tag:"$E(X) =$"
 							name:"esp"
 							description:"Espérance à 0,01 près"
 						}
 						{
 							type:"input"
-							rank: 3
 							tag:"$\\sigma(X) =$"
 							name:"std"
 							description:"Écart-type à 0,01 près"
 						}
 						{
 							type:"validation"
-							rank: 4
-							clavier:[]
 						}
 					]
 
@@ -104,7 +99,6 @@ define ["utils/math","utils/help"], (mM, help) ->
 					items: [
 						{
 							type:"text"
-							rank: 1
 							ps:[
 								"On choisit d'approximer la loi de &nbsp; $X$ &nbsp; par une loi normale."
 								"Déduisez-en l'intervalle de fluctuation asymptotique, au seuil de 95 %, de la fréquence de pièces non conformes dans un échantillon."
@@ -112,7 +106,6 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type:"input"
-							rank: 2
 							format:[
 								{ text: "$I_F =$", cols:2, class:"text-right" }
 								{ text:"[", cols:1, class:"text-right h3"}
@@ -124,8 +117,6 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type:"validation"
-							rank: 4
-							clavier:[]
 						}
 					]
 					validations:{
@@ -156,7 +147,6 @@ define ["utils/math","utils/help"], (mM, help) ->
 					items:[
 						{
 							type:"text"
-							rank: 1
 							ps:[
 								"On a obtenu #{nf} pièces non conformes."
 								"Faut-il accepter ou rejeter l'affirmation du fabriquant ?"
@@ -164,7 +154,6 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type:"radio"
-							rank: 2
 							tag:"Décision"
 							name:"d"
 							radio:[
@@ -174,12 +163,10 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type:"validation"
-							rank: 3
-							clavier:[]
 						}
 					]
 					validations: {
-						d: "radio:1"
+						d: "radio:2"
 					}
 					verifications: [
 						{

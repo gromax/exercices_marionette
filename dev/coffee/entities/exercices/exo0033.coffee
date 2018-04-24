@@ -25,11 +25,12 @@ define ["utils/math", "utils/help"], (mM, help) ->
 
 			[
 				mM.exec([ "x", a, "*", ang1, "+"], {simplify:true}).tex()
-				mM.exec([ "x", b, "*", ang2, "+", 2, "#", "pi", "*", "*", "+"], {simplify:true}).tex()
-				[ mM.exec([ang2, ang1, "-", 2, "#", "pi", "*", "*", "+", a, b, "-", "/"], { simplify:true, developp:true, modulo:true}) ]
+				mM.exec([ "x", b, "*", ang2, "+", 2, "Symbol:k", "pi", "*", "*", "+"], {simplify:true}).tex()
+				mM.exec([ang2, ang1, "-", a, b, "-", "/"], { simplify:true, developp:true })
+				mM.exec([2, "pi", "*", a, b, "-", "/"], { simplify:true, developp:true})
 			]
 		getBriques: (inputs, options) ->
-			[membreGaucheTex, membreDroiteTex, sols] = @init(inputs)
+			[membreGaucheTex, membreDroiteTex, sol, modu] = @init(inputs)
 
 			[
 				{
@@ -37,29 +38,62 @@ define ["utils/math", "utils/help"], (mM, help) ->
 					items: [
 						{
 							type: "text"
-							rank: 1
 							ps: [
 								"Vous devez résoudre l'équation suivante :"
-								"$#{membreGaucheTex} = #{membreDroiteTex}$"
-								"S'il y a plusieurs solutions, séparez-les avec ;"
+								"$#{membreGaucheTex} = #{membreDroiteTex}, k\\in\\mathbb{Z}$"
+								"Votre réponses doit être de la forme &nbsp; $\\cdots + k \\cdots$"
 							]
 						}
 						{
 							type: "input"
-							rank: 2
-							waited: "liste:number"
-							name: "solutions"
-							tag:"$\\mathcal{S}$"
-							description:"Solutions"
-							good: sols
-							moduloKey: "k"
+							format: [
+								{ text: "$x =$", cols:2, class:"text-right" }
+								{ latex: true, cols:3, name:"x"}
+								{ text: "$ + k \\quad\\cdot$", cols:1, class:"text-center" }
+								{ latex: true, cols:3, name:"m"}
+								{ text: "$, k \\in\\mathbb{Z}$", cols:2 }
+							]
 						}
 						{
 							type: "validation"
-							rank: 4
-							clavier: ["empty", "pi"]
+							clavier: ["pi", "aide"]
+						}
+						{
+							type: "aide"
+							list:[
+								"$k$ &nbsp; est un entier quelconque. Vous pouvez le manipuler comme si sa valeur était connue, comme on le fait avec le symbole &nbsp; $\\pi$."
+							]
 						}
 					]
+					validations: {
+						x: "number"
+						m: "number"
+					}
+					verifications: [
+						(data)->
+							verX = mM.verification.isSame(data.x.processed, sol, {})
+							verM = mM.verification.areSome(data.m.processed, [modu, mM.exec([modu,"*-"])], {})
+							# Il faut accepter un x qui serait avec le modulo
+							if verX.note is 0
+								ratio = mM.float(mM.exec([data.x.processed.object, sol, "-", data.m.processed.object, "/"]))
+								if ratio-Math.abs(ratio)<.000000001
+									verX.note = 1
+									verX.goodMessage = {
+										type:"success"
+										text: "$#{data.x.processed.tex}$ &nbsp; est une bonne réponse."
+									}
+							{
+								note: (verX.note+verM.note)/2
+								add: {
+									type: "ul"
+									list: [{
+										type:"normal"
+										text: "Vous avez répondu &nbsp; $x= #{data.x.processed.tex} + k \\cdot #{data.m.processed.tex}$"
+									}].concat(verX.errors, [verX.goodMessage], verM.errors, [verM.goodMessage])
+								}
+							}
+					]
+
 				}
 			]
 

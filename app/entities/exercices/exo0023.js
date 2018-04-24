@@ -61,11 +61,9 @@ define(["utils/math", "utils/help"], function(mM, help) {
               formes: "FRACTION"
             }, {
               type: "validation",
-              rank: 3,
               clavier: ["aide"]
             }, {
               type: "aide",
-              rank: 4,
               list: help.derivee.tangente
             }
           ]

@@ -78,25 +78,31 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["La variable aléatoire &nbsp; $X$ &nbsp; suit la <b>loi normale</b> de moyenne &nbsp; $\\mu = " + mu + "$ &nbsp; et d'écart-type &nbsp; $\\sigma = " + std + "$.", "<b>Remarque :</b> on note &nbsp; $\\mathcal{N}(" + mu + ";" + std + ")$ &nbsp; cette loi."]
             }, {
               type: "input",
-              rank: 2,
               tag: "$p(" + ens + ")$",
               name: "pX",
-              description: "Valeur à 0,01 près",
-              good: p,
-              waited: "number",
-              arrondi: -2
+              description: "Valeur à 0,01 près"
             }, {
               type: "validation",
-              rank: 3,
               clavier: ["aide"]
             }, {
               type: "aide",
-              rank: 4,
               list: help.proba.binomiale.calculette
+            }
+          ],
+          validations: {
+            pX: "number"
+          },
+          verifications: [
+            {
+              name: "pX",
+              tag: "$p(" + ens + ")$",
+              good: p,
+              parameters: {
+                arrondi: -2
+              }
             }
           ]
         }

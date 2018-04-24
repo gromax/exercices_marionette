@@ -35,33 +35,39 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["On donne &nbsp; $A$ &nbsp; d'affixe &nbsp; $z_A=" + (zA.tex()) + "$, &nbsp; $B$ &nbsp; d'affixe &nbsp; $z_B=" + (zB.tex()) + "$ &nbsp; et &nbsp; $C$ &nbsp; d'affixe &nbsp; $z_C=" + (zC.tex()) + "$.", "On notera &nbsp; $z_1$ &nbsp; l'affixe de &nbsp; $\\overrightarrow{AC}$ &nbsp; et &nbsp; $z_2$ &nbsp; l'affixe de &nbsp; $\\overrightarrow{AB}$."]
             }, {
               type: "input",
-              rank: 2,
-              waited: "number",
               tag: "$z_1$",
               name: "z1",
-              description: "Affixe de AC",
-              good: zAC
+              description: "Affixe de AC"
             }, {
               type: "input",
-              rank: 3,
-              waited: "number",
               tag: "$z_1$",
               name: "z2",
-              description: "Affixe de AB",
-              good: zAB
+              description: "Affixe de AB"
             }, {
               type: "validation",
-              rank: 6,
               clavier: ["aide"]
             }, {
               type: type,
               "aide": "aide",
-              rank: 7,
               list: help.complexes.affixeVecteur
+            }
+          ],
+          validations: {
+            z1: "number",
+            z2: "number"
+          },
+          verifications: [
+            {
+              name: "z1",
+              good: zAC,
+              tag: "$z_1$"
+            }, {
+              name: "z2",
+              good: zAB,
+              tag: "$z_2$"
             }
           ]
         }, {
@@ -70,20 +76,24 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["Calculez le produit &nbsp; $z_1\\cdot\\overline{z_2}$ &nbsp; sous sa forme algébrique."]
             }, {
               type: "input",
-              rank: 2,
-              waited: "number",
               tag: "$z$",
               name: "z",
-              description: "Forme x+iy",
-              good: z
+              description: "Forme x+iy"
             }, {
-              type: "validation",
-              rank: 6,
-              clavier: []
+              type: "validation"
+            }
+          ],
+          validations: {
+            z: "number"
+          },
+          verifications: [
+            {
+              name: "z",
+              good: z,
+              tag: "$z$"
             }
           ]
         }, {
@@ -92,26 +102,33 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["L'angle que l'on cherche est l'argument de &nbsp; $z$. Donnez une approximation à 1° près de cet angle en degrés."]
             }, {
               type: "input",
-              rank: 2,
-              waited: "number",
               tag: "$\\widehat{BAC}$",
               name: "a",
               description: "Angle",
-              good: ang,
-              arrondi: 0
+              good: ang
             }, {
               type: "validation",
-              rank: 6,
               clavier: ["aide"]
             }, {
               type: type,
               "aide": "aide",
-              rank: 7,
               list: help.complexes.argument
+            }
+          ],
+          validations: {
+            a: "number"
+          },
+          verifications: [
+            {
+              name: "a",
+              good: ang,
+              tag: "$\\widehat{BAC}$",
+              parameters: {
+                arrondi: 0
+              }
             }
           ]
         }

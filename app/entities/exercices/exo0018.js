@@ -257,6 +257,13 @@ define(["utils/math", "utils/help"], function(mM, help) {
           "Tracez les courbes des fonctions suivantes.", {
             type: "enumerate",
             children: _.map(inputs_list, fct_item)
+          }, {
+            type: "tikz",
+            left: -max,
+            bottom: -max,
+            right: max,
+            top: max,
+            axes: [1, 1]
           }
         ]
       };

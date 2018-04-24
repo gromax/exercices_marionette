@@ -11,11 +11,16 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 
 	return {
 		max: 6
-		init: (inputs, options) ->
+		init: (inputs, options, der) ->
 			max = @max
-			optA = Number(options.a.value ? 0) is 0
 
 			# Initialisation du polynome
+			if (inputs.ranks?)
+				ranks =(Number it for it in inputs.ranks.split(";"))
+			else
+				ranks = _.shuffle([0..1])
+				inputs.ranks = ranks.join(";")
+
 			poly = null
 			if typeof inputs.p isnt "undefined"
 				poly = mM.polynome.make inputs.p
@@ -34,28 +39,27 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 
 			# Calcul de la dérivée
 			polyDer = poly.derivate()
-			col = Math.floor(Math.random() * 2)
 
 			[
 				[
-					[poly, colors.html(col) ]
-					[polyDer, colors.html(1-col)]
+					poly
+					polyDer
 				]
 				[
-					{ rank:col, text: "$#{if optA then "f" else "F"}$" }
-					{ rank:1-col, text: "$#{if optA then "f'" else "f"}$" }
+					"$#{if der then "f" else "F"}$"
+					"$#{if der then "f'" else "f"}$"
 				]
+				ranks
 			]
 
-		getBriques: (inputs, options) ->
-			optA = Number(options.a.value ? 0) is 0
+		getBriques: (inputs, options, fixedSettings) ->
 			max= @max
-			[polys, items] = @init(inputs,options)
+			[polys, items, ranks] = @init(inputs,options, fixedSettings.derivee)
 
 			initGraph = (graph) ->
-				for p in polys
-					fct = (x) -> mM.float(p[0], {x:x})
-					graph.create('functiongraph', [ fct, -max, max ], { strokeWidth:3, strokeColor: p[1], fixed:true })
+				for p, i in polys
+					fct = (x) -> mM.float(p, {x:x})
+					graph.create('functiongraph', [ fct, -max, max ], { strokeWidth:3, strokeColor: colors.html(ranks[i]), fixed:true })
 
 			[
 				{
@@ -63,8 +67,7 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 					items: [
 						{
 							type: "text"
-							rank: 1
-							ps: if optA then [
+							ps: if fixedSettings.derivee then [
 								"On vous donne 2 courbes."
 								"L'une d'elle correspond à la fonction &nbsp; $f$, l'autre à sa dérivée $f'$."
 								"Vous devez associer chaque courbe avec &nbsp; $f$ &nbsp; ou &nbsp; $f'$."
@@ -76,7 +79,6 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 						}
 						{
 							type:"jsxgraph"
-							rank: 2
 							divId: "jsx#{Math.random()}"
 							params: {
 								axis:true
@@ -90,38 +92,149 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 						}
 						{
 							type:"color-choice"
-							rank: 3
 							name:"it"
 							list: items
 						}
 						{
 							type: "validation"
-							rank: 4
 							clavier: ["aide"]
 						}
 						{
 							type: "aide"
-							rank: 5
-							list: if optA then help.derivee.variation else help.primitive.variation
+							list: if fixedSettings.derivee then help.derivee.variation else help.primitive.variation
+						}
+					]
+					validations:{
+						it:"color:2"
+					}
+					verifications:[
+						{
+							name:"it"
+							colors: ranks
+							items: items
 						}
 					]
 				}
 			]
 
+		getExamBriques: (inputs_list,options, fixedSettings) ->
+			max = @max
+			that = @
+			graphs = {}
+			if fixedSettings.derivee
+				sujet = [
+					"Dans chaque cas, on vous donne 2 courbes."
+					"L'une représente une fonction &nbsp; $f$ &nbsp; et la seconde représente sa dérivée &nbsp; $f'$."
+					"Indiquez à chaque fois quelle courbe correspond à &nbsp; $f$ &nbsp; et quelle courbe correspond à &nbsp; $f'$."
+				]
+			else
+				sujet = [
+					"Dans chaque cas, on vous donne 2 courbes."
+					"L'une représente une fonction &nbsp; $f$ &nbsp; et la seconde représente une primitive &nbsp; $F$."
+					"Indiquez à chaque fois quelle courbe correspond à &nbsp; $f$ &nbsp; et quelle courbe correspond à &nbsp; $F$."
+				]
+			fct_item = (inputs, index) ->
+				[polys, items, ranks] = that.init(inputs, options, fixedSettings.derivee)
+				id = "jsx"+Math.random()
 
-		tex: (data) ->
-			if not isArray(data) then data = [ data ]
-			out = []
-			for itemData,i in data
-				if itemData.options.a.value is 0
-					title = "Identifier la courbe de $f$ et celle de sa dérivée $f'$"
-				else
-					title = "Identifier la courbe de $f$ et celle de sa primitive $F$"
-				courbes = ( { color:item.color.tex, expr:item.obj.toClone().simplify().toString().replace(/,/g,'.').replace(/x/g,'(\\x)') } for item in itemData.polys )
-				graphique = Handlebars.templates["tex_courbes"] { index:i+1, max:@max, courbes:courbes, scale:.6*@max/6, center:true }
-				out.push {
-					title:title
-					content:graphique
+				graphs[id] = {
+					params: {
+						axis:true
+						grid:true
+						boundingbox:[-max,max,max,-max]
+						keepaspectratio: true
+					}
+					init: (graph) ->
+						for p, i in polys
+							fct = (x) -> mM.float(p, {x:x})
+							graph.create('functiongraph', [ fct, -max, max ], { strokeWidth:3, strokeColor: colors.html(ranks[i]), fixed:true })
 				}
-			out
+				return {
+					children: [
+						{
+							type:"graphique"
+							divId: id
+						}
+					]
+				}
+
+			return {
+				children: [
+					{
+							type: "text"
+							children: sujet
+					}
+					{
+						type: "subtitles"
+						enumi: "A"
+						refresh:true
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+				graphs: graphs
+			}
+
+		getTex: (inputs_list, options, fixedSettings) ->
+			that = @
+			max = @max
+			fct_item = (inputs, index) ->
+				[polys, items, ranks] = that.init(inputs, options, fixedSettings.derivee)
+
+				return [
+					{
+						type:"tikz"
+						left: -max
+						bottom: -max
+						right: max
+						top: max
+						index: index+1
+						axes:[1,1]
+						courbes: ( { color:colors.tex(ranks[i]), expression:String(p).replace /x/g, '(/x)' } for p,i in polys)
+					}
+				]
+
+
+			if inputs_list.length is 1
+				if fixedSettings.derivee
+					sujet = [
+						"On vous donne 2 courbes."
+						"L'une représente une fonction $f$ et la seconde représente sa dérivée $f'$."
+						"Indiquez quelle courbe correspond à $f$ et quelle courbe correspond à $f'$."
+					]
+				else
+					sujet = [
+						"On vous donne 2 courbes."
+						"L'une représente une fonction $f$ et la seconde représente une primitive $F$."
+						"Indiquez quelle courbe correspond à $f$ et quelle courbe correspond à $F$."
+					]
+
+				return {
+					children: sujet.concat fct_item(inputs_list[0],0)
+				}
+			else
+				if fixedSettings.derivee
+					sujet = [
+						"Dans chaque cas, on vous donne 2 courbes."
+						"L'une représente une fonction $f$ et la seconde représente sa dérivée $f'$."
+						"Indiquez à chaque fois quelle courbe correspond à $f$ et quelle courbe correspond à $f'$."
+					]
+				else
+					sujet = [
+						"Dans chaque cas, on vous donne 2 courbes."
+						"L'une représente une fonction $f$ et la seconde représente une primitive $F$."
+						"Indiquez à chaque fois quelle courbe correspond à $f$ et quelle courbe correspond à $F$."
+					]
+
+
+				return {
+					children: [
+						{
+							type: "enumerate"
+							enumi: "1)"
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
+
+
 	}

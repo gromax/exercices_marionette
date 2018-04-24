@@ -188,14 +188,16 @@ define [], () ->
 				description:"Une série statistique est donnée. Il faut calculer sa moyenne et son écart-type."
 				keyWords:["Statistiques","Moyenne","Écart-type","Première"]
 				options: {}
+				fixedSettings: { moyenne:true }
 			}
 			{
 				id:21
-				filename: "exo0021"
+				filename: "exo0020"
 				title:"Médiane et quartiles"
 				description:"Une série statistique est donnée. Il faut calculer le premier quartile, la médiane et le troisième quartile."
 				keyWords:["Statistiques","Médiane","Quartile","Seconde"]
 				options: {}
+				fixedSettings: { moyenne:false }
 			}
 			{
 				id:22
@@ -426,11 +428,12 @@ define [], () ->
 			{
 				id:48
 				filename: "exo0048"
-				title: "Reconnaître les courbes fonction / dérivée ou fonction / primitive"
-				description: "On donne la courbe d'une fonction $f$ et la courbe de sa dérivée $f'$ (ou de sa primitive $F$), il faut reconnaître quelle courbe correspond à $f$ et quelle courbe correspond à $f'$ (ou $F$)."
-				keyWords:["Analyse", "Déerivation", "Première", "Primitive", "Terminale"]
-				options: {
-					a:{ tag:"Dérivée ou Primitive" , options:["Dérivée", "Primitive"] }
+				title: "Reconnaître les courbes fonction / dérivée"
+				description: "On donne la courbe d'une fonction $f$ et la courbe de sa dérivée $f'$, il faut reconnaître quelle courbe correspond à $f$ et quelle courbe correspond à $f'$."
+				keyWords:["Analyse", "Dérivation", "1STL"]
+				options: {}
+				fixedSettings: {
+					derivee:true
 				}
 			}
 			{
@@ -516,6 +519,17 @@ define [], () ->
 				description:"La courbe d'une fonction est donnée. Il faut déterminer l'aire sous la courbe."
 				keyWords:["Intégrale","Analyse","Primitive", "TSTL"]
 				options: {}
+			}
+			{
+				id:58
+				filename: "exo0048"
+				title: "Reconnaître les courbes fonction / primitive"
+				description: "On donne la courbe d'une fonction $f$ et la courbe de sa primitive $F$, il faut reconnaître quelle courbe correspond à $f$ et quelle courbe correspond à $F$."
+				keyWords:["Analyse", "Primitive", "TSTL"]
+				options: {}
+				fixedSettings: {
+					derivee:false
+				}
 			}
 		]
 		get: (id) ->

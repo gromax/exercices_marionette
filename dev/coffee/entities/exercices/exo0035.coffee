@@ -14,29 +14,32 @@ define ["utils/math", "utils/help"], (mM, help) ->
 			else
 				ang1 = mM.alea.number { min:1, max:6, sign:true, coeff:30 }
 				inputs.ang1 = String ang1
-			ang1 = mM.trigo.degToRad ang1
+
 			if inputs.ang2? then ang2 = mM.toNumber inputs.ang2
 			else
 				ang2 = mM.alea.number { min:1, max:6, sign:true, coeff:30 }
 				inputs.ang2 = String ang2
-			ang2 = mM.trigo.degToRad ang2
 			if inputs.type? then type=inputs.type
 			else inputs.type = type = mM.alea.real ["cos","sin"]
 
-			membreGauche = mM.exec(["x", a, "*", ang1, "+", type], {simplify:true}).tex()
-			membreDroite = mM.exec([ang2, type]).tex()
+			ang1R = mM.trigo.degToRad ang1
+			ang2R = mM.trigo.degToRad ang2
 
-			modulo = mM.exec [2, "pi", "*", a, "/"], {simplify:true}
-			ang = mM.exec [ang2, ang1, "-", a, "/"], {simplify:true}
+			membreGauche = mM.exec(["x", a, "*", ang1R, "+", type], {simplify:true}).tex()
+			membreDroite = mM.exec([ang2R, type]).tex()
+
+			angSol = mM.exec([ang2R, ang1R, "-", a, "/"], {simplify:true})
+			modulo = mM.exec([2, "pi", "*", a, "/"], {simplify:true})
+
 			if type is "cos"
-				solutions = [ang.toClone().setModulo(modulo), ang.opposite().setModulo(modulo)]
+				solutions = [angSol, mM.exec([angSol, "*-"])]
 			else
-				solutions = [ang.toClone().setModulo(modulo), mM.trigo.principale(["pi", ang, "-"]).setModulo(modulo)]
+				solutions = [angSol, mM.trigo.principale(["pi", angSol, "-"])]
 
-			[membreGauche, membreDroite, solutions]
+			[membreGauche, membreDroite, solutions, modulo]
 
 		getBriques: (inputs, options) ->
-			[membreGaucheTex, membreDroiteTex, solutions] = @init(inputs)
+			[membreGaucheTex, membreDroiteTex, solutions, modu] = @init(inputs)
 
 			[
 				{
@@ -44,28 +47,65 @@ define ["utils/math", "utils/help"], (mM, help) ->
 					items: [
 						{
 							type: "text"
-							rank: 1
 							ps: [
 								"Vous devez résoudre l'équation suivante :"
 								"$#{membreGaucheTex} = #{membreDroiteTex}$"
-								"S'il y a plusieurs solutions, séparez-les avec ;"
+								"Donnez une équation sous la forme les solutions appartenant à &nbsp; $]-\\pi;+\\pi]$."
+								"Votre réponses doit être de la forme &nbsp; $\\cdots + k \\cdots, k\\in\\mathbb{Z}$"
 							]
 						}
 						{
 							type: "input"
-							rank: 2
-							waited: "liste:number"
-							name: "solutions"
-							tag:"$\\mathcal{S}$"
-							description:"Solutions"
-							good: solutions
-							moduloKey: "k"
+							format: [
+								{ text: "$x =$", cols:2, class:"text-right" }
+								{ latex: true, cols:3, name:"x"}
+								{ text: "$ + k \\quad\\cdot$", cols:1, class:"text-center" }
+								{ latex: true, cols:3, name:"m"}
+								{ text: "$, k \\in\\mathbb{Z}$", cols:2 }
+							]
 						}
 						{
 							type: "validation"
-							rank: 4
-							clavier: ["empty", "pi"]
+							clavier: ["pi"]
 						}
+					]
+					validations: {
+						x:"number"
+						m:"number"
+					}
+					verifications:[
+						(data)->
+							verX = mM.verification.areSome(data.x.processed, solutions, {})
+							verM = mM.verification.areSome(data.m.processed, [modu, mM.exec([modu,"*-"])], {})
+							# Il faut accepter un x qui serait avec le modulo
+							if verX.note is 0
+								ratio = mM.float(mM.exec([data.x.processed.object, solutions[0], "-", data.m.processed.object, "/"]))
+								if ratio-Math.abs(ratio)<.000000001
+									verX.note = 1
+									verX.goodMessage = {
+										type:"success"
+										text: "$#{data.x.processed.tex}$ &nbsp; est une bonne réponse."
+									}
+								else
+									# on essaie avec l'autre solution
+									ratio = mM.float(mM.exec([data.x.processed.object, solutions[1], "-", data.m.processed.object, "/"]))
+									if ratio-Math.abs(ratio)<.000000001
+										verX.note = 1
+										verX.goodMessage = {
+											type:"success"
+											text: "$#{data.x.processed.tex}$ &nbsp; est une bonne réponse."
+										}
+
+							{
+								note: (verX.note+verM.note)/2
+								add: {
+									type: "ul"
+									list: [{
+										type:"normal"
+										text: "Vous avez répondu &nbsp; $x= #{data.x.processed.tex} + k \\cdot #{data.m.processed.tex}$"
+									}].concat(verX.errors, [verX.goodMessage], verM.errors, [verM.goodMessage])
+								}
+							}
 					]
 				}
 			]
@@ -73,7 +113,7 @@ define ["utils/math", "utils/help"], (mM, help) ->
 		getExamBriques: (inputs_list,options) ->
 			that = @
 			fct_item = (inputs, index) ->
-				[membreGaucheTex, membreDroiteTex, sols] = that.init(inputs,options)
+				[membreGaucheTex, membreDroiteTex, sols, modulo] = that.init(inputs,options)
 				return "$#{membreGaucheTex} = #{membreDroiteTex}$"
 
 			return {
@@ -96,7 +136,7 @@ define ["utils/math", "utils/help"], (mM, help) ->
 		getTex: (inputs_list, options) ->
 			that = @
 			fct_item = (inputs, index) ->
-				[membreGaucheTex, membreDroiteTex, sols] = that.init(inputs,options)
+				[membreGaucheTex, membreDroiteTex, sols, modulo] = that.init(inputs,options)
 				return "$#{membreGaucheTex} = #{membreDroiteTex}$"
 
 			return {
