@@ -4,24 +4,12 @@
 		main: (goodObject, answer,symbols) ->
 			# goodObject est un NumberObject
 			# answer est un NumberObject
-			moduloError=false
-			if modulo = goodObject.getModulo()
-				floatModulo = Math.abs modulo.floatify(symbols).float()
-				answerModuloObject = answer.modulo()
-				if (answerModuloObject.modulo isnt false)
-					moduloError = (Math.abs(answerModuloObject.modulo.floatify(symbols).float())-floatModulo > ERROR_MIN)
-					answer = answerModuloObject.base
-				else moduloError = true
-				if moduloError then moduloError = modulo.tex()
-			else floatModulo = 0
 			if (goodObject instanceof InftyNumber) and (answer instanceof InftyNumber) and (goodObject.isPositive() is answer.isPositive()) then ecart  = 0
 			else
 				g = goodObject.toClone().simplify(null,true)
 				a = answer.toClone().simplify(null,true)
 				# Cette façon de faire plus lourde est là pour permettre la gestion d'expression plus complexe comme (3t+2)exp(4t)
 				ecart = g.am(a,true).simplify(null,false,true).floatify(symbols).abs().float()
-			if floatModulo>0
-				ecart -= floatModulo while floatModulo<=ecart
 			if ecart<ERROR_MIN then ecart = 0
 			if answer instanceof RealNumber
 				# Dans ce cas, l'utilisateur donne une valeur numérique
@@ -29,7 +17,7 @@
 				# On cherche l'ordre de grandeur de la justesse de la réponse.
 				# On souhaite aussi savoir s'il s'agit d'une troncature au lieu d'une approx
 				# On souhaite aussi connaître le nombre de décimales de la réponse de l'utilisateur (p_user)
-				if ecart is 0 then return { exact:true, float:true, moduloError:moduloError, p_user:answer.precision(), ordre:null }
+				if ecart is 0 then return { exact:true, float:true, p_user:answer.precision(), ordre:null }
 				else
 					ordre = Math.ceil(Math.log(ecart)/Math.log(10))
 					p_user = answer.precision()
@@ -40,15 +28,14 @@
 					if (marge>=-ERROR_MIN)
 						# L'erreur est plus petite que le degré de précision donné par l'utilisateur
 						# C'est ici qu'éventuellement on parlera de troncature
-						return { exact:false, float:true, approx_ok:true, ecart:ecart, moduloError:moduloError, p_user:p_user, ordre:ordre }
-					else return { exact:false, float:true, approx_ok:false, ecart:ecart, moduloError:moduloError, p_user:p_user, ordre:ordre }
+						return { exact:false, float:true, approx_ok:true, ecart:ecart, p_user:p_user, ordre:ordre }
+					else return { exact:false, float:true, approx_ok:false, ecart:ecart, p_user:p_user, ordre:ordre }
 			# L'utilisateur donne une formule. On attend donc une valeur exacte.
-			{ exact: (ecart is 0), float:false, moduloError:moduloError }
+			{ exact: (ecart is 0), float:false }
 		tri: (usersObj,goodsObj) ->
 			# On donne un tableau de réponses utilisateur et un tableau de bonnes réponses
 			# On cherche à les associer 2 à 2 et à renvoyer le tableau des bonnes réponses
 			# trier dans le bon ordre relativement à users
-			# On organise les goods et on en profite pour détecter un modulo
 			paired_users = []
 			maxIter = usersObj.length*(usersObj.length+1)/2
 			# Évite une éventuelle boucle infinie. Dans tous les cas, le nombre d'iter

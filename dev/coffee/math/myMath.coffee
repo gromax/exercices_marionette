@@ -170,7 +170,6 @@
 			config = mergeObj {
 				simplify: false
 				developp: false
-				modulo:false
 				clone:true
 			}, params
 
@@ -209,10 +208,7 @@
 						op2 = pile.pop()
 						op1 = pile.pop()
 						pile.push(new Intersection(op1,op2))
-					when arg is "modulo"
-						op2 = pile.pop()
-						pile.push(pile.pop()?.setModulo(op2))
-					when arg in ["x","y","t","i","pi","#","e","∞"] then pile.push SymbolManager.makeSymbol(arg)
+					when arg in ["x","y","t","i","pi","e","∞"] then pile.push SymbolManager.makeSymbol(arg)
 					when (typeof arg is "string") and (FunctionNumber.functions[arg]?) then pile.push(new FunctionNumber(arg,pile.pop()))
 					when typeof arg is "number" then pile.push(new RealNumber(arg))
 					when (typeof arg is "string") and (m = arg.match /// ^symbol:([a-zA-Z_']+)$ ///i) then pile.push SymbolManager.makeSymbol(m[1])
@@ -224,11 +220,6 @@
 			out = pile.pop()
 			if config.developp then out.developp()
 			if config.simplify then out = out.simplify(null,config.developp)
-			if config.modulo isnt false
-				# On cherche à extraire un modulo
-				unless typeof config.modulo is "string" then config.modulo = "modulo"
-				decomposition = out.modulo(config.modulo)
-				unless decomposition.modulo is false then out = decomposition.base.setModulo(decomposition.modulo)
 			out
 		parse: (expression,params) -> (new ParseInfo expression,params).object
 		equals: (a, b) ->
@@ -411,27 +402,6 @@
 				v2 = mM.toNumber val2
 				(new Ensemble()).init((ouvrant is "[") or (ouvrant is true), v1, (fermant is "]") or (fermant is true), v2)
 		}
-		tri: (users,goods) ->
-			# users est un tableau d'objets ParseInfo
-			# goods est un tableau d'objets (idem)
-			goodsObj = ( { value: mM.toNumber(item), rank:i, d:[] } for item,i in goods )
-			# on détecte les modulos sur les users
-			usersObj = []
-			for userInfo, i in users when userInfo instanceof ParseInfo
-				user = userInfo.object
-				if user instanceof NumberObject
-					moduloObj = user.modulo?()
-					if moduloObj.modulo isnt false then user = moduloObj.base
-				usersObj.push { value:user, info:userInfo, rank:i, d:[] }
-			erreurManager.tri(usersObj,goodsObj)
-		erreur:(good,userObject,symbols) ->
-			# userObject est un NumberObject
-			# good peut-être un tableau de proposition dont on cherchera la plus proche
-			if isArray(good)
-				closest = erreurManager.searchClosest( ( { value:@toNumber(item), rank:i } for item,i in good ), userObject )
-				goodObject = if closest isnt null then good = closest.value else new RealNumber()
-			else goodObject = @toNumber good
-			erreurManager.main(goodObject,userObject,symbols)
 		factorisation:(obj,regex, params)->
 			# Bug ici, besoin de trop simplifier
 			if (f=obj.facto?(regex))?
@@ -439,140 +409,8 @@
 				if config.simplify then f[0] = f[0].simplify(null,config.developp).simplify() # bug : pourquoi faut-il deux simplify() ?
 				MultiplyNumber.makeMult f
 			else obj.toClone()
-		p:{
-			type: (goodObject,params) ->
-				if (typeof params isnt "object") or (params is null) then params = {}
-				if not(params.type in ["ensemble", "number"])
-					switch
-						when goodObject instanceof EnsembleObject then params.type = "ensemble" # On attend un ensemble
-						when typeof goodObject is "number" then params.type = "number"
-						else params.type = "number"	# A défaut, on attend un nombre
-				params
-			userAnswer: (user, params) ->
-				# user est le string utilisateur
-				# params sont les éventuels paramètres
-				config = mergeObj {
-					developp:false	# Indique s'il faut développer le résultat de l'utilisateur
-					toLowerCase:false # Pour le parser, convertit en petit
-					type:"number" # type de parse par défaut
-				}, params
-				if user instanceof ParseInfo then info=user # Cas où on fournirait un user déjà parsé
-				else info = new ParseInfo user, config
-				info
-			validate: (user, type) ->
-				if typeof user isnt "string" then return { info:null, error:"Erreur inconnue !"}
-				if user is "" then return { info:null, error:"Ne doit pas être vide" }
-				switch type
-					when "liste:number"
-						if user is "∅" then return { info:[], error: false }
-						liste = user.split(";")
-						infos = ( new ParseInfo(item, {type:"number"}) for item in liste)
-						invalids = (inf for inf in infos when inf.valid is false)
-						if invalids.length>0
-							return { info:infos, error:"Saisie invalide" }
-						else
-							return { info:infos, error: false }
-					when "ensemble"
-						info = new ParseInfo(user, {type:"ensemble"})
-						if info.valid then return { info:info, error:false }
-						else return { info:info, error: info.messages }
-					else
-						info = new ParseInfo(user, {type:"number"})
-						if info.valid then return { info:info, error:false }
-						else return { info:info, error: info.messages }
-		}
+
 		verif:{
-			number: (userInfo,goodObject,params) ->
-				if typeof goodObject is "number" then goodObject = new RealNumber(goodObject)
-				# Fonction de vérification des exercices pour les numberObject ou number
-				# La sortie bareme est un facteur / 1
-				# userInfo = Parse du string retourné par l'utilisateur
-				# goodObject = bonne valeur. Un NumberObject
-				# params = objet de paramètres dont les possibilités sont données ci-dessous
-				default_config = {
-					formes:null		# forme autorisées. Par ex : { racine:true, fraction:true } ou encore "FRACTION"
-					p_forme:0.75		# pondération pour une forme pas suffisemment simplifiée
-					tolerance:0		# Une approximation dans la tolérance est considérée comme juste et n'est pas signalée
-					approx:0.1		# Une approximation est tolérée mais signalée comme fausse
-					p_approx:0.5	# Pondération si le résultat n'est qu'approximatif et dans la tolérance
-					arrondi:null	# Si on demande un arrondi, on précise ici une puissance (-2 pour 0.01 par ex.)
-					p_arrondi:0.5	# Pondération si arrondi demandé et mal fait
-					p_modulo:0.5	# Pondération si le modulo est faux
-					symbols:null	# liste de symboles
-					custom:false	# fonction custom
-				}
-
-				keysFilter = [
-					"formes"
-					"p_forme"
-					"tolerance"
-					"approx"
-					"p_approx"
-					"arrondi"
-					"p_arrondi"
-					"p_modulo"
-					"symbols"
-					"custom"
-					"goodTex"
-				]
-
-				params = _.pick(params, keysFilter...)
-				config = _.extend default_config, params
-
-				erreur = erreurManager.main(goodObject,userInfo.object,config.symbols)
-				# erreur = objet produit par la fonction mM.erreur et contenant les infos :
-				# - exact = true/false : valeur exacte
-				# - float = true/false : valeur décimale
-				# - approx_ok:true/false : approximation correctement faite
-				# - ecart:ecart = nombre
-				# - moduloError = false/tex : en cas d'erreur, on envoie le tex du modulo demandé
-				# - p_user = nombre entier : puissance du dernier chiffre significatif
-
-				note = 0
-				errors=[]		# liste des messages d'erreur
-
-				switch
-					when typeof config.arrondi is "number"
-						# On exige un arrondi.
-						# On envisage pas le cas d'un modulo, donc si l'utilisateur en a mis un, c'est faux
-						approx = Math.pow(10,config.arrondi)
-
-						# On vérifie d'abord qu'on est juste au moins dans l'approx
-						# Une difficulté : Si la réponse attendue est ,4,10236 à 0,01. L'utilisateur répond 4,10 ou 4,1 ce qui est
-						# pris identique pour la machine et peut provoquer une erreur
-						if (erreur.exact or erreur.float and ((erreur.ordre<=config.arrondi) or (erreur.p_user<=config.arrondi))) and not erreur.moduloError
-							# Maintenant on peut vérifier si l'utilisateur respecte le format
-							if not erreur.float
-								errors.push "Approximation sous forme décimale attendue."
-							if not(erreur.approx_ok or erreur.exact)
-								errors.push "Il faut arrondir au #{approx} le plus proche."
-							if erreur.p_user<config.arrondi
-								errors.push "Vous donnez trop de décimales."
-							if errors.length>0
-								note = config.p_arrondi
-								errors.push "La bonne réponse était #{numToStr(mM.float(goodObject), -config.arrondi)}."
-							else note = 1
-						else
-							if not erreur.float
-								errors.push "Approximation sous forme décimale attendue."
-							errors.push "La bonne réponse était #{numToStr(mM.float(goodObject), -config.arrondi)}."
-					when erreur.exact or erreur.float and (erreur.ecart<=config.tolerance)
-						# Résultat exact ou dans la tolérance
-						note = 1
-						if not userInfo.forme(config.formes)
-							note *= config.p_forme
-							errors.push "Vous devez simplifier votre résultat."
-						if erreur.moduloError
-							note *= config.p_modulo
-							output.errors.push "Le bon modulo était &nbsp; $k\\cdot #{erreur.moduloError}$"
-					when erreur.float and erreur.approx_ok and (erreur.ecart<=config.approx) and not erreur.moduloError
-						errors.push "Vous avez donné une approximation. Il faut donner une valeur exacte."
-						note = config.p_approx
-					else
-						errors.push "La bonne réponse était &nbsp; $#{ config.goodTex ? goodObject.tex()}$"
-					#when config.custom isnt false
-					#	{ note, errors } = config.custom(userInfo.object, goodObject)
-				{ note: note, errors:errors }
 			ensemble: (userInfo,goodObject,params) ->
 				# fonction de vérification des exercices pour les ensembleObject
 				# La sortie bareme est un facteur / 1
@@ -589,13 +427,6 @@
 				{
 					note: if ok then 1 else 0
 					errors: ["La bonne réponse était &nbsp; $#{goodObject.tex()}$"]
-				}
-
-			def: (user, goodObject, params) ->
-				{
-					note: 0
-					ok:false							# ok = true -> la réponse s'affiche en vert avec éventuellement une remarque
-					formeOk : false						# La forme est ok par défaut
 				}
 		}
 
@@ -629,7 +460,6 @@
 					p_approx:0.5	# Pondération si le résultat n'est qu'approximatif et dans la tolérance
 					arrondi:null	# Si on demande un arrondi, on précise ici une puissance (-2 pour 0.01 par ex.)
 					p_arrondi:0.5	# Pondération si arrondi demandé et mal fait
-					p_modulo:0.5	# Pondération si le modulo est faux
 					symbols:null	# liste de symboles
 					custom:false	# fonction custom
 				}
@@ -642,7 +472,6 @@
 					"p_approx"
 					"arrondi"
 					"p_arrondi"
-					"p_modulo"
 					"symbols"
 					"custom"
 					"goodTex"
@@ -657,7 +486,6 @@
 				# - float = true/false : valeur décimale
 				# - approx_ok:true/false : approximation correctement faite
 				# - ecart:ecart = nombre
-				# - moduloError = false/tex : en cas d'erreur, on envoie le tex du modulo demandé
 				# - p_user = nombre entier : puissance du dernier chiffre significatif
 
 				note = 0
@@ -665,13 +493,12 @@
 				switch
 					when typeof config.arrondi is "number"
 						# On exige un arrondi.
-						# On envisage pas le cas d'un modulo, donc si l'utilisateur en a mis un, c'est faux
 						approx = Math.pow(10,config.arrondi)
 
 						# On vérifie d'abord qu'on est juste au moins dans l'approx
 						# Une difficulté : Si la réponse attendue est ,4,10236 à 0,01. L'utilisateur répond 4,10 ou 4,1 ce qui est
 						# pris identique pour la machine et peut provoquer une erreur
-						if (erreur.exact or erreur.float and ((erreur.ordre<=config.arrondi) or (erreur.p_user<=config.arrondi))) and not erreur.moduloError
+						if (erreur.exact or erreur.float and ((erreur.ordre<=config.arrondi) or (erreur.p_user<=config.arrondi)))
 
 							# Maintenant on peut vérifier si l'utilisateur respecte le format
 							if not erreur.float
@@ -696,14 +523,11 @@
 						if not processedAnswer.forme(config.formes)
 							note *= config.p_forme
 							errors.push { type:"warning", text:"Vous devez simplifier votre résultat." }
-						if erreur.moduloError
-							note *= config.p_modulo
-							errors.push { type:"warning", text:"Le bon modulo était &nbsp; $k\\cdot #{erreur.moduloError}$" }
 						if errors.length>0
 							goodMessage = { type:"warning", text:"$#{processedAnswer.tex}$ &nbsp; est acceptée mais peut être amélioré." }
 						else
 							goodMessage = { type:"success", text:"$#{processedAnswer.tex}$ &nbsp; est une bonne réponse." }
-					when erreur.float and erreur.approx_ok and (erreur.ecart<=config.approx) and not erreur.moduloError
+					when erreur.float and erreur.approx_ok and (erreur.ecart<=config.approx)
 						errors.push { type:"warning", text:"Vous avez donné une approximation. Il faut donner une valeur exacte." }
 						note = config.p_approx
 						goodMessage = { type:"warning", text:"$#{processedAnswer.tex}$ &nbsp; est acceptée mais peut être amélioré." }
@@ -738,7 +562,7 @@
 						goodMessage = { type:"error", text:"La bonne réponse était &nbsp; $\\varnothing$." }
 					else
 						# Il faut faire le tri pour associer deux à deux user et good
-						{ closests, lefts } = mM.tri processedAnswerList, goodObjectList
+						{ closests, lefts } = mM.verification.tri processedAnswerList, goodObjectList
 						bads = []
 						goods = []
 						N = Math.max(goodObjectList.length, processedAnswerList.length)
@@ -795,7 +619,7 @@
 						goodMessage = { type:"error", text:"La bonne réponse était &nbsp; $\\varnothing$." }
 					else
 						# Il faut faire le tri pour associer deux à deux user et good
-						{ closests, lefts } = mM.tri processedAnswerList, goodObjectList
+						{ closests, lefts } = mM.verification.tri processedAnswerList, goodObjectList
 						bads = []
 						N = processedAnswerList.length
 						messages = []
@@ -829,6 +653,14 @@
 					errors: errors
 					goodMessage: goodMessage
 				}
+
+			tri: (users,goods) ->
+				# users est un tableau d'objets ParseInfo
+				# goods est un tableau d'objets (idem)
+				goodsObj = ( { value: mM.toNumber(item), rank:i, d:[] } for item,i in goods )
+				usersObj = ( { value:userInfo.object, info:userInfo, rank:i, d:[] } for userInfo, i in users when userInfo instanceof ParseInfo)
+				erreurManager.tri(usersObj,goodsObj)
+
 
 		}
 	}

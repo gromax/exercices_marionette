@@ -1,6 +1,4 @@
 
-	MODULO_LETTER = "k"
-
 	class SymbolManager
 		# Simple conteneur pour créer les objets symboles
 		# et pour contenir les valeurs
@@ -24,7 +22,6 @@
 				when name is "∅" then new Ensemble()
 				when (name is "∞") or (name is "infini") then new InftyNumber()
 				when name is "i" then new ComplexeNumber(0,1)
-				when name is "#" then new Monome(1, { name:"modulo", power:1} )
 				when name is "" then new RealNumber()
 				else new Monome(1, { name:name, power:1 })
 		@pi: -> new Monome(1, { name:"pi", power:1 })
@@ -67,10 +64,6 @@
 			composite = @compositeString { tex:false }
 			if composite[1] then out=composite[0]
 			else out="-"+composite[0]
-			if @_modulo?
-				modComposite = @_modulo.compositeString { tex:false }
-				if modComposite[1] then out = out+"+"+MODULO_LETTER+"*"+modComposite[0]
-				else out = out+"-"+MODULO_LETTER+"*"+modComposite[0]
 			out
 		tex: (config)->
 			# options.tex = indique si on cherche une version tex
@@ -82,11 +75,6 @@
 			composite = @compositeString options
 			if composite[1] then out=composite[0]
 			else out="-"+composite[0]
-			if @_modulo?
-				modComposite = @_modulo.compositeString options
-				if modComposite[1] then out = out+"+"+MODULO_LETTER+"\\cdot "+modComposite[0]
-				else out = out+"-"+MODULO_LETTER+"\\cdot "+modComposite[0]
-				out+=",k\\in\\mathbb{Z}"
 			out
 		compositeString : (options) -> ["?", @_plus, false, false]
 			# Cette fonction renvoie en morceaux les différents éléments d'un string
@@ -174,23 +162,6 @@
 		derivate:(variable)->
 			if @isFunctionOf(variable) then return new RealNumber()
 			else return new RealNumber(0)
-		extractModulo: (variable) -> { base:@, error:false } # La fonction peut corrompre l'objet en cas d'échec
-		setModulo: (modulo) ->
-			@_modulo = modulo
-			@
-		getModulo: ->
-			if @_modulo? then @_modulo
-			else false
-		modulo: (param) ->
-			if param instanceof NumberObject
-				@_modulo = param
-			if @_modulo? then return { base:@, modulo:@_modulo }
-			unless typeof param is "string" then param = "modulo"
-			out = @toClone().extractModulo param
-			if not(out.error) and out.modulo?
-				modulo = out.modulo.simplify()
-				{ base:out.base.setModulo(modulo), modulo:modulo }
-			else { base:@, modulo:false }
 		applyFunction: (functionName) -> FunctionNumber.make functionName, @
 		compare: (b,symbols)->
 			ecart = @toClone().am(b,true);
@@ -205,14 +176,6 @@
 			# Fonctionne pour les complexes
 			if not(b instanceof NumberObject) then return NaN
 			d = @toClone().am(b,true).floatify(symbols).abs().float()
-			if @getModulo() isnt false then modA = @getModulo().floatify(symbols).abs().float()
-			else modA=-1
-			if b.getModulo() isnt false then modB = b.getModulo().floatify(symbols).abs().float()
-			else modB=-1
-			# Je ne prends en compte qu'un seul des modulo
-			modulo = Math.max(modA,modB)
-			if modulo>0
-				d-= modulo while modulo<=d
 			if d<ERROR_MIN then d = 0
 			d
 		equals: (b,symbols) -> @floatify(symbols).am(b.floatify(symbols),true).isNul()
@@ -350,17 +313,6 @@
 			der.setPlus(@_plus)
 			der.push nb.derivate(variable) for nb in @operands
 			der
-		extractModulo: (variable) ->
-			moduloObject = null
-			for op, i in @operands
-				moduloPartial = op.extractModulo variable
-				if moduloPartial.error then return { error:true }
-				if moduloPartial.modulo?
-					if moduloObject is null then moduloObject = moduloPartial.modulo
-					else moduloObject = moduloObject.am moduloPartial.modulo, false
-					@operands[i] = moduloPartial.base
-			if moduloObject is null then return { base:@simplify(), error:false }
-			else return { base:@simplify(), error:false, modulo:moduloObject }
 		# spécifiques de la classe
 		push: ->
 			for operand in arguments
@@ -738,18 +690,6 @@
 				if options.tex then str = "#{str}\\cdot #{cs[0]}"
 				else str = "#{str}*#{cs[0]}"
 			[str, cs0[1], false, true]
-		extractModulo: (variable) ->
-			if not @isFunctionOf variable then return { base:@, error:false }
-			@contractNumbersAndSymbols()
-			for op,i in @numerator
-				if (op instanceof Monome) and (op.isFunctionOf variable)
-					mod = op.extractModulo(variable)
-					if mod.error then return { error:true }
-					@numerator[i] = mod.modulo
-					if not @isFunctionOf variable then return { base:new RealNumber(0), error:false, modulo:@ }
-					else return { error:true }
-			# normalement on n'atteint pas ce niveau
-			return { base:@, error:true }
 		facto: (regex) ->
 			i=0
 			while i<@numerator.length
@@ -924,7 +864,6 @@
 				switch
 					when options.tex and (key in grecques) then name = "\\#{key}"
 					when key is "pi" then name = "π"
-					when key is "modulo" then name=MODULO_LETTER
 					else name = key
 				multObj=true
 				switch
@@ -1085,14 +1024,6 @@
 				out.symbols[variable] = power-1
 				return out
 			new RealNumber 0
-		extractModulo: (variable) ->
-			if @symbols[variable]?
-				if @symbols[variable] isnt 1 then return { error:true }
-				cl = @toClone()
-				delete cl.symbols[variable]
-				if not cl.hasSymbols() then cl=cl.coeff
-				return {base:new RealNumber(0),error:false,modulo:cl}
-			{ base:@, error:false}
 		order: (normal=true) ->
 			@_order = normal
 			@

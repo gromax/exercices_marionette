@@ -5,7 +5,7 @@
     slice = [].slice;
 
   define([], function() {
-    var Collection, ComplexeNumber, DECIMAL_MAX_PRECISION, DECIMAL_SEPARATOR, Droite2D, ERROR_MIN, Ensemble, EnsembleObject, FloatNumber, FunctionNumber, InftyNumber, Intersection, MODULO_LETTER, MObject, Monome, MultiplyNumber, NumberObject, ParseInfo, ParseManager, PlusNumber, Polynome, PolynomeMaker, PowerNumber, Proba, RadicalNumber, RationalNumber, RealNumber, SOLVE_MAX_PRECISION, SimpleNumber, Suite, SymbolManager, TokenEnsembleDelimiter, TokenFunction, TokenNumber, TokenObject, TokenOperator, TokenParenthesis, TokenVariable, Trigo, Union, Vector, arrayIntersect, erreurManager, extractSquarePart, fixNumber, grecques, in_array, isArray, isInfty, isInteger, mM, mergeObj, numToStr, signatures_comparaison, union_arrays;
+    var Collection, ComplexeNumber, DECIMAL_MAX_PRECISION, DECIMAL_SEPARATOR, Droite2D, ERROR_MIN, Ensemble, EnsembleObject, FloatNumber, FunctionNumber, InftyNumber, Intersection, MObject, Monome, MultiplyNumber, NumberObject, ParseInfo, ParseManager, PlusNumber, Polynome, PolynomeMaker, PowerNumber, Proba, RadicalNumber, RationalNumber, RealNumber, SOLVE_MAX_PRECISION, SimpleNumber, Suite, SymbolManager, TokenEnsembleDelimiter, TokenFunction, TokenNumber, TokenObject, TokenOperator, TokenParenthesis, TokenVariable, Trigo, Union, Vector, arrayIntersect, erreurManager, extractSquarePart, fixNumber, grecques, in_array, isArray, isInfty, isInteger, mM, mergeObj, numToStr, signatures_comparaison, union_arrays;
     grecques = ["alpha", "beta", "delta", "psi", "pi", "theta", "phi", "xi", "rho", "epsilon", "omega", "nu", "mu", "gamma", "Alpha", "Beta", "Delta", "Psi", "Pi", "Theta", "Phi", "Xi", "Rho", "Epsilon", "Omega", "Nu", "Mu", "Gamma"];
     DECIMAL_SEPARATOR = ',';
     DECIMAL_MAX_PRECISION = 10;
@@ -176,7 +176,6 @@
       }
       return out.replace('.', ",");
     };
-    MODULO_LETTER = "k";
     SymbolManager = (function() {
       function SymbolManager() {}
 
@@ -224,11 +223,6 @@
             return new InftyNumber();
           case name !== "i":
             return new ComplexeNumber(0, 1);
-          case name !== "#":
-            return new Monome(1, {
-              name: "modulo",
-              power: 1
-            });
           case name !== "":
             return new RealNumber();
           default:
@@ -353,7 +347,7 @@
       };
 
       NumberObject.prototype.toString = function() {
-        var composite, modComposite, out;
+        var composite, out;
         composite = this.compositeString({
           tex: false
         });
@@ -362,21 +356,11 @@
         } else {
           out = "-" + composite[0];
         }
-        if (this._modulo != null) {
-          modComposite = this._modulo.compositeString({
-            tex: false
-          });
-          if (modComposite[1]) {
-            out = out + "+" + MODULO_LETTER + "*" + modComposite[0];
-          } else {
-            out = out + "-" + MODULO_LETTER + "*" + modComposite[0];
-          }
-        }
         return out;
       };
 
       NumberObject.prototype.tex = function(config) {
-        var composite, modComposite, options, out;
+        var composite, options, out;
         options = mergeObj({
           tex: true
         }, config);
@@ -385,15 +369,6 @@
           out = composite[0];
         } else {
           out = "-" + composite[0];
-        }
-        if (this._modulo != null) {
-          modComposite = this._modulo.compositeString(options);
-          if (modComposite[1]) {
-            out = out + "+" + MODULO_LETTER + "\\cdot " + modComposite[0];
-          } else {
-            out = out + "-" + MODULO_LETTER + "\\cdot " + modComposite[0];
-          }
-          out += ",k\\in\\mathbb{Z}";
         }
         return out;
       };
@@ -644,55 +619,6 @@
         }
       };
 
-      NumberObject.prototype.extractModulo = function(variable) {
-        return {
-          base: this,
-          error: false
-        };
-      };
-
-      NumberObject.prototype.setModulo = function(modulo) {
-        this._modulo = modulo;
-        return this;
-      };
-
-      NumberObject.prototype.getModulo = function() {
-        if (this._modulo != null) {
-          return this._modulo;
-        } else {
-          return false;
-        }
-      };
-
-      NumberObject.prototype.modulo = function(param) {
-        var modulo, out;
-        if (param instanceof NumberObject) {
-          this._modulo = param;
-        }
-        if (this._modulo != null) {
-          return {
-            base: this,
-            modulo: this._modulo
-          };
-        }
-        if (typeof param !== "string") {
-          param = "modulo";
-        }
-        out = this.toClone().extractModulo(param);
-        if (!out.error && (out.modulo != null)) {
-          modulo = out.modulo.simplify();
-          return {
-            base: out.base.setModulo(modulo),
-            modulo: modulo
-          };
-        } else {
-          return {
-            base: this,
-            modulo: false
-          };
-        }
-      };
-
       NumberObject.prototype.applyFunction = function(functionName) {
         return FunctionNumber.make(functionName, this);
       };
@@ -713,27 +639,11 @@
       };
 
       NumberObject.prototype.distance = function(b, symbols) {
-        var d, modA, modB, modulo;
+        var d;
         if (!(b instanceof NumberObject)) {
           return NaN;
         }
         d = this.toClone().am(b, true).floatify(symbols).abs().float();
-        if (this.getModulo() !== false) {
-          modA = this.getModulo().floatify(symbols).abs().float();
-        } else {
-          modA = -1;
-        }
-        if (b.getModulo() !== false) {
-          modB = b.getModulo().floatify(symbols).abs().float();
-        } else {
-          modB = -1;
-        }
-        modulo = Math.max(modA, modB);
-        if (modulo > 0) {
-          while (modulo <= d) {
-            d -= modulo;
-          }
-        }
         if (d < ERROR_MIN) {
           d = 0;
         }
@@ -1089,41 +999,6 @@
           der.push(nb.derivate(variable));
         }
         return der;
-      };
-
-      PlusNumber.prototype.extractModulo = function(variable) {
-        var aa, i, len, moduloObject, moduloPartial, op, ref;
-        moduloObject = null;
-        ref = this.operands;
-        for (i = aa = 0, len = ref.length; aa < len; i = ++aa) {
-          op = ref[i];
-          moduloPartial = op.extractModulo(variable);
-          if (moduloPartial.error) {
-            return {
-              error: true
-            };
-          }
-          if (moduloPartial.modulo != null) {
-            if (moduloObject === null) {
-              moduloObject = moduloPartial.modulo;
-            } else {
-              moduloObject = moduloObject.am(moduloPartial.modulo, false);
-            }
-            this.operands[i] = moduloPartial.base;
-          }
-        }
-        if (moduloObject === null) {
-          return {
-            base: this.simplify(),
-            error: false
-          };
-        } else {
-          return {
-            base: this.simplify(),
-            error: false,
-            modulo: moduloObject
-          };
-        }
       };
 
       PlusNumber.prototype.push = function() {
@@ -1923,45 +1798,6 @@
         return [str, cs0[1], false, true];
       };
 
-      MultiplyNumber.prototype.extractModulo = function(variable) {
-        var aa, i, len, mod, op, ref;
-        if (!this.isFunctionOf(variable)) {
-          return {
-            base: this,
-            error: false
-          };
-        }
-        this.contractNumbersAndSymbols();
-        ref = this.numerator;
-        for (i = aa = 0, len = ref.length; aa < len; i = ++aa) {
-          op = ref[i];
-          if ((op instanceof Monome) && (op.isFunctionOf(variable))) {
-            mod = op.extractModulo(variable);
-            if (mod.error) {
-              return {
-                error: true
-              };
-            }
-            this.numerator[i] = mod.modulo;
-            if (!this.isFunctionOf(variable)) {
-              return {
-                base: new RealNumber(0),
-                error: false,
-                modulo: this
-              };
-            } else {
-              return {
-                error: true
-              };
-            }
-          }
-        }
-        return {
-          base: this,
-          error: true
-        };
-      };
-
       MultiplyNumber.prototype.facto = function(regex) {
         var f, i, out;
         i = 0;
@@ -2339,9 +2175,6 @@
             case key !== "pi":
               name = "π";
               break;
-            case key !== "modulo":
-              name = MODULO_LETTER;
-              break;
             default:
               name = key;
           }
@@ -2697,31 +2530,6 @@
           return out;
         }
         return new RealNumber(0);
-      };
-
-      Monome.prototype.extractModulo = function(variable) {
-        var cl;
-        if (this.symbols[variable] != null) {
-          if (this.symbols[variable] !== 1) {
-            return {
-              error: true
-            };
-          }
-          cl = this.toClone();
-          delete cl.symbols[variable];
-          if (!cl.hasSymbols()) {
-            cl = cl.coeff;
-          }
-          return {
-            base: new RealNumber(0),
-            error: false,
-            modulo: cl
-          };
-        }
-        return {
-          base: this,
-          error: false
-        };
       };
 
       Monome.prototype.order = function(normal) {
@@ -6262,13 +6070,13 @@
         this.simplificationList = [];
         this.messages = [];
         this.context = "";
-        this.config = mergeObj({
+        this.config = _.extend({
           developp: false,
           simplify: true,
           type: "number",
           toLowerCase: false,
           alias: false
-        }, params);
+        }, params != null ? params : {});
         this.type = this.config.type;
         if (typeof value === "string") {
           this.expression = value;
@@ -8566,34 +8374,13 @@
     };
     erreurManager = {
       main: function(goodObject, answer, symbols) {
-        var a, answerModuloObject, ecart, floatModulo, g, marge, modulo, moduloError, ordre, p_user;
-        moduloError = false;
-        if (modulo = goodObject.getModulo()) {
-          floatModulo = Math.abs(modulo.floatify(symbols).float());
-          answerModuloObject = answer.modulo();
-          if (answerModuloObject.modulo !== false) {
-            moduloError = Math.abs(answerModuloObject.modulo.floatify(symbols).float()) - floatModulo > ERROR_MIN;
-            answer = answerModuloObject.base;
-          } else {
-            moduloError = true;
-          }
-          if (moduloError) {
-            moduloError = modulo.tex();
-          }
-        } else {
-          floatModulo = 0;
-        }
+        var a, ecart, g, marge, ordre, p_user;
         if ((goodObject instanceof InftyNumber) && (answer instanceof InftyNumber) && (goodObject.isPositive() === answer.isPositive())) {
           ecart = 0;
         } else {
           g = goodObject.toClone().simplify(null, true);
           a = answer.toClone().simplify(null, true);
           ecart = g.am(a, true).simplify(null, false, true).floatify(symbols).abs().float();
-        }
-        if (floatModulo > 0) {
-          while (floatModulo <= ecart) {
-            ecart -= floatModulo;
-          }
         }
         if (ecart < ERROR_MIN) {
           ecart = 0;
@@ -8603,7 +8390,6 @@
             return {
               exact: true,
               float: true,
-              moduloError: moduloError,
               p_user: answer.precision(),
               ordre: null
             };
@@ -8617,7 +8403,6 @@
                 float: true,
                 approx_ok: true,
                 ecart: ecart,
-                moduloError: moduloError,
                 p_user: p_user,
                 ordre: ordre
               };
@@ -8627,7 +8412,6 @@
                 float: true,
                 approx_ok: false,
                 ecart: ecart,
-                moduloError: moduloError,
                 p_user: p_user,
                 ordre: ordre
               };
@@ -8636,8 +8420,7 @@
         }
         return {
           exact: ecart === 0,
-          float: false,
-          moduloError: moduloError
+          float: false
         };
       },
       tri: function(usersObj, goodsObj) {
@@ -9035,11 +8818,10 @@
         }
       },
       exec: function(arr, params) {
-        var arg, config, decomposition, m, op1, op2, out, pile, ref, ref1, ref2, ref3, ref4;
+        var arg, config, m, op1, op2, out, pile, ref, ref1, ref2, ref3;
         config = mergeObj({
           simplify: false,
           developp: false,
-          modulo: false,
           clone: true
         }, params);
         arr.reverse();
@@ -9096,11 +8878,7 @@
               op1 = pile.pop();
               pile.push(new Intersection(op1, op2));
               break;
-            case arg !== "modulo":
-              op2 = pile.pop();
-              pile.push((ref4 = pile.pop()) != null ? ref4.setModulo(op2) : void 0);
-              break;
-            case arg !== "x" && arg !== "y" && arg !== "t" && arg !== "i" && arg !== "pi" && arg !== "#" && arg !== "e" && arg !== "∞":
+            case arg !== "x" && arg !== "y" && arg !== "t" && arg !== "i" && arg !== "pi" && arg !== "e" && arg !== "∞":
               pile.push(SymbolManager.makeSymbol(arg));
               break;
             case !((typeof arg === "string") && (FunctionNumber.functions[arg] != null)):
@@ -9127,15 +8905,6 @@
         }
         if (config.simplify) {
           out = out.simplify(null, config.developp);
-        }
-        if (config.modulo !== false) {
-          if (typeof config.modulo !== "string") {
-            config.modulo = "modulo";
-          }
-          decomposition = out.modulo(config.modulo);
-          if (decomposition.modulo !== false) {
-            out = decomposition.base.setModulo(decomposition.modulo);
-          }
         }
         return out;
       },
@@ -9454,64 +9223,6 @@
           return (new Ensemble()).init((ouvrant === "[") || (ouvrant === true), v1, (fermant === "]") || (fermant === true), v2);
         }
       },
-      tri: function(users, goods) {
-        var aa, goodsObj, i, item, len, moduloObj, user, userInfo, usersObj;
-        goodsObj = (function() {
-          var aa, len, results;
-          results = [];
-          for (i = aa = 0, len = goods.length; aa < len; i = ++aa) {
-            item = goods[i];
-            results.push({
-              value: mM.toNumber(item),
-              rank: i,
-              d: []
-            });
-          }
-          return results;
-        })();
-        usersObj = [];
-        for (i = aa = 0, len = users.length; aa < len; i = ++aa) {
-          userInfo = users[i];
-          if (!(userInfo instanceof ParseInfo)) {
-            continue;
-          }
-          user = userInfo.object;
-          if (user instanceof NumberObject) {
-            moduloObj = typeof user.modulo === "function" ? user.modulo() : void 0;
-            if (moduloObj.modulo !== false) {
-              user = moduloObj.base;
-            }
-          }
-          usersObj.push({
-            value: user,
-            info: userInfo,
-            rank: i,
-            d: []
-          });
-        }
-        return erreurManager.tri(usersObj, goodsObj);
-      },
-      erreur: function(good, userObject, symbols) {
-        var closest, goodObject, i, item;
-        if (isArray(good)) {
-          closest = erreurManager.searchClosest((function() {
-            var aa, len, results;
-            results = [];
-            for (i = aa = 0, len = good.length; aa < len; i = ++aa) {
-              item = good[i];
-              results.push({
-                value: this.toNumber(item),
-                rank: i
-              });
-            }
-            return results;
-          }).call(this), userObject);
-          goodObject = closest !== null ? good = closest.value : new RealNumber();
-        } else {
-          goodObject = this.toNumber(good);
-        }
-        return erreurManager.main(goodObject, userObject, symbols);
-      },
       factorisation: function(obj, regex, params) {
         var config, f;
         if ((f = typeof obj.facto === "function" ? obj.facto(regex) : void 0) != null) {
@@ -9527,204 +9238,7 @@
           return obj.toClone();
         }
       },
-      p: {
-        type: function(goodObject, params) {
-          var ref;
-          if ((typeof params !== "object") || (params === null)) {
-            params = {};
-          }
-          if (!((ref = params.type) === "ensemble" || ref === "number")) {
-            switch (false) {
-              case !(goodObject instanceof EnsembleObject):
-                params.type = "ensemble";
-                break;
-              case typeof goodObject !== "number":
-                params.type = "number";
-                break;
-              default:
-                params.type = "number";
-            }
-          }
-          return params;
-        },
-        userAnswer: function(user, params) {
-          var config, info;
-          config = mergeObj({
-            developp: false,
-            toLowerCase: false,
-            type: "number"
-          }, params);
-          if (user instanceof ParseInfo) {
-            info = user;
-          } else {
-            info = new ParseInfo(user, config);
-          }
-          return info;
-        },
-        validate: function(user, type) {
-          var inf, info, infos, invalids, item, liste;
-          if (typeof user !== "string") {
-            return {
-              info: null,
-              error: "Erreur inconnue !"
-            };
-          }
-          if (user === "") {
-            return {
-              info: null,
-              error: "Ne doit pas être vide"
-            };
-          }
-          switch (type) {
-            case "liste:number":
-              if (user === "∅") {
-                return {
-                  info: [],
-                  error: false
-                };
-              }
-              liste = user.split(";");
-              infos = (function() {
-                var aa, len, results;
-                results = [];
-                for (aa = 0, len = liste.length; aa < len; aa++) {
-                  item = liste[aa];
-                  results.push(new ParseInfo(item, {
-                    type: "number"
-                  }));
-                }
-                return results;
-              })();
-              invalids = (function() {
-                var aa, len, results;
-                results = [];
-                for (aa = 0, len = infos.length; aa < len; aa++) {
-                  inf = infos[aa];
-                  if (inf.valid === false) {
-                    results.push(inf);
-                  }
-                }
-                return results;
-              })();
-              if (invalids.length > 0) {
-                return {
-                  info: infos,
-                  error: "Saisie invalide"
-                };
-              } else {
-                return {
-                  info: infos,
-                  error: false
-                };
-              }
-              break;
-            case "ensemble":
-              info = new ParseInfo(user, {
-                type: "ensemble"
-              });
-              if (info.valid) {
-                return {
-                  info: info,
-                  error: false
-                };
-              } else {
-                return {
-                  info: info,
-                  error: info.messages
-                };
-              }
-              break;
-            default:
-              info = new ParseInfo(user, {
-                type: "number"
-              });
-              if (info.valid) {
-                return {
-                  info: info,
-                  error: false
-                };
-              } else {
-                return {
-                  info: info,
-                  error: info.messages
-                };
-              }
-          }
-        }
-      },
       verif: {
-        number: function(userInfo, goodObject, params) {
-          var approx, config, default_config, erreur, errors, keysFilter, note, ref;
-          if (typeof goodObject === "number") {
-            goodObject = new RealNumber(goodObject);
-          }
-          default_config = {
-            formes: null,
-            p_forme: 0.75,
-            tolerance: 0,
-            approx: 0.1,
-            p_approx: 0.5,
-            arrondi: null,
-            p_arrondi: 0.5,
-            p_modulo: 0.5,
-            symbols: null,
-            custom: false
-          };
-          keysFilter = ["formes", "p_forme", "tolerance", "approx", "p_approx", "arrondi", "p_arrondi", "p_modulo", "symbols", "custom", "goodTex"];
-          params = _.pick.apply(_, [params].concat(slice.call(keysFilter)));
-          config = _.extend(default_config, params);
-          erreur = erreurManager.main(goodObject, userInfo.object, config.symbols);
-          note = 0;
-          errors = [];
-          switch (false) {
-            case typeof config.arrondi !== "number":
-              approx = Math.pow(10, config.arrondi);
-              if ((erreur.exact || erreur.float && ((erreur.ordre <= config.arrondi) || (erreur.p_user <= config.arrondi))) && !erreur.moduloError) {
-                if (!erreur.float) {
-                  errors.push("Approximation sous forme décimale attendue.");
-                }
-                if (!(erreur.approx_ok || erreur.exact)) {
-                  errors.push("Il faut arrondir au " + approx + " le plus proche.");
-                }
-                if (erreur.p_user < config.arrondi) {
-                  errors.push("Vous donnez trop de décimales.");
-                }
-                if (errors.length > 0) {
-                  note = config.p_arrondi;
-                  errors.push("La bonne réponse était " + (numToStr(mM.float(goodObject), -config.arrondi)) + ".");
-                } else {
-                  note = 1;
-                }
-              } else {
-                if (!erreur.float) {
-                  errors.push("Approximation sous forme décimale attendue.");
-                }
-                errors.push("La bonne réponse était " + (numToStr(mM.float(goodObject), -config.arrondi)) + ".");
-              }
-              break;
-            case !(erreur.exact || erreur.float && (erreur.ecart <= config.tolerance)):
-              note = 1;
-              if (!userInfo.forme(config.formes)) {
-                note *= config.p_forme;
-                errors.push("Vous devez simplifier votre résultat.");
-              }
-              if (erreur.moduloError) {
-                note *= config.p_modulo;
-                output.errors.push("Le bon modulo était &nbsp; $k\\cdot " + erreur.moduloError + "$");
-              }
-              break;
-            case !(erreur.float && erreur.approx_ok && (erreur.ecart <= config.approx) && !erreur.moduloError):
-              errors.push("Vous avez donné une approximation. Il faut donner une valeur exacte.");
-              note = config.p_approx;
-              break;
-            default:
-              errors.push("La bonne réponse était &nbsp; $" + ((ref = config.goodTex) != null ? ref : goodObject.tex()) + "$");
-          }
-          return {
-            note: note,
-            errors: errors
-          };
-        },
         ensemble: function(userInfo, goodObject, params) {
           var config, ok;
           config = mergeObj({
@@ -9735,18 +9249,11 @@
             note: ok ? 1 : 0,
             errors: ["La bonne réponse était &nbsp; $" + (goodObject.tex()) + "$"]
           };
-        },
-        def: function(user, goodObject, params) {
-          return {
-            note: 0,
-            ok: false,
-            formeOk: false
-          };
         }
       },
       verification: {
-        numberValidation: function(userString) {
-          var info;
+        numberValidation: function(userString, inConfig) {
+          var config, info;
           switch (false) {
             case typeof userString === "string":
               return {
@@ -9761,9 +9268,12 @@
                 error: "Ne doit pas être vide"
               };
             default:
-              info = new ParseInfo(userString, {
-                type: "number"
-              });
+              config = _.extend({
+                type: "number",
+                developp: true,
+                toLowerCase: false
+              }, inConfig != null ? inConfig : {});
+              info = new ParseInfo(userString, config);
               if (info.valid) {
                 return {
                   processed: info,
@@ -9792,11 +9302,10 @@
             p_approx: 0.5,
             arrondi: null,
             p_arrondi: 0.5,
-            p_modulo: 0.5,
             symbols: null,
             custom: false
           };
-          keysFilter = ["formes", "p_forme", "tolerance", "approx", "p_approx", "arrondi", "p_arrondi", "p_modulo", "symbols", "custom", "goodTex"];
+          keysFilter = ["formes", "p_forme", "tolerance", "approx", "p_approx", "arrondi", "p_arrondi", "symbols", "custom", "goodTex"];
           filtered_parameters = _.pick.apply(_, [parameters].concat(slice.call(keysFilter)));
           config = _.extend(default_config, filtered_parameters);
           erreur = erreurManager.main(goodObject, processedAnswer.object, config.symbols);
@@ -9805,7 +9314,7 @@
           switch (false) {
             case typeof config.arrondi !== "number":
               approx = Math.pow(10, config.arrondi);
-              if ((erreur.exact || erreur.float && ((erreur.ordre <= config.arrondi) || (erreur.p_user <= config.arrondi))) && !erreur.moduloError) {
+              if (erreur.exact || erreur.float && ((erreur.ordre <= config.arrondi) || (erreur.p_user <= config.arrondi))) {
                 if (!erreur.float) {
                   errors.push({
                     type: "warning",
@@ -9859,13 +9368,6 @@
                   text: "Vous devez simplifier votre résultat."
                 });
               }
-              if (erreur.moduloError) {
-                note *= config.p_modulo;
-                errors.push({
-                  type: "warning",
-                  text: "Le bon modulo était &nbsp; $k\\cdot " + erreur.moduloError + "$"
-                });
-              }
               if (errors.length > 0) {
                 goodMessage = {
                   type: "warning",
@@ -9878,7 +9380,7 @@
                 };
               }
               break;
-            case !(erreur.float && erreur.approx_ok && (erreur.ecart <= config.approx) && !erreur.moduloError):
+            case !(erreur.float && erreur.approx_ok && (erreur.ecart <= config.approx)):
               errors.push({
                 type: "warning",
                 text: "Vous avez donné une approximation. Il faut donner une valeur exacte."
@@ -9935,7 +9437,7 @@
                 text: "La bonne réponse était &nbsp; $\\varnothing$."
               };
             } else {
-              ref = mM.tri(processedAnswerList, goodObjectList), closests = ref.closests, lefts = ref.lefts;
+              ref = mM.verification.tri(processedAnswerList, goodObjectList), closests = ref.closests, lefts = ref.lefts;
               bads = [];
               goods = [];
               N = Math.max(goodObjectList.length, processedAnswerList.length);
@@ -10046,7 +9548,7 @@
                 text: "La bonne réponse était &nbsp; $\\varnothing$."
               };
             } else {
-              ref = mM.tri(processedAnswerList, goodObjectList), closests = ref.closests, lefts = ref.lefts;
+              ref = mM.verification.tri(processedAnswerList, goodObjectList), closests = ref.closests, lefts = ref.lefts;
               bads = [];
               N = processedAnswerList.length;
               messages = [];
@@ -10119,6 +9621,39 @@
             errors: errors,
             goodMessage: goodMessage
           };
+        },
+        tri: function(users, goods) {
+          var goodsObj, i, item, userInfo, usersObj;
+          goodsObj = (function() {
+            var aa, len, results;
+            results = [];
+            for (i = aa = 0, len = goods.length; aa < len; i = ++aa) {
+              item = goods[i];
+              results.push({
+                value: mM.toNumber(item),
+                rank: i,
+                d: []
+              });
+            }
+            return results;
+          })();
+          usersObj = (function() {
+            var aa, len, results;
+            results = [];
+            for (i = aa = 0, len = users.length; aa < len; i = ++aa) {
+              userInfo = users[i];
+              if (userInfo instanceof ParseInfo) {
+                results.push({
+                  value: userInfo.object,
+                  info: userInfo,
+                  rank: i,
+                  d: []
+                });
+              }
+            }
+            return results;
+          })();
+          return erreurManager.tri(usersObj, goodsObj);
         }
       }
     };
