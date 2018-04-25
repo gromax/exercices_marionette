@@ -1,10 +1,24 @@
 define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, help, colors, TabVarApi) {
   return {
     init: function(inputs) {
-      var cano, cas, i, item, items, j, len, liste, max, poly, tab, tabX, tabs, variations, xA, xB, yA, yB;
-      max = 6;
-      items = [];
-      liste = _.shuffle([
+      var i, it, iteratee, liste, max, ranks;
+      max = 15;
+      if ((inputs.ranks != null)) {
+        ranks = (function() {
+          var j, len, ref, results;
+          ref = inputs.ranks.split(";");
+          results = [];
+          for (j = 0, len = ref.length; j < len; j++) {
+            it = ref[j];
+            results.push(Number(it));
+          }
+          return results;
+        })();
+      } else {
+        ranks = _.shuffle([0, 1, 2, 3]);
+        inputs.ranks = ranks.join(";");
+      }
+      liste = [
         {
           cano: true,
           convexe: true
@@ -18,9 +32,9 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
           cano: false,
           convexe: false
         }
-      ]);
-      tabs = [];
-      for (i = j = 0, len = liste.length; j < len; i = ++j) {
+      ];
+      iteratee = function(i) {
+        var cano, cas, poly, polyTex, tab, tabX, variations, xA, xB, yA, yB;
         cas = liste[i];
         if ((typeof inputs["xA" + i] !== "undefined") && (typeof inputs["yA" + i] !== "undefined") && (typeof inputs["xB" + i] !== "undefined") && (typeof inputs["yB" + i] !== "undefined") && (typeof inputs["c" + i] !== "undefined")) {
           xA = Number(inputs["xA" + i]);
@@ -64,12 +78,9 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
           simplify: true,
           developp: !cano
         });
-        item = {
-          rank: i,
-          text: "$x \\mapsto " + poly.tex({
-            canonique: cano
-          }) + "$"
-        };
+        polyTex = "$x \\mapsto " + poly.tex({
+          canonique: cano
+        }) + "$";
         tabX = ["$-\\infty$", "$" + xA + "$", "$+\\infty$"];
         if (yB > yA) {
           variations = "+/$+\\infty$,-/$" + yA + "$,+/$+\\infty$";
@@ -78,17 +89,24 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
         }
         tab = (TabVarApi.make(tabX, {
           hauteur_ligne: 25,
-          color: colors.html(i),
+          color: colors.html(ranks[i]),
           texColor: colors.tex(i)
         })).addVarLine(variations);
-        tabs.push(tab);
-        items.push(item);
-      }
-      return [tabs, items];
+        return [polyTex, tab, ranks[i]];
+      };
+      return _.unzip((function() {
+        var j, results;
+        results = [];
+        for (i = j = 0; j <= 3; i = ++j) {
+          results.push(iteratee(i));
+        }
+        return results;
+      })());
     },
     getBriques: function(inputs, options) {
-      var initTabs, items, ref, tabs;
-      ref = this.init(inputs), tabs = ref[0], items = ref[1];
+      var initTabs, items, ranks, ref, tabs;
+      ref = this.init(inputs), items = ref[0], tabs = ref[1], ranks = ref[2];
+      tabs = _.shuffle(tabs);
       initTabs = function($container) {
         var initOneTab;
         initOneTab = function(tab) {
@@ -105,66 +123,117 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["On vous donne 4 tableaux de variations et 4 fonctions du second degré.", "Vous devez dire à quelle fonction correspond chaque tableau.", "Pour cela appuyez sur les carrés pour sélectionner la bonne couleur."]
             }, {
               type: "def",
-              rank: 2,
               renderingFunctions: [initTabs]
             }, {
               type: "color-choice",
-              rank: 3,
               name: "it",
-              list: _.shuffle(items)
+              list: items
             }, {
               type: "validation",
-              rank: 5,
               clavier: ["aide"]
             }, {
               type: "aide",
-              rank: 6,
               list: help.trinome.canonique_et_parabole.concat(help.trinome.a_et_concavite_parabole)
+            }
+          ],
+          validations: {
+            it: "color:4"
+          },
+          verifications: [
+            {
+              name: "it",
+              colors: ranks,
+              items: items
             }
           ]
         }
       ];
     },
-    tex: function(data) {
-      var item, itemData, j, len, out, tab;
-      if (!isArray(data)) {
-        data = [data];
-      }
-      out = [];
-      for (j = 0, len = data.length; j < len; j++) {
-        itemData = data[j];
-        out.push({
-          title: "Associer tableaux et fonctions",
-          contents: ((function() {
-            var k, len1, ref, results;
-            ref = itemData.tabs;
-            results = [];
-            for (k = 0, len1 = ref.length; k < len1; k++) {
-              tab = ref[k];
-              results.push(tab.tex({
-                color: false
-              }));
+    getExamBriques: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var initTabs, items, ranks, ref, tabs;
+        ref = that.init(inputs, options), items = ref[0], tabs = ref[1], ranks = ref[2];
+        tabs = _.shuffle(tabs);
+        initTabs = function($container) {
+          var initOneTab;
+          initOneTab = function(tab) {
+            var $el;
+            $el = $("<div></div>");
+            $container.append($el);
+            return tab.render($el[0]);
+          };
+          return _.each(tabs, initOneTab);
+        };
+        return {
+          children: [
+            {
+              type: "def",
+              renderingFunctions: [initTabs]
+            }, {
+              type: "enumerate",
+              enumi: "a",
+              children: items
             }
-            return results;
-          })()).concat(Handlebars.templates["tex_enumerate"]({
-            items: (function() {
-              var k, len1, ref, results;
-              ref = itemData.items;
-              results = [];
-              for (k = 0, len1 = ref.length; k < len1; k++) {
-                item = ref[k];
-                results.push(item.title);
-              }
-              return results;
-            })()
-          }))
-        });
+          ]
+        };
+      };
+      return {
+        children: [
+          {
+            type: "text",
+            children: ["Dans chaque cas, on vous donne 4 tableaux de variations et 4 fonctions du second degré.", "À chaque fois, vous devez dire à quelle fonction correspond chaque tableau."]
+          }, {
+            type: "subtitles",
+            enumi: "A",
+            refresh: true,
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var fct_item, that;
+      that = this;
+      fct_item = function(inputs, index) {
+        var items, ranks, ref, tab, tabs;
+        ref = that.init(inputs, options), items = ref[0], tabs = ref[1], ranks = ref[2];
+        tabs = _.shuffle(tabs);
+        return ((function() {
+          var j, len, results;
+          results = [];
+          for (j = 0, len = tabs.length; j < len; j++) {
+            tab = tabs[j];
+            results.push(tab.toTexTpl());
+          }
+          return results;
+        })()).concat([
+          {
+            type: "enumerate",
+            enumi: "a)",
+            children: items
+          }
+        ]);
+      };
+      if (inputs_list.length === 1) {
+        return {
+          children: ["On vous donne 4 tableaux de variations et 4 fonctions du second degré.", "Vous devez dire à quelle fonction correspond chaque tableau."].concat(fct_item(inputs_list[0], 0))
+        };
+      } else {
+        return {
+          children: [
+            "Dans chaque cas, on vous donne 4 tableaux de variations et 4 fonctions du second degré.", "À chaque fois, vous devez dire à quelle fonction correspond chaque tableau.", {
+              type: "enumerate",
+              enumi: "1",
+              children: _.map(inputs_list, fct_item)
+            }
+          ]
+        };
       }
-      return out;
     }
   };
 });

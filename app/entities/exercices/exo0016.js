@@ -250,7 +250,7 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
           children: [
             "Dans chaque cas, on vous donne 5 courbes et 5 fonctions du second degré.", "Vous devez dire à chaque fois quelle fonction correspond chaque courbe.", {
               type: "enumerate",
-              enumi: "A",
+              enumi: "1",
               children: _.map(inputs_list, fct_item)
             }
           ]

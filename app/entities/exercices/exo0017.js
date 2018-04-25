@@ -48,7 +48,7 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
           xB = Number(inputs["xB" + i]);
           yB = Number(inputs["yB" + i]);
         } else {
-          cas = liste.shift();
+          cas = liste[i];
           xA = inputs["xA" + i] = xB = mM.alea.real({
             min: -max + 1,
             max: max - 1
@@ -243,7 +243,7 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
           children: [
             {
               type: "text",
-              children: ["On vous donne 5 cas de fonctions du second degré, donc de la forme &nbsp; $f:x\\mapsto ax^2+bx+c$.", "On ne connaît que les valeurs de &nbsp; $\\Delta$ &nbsp; et de &nbsp; $a$."]
+              children: ["On vous donne 5 fonctions du second degré, donc de la forme &nbsp; $f:x\\mapsto ax^2+bx+c$.", "On ne connaît que les valeurs de &nbsp; $\\Delta$ &nbsp; et de &nbsp; $a$.", "Vous devez associer ces fonctions avec les courbes."]
             }, {
               type: "graphique",
               divId: id
@@ -275,7 +275,7 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
         var i, items, p, polys, ranks, ref;
         ref = that.init(inputs, options), items = ref[0], polys = ref[1], ranks = ref[2];
         return [
-          "On vous donne 5 cas de fonctions du second degré, donc de la forme $f:x\\mapsto ax^2+bx+c$.", "On ne connaît que les valeurs de $\\Delta$ et de $a$.", {
+          {
             type: "tikz",
             left: -max,
             bottom: -max,
@@ -303,13 +303,15 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
         ];
       };
       if (inputs_list.length === 1) {
-        return fct_item(inputs_list[0], 0);
+        return {
+          children: ["On vous donne 5 fonctions du second degré, donc de la forme $f:x\\mapsto ax^2+bx+c$.", "On ne connaît que les valeurs de $\\Delta$ et de $a$.", "Vous devez associer ces fonctions avec les courbes."].concat(fct_item(inputs_list[0], 0))
+        };
       } else {
         return {
           children: [
-            {
+            "Dans chaque cas, on vous donne 5 fonctions du second degré, donc de la forme $f:x\\mapsto ax^2+bx+c$.", "On ne connaît que les valeurs de $\\Delta$ et de $a$.", "Vous devez associer ces fonctions avec les courbes.", {
               type: "enumerate",
-              enumi: "A",
+              enumi: "1",
               children: _.map(inputs_list, fct_item)
             }
           ]

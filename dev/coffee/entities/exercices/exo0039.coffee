@@ -8,12 +8,17 @@ define ["utils/math", "utils/help", "utils/colors", "utils/tab"], (mM, help, col
 
 	return {
 		init: (inputs) ->
-			max = 6
-			items = []
-			# Les paraboles sont définies par sommet et point
-			liste = _.shuffle [{cano:true, convexe:true}, {cano:true, convexe:false}, {cano:false, convexe:true}, {cano:false, convexe:false}]
-			tabs = []
-			for cas, i in liste
+			max = 15
+			if (inputs.ranks?)
+				ranks =(Number it for it in inputs.ranks.split(";"))
+			else
+				ranks = _.shuffle([0..3])
+				inputs.ranks = ranks.join(";")
+			liste = [{cano:true, convexe:true}, {cano:true, convexe:false}, {cano:false, convexe:true}, {cano:false, convexe:false}]
+
+			iteratee = (i)->
+				cas = liste[i]
+
 				if (typeof inputs["xA"+i] isnt "undefined") and (typeof inputs["yA"+i] isnt "undefined") and (typeof inputs["xB"+i] isnt "undefined") and (typeof inputs["yB"+i] isnt "undefined") and (typeof inputs["c"+i] isnt "undefined")
 					xA = Number inputs["xA"+i]
 					yA = Number inputs["yA"+i]
@@ -33,17 +38,18 @@ define ["utils/math", "utils/help", "utils/colors", "utils/tab"], (mM, help, col
 						yB = inputs["yB"+i] = mM.alea.real { min:yA+1, max:max }
 					cano = inputs["c"+i] = cas.cano
 				poly = mM.exec [ yB, yA, "-", xB, xA, "-", 2, "^", "/", "x", xA, "-", 2, "^", "*", yA, "+" ], { simplify:true, developp:not cano }
-				item = { rank:i, text: "$x \\mapsto "+poly.tex({canonique:cano})+"$" }
+				polyTex = "$x \\mapsto "+poly.tex({canonique:cano})+"$"
 				tabX = ["$-\\infty$", "$#{xA}$", "$+\\infty$"]
 				if yB>yA then variations = "+/$+\\infty$,-/$#{yA}$,+/$+\\infty$"
 				else variations = "-/$-\\infty$,+/$#{yA}$,-/$-\\infty$"
-				tab = ( TabVarApi.make(tabX, {hauteur_ligne:25, color:colors.html(i), texColor:colors.tex(i)})).addVarLine(variations)
-				tabs.push tab
-				items.push item
-			[tabs, items]
+				tab = ( TabVarApi.make(tabX, {hauteur_ligne:25, color:colors.html(ranks[i])} )).addVarLine(variations)
+				[polyTex, tab, ranks[i]]
+
+			_.unzip((iteratee(i) for i in [0..3]))
 
 		getBriques: (inputs,options) ->
-			[tabs, items] = @init(inputs)
+			[items, tabs, ranks] = @init(inputs)
+			tabs = _.shuffle(tabs)
 
 			initTabs = ($container)->
 				initOneTab = (tab) ->
@@ -58,7 +64,6 @@ define ["utils/math", "utils/help", "utils/colors", "utils/tab"], (mM, help, col
 					items:[
 						{
 							type: "text"
-							rank: 1
 							ps:[
 								"On vous donne 4 tableaux de variations et 4 fonctions du second degré."
 								"Vous devez dire à quelle fonction correspond chaque tableau."
@@ -67,7 +72,6 @@ define ["utils/math", "utils/help", "utils/colors", "utils/tab"], (mM, help, col
 						}
 						{
 							type: "def"
-							rank: 2
 							renderingFunctions:[
 								initTabs
 							]
@@ -75,32 +79,111 @@ define ["utils/math", "utils/help", "utils/colors", "utils/tab"], (mM, help, col
 						}
 						{
 							type:"color-choice"
-							rank: 3
 							name:"it"
-							list: _.shuffle(items)
+							list: items
 						}
 						{
 							type: "validation"
-							rank: 5
 							clavier: ["aide"]
 						}
 						{
 							type: "aide"
-							rank: 6
 							list: help.trinome.canonique_et_parabole.concat(help.trinome.a_et_concavite_parabole)
+						}
+					]
+					validations:{
+						it:"color:4"
+					}
+					verifications:[
+						{
+							name:"it"
+							colors:ranks
+							items: items
 						}
 					]
 				}
 			]
 
+		getExamBriques: (inputs_list,options) ->
+			that = @
 
-		tex: (data) ->
-			if not isArray(data) then data = [ data ]
-			out = []
-			for itemData in data
-				out.push {
-					title:"Associer tableaux et fonctions"
-					contents: (tab.tex( { color:false } ) for tab in itemData.tabs).concat(Handlebars.templates["tex_enumerate"] { items:(item.title for item in itemData.items)})
+			fct_item = (inputs, index) ->
+				[items, tabs, ranks] = that.init(inputs,options)
+				tabs = _.shuffle(tabs)
+				initTabs = ($container)->
+					initOneTab = (tab) ->
+						$el = $("<div></div>")
+						$container.append($el)
+						tab.render $el[0]
+					_.each(tabs, initOneTab)
+
+				return {
+					children: [
+						{
+							type: "def"
+							renderingFunctions:[
+								initTabs
+							]
+						}
+						{
+							type: "enumerate"
+							enumi: "a"
+							children: items
+						}
+					]
 				}
-			out
+
+			return {
+				children: [
+					{
+						type:"text"
+						children:[
+							"Dans chaque cas, on vous donne 4 tableaux de variations et 4 fonctions du second degré."
+							"À chaque fois, vous devez dire à quelle fonction correspond chaque tableau."
+						]
+					}
+					{
+						type: "subtitles"
+						enumi: "A"
+						refresh: true
+						children: _.map(inputs_list, fct_item)
+					}
+				]
+			}
+
+		getTex: (inputs_list,options) ->
+			that = @
+			fct_item = (inputs, index) ->
+				[items, tabs, ranks] = that.init(inputs,options)
+				tabs = _.shuffle(tabs)
+
+				return (tab.toTexTpl() for tab in tabs).concat [
+					{
+						type: "enumerate"
+						enumi: "a)"
+						children: items
+					}
+				]
+
+			if inputs_list.length is 1
+				return {
+					children: [
+						"On vous donne 4 tableaux de variations et 4 fonctions du second degré."
+						"Vous devez dire à quelle fonction correspond chaque tableau."
+					].concat fct_item(inputs_list[0],0)
+				}
+			else
+				return {
+					children: [
+						"Dans chaque cas, on vous donne 4 tableaux de variations et 4 fonctions du second degré."
+						"À chaque fois, vous devez dire à quelle fonction correspond chaque tableau."
+						{
+							type: "enumerate"
+							enumi: "1"
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
+
+
 	}

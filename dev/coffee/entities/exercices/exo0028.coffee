@@ -91,7 +91,6 @@
 					items: [
 						{
 							type: "text"
-							rank: 1
 							ps: [
 								"Soit $f(x) = #{fct.tex()}$"
 								"Donnez l'expression de $f'$, fonction dérivée de $f$."
@@ -99,25 +98,33 @@
 						}
 						{
 							type: "input"
-							rank: 2
-							waited: "number"
-							tag:"$f'(x)$"
-							name:"d"
-							description:"Expression de la dérivée"
-							good:derivee
-							developp:true
-							goodTex:deriveeForTex.tex()
-							formes: { fraction:true, distribution:true }
+							format: [
+								{ text: "$f'(x) =$", cols:2, class:"text-right" }
+								{ latex: true, cols:10, name:"d"}
+							]
 						}
 						{
 							type: "validation"
-							rank: 3
-							clavier: ["aide"]
+							clavier: ["aide", "sqrt", "pow"]
 						}
 						{
 							type: "aide"
-							rank: 4
 							list: help.derivee.basics
+						}
+					]
+					validations:{
+						d:"number"
+					}
+					verifications:[
+						{
+							name:"d"
+							good:derivee
+							tag:"$f'(x)$"
+							parameters: {
+								goodTex: deriveeForTex.tex()
+								formes: { fraction:true, distribution:true }
+								developp: true
+							}
 						}
 					]
 				}
@@ -130,28 +137,37 @@
 					items:[
 						{
 							type: "input"
-							rank: 1
-							waited: "number"
 							tag: "$f(#{x})$"
 							name: "fa"
 							description: "Valeur de f(a) à 0,01"
-							good: fa
-							arrondi: -2
+
 						}
 						{
 							type: "input"
-							rank: 2
-							waited: "number"
 							tag: "$f'(#{x})$"
 							name: "f2a"
 							description: "Valeur de f'(a) à 0,01"
-							good: f2a
-							arrondi: -2
 						}
 						{
 							type: "validation"
-							rank: 3
-							clavier: []
+						}
+					]
+					validations:{
+						fa: "number"
+						f2a: "number"
+					}
+					verifications:[
+						{
+							name:"fa"
+							tag:"$f(#{x})$"
+							good:fa
+							parameters: { arrondi: -2 }
+						}
+						{
+							name:"f2a"
+							tag:"$f'(#{x})$"
+							good:f2a
+							parameters: { arrondi: -2 }
 						}
 					]
 				}
@@ -162,34 +178,48 @@
 					items: [
 						{
 							type: "input"
-							rank: 1
-							waited: "number"
-							tag:"$\\mathcal{T}$"
-							answerPreprocessing:(userValue)->
-								pattern =/y\s*=([\s*+-/0-9a-zA-Z]+)/
-								result = pattern.exec(userValue)
-								if result
-									{ processed:result[1], error:false }
-								else
-									{ processed:userValue, error:"L'équation doit être de la forme y=..." }
-							name:"e"
-							description:"Équation de la tangente"
-							good:t
-							goodTex: "y = #{t.tex()}"
-							developp:true
-							formes:"FRACTION"
+							format: [
+								{ text: "$\\mathcal{T} :$", cols:2, class:"text-right" }
+								{ latex: true, cols:10, name:"e"}
+							]
 						}
 						{
 							type: "validation"
-							rank: 2
 							clavier: ["aide"]
 						}
 						{
 							type: "aide"
-							rank: 3
 							list: help.derivee.tangente
 						}
 					]
+					validations:{
+						e:(user)->
+							pattern =/y\s*=([^=]+)/
+							result = pattern.exec(userValue)
+							if result
+								out =  mM.verification.numberValidation(result, {})
+								out.user = user
+							else
+								out = { processed:false, user:user, error:"L'équation doit être de la forme y=..." }
+							out
+					}
+					verifications:[
+						(data) ->
+							ver = mM.verification.isSame(data.e.processed, t, { developp:true, formes:"FRACTION"} )
+							if ver.note is 0 then ver.goodMessage = { type:"error", text:"La bonne réponse était &nbsp; $y = #{t.tex()}$."}
+							list = [
+								{ type:"normal", text:"<b>#{tag}</b> &nbsp; :</b>&emsp; Vous avez répondu &nbsp; $y = #{data.e.processed.tex}$" }
+								ver.goodMessage
+							]
+							out = {
+								note: ver.note
+								add: {
+									type:"ul"
+									list: list.concat(ver.errors)
+								}
+							}
+					]
+
 				}
 
 			briques

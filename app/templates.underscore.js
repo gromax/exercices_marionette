@@ -709,6 +709,40 @@ __p += '\n' +
 } ;
 __p += '\n\\end{tikzpicture}\n\\end{center}\n';
 					break;
+				case "tkz-tab":;
+__p += '\n\\begin{center}\\begin{tikzpicture}[';
+ if (el.color) { ;
+__p += ' color = ' +
+__e( el.color ) +
+' ';
+ } ;
+__p += ']\n\\tkzTabInit[lgt=' +
+__e( el.lgt ) +
+', espcl=' +
+__e( el.espcl ) +
+', lw=' +
+__e( el.lw ) +
+']{' +
+__e( el.entetes ) +
+'}{' +
+__e( el.x_list ) +
+'}';
+
+					_.each(el.lignes, function(itLigne){
+						if (itLigne.sign) {;
+__p += '\n\\tkzTabLine{' +
+__e( itLigne.sign ) +
+' }';
+
+						} else {;
+__p += '\n\\tkzTabVar{' +
+__e( itLigne.var ) +
+'}';
+
+						}
+					});;
+__p += '\n\\end{tikzpicture}\\end{center}\n';
+					break;
 				case "enumerate": ;
 __p += '\n\\begin{enumerate}';
 if (el.enumi){;

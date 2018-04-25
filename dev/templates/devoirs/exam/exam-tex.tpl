@@ -91,6 +91,18 @@ if (el.misc) {%>
 \end{tikzpicture}
 \end{center}
 <%					break;
+				case "tkz-tab":%>
+\begin{center}\begin{tikzpicture}[<% if (el.color) { %> color = <%- el.color %> <% } %>]
+\tkzTabInit[lgt=<%- el.lgt %>, espcl=<%- el.espcl %>, lw=<%- el.lw %>]{<%- el.entetes %>}{<%- el.x_list %>}<%
+					_.each(el.lignes, function(itLigne){
+						if (itLigne.type=="sign") {%>
+\tkzTabLine{<%- itLigne.values.join(",")  %> }<%
+						} else {%>
+\tkzTabVar{<%- itLigne.values.join(",") %>}<%
+						}
+					});%>
+\end{tikzpicture}\end{center}
+<%					break;
 				case "enumerate": %>
 \begin{enumerate}<%if (el.enumi){%>[<%-el.enumi %>]<% } else {%>[1)]<% } %>
 <% _.each(el.children, function(it, index){ %>\item <%recursive_fct(it, index); }); %>

@@ -26,7 +26,6 @@ define ["utils/math", "utils/help"], (mM, help) ->
 					items: [
 						{
 							type: "text"
-							rank: 1
 							ps: [
 								"On considère une fonction une fonction &nbsp; $f$ &nbsp; dérivable sur &nbsp; $\\mathbb{R}$."
 								"$\\mathcal{C}$ &nbsp; est sa courbe représentative dans un repère."
@@ -35,23 +34,11 @@ define ["utils/math", "utils/help"], (mM, help) ->
 							]
 						}
 						{
-							type: "latex-input"
-							rank: 2
-							waited: "number"
-							tag:"$\\mathcal{T}$"
-							answerPreprocessing:(userValue)->
-								pattern =/y\s*=([^=]+)/
-								result = pattern.exec(userValue)
-								if result
-									{ processed:result[1], error:false }
-								else
-									{ processed:userValue, error:"L'équation doit être de la forme y=..." }
-							name:"e"
-							description:"Équation de la tangente"
-							good:eqReduite
-							goodTex: "y = #{eqReduite.tex()}"
-							developp:true
-							formes:"FRACTION"
+							type: "input"
+							format: [
+								{ text: "$\\mathcal{T} :$", cols:2, class:"text-right" }
+								{ latex: true, cols:10, name:"e"}
+							]
 						}
 						{
 							type: "validation"
@@ -61,6 +48,33 @@ define ["utils/math", "utils/help"], (mM, help) ->
 							type: "aide"
 							list: help.derivee.tangente
 						}
+					]
+					validations:{
+						e:(user)->
+							pattern =/y\s*=([^=]+)/
+							result = pattern.exec(userValue)
+							if result
+								out =  mM.verification.numberValidation(result, {})
+								out.user = user
+							else
+								out = { processed:false, user:user, error:"L'équation doit être de la forme y=..." }
+							out
+					}
+					verifications:[
+						(data) ->
+							ver = mM.verification.isSame(data.e.processed, eqReduite, { developp:true, formes:"FRACTION"} )
+							if ver.note is 0 then ver.goodMessage = { type:"error", text:"La bonne réponse était &nbsp; $y = #{eqReduite.tex()}$."}
+							list = [
+								{ type:"normal", text:"<b>#{tag}</b> &nbsp; :</b>&emsp; Vous avez répondu &nbsp; $y = #{data.e.processed.tex}$" }
+								ver.goodMessage
+							]
+							out = {
+								note: ver.note
+								add: {
+									type:"ul"
+									list: list.concat(ver.errors)
+								}
+							}
 					]
 				}
 			]

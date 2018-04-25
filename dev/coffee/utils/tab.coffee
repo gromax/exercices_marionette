@@ -49,7 +49,7 @@ define ["utils/svg"], (SVGapi) ->
 					when tab[0] is "-D+" then out.push { type:"forbidden", leftPos:"bottom", leftTag:tab[1], rightPos:"top", rightTag:tab[2] }
 					when tab[0] is "+D-" then out.push { type:"forbidden", leftPos:"top", leftTag:tab[1], rightPos:"bottom", rightTag:tab[2] }
 					when tab[0] is "+D+" then out.push { type:"forbidden", leftPos:"top", leftTag:tab[1], rightPos:"top", rightTag:tab[2] }
-			@lines.push {type:"var", tag:config.tag, str:line.join(), values:out, hauteur:Math.max(config.h,3)}
+			@lines.push {type:"var", tag:config.tag, values:line, svgValues:out, hauteur:Math.max(config.h,3)}
 			@
 		addSignLine: (line, params) ->
 			# line est un texte qui a la forme z,+,z
@@ -62,15 +62,12 @@ define ["utils/svg"], (SVGapi) ->
 			if not(_.isArray(line)) then return
 			line.push('?') while line.length<2*@x_list.length-1 # On s'assure une longueur minimum
 			line.pop() while line.length>2*@x_list.length-1 # On s'assure d'une longueur maximum
-			@lines.push {type:"sign", sign:true, tag:config.tag, values:line, hauteur:Math.max(config.h,1)}
+			@lines.push {type:"sign", tag:config.tag, values:line, hauteur:Math.max(config.h,1)}
 			@
-		tex: (params) ->
+		toTexTpl: () ->
 			entetes = ("#{line.tag}/#{line.hauteur/2}" for line in @lines)
 			entetes.unshift "#{@x_tag}/1"
-			config = { lgt:1, espcl:1.5, lw:"1pt", entetes:entetes.join(), lines:@lines, x_list:@x_list.join(), color:@config.texColor }
-			if (typeof params is "object") and params isnt null
-				config[key] = params[key] for key of params
-			Handlebars.templates["tex_tab"] config
+			{ type:"tkz-tab", lgt:1, espcl:1.5, lw:"1pt", entetes:entetes.join(), lines:@lines, x_list:@x_list.join(), color:@config.texColor }
 		render: (div) ->
 			longueur = @config.espace_gauche+(@x_list.length-1)*@config.espace_entre_valeurs+2*@config.marge
 			hauteur = @linesNumber() * @config.hauteur_ligne
@@ -131,12 +128,12 @@ define ["utils/svg"], (SVGapi) ->
 			@paper.rect(0, lineY*@config.hauteur_ligne, @config.espace_gauche, h, @config.color) # Rectangle de l'entête
 			@paper.text(line.tag, @config.espace_gauche/2, (lineY+line.hauteur/2)*@config.hauteur_ligne, x0, h, "center", "center")
 			arrowPath = [] # Chemin des flèches
-			for item,i in line.values
+			for item,i in line.svgValues
 				switch
 					when typeof item.type is "undefined"
 						# Cas normal
 						arrowPath.push @renderTabVarValueTag(item.tag, "center", item.pos, i, lineY, line.hauteur)
-						if not ( (item?.no_vertical_line is true) or (i is 0) or (i is line.values.length-1))
+						if not ( (item?.no_vertical_line is true) or (i is 0) or (i is line.svgValues.length-1))
 							# Tracé d'une ligne pointillée verticale
 							@paper.line(x0+i*d,lineY*@config.hauteur_ligne,x0+i*d,lineY*@config.hauteur_ligne+h,{dash:'5,5', width:.5})
 					#when item.type is "value"

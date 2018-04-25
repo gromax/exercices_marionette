@@ -30,41 +30,72 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["On considère une fonction une fonction &nbsp; $f$ &nbsp; dérivable sur &nbsp; $\\mathbb{R}$.", "$\\mathcal{C}$ &nbsp; est sa courbe représentative dans un repère.", "On sait que &nbsp; $f\\left(" + xAtex + "\\right) = " + yAtex + "$ &nbsp; et &nbsp; $f'\\left(" + xAtex + "\\right) = " + (droite.m().tex()) + "$.", "Donnez l'équation de la tangente &nbsp; $\\mathcal{T}$ &nbsp; à la courbe &nbsp; $\\mathcal{C}$ &nbsp; en l'abscisse &nbsp; $" + xAtex + "$."]
             }, {
-              type: "latex-input",
-              rank: 2,
-              waited: "number",
-              tag: "$\\mathcal{T}$",
-              answerPreprocessing: function(userValue) {
-                var pattern, result;
-                pattern = /y\s*=([^=]+)/;
-                result = pattern.exec(userValue);
-                if (result) {
-                  return {
-                    processed: result[1],
-                    error: false
-                  };
-                } else {
-                  return {
-                    processed: userValue,
-                    error: "L'équation doit être de la forme y=..."
-                  };
+              type: "input",
+              format: [
+                {
+                  text: "$\\mathcal{T} :$",
+                  cols: 2,
+                  "class": "text-right"
+                }, {
+                  latex: true,
+                  cols: 10,
+                  name: "e"
                 }
-              },
-              name: "e",
-              description: "Équation de la tangente",
-              good: eqReduite,
-              goodTex: "y = " + (eqReduite.tex()),
-              developp: true,
-              formes: "FRACTION"
+              ]
             }, {
               type: "validation",
               clavier: ["aide"]
             }, {
               type: "aide",
               list: help.derivee.tangente
+            }
+          ],
+          validations: {
+            e: function(user) {
+              var out, pattern, result;
+              pattern = /y\s*=([^=]+)/;
+              result = pattern.exec(userValue);
+              if (result) {
+                out = mM.verification.numberValidation(result, {});
+                out.user = user;
+              } else {
+                out = {
+                  processed: false,
+                  user: user,
+                  error: "L'équation doit être de la forme y=..."
+                };
+              }
+              return out;
+            }
+          },
+          verifications: [
+            function(data) {
+              var list, out, ver;
+              ver = mM.verification.isSame(data.e.processed, eqReduite, {
+                developp: true,
+                formes: "FRACTION"
+              });
+              if (ver.note === 0) {
+                ver.goodMessage = {
+                  type: "error",
+                  text: "La bonne réponse était &nbsp; $y = " + (eqReduite.tex()) + "$."
+                };
+              }
+              list = [
+                {
+                  type: "normal",
+                  text: "<b>" + tag + "</b> &nbsp; :</b>&emsp; Vous avez répondu &nbsp; $y = " + data.e.processed.tex + "$"
+                }, ver.goodMessage
+              ];
+              return out = {
+                note: ver.note,
+                add: {
+                  type: "ul",
+                  list: list.concat(ver.errors)
+                }
+              };
             }
           ]
         }

@@ -153,8 +153,8 @@ define(["utils/svg"], function(SVGapi) {
       this.lines.push({
         type: "var",
         tag: config.tag,
-        str: line.join(),
-        values: out,
+        values: line,
+        svgValues: out,
         hauteur: Math.max(config.h, 3)
       });
       return this;
@@ -185,7 +185,6 @@ define(["utils/svg"], function(SVGapi) {
       }
       this.lines.push({
         type: "sign",
-        sign: true,
         tag: config.tag,
         values: line,
         hauteur: Math.max(config.h, 1)
@@ -193,8 +192,8 @@ define(["utils/svg"], function(SVGapi) {
       return this;
     };
 
-    TabVar.prototype.tex = function(params) {
-      var config, entetes, key, line;
+    TabVar.prototype.toTexTpl = function() {
+      var entetes, line;
       entetes = (function() {
         var k, len, ref, results;
         ref = this.lines;
@@ -206,7 +205,8 @@ define(["utils/svg"], function(SVGapi) {
         return results;
       }).call(this);
       entetes.unshift(this.x_tag + "/1");
-      config = {
+      return {
+        type: "tkz-tab",
         lgt: 1,
         espcl: 1.5,
         lw: "1pt",
@@ -215,12 +215,6 @@ define(["utils/svg"], function(SVGapi) {
         x_list: this.x_list.join(),
         color: this.config.texColor
       };
-      if ((typeof params === "object") && params !== null) {
-        for (key in params) {
-          config[key] = params[key];
-        }
-      }
-      return Handlebars.templates["tex_tab"](config);
     };
 
     TabVar.prototype.render = function(div) {
@@ -317,13 +311,13 @@ define(["utils/svg"], function(SVGapi) {
       this.paper.rect(0, lineY * this.config.hauteur_ligne, this.config.espace_gauche, h, this.config.color);
       this.paper.text(line.tag, this.config.espace_gauche / 2, (lineY + line.hauteur / 2) * this.config.hauteur_ligne, x0, h, "center", "center");
       arrowPath = [];
-      ref = line.values;
+      ref = line.svgValues;
       for (i = k = 0, len = ref.length; k < len; i = ++k) {
         item = ref[i];
         switch (false) {
           case typeof item.type !== "undefined":
             arrowPath.push(this.renderTabVarValueTag(item.tag, "center", item.pos, i, lineY, line.hauteur));
-            if (!(((item != null ? item.no_vertical_line : void 0) === true) || (i === 0) || (i === line.values.length - 1))) {
+            if (!(((item != null ? item.no_vertical_line : void 0) === true) || (i === 0) || (i === line.svgValues.length - 1))) {
               this.paper.line(x0 + i * d, lineY * this.config.hauteur_ligne, x0 + i * d, lineY * this.config.hauteur_ligne + h, {
                 dash: '5,5',
                 width: .5

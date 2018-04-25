@@ -186,7 +186,7 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 						"Vous devez dire à chaque fois quelle fonction correspond chaque courbe."
 						{
 							type: "enumerate"
-							enumi: "A"
+							enumi: "1"
 							children: _.map(inputs_list, fct_item)
 						}
 					]
