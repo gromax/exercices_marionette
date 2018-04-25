@@ -5,14 +5,9 @@
 			@initOk = true
 			# Pour éviter d'alourdir le constructor dans le cas où la classe ne servirait à aucun parse
 			# Initialisation du parser
-			@Tokens = [TokenNumber, TokenParenthesis, TokenOperator, TokenFunction, TokenVariable, TokenEnsembleDelimiter]
+			@Tokens = [TokenNumber, TokenParenthesis, TokenOperator, TokenFunction, TokenVariable]
 			@globalRegex = new RegExp ( "(#{oToken.getRegex()})" for oToken in @Tokens ).join("|"), "gi"
-		typeToStr: (type) ->
-			switch type
-				when "number" then "nombre"
-				when "ensemble" then "ensemble"
-				else "(#{type} ?)"
-		parse: (expression,type, info) ->
+		parse: (expression, info) ->
 			if @initOk is false then @initParse()
 			# Les élèves ont le réflexe d'utiliser la touche ² présente sur les claviers
 			if typeof expression is "string"
@@ -31,50 +26,40 @@
 				expression = expression.replace /−/g, "-"
 			matchList = expression.match(@globalRegex)
 			if matchList?
-				openedEnsemble = false # préparation pour un parse d'ensemble
-				createToken = (Tokens,tokenString, type, info)->
+				createToken = (Tokens,tokenString, info)->
 					# tous les tokens doivent être reconnus
 					# Une erreur crée un null qui lors de la correction provoquera l'erreur du parse
-					for oToken in Tokens when typeof (tokenStringRegex = oToken.getRegex(type)) is "string"
+					for oToken in Tokens when typeof (tokenStringRegex = oToken.getRegex()) is "string"
 						regex = new RegExp(tokenStringRegex,'i')
 						if regex.test(tokenString)
-							tok = new oToken(tokenString)
-							if tok instanceof TokenEnsembleDelimiter
-								tok.setOuvrant(openedEnsemble = not openedEnsemble)
-							return tok
-					info.messages.push "'#{tokenString}' n'est pas valide pour un(e) #{@typeToStr(type)}"
+							return new oToken(tokenString)
+					info.messages.push "'#{tokenString}' n'est pas valide."
 					null
-				tokensList = ( createToken(@Tokens, strToken,type, info) for strToken in matchList )
-				if openedEnsemble
-					info.messages.push "Ensemble ouvert mais pas refermé"
-					false
-				else
-					correctedTokensList = @correction tokensList , info
-					switch
-						when correctedTokensList is null then false
-						when correctedTokensList.length is 0
-							info.messages.push "Liste de tokens vide"
-							false
-						else
-							rpn = @buildReversePolishNotation correctedTokensList
-							buildArray = @buildObject(rpn)
-							output = buildArray.pop()
-							# On vérifie que la sortie a la bonne forme
-							switch
-								when buildArray.length>0
-									info.messages.push "La pile n'est pas vide"
-									false
-								when (type is "ensemble") and (output instanceof EnsembleObject) then output
-								when (type is "number") and (output instanceof NumberObject) then output
-								else
-									info.messages.push "Le résultat ne correspond pas à un(e) '#{@typeToStr(type)}'"
-									false
+				tokensList = ( createToken(@Tokens, strToken,info) for strToken in matchList )
+				correctedTokensList = @correction tokensList , info
+				switch
+					when correctedTokensList is null then false
+					when correctedTokensList.length is 0
+						info.messages.push "Liste de tokens vide"
+						false
+					else
+						rpn = @buildReversePolishNotation correctedTokensList
+						buildArray = @buildObject(rpn)
+						output = buildArray.pop()
+						# On vérifie que la sortie a la bonne forme
+						switch
+							when buildArray.length>0
+								info.messages.push "La pile n'est pas vide"
+								false
+							when (output instanceof NumberObject) then output
+							else
+								info.messages.push "Le résultat ne correspond pas à un nombre"
+								false
 			else
 				info.messages.push "Vide !"
 				false
 		correction: (tokens, info) ->
 			if ( oToken for oToken in tokens when not(oToken instanceof TokenObject) ).length>0 then return null
-			# Vérification des bons positionnement des délimiters d'ensembles
 			gauche = undefined
 			droite = tokens.shift()
 			stack = []
@@ -115,32 +100,17 @@
 					when token instanceof TokenNumber then rpn.push token
 					when token instanceof TokenVariable then rpn.push token
 					when token instanceof TokenFunction then stack.push token
-					when token instanceof TokenEnsembleDelimiter
-						if token.ouvrant
-							# Le token est chargé simultanément dans les deux piles
-							stack.push token
-							rpn.push token
-						else
-							# On dépile à la recherche de l'ouvrant
-							# qui existe forcément
-							rpn.push depile while (depile = stack.pop()) and not (depile instanceof TokenEnsembleDelimiter)
-							rpn.push token
 					when token instanceof TokenParenthesis
 						if token.isOpeningParenthesis() then stack.push token
 						else
 							# On dépile jusqu'à rencontrer (
 							# ou vider la pile - ce qui constituerait une erreur)
-							# ou rencontrer un délimiteur d'ensemble
-							rpn.push depile while (depile = stack.pop()) and not (depile instanceof TokenParenthesis) and not (depile instanceof TokenEnsembleDelimiter)
-							# Si le dernier élément dépilé est un délimiteur d'ensemble
-							# Il faut le rempiler
-							if depile instanceof TokenEnsembleDelimiter then stack.push depile
+							rpn.push depile while (depile = stack.pop()) and not (depile instanceof TokenParenthesis)
 					else
 						# Il s'agit d'un opérateur
 						rpn.push(depile) while (depile = stack.pop()) and (depile.getPriority() >= token.getPriority())
 						if depile then stack.push depile
 						stack.push token
-			# Enfin on vide la pile restante qui ne contient plus de délimiteurs d'ensembles
 			while depile = stack.pop()
 				if not (depile instanceof TokenParenthesis) then rpn.push depile
 			rpn
@@ -156,27 +126,22 @@
 		tex: "?"
 		valid: true
 		expression: ""
-		type:""
 		constructor: (value,params) ->
 			@simplificationList = [] #liste des flags de simplification
 			@messages = [] # messages d'erreur
 			@context = "" # A modifier : mise dans un context particulier pour certaines simplifications
 			# config
-			@config = _.extend({ developp:false, simplify:true, type:"number", toLowerCase:false, alias:false }, params ? {})
-			@type = @config.type
+			@config = _.extend({ developp:false, simplify:true, toLowerCase:false, alias:false }, params ? {})
 			if typeof value is "string"
 				@expression = value
 				if @config.toLowerCase then value = value.toLowerCase()
 				SymbolManager.setAlias(@config.alias)
-				value = ParseManager.parse(value, @config.type, @)
+				value = ParseManager.parse(value, @)
 				if value is false
 					# Le parse est invalid
 					@setInvalid()
 					# Pour éviter une erreur, on renvoie tout de même un objet
-					switch
-						when @config.type is "number" then value = new RealNumber()
-						when @config.type is "ensemble" then value = new Ensemble()
-						else value = new MObject()
+					value = new RealNumber()
 			if value instanceof MObject
 				# Cas où on a fourni directement un objet pour suivi de simplifications
 				@object = value
@@ -188,8 +153,7 @@
 		# ADD_SIMPLE, MULT_SIMPLE, ADD_REGROUPEMENT, EXPOSANT_UN, EXPOSANT_ZERO, PUISSANCE, RATION_REDUCTION
 		# MULT_SYMBOLE, DIVISION_EXACTE, APPROX, RACINE, EXPOSANT_DEVELOPP, DISTRIBUTION
 		# Contexte : |IN_RADICAL
-		# Markers pour les ensembles
-		# }_inattendu
+
 		set: (flag) -> @simplificationList.push(flag+@context)
 		setInvalid: () ->
 			@valid = false

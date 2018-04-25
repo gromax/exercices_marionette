@@ -118,11 +118,11 @@ define(["utils/math", "utils/help"], function(mM, help) {
                 ratio = mM.float(mM.exec([data.x.processed.object, sol, "-", data.m.processed.object, "/"]));
                 if (ratio - Math.abs(ratio) < .000000001) {
                   verX.note = 1;
+                  verX.goodMessage = {
+                    type: "success",
+                    text: "$" + data.x.processed.tex + "$ &nbsp; est une bonne réponse."
+                  };
                 }
-                verX.goodMessage = {
-                  type: "success",
-                  text: "$" + data.x.processed.tex + "$ &nbsp; est une bonne réponse."
-                };
               }
               return {
                 note: (verX.note + verM.note) / 2,

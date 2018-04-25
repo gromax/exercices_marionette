@@ -1,7 +1,7 @@
 define(["utils/math", "utils/help"], function(mM, help) {
   return {
     init: function(inputs, options) {
-      var a, ang, ang1, ang2, membreDroite, membreGauche, modulo, solutions, type;
+      var a, ang1, ang1R, ang2, ang2R, angSol, membreDroite, membreGauche, modulo, solutions, type;
       if (inputs.a != null) {
         a = Number(inputs.a);
       } else {
@@ -22,7 +22,6 @@ define(["utils/math", "utils/help"], function(mM, help) {
         });
         inputs.ang1 = String(ang1);
       }
-      ang1 = mM.trigo.degToRad(ang1);
       if (inputs.ang2 != null) {
         ang2 = mM.toNumber(inputs.ang2);
       } else {
@@ -34,53 +33,109 @@ define(["utils/math", "utils/help"], function(mM, help) {
         });
         inputs.ang2 = String(ang2);
       }
-      ang2 = mM.trigo.degToRad(ang2);
       if (inputs.type != null) {
         type = inputs.type;
       } else {
         inputs.type = type = mM.alea.real(["cos", "sin"]);
       }
-      membreGauche = mM.exec(["x", a, "*", ang1, "+", type], {
+      ang1R = mM.trigo.degToRad(ang1);
+      ang2R = mM.trigo.degToRad(ang2);
+      membreGauche = mM.exec(["x", a, "*", ang1R, "+", type], {
         simplify: true
       }).tex();
-      membreDroite = mM.exec([ang2, type]).tex();
+      membreDroite = mM.exec([ang2R, type]).tex();
+      angSol = mM.exec([ang2R, ang1R, "-", a, "/"], {
+        simplify: true
+      });
       modulo = mM.exec([2, "pi", "*", a, "/"], {
         simplify: true
       });
-      ang = mM.exec([ang2, ang1, "-", a, "/"], {
-        simplify: true
-      });
       if (type === "cos") {
-        solutions = [ang.toClone().setModulo(modulo), ang.opposite().setModulo(modulo)];
+        solutions = [angSol, mM.exec([angSol, "*-"])];
       } else {
-        solutions = [ang.toClone().setModulo(modulo), mM.trigo.principale(["pi", ang, "-"]).setModulo(modulo)];
+        solutions = [angSol, mM.trigo.principale(["pi", angSol, "-"])];
       }
-      return [membreGauche, membreDroite, solutions];
+      return [membreGauche, membreDroite, solutions, modulo];
     },
     getBriques: function(inputs, options) {
-      var membreDroiteTex, membreGaucheTex, ref, solutions;
-      ref = this.init(inputs), membreGaucheTex = ref[0], membreDroiteTex = ref[1], solutions = ref[2];
+      var membreDroiteTex, membreGaucheTex, modu, ref, solutions;
+      ref = this.init(inputs), membreGaucheTex = ref[0], membreDroiteTex = ref[1], solutions = ref[2], modu = ref[3];
       return [
         {
           bareme: 100,
           items: [
             {
               type: "text",
-              rank: 1,
-              ps: ["Vous devez résoudre l'équation suivante :", "$" + membreGaucheTex + " = " + membreDroiteTex + "$", "S'il y a plusieurs solutions, séparez-les avec ;"]
+              ps: ["Vous devez résoudre l'équation suivante :", "$" + membreGaucheTex + " = " + membreDroiteTex + "$", "Donnez une équation sous la forme les solutions appartenant à &nbsp; $]-\\pi;+\\pi]$.", "Votre réponses doit être de la forme &nbsp; $\\cdots + k \\cdots, k\\in\\mathbb{Z}$"]
             }, {
               type: "input",
-              rank: 2,
-              waited: "liste:number",
-              name: "solutions",
-              tag: "$\\mathcal{S}$",
-              description: "Solutions",
-              good: solutions,
-              moduloKey: "k"
+              format: [
+                {
+                  text: "$x =$",
+                  cols: 2,
+                  "class": "text-right"
+                }, {
+                  latex: true,
+                  cols: 3,
+                  name: "x"
+                }, {
+                  text: "$ + k \\quad\\cdot$",
+                  cols: 1,
+                  "class": "text-center"
+                }, {
+                  latex: true,
+                  cols: 3,
+                  name: "m"
+                }, {
+                  text: "$, k \\in\\mathbb{Z}$",
+                  cols: 2
+                }
+              ]
             }, {
               type: "validation",
-              rank: 4,
-              clavier: ["empty", "pi"]
+              clavier: ["pi"]
+            }
+          ],
+          validations: {
+            x: "number",
+            m: "number"
+          },
+          verifications: [
+            function(data) {
+              var ratio, verM, verX;
+              verX = mM.verification.areSome(data.x.processed, solutions, {});
+              verM = mM.verification.areSome(data.m.processed, [modu, mM.exec([modu, "*-"])], {});
+              if (verX.note === 0) {
+                ratio = mM.float(mM.exec([data.x.processed.object, solutions[0], "-", data.m.processed.object, "/"]));
+                if (ratio - Math.abs(ratio) < .000000001) {
+                  verX.note = 1;
+                  verX.goodMessage = {
+                    type: "success",
+                    text: "$" + data.x.processed.tex + "$ &nbsp; est une bonne réponse."
+                  };
+                } else {
+                  ratio = mM.float(mM.exec([data.x.processed.object, solutions[1], "-", data.m.processed.object, "/"]));
+                  if (ratio - Math.abs(ratio) < .000000001) {
+                    verX.note = 1;
+                    verX.goodMessage = {
+                      type: "success",
+                      text: "$" + data.x.processed.tex + "$ &nbsp; est une bonne réponse."
+                    };
+                  }
+                }
+              }
+              return {
+                note: (verX.note + verM.note) / 2,
+                add: {
+                  type: "ul",
+                  list: [
+                    {
+                      type: "normal",
+                      text: "Vous avez répondu &nbsp; $x= " + data.x.processed.tex + " + k \\cdot " + data.m.processed.tex + "$"
+                    }
+                  ].concat(verX.errors, [verX.goodMessage], verM.errors, [verM.goodMessage])
+                }
+              };
             }
           ]
         }
@@ -90,8 +145,8 @@ define(["utils/math", "utils/help"], function(mM, help) {
       var fct_item, that;
       that = this;
       fct_item = function(inputs, index) {
-        var membreDroiteTex, membreGaucheTex, ref, sols;
-        ref = that.init(inputs, options), membreGaucheTex = ref[0], membreDroiteTex = ref[1], sols = ref[2];
+        var membreDroiteTex, membreGaucheTex, modulo, ref, sols;
+        ref = that.init(inputs, options), membreGaucheTex = ref[0], membreDroiteTex = ref[1], sols = ref[2], modulo = ref[3];
         return "$" + membreGaucheTex + " = " + membreDroiteTex + "$";
       };
       return {
@@ -112,8 +167,8 @@ define(["utils/math", "utils/help"], function(mM, help) {
       var fct_item, that;
       that = this;
       fct_item = function(inputs, index) {
-        var membreDroiteTex, membreGaucheTex, ref, sols;
-        ref = that.init(inputs, options), membreGaucheTex = ref[0], membreDroiteTex = ref[1], sols = ref[2];
+        var membreDroiteTex, membreGaucheTex, modulo, ref, sols;
+        ref = that.init(inputs, options), membreGaucheTex = ref[0], membreDroiteTex = ref[1], sols = ref[2], modulo = ref[3];
         return "$" + membreGaucheTex + " = " + membreDroiteTex + "$";
       };
       return {

@@ -165,11 +165,9 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["On considère la série statistique donnée par le tableau suivant :"]
             }, {
               type: "tableau",
-              rank: 2,
               entetes: false,
               lignes: [_.flatten(["$x_i$", serie_x.getValues()]), _.flatten(["$y_i$", serie_y.getValues()])]
             }
@@ -182,7 +180,6 @@ define(["utils/math", "utils/help"], function(mM, help) {
         tagVar = "z";
         briques[0].items.push({
           type: "text",
-          rank: 3,
           ps: ["On propose le changement de variable suivant : &nbsp; " + chgTex + "."]
         });
       }
@@ -193,34 +190,59 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["Soit &nbsp; $G$ &nbsp; le point moyen du nuage &nbsp; $M_i\\left(x_i;" + tagVar + "_i\\right)$.", "Donnez ses coordonnées à 0,01 près"]
             }, {
               type: "input",
-              rank: 2,
-              waited: "number",
-              tag: "$x_G$",
-              name: "xG",
-              description: "Abscisse de G",
-              good: serie_x.moyenne(),
-              arrondi: -2
-            }, {
-              type: "input",
-              rank: 3,
-              waited: "number",
-              tag: "$y_G$",
-              name: "yG",
-              description: "Ordonnée de G",
-              good: serie_z.moyenne(),
-              arrondi: -2
+              format: [
+                {
+                  text: "G (",
+                  cols: 3,
+                  "class": "text-right h4"
+                }, {
+                  name: "xG",
+                  cols: 2,
+                  latex: true
+                }, {
+                  text: ";",
+                  cols: 1,
+                  "class": "text-center h4"
+                }, {
+                  name: "yG",
+                  cols: 2,
+                  latex: true
+                }, {
+                  text: ")",
+                  cols: 1,
+                  "class": "h4"
+                }
+              ]
             }, {
               type: "validation",
-              rank: 6,
               clavier: ["aide"]
             }, {
               type: "aide",
-              rank: 7,
               list: help.stats.centre
+            }
+          ],
+          validations: {
+            xG: "number",
+            yG: "number"
+          },
+          verifications: [
+            {
+              name: "xG",
+              tag: "$x_G$",
+              good: serie_x.moyenne(),
+              parameters: {
+                arrondi: -2
+              }
+            }, {
+              name: "yG",
+              tag: "$y_G$",
+              good: serie_z.moyenne(),
+              parameters: {
+                arrondi: -2
+              }
             }
           ]
         });
@@ -231,34 +253,42 @@ define(["utils/math", "utils/help"], function(mM, help) {
         items: [
           {
             type: "text",
-            rank: 1,
             ps: ["Donnez les coefficients de l'ajustement affine : &nbsp; $" + tagVar + "=ax+b$ &nbsp; à 0,001 près"]
           }, {
             type: "input",
-            rank: 2,
-            waited: "number",
-            tag: "$a$",
+            tag: "a",
             name: "a",
-            description: "à 0,001 près",
-            good: a,
-            arrondi: -3
+            description: "à 0,001 près"
           }, {
             type: "input",
-            rank: 3,
-            waited: "number",
             tag: "$b$",
             name: "b",
-            description: "à 0,001 près",
-            good: b,
-            arrondi: -3
+            description: "à 0,001 près"
           }, {
             type: "validation",
-            rank: 6,
             clavier: ["aide"]
           }, {
             type: "aide",
-            rank: 7,
             list: help.stats.ajustement.concat(help.stats.variance, help.stats.covariance)
+          }
+        ],
+        validations: {
+          a: "number",
+          b: "number"
+        },
+        verifications: [
+          {
+            name: "a",
+            good: a,
+            parameters: {
+              arrondi: -3
+            }
+          }, {
+            name: "b",
+            good: b,
+            parameters: {
+              arrondi: -3
+            }
           }
         ]
       });
@@ -269,21 +299,26 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["Donnez la valeur de &nbsp; $y$ &nbsp; pour &nbsp; $x = " + (mM.misc.numToStr(i, 1)) + "$ &nbsp; à 0,01 près"]
             }, {
               type: "input",
-              rank: 2,
-              waited: "number",
               tag: "$y$",
               name: "y",
-              description: "à 0,01 près",
-              good: y,
-              arrondi: -2
+              description: "à 0,01 près"
             }, {
-              type: "validation",
-              rank: 6,
-              clavier: []
+              type: "validation"
+            }
+          ],
+          validations: {
+            y: "number"
+          },
+          verifications: [
+            {
+              name: "y",
+              good: y,
+              parameters: {
+                arrondi: -2
+              }
             }
           ]
         });

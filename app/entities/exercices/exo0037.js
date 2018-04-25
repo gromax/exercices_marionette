@@ -26,27 +26,41 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["On considère la fonction &nbsp; $" + fTex + "$.", "Vous devez donner l'expression de sa dérivée.", "<b>Attention :</b> La variable choisie est &nbsp; $t$ &nbsp; et pas &nbsp; $x$ &nbsp; !"]
             }, {
               type: "input",
-              rank: 2,
-              waited: "number",
-              name: "u",
-              tag: "$f'(t)$",
-              description: "Expression de f'",
-              good: fDer,
-              forme: {
-                fraction: true
-              }
+              format: [
+                {
+                  text: "$f'(t) =$",
+                  cols: 2,
+                  "class": "text-right"
+                }, {
+                  latex: true,
+                  cols: 10,
+                  name: "u"
+                }
+              ]
             }, {
               type: "validation",
-              rank: 4,
               clavier: ["aide"]
             }, {
               type: "aide",
-              rank: 5,
               list: help.trigo.derivee
+            }
+          ],
+          validations: {
+            u: "number"
+          },
+          verifications: [
+            {
+              name: "u",
+              tag: "$f'(t)$",
+              good: fDer,
+              parameters: {
+                forme: {
+                  fraction: true
+                }
+              }
             }
           ]
         }

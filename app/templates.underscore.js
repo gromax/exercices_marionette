@@ -1190,6 +1190,40 @@ __p += '<div id="devoir-params-region"></div>\n<br>\n<div id="exercices-region">
 return __p
 };
 
+this["JST"]["exercices/common/add-input"] = function(obj) {
+obj || (obj = {});
+var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
+function print() { __p += __j.call(arguments, '') }
+with (obj) {
+
+ if (typeof text != "undefined"){ ;
+__p += '<p>' +
+((__t = ( text )) == null ? '' : __t) +
+'</p>\n';
+ } ;
+__p += '<p>Ajouter un champ : <button class="btn btn-default js-add-input" type="button" title="Ajouter un champ"><i class="fa fa-plus"></i></button></p>\n';
+
+}
+return __p
+};
+
+this["JST"]["exercices/common/aide-item"] = function(obj) {
+obj || (obj = {});
+var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
+function print() { __p += __j.call(arguments, '') }
+with (obj) {
+__p += '<ul class="list-group list-group-flush js-liste-aide" style="display:none;">\n';
+ _.each(list,function(item){ ;
+__p += '\n\t<li class="list-group-item list-group-item-info">' +
+((__t = ( item )) == null ? '' : __t) +
+'</li>\n';
+ }) ;
+__p += '\n</ul>\n';
+
+}
+return __p
+};
+
 this["JST"]["exercices/common/brique-item"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
@@ -1257,15 +1291,7 @@ __p += '\n\t\t</tr>\n\t\t';
  }) ;
 __p += '\n\t</tbody>\n\t';
  } ;
-__p += '\n</table>\n</div>\n\n';
- break; case "aide": ;
-__p += '\n<ul class="list-group list-group-flush js-liste-aide" style="display:none;">\n';
- _.each(list,function(item){ ;
-__p += '\n\t<li class="list-group-item list-group-item-info">' +
-((__t = ( item )) == null ? '' : __t) +
-'</li>\n';
- }) ;
-__p += '\n</ul>\n\n';
+__p += '\n</table>\n</div>\n';
  } ;
 __p += '\n';
 
@@ -1389,6 +1415,79 @@ __p += '\n</ul>\n';
 return __p
 };
 
+this["JST"]["exercices/common/input-del"] = function(obj) {
+obj || (obj = {});
+var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
+function print() { __p += __j.call(arguments, '') }
+with (obj) {
+__p += '<div class="form-group row">\n\t';
+ if (typeof format == "undefined") { // format de base ;
+__p += '\n\t<label class="col-sm-2 col-form-label">' +
+__e( tag ) +
+'</label>\n\t<div class="col-sm-9">\n\t\t<input type="text" class="form-control" id="exo-' +
+__e( name ) +
+'" name="' +
+__e( name+'['+index+']' ) +
+'" ';
+ if (typeof description != "undefined") { ;
+__p += ' placeholder="' +
+__e( description ) +
+'" ';
+ } ;
+__p += ' value="">\n\t</div>\n\t<div class="col-sm-1">\n\t\t<button class="btn btn-default js-remove-input" type="button" title="Ajouter un champ" index=' +
+__e( index ) +
+'><i class="fa fa-minus"></i></button></p>\n\t</div>\n\t';
+ } else {
+		// format est un tableau d'objets { cols, name, class, text, latex }
+		_.each(format, function(item){ ;
+__p += '\n\t<div class="col-sm-' +
+__e( item.cols ) +
+' ' +
+__e( item.class ) +
+'">';
+
+			if (item.name) {
+				if (item.latex) { ;
+__p += '\n\t\t<span class="js-mathquill" id="mq-exo-' +
+__e( item.name ) +
+'" style="width:100%;"></span>\n\t\t<input type="hidden" id="exo-' +
+__e( item.name ) +
+'" name="' +
+__e( item.name+'['+index+']' ) +
+'" value="" ';
+ if(item.description) { ;
+__p += ' placeholder="' +
+__e( item.description ) +
+'" ';
+ } ;
+__p += ' >\n\t\t\t\t';
+ } else { ;
+__p += '\n\t\t<input type="text" class="form-control" id="exo-' +
+__e( item.name+'['+index+']' ) +
+'" name="' +
+__e( item.name ) +
+'" value="">\n\t\t\t\t';
+ }
+			} else { ;
+__p += '\n\t\t' +
+((__t = ( item.text )) == null ? '' : __t) +
+'\n\t\t\t';
+ }
+	;
+__p += '</div>';
+
+		}); ;
+__p += '\n\t<div class="col-sm-1">\n\t\t<button class="btn btn-default js-remove-input" type="button" title="Supprimer la ligne" index=' +
+__e( index ) +
+'><i class="fa fa-minus"></i></button></p>\n\t</div>';
+
+	} ;
+__p += '\n</div>\n';
+
+}
+return __p
+};
+
 this["JST"]["exercices/common/input"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
@@ -1478,42 +1577,6 @@ __p += '<div class="card-body">\n\t<p class="card-text">Cettre brique n\'est pas
 return __p
 };
 
-this["JST"]["exercices/common/multi-input"] = function(obj) {
-obj || (obj = {});
-var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
-function print() { __p += __j.call(arguments, '') }
-with (obj) {
-__p += '<div class="form-group row">\n\t<label class="col-sm-2 col-form-label">' +
-__e( tag ) +
-'</label>\n\t';
- _.each(format, function(item){ ;
-__p += '\n\t<div class="col-sm-' +
-__e( item.cols ) +
-' ' +
-__e( item.class ) +
-'">';
-
-		if (item.name) { ;
-__p += '\n\t\t<input type="text" class="form-control" id="exo-' +
-__e( item.name ) +
-'" name="' +
-__e( item.name ) +
-'" value="">\n\t\t';
- } else { ;
-__p += '\n\t\t<span>' +
-__e( item.text ) +
-'</span>\n\t\t';
- }
-	;
-__p += '</div>';
-
-	}); ;
-__p += '\n</div>\n';
-
-}
-return __p
-};
-
 this["JST"]["exercices/common/pied"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
@@ -1558,6 +1621,29 @@ __e( radio_id ) +
 __e( subItem ) +
 '\n\t</label>\n</div>\n';
  }) ;
+__p += '\n';
+
+}
+return __p
+};
+
+this["JST"]["exercices/common/validation-error"] = function(obj) {
+obj || (obj = {});
+var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
+function print() { __p += __j.call(arguments, '') }
+with (obj) {
+
+ if (_.isArray(error)) {
+	_.each(error, function(item){ ;
+__p += '\n<small class=\'js-validation-error\'><i class=\'fa fa-exclamation-triangle\'></i>' +
+__e( item ) +
+'</small>\n';
+	});
+} else { ;
+__p += '\n<small class=\'js-validation-error\'><i class=\'fa fa-exclamation-triangle\'></i>' +
+__e( error ) +
+'</small>\n';
+ } ;
 __p += '\n';
 
 }

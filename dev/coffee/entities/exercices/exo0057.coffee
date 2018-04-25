@@ -53,7 +53,6 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 					items: [
 						{
 							type: "text"
-							rank: 1
 							ps: [
 								"On vous donne la courbe de &nbsp; $x\\mapsto #{fct.tex()}$."
 								"On sait que la primitive de cette fonction est &nbsp; $x \\mapsto #{prim.tex()}$."
@@ -63,7 +62,6 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 						}
 						{
 							type:"jsxgraph"
-							rank: 2
 							divId: "jsx#{Math.random()}"
 							params: {
 								axis:true
@@ -77,38 +75,31 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 						}
 						{
 							type:"input"
-							rank: 3
 							tag:"Aire"
 							name:"A"
 							description:"Aire sous la courbe"
-							good:integrale
-							approx:-2
-							waited:"number"
 						}
 
 						{
 							type: "validation"
-							rank: 4
-							clavier: []
+						}
+					]
+					validations:{
+						A:"number"
+					}
+					verifications:[
+						{
+							name: "A"
+							tag: "Aire"
+							good: integrale
+							parameters: {
+								arrondi:-2
+							}
 						}
 					]
 				}
 			]
 
 
-		tex: (data) ->
-			if not isArray(data) then data = [ data ]
-			out = []
-			for itemData,i in data
-				if itemData.options.a.value is 0
-					title = "Identifier la courbe de $f$ et celle de sa dérivée $f'$"
-				else
-					title = "Identifier la courbe de $f$ et celle de sa primitive $F$"
-				courbes = ( { color:item.color.tex, expr:item.obj.toClone().simplify().toString().replace(/,/g,'.').replace(/x/g,'(\\x)') } for item in itemData.polys )
-				graphique = Handlebars.templates["tex_courbes"] { index:i+1, max:@max, courbes:courbes, scale:.6*@max/6, center:true }
-				out.push {
-					title:title
-					content:graphique
-				}
-			out
+
 	}

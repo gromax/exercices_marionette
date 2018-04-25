@@ -5,7 +5,7 @@
     slice = [].slice;
 
   define([], function() {
-    var Collection, ComplexeNumber, DECIMAL_MAX_PRECISION, DECIMAL_SEPARATOR, Droite2D, ERROR_MIN, Ensemble, EnsembleObject, FloatNumber, FunctionNumber, InftyNumber, Intersection, MObject, Monome, MultiplyNumber, NumberObject, ParseInfo, ParseManager, PlusNumber, Polynome, PolynomeMaker, PowerNumber, Proba, RadicalNumber, RationalNumber, RealNumber, SOLVE_MAX_PRECISION, SimpleNumber, Suite, SymbolManager, TokenEnsembleDelimiter, TokenFunction, TokenNumber, TokenObject, TokenOperator, TokenParenthesis, TokenVariable, Trigo, Union, Vector, arrayIntersect, erreurManager, extractSquarePart, fixNumber, grecques, in_array, isArray, isInfty, isInteger, mM, mergeObj, numToStr, signatures_comparaison, union_arrays;
+    var Collection, ComplexeNumber, DECIMAL_MAX_PRECISION, DECIMAL_SEPARATOR, Droite2D, ERROR_MIN, Ensemble, EnsembleObject, FloatNumber, FunctionNumber, InftyNumber, Intersection, MObject, Monome, MultiplyNumber, NumberObject, ParseInfo, ParseManager, PlusNumber, Polynome, PolynomeMaker, PowerNumber, Proba, RadicalNumber, RationalNumber, RealNumber, SOLVE_MAX_PRECISION, SimpleNumber, Suite, SymbolManager, TokenFunction, TokenNumber, TokenObject, TokenOperator, TokenParenthesis, TokenVariable, Trigo, Union, Vector, arrayIntersect, erreurManager, extractSquarePart, fixNumber, grecques, in_array, isArray, isInfty, isInteger, mM, mergeObj, numToStr, signatures_comparaison, union_arrays;
     grecques = ["alpha", "beta", "delta", "psi", "pi", "theta", "phi", "xi", "rho", "epsilon", "omega", "nu", "mu", "gamma", "Alpha", "Beta", "Delta", "Psi", "Pi", "Theta", "Phi", "Xi", "Rho", "Epsilon", "Omega", "Nu", "Mu", "Gamma"];
     DECIMAL_SEPARATOR = ',';
     DECIMAL_MAX_PRECISION = 10;
@@ -5568,12 +5568,8 @@
         return this.name;
       };
 
-      TokenVariable.getRegex = function(type) {
-        if (type === "number") {
-          return "[#∞πa-zA-Z_\\x7f-\\xff][a-zA-Z0-9_\\x7f-\\xff]*";
-        } else {
-          return "[#π∅ℝ∞a-zA-Z_\\x7f-\\xff][a-zA-Z0-9_\\x7f-\\xff]*";
-        }
+      TokenVariable.getRegex = function() {
+        return "[#∞πa-zA-Z_\\x7f-\\xff][a-zA-Z0-9_\\x7f-\\xff]*";
       };
 
       TokenVariable.prototype.acceptOperOnLeft = function() {
@@ -5609,12 +5605,8 @@
         return this.opType;
       };
 
-      TokenOperator.getRegex = function(type) {
-        if (type === "number") {
-          return "[\\+\\-\\/\\^÷;]|cdot";
-        } else {
-          return "[\\+\\-\\/\\^;∪∩÷]|cdot";
-        }
+      TokenOperator.getRegex = function() {
+        return "[\\+\\-\\/\\^÷;]|cdot";
       };
 
       TokenOperator.prototype.setOpposite = function() {
@@ -5632,10 +5624,6 @@
             return 7;
           case !((this.opType === "+") || (this.opType === "-")):
             return 6;
-          case this.opType !== "∩":
-            return 5;
-          case this.opType !== "∪":
-            return 4;
           default:
             return 1;
         }
@@ -5675,10 +5663,6 @@
               return PowerNumber.make(this.operand1, this.operand2);
             case this.opType !== ";":
               return new Collection(";", [this.operand1, this.operand2]);
-            case this.opType !== "∪":
-              return new Union(this.operand1, this.operand2);
-            case this.opType !== "∩":
-              return new Intersection(this.operand1, this.operand2);
             default:
               return new RealNumber();
           }
@@ -5748,12 +5732,8 @@
         return this.type;
       };
 
-      TokenParenthesis.getRegex = function(type) {
-        if (type === "ensemble") {
-          return "[\\(\\)]";
-        } else {
-          return "[\\(\\{\\[\\]\\}\\)]";
-        }
+      TokenParenthesis.getRegex = function() {
+        return "[\\(\\{\\}\\)]";
       };
 
       TokenParenthesis.prototype.acceptOperOnLeft = function() {
@@ -5775,68 +5755,12 @@
       return TokenParenthesis;
 
     })(TokenObject);
-    TokenEnsembleDelimiter = (function(superClass) {
-      extend(TokenEnsembleDelimiter, superClass);
-
-      function TokenEnsembleDelimiter(delimiterType) {
-        this.delimiterType = delimiterType;
-        this.ouvrant = false;
-      }
-
-      TokenEnsembleDelimiter.prototype.toString = function() {
-        return this.delimiterType;
-      };
-
-      TokenEnsembleDelimiter.getRegex = function(type) {
-        if ((typeof type === "string") && !(type === "ensemble")) {
-          return null;
-        } else {
-          return "[\\[\\]]";
-        }
-      };
-
-      TokenEnsembleDelimiter.prototype.acceptOperOnLeft = function() {
-        return this.ouvrant;
-      };
-
-      TokenEnsembleDelimiter.prototype.acceptOperOnRight = function() {
-        return !this.ouvrant;
-      };
-
-      TokenEnsembleDelimiter.prototype.setOuvrant = function(newValue) {
-        this.ouvrant = newValue;
-        return true;
-      };
-
-      TokenEnsembleDelimiter.prototype.execute = function(stack) {
-        var collect, depile, op, ops;
-        if (!this.ouvrant) {
-          ops = [];
-          while ((depile = stack.pop()) && !(depile instanceof TokenEnsembleDelimiter)) {
-            if (depile instanceof Collection) {
-              collect = depile.getOperands();
-              while ((op = collect.pop())) {
-                ops.unshift(op);
-              }
-            } else {
-              ops.unshift(depile);
-            }
-          }
-          return EnsembleObject.make(depile != null ? depile.delimiterType : void 0, ops, this.delimiterType);
-        } else {
-          return this;
-        }
-      };
-
-      return TokenEnsembleDelimiter;
-
-    })(TokenObject);
     ParseManager = {
       initOk: false,
       initParse: function() {
         var oToken;
         this.initOk = true;
-        this.Tokens = [TokenNumber, TokenParenthesis, TokenOperator, TokenFunction, TokenVariable, TokenEnsembleDelimiter];
+        this.Tokens = [TokenNumber, TokenParenthesis, TokenOperator, TokenFunction, TokenVariable];
         return this.globalRegex = new RegExp(((function() {
           var aa, len, ref, results;
           ref = this.Tokens;
@@ -5848,18 +5772,8 @@
           return results;
         }).call(this)).join("|"), "gi");
       },
-      typeToStr: function(type) {
-        switch (type) {
-          case "number":
-            return "nombre";
-          case "ensemble":
-            return "ensemble";
-          default:
-            return "(" + type + " ?)";
-        }
-      },
-      parse: function(expression, type, info) {
-        var buildArray, correctedTokensList, createToken, matchList, openedEnsemble, output, rpn, strToken, tokensList;
+      parse: function(expression, info) {
+        var buildArray, correctedTokensList, createToken, matchList, output, rpn, strToken, tokensList;
         if (this.initOk === false) {
           this.initParse();
         }
@@ -5873,24 +5787,19 @@
         }
         matchList = expression.match(this.globalRegex);
         if (matchList != null) {
-          openedEnsemble = false;
-          createToken = function(Tokens, tokenString, type, info) {
-            var aa, len, oToken, regex, tok, tokenStringRegex;
+          createToken = function(Tokens, tokenString, info) {
+            var aa, len, oToken, regex, tokenStringRegex;
             for (aa = 0, len = Tokens.length; aa < len; aa++) {
               oToken = Tokens[aa];
-              if (!(typeof (tokenStringRegex = oToken.getRegex(type)) === "string")) {
+              if (!(typeof (tokenStringRegex = oToken.getRegex()) === "string")) {
                 continue;
               }
               regex = new RegExp(tokenStringRegex, 'i');
               if (regex.test(tokenString)) {
-                tok = new oToken(tokenString);
-                if (tok instanceof TokenEnsembleDelimiter) {
-                  tok.setOuvrant(openedEnsemble = !openedEnsemble);
-                }
-                return tok;
+                return new oToken(tokenString);
               }
             }
-            info.messages.push("'" + tokenString + "' n'est pas valide pour un(e) " + (this.typeToStr(type)));
+            info.messages.push("'" + tokenString + "' n'est pas valide.");
             return null;
           };
           tokensList = (function() {
@@ -5898,38 +5807,31 @@
             results = [];
             for (aa = 0, len = matchList.length; aa < len; aa++) {
               strToken = matchList[aa];
-              results.push(createToken(this.Tokens, strToken, type, info));
+              results.push(createToken(this.Tokens, strToken, info));
             }
             return results;
           }).call(this);
-          if (openedEnsemble) {
-            info.messages.push("Ensemble ouvert mais pas refermé");
-            return false;
-          } else {
-            correctedTokensList = this.correction(tokensList, info);
-            switch (false) {
-              case correctedTokensList !== null:
-                return false;
-              case correctedTokensList.length !== 0:
-                info.messages.push("Liste de tokens vide");
-                return false;
-              default:
-                rpn = this.buildReversePolishNotation(correctedTokensList);
-                buildArray = this.buildObject(rpn);
-                output = buildArray.pop();
-                switch (false) {
-                  case !(buildArray.length > 0):
-                    info.messages.push("La pile n'est pas vide");
-                    return false;
-                  case !((type === "ensemble") && (output instanceof EnsembleObject)):
-                    return output;
-                  case !((type === "number") && (output instanceof NumberObject)):
-                    return output;
-                  default:
-                    info.messages.push("Le résultat ne correspond pas à un(e) '" + (this.typeToStr(type)) + "'");
-                    return false;
-                }
-            }
+          correctedTokensList = this.correction(tokensList, info);
+          switch (false) {
+            case correctedTokensList !== null:
+              return false;
+            case correctedTokensList.length !== 0:
+              info.messages.push("Liste de tokens vide");
+              return false;
+            default:
+              rpn = this.buildReversePolishNotation(correctedTokensList);
+              buildArray = this.buildObject(rpn);
+              output = buildArray.pop();
+              switch (false) {
+                case !(buildArray.length > 0):
+                  info.messages.push("La pile n'est pas vide");
+                  return false;
+                case !(output instanceof NumberObject):
+                  return output;
+                default:
+                  info.messages.push("Le résultat ne correspond pas à un nombre");
+                  return false;
+              }
           }
         } else {
           info.messages.push("Vide !");
@@ -6005,26 +5907,12 @@
             case !(token instanceof TokenFunction):
               stack.push(token);
               break;
-            case !(token instanceof TokenEnsembleDelimiter):
-              if (token.ouvrant) {
-                stack.push(token);
-                rpn.push(token);
-              } else {
-                while ((depile = stack.pop()) && !(depile instanceof TokenEnsembleDelimiter)) {
-                  rpn.push(depile);
-                }
-                rpn.push(token);
-              }
-              break;
             case !(token instanceof TokenParenthesis):
               if (token.isOpeningParenthesis()) {
                 stack.push(token);
               } else {
-                while ((depile = stack.pop()) && !(depile instanceof TokenParenthesis) && !(depile instanceof TokenEnsembleDelimiter)) {
+                while ((depile = stack.pop()) && !(depile instanceof TokenParenthesis)) {
                   rpn.push(depile);
-                }
-                if (depile instanceof TokenEnsembleDelimiter) {
-                  stack.push(depile);
                 }
               }
               break;
@@ -6063,8 +5951,6 @@
 
       ParseInfo.prototype.expression = "";
 
-      ParseInfo.prototype.type = "";
-
       function ParseInfo(value, params) {
         var dvp, simp;
         this.simplificationList = [];
@@ -6073,30 +5959,19 @@
         this.config = _.extend({
           developp: false,
           simplify: true,
-          type: "number",
           toLowerCase: false,
           alias: false
         }, params != null ? params : {});
-        this.type = this.config.type;
         if (typeof value === "string") {
           this.expression = value;
           if (this.config.toLowerCase) {
             value = value.toLowerCase();
           }
           SymbolManager.setAlias(this.config.alias);
-          value = ParseManager.parse(value, this.config.type, this);
+          value = ParseManager.parse(value, this);
           if (value === false) {
             this.setInvalid();
-            switch (false) {
-              case this.config.type !== "number":
-                value = new RealNumber();
-                break;
-              case this.config.type !== "ensemble":
-                value = new Ensemble();
-                break;
-              default:
-                value = new MObject();
-            }
+            value = new RealNumber();
           }
         }
         if (value instanceof MObject) {
@@ -9238,19 +9113,6 @@
           return obj.toClone();
         }
       },
-      verif: {
-        ensemble: function(userInfo, goodObject, params) {
-          var config, ok;
-          config = mergeObj({
-            tolerance: 0
-          }, params);
-          ok = goodObject.isEqual(userInfo.object, config.tolerance);
-          return {
-            note: ok ? 1 : 0,
-            errors: ["La bonne réponse était &nbsp; $" + (goodObject.tex()) + "$"]
-          };
-        }
-      },
       verification: {
         numberValidation: function(userString, inConfig) {
           var config, info;
@@ -9269,7 +9131,6 @@
               };
             default:
               config = _.extend({
-                type: "number",
                 developp: true,
                 toLowerCase: false
               }, inConfig != null ? inConfig : {});

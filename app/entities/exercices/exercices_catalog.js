@@ -515,6 +515,13 @@ define([], function() {
         fixedSettings: {
           derivee: false
         }
+      }, {
+        id: 59,
+        filename: "exo0059",
+        title: "Exercice de test",
+        description: "Exercice utilisé pour développer de nouvelles fonctionalités",
+        keyWords: [],
+        options: {}
       }
     ],
     get: function(id) {

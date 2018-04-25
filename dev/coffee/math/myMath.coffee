@@ -410,26 +410,6 @@
 				MultiplyNumber.makeMult f
 			else obj.toClone()
 
-		verif:{
-			ensemble: (userInfo,goodObject,params) ->
-				# fonction de vérification des exercices pour les ensembleObject
-				# La sortie bareme est un facteur / 1
-				# Il faut alors sortir le calcul de la note et vérifier les custom correc
-				# userInfo = Parse du string retourné par l'utilisateur
-				# goodObject = bonne valeur. Un EnsembleObject
-				# params = objet de paramètres dont les possibilités sont données ci-dessous
-				config = mergeObj {
-					tolerance:0		# Une approximation dans la tolérance est considérée comme juste et n'est pas signalée
-				}, params
-
-				ok = goodObject.isEqual(userInfo.object,config.tolerance)
-
-				{
-					note: if ok then 1 else 0
-					errors: ["La bonne réponse était &nbsp; $#{goodObject.tex()}$"]
-				}
-		}
-
 		verification: {
 			numberValidation: (userString, inConfig) ->
 				switch
@@ -438,7 +418,7 @@
 					when userString is ""
 						{ processed:false, user:userString, error:"Ne doit pas être vide" }
 					else
-						config = _.extend({ type:"number", developp:true, toLowerCase:false }, inConfig ? {})
+						config = _.extend({ developp:true, toLowerCase:false }, inConfig ? {})
 						info = new ParseInfo(userString, config)
 						if info.valid
 							{ processed:info, user:userString, error:false }

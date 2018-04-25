@@ -1,7 +1,7 @@
 define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, help, colors, TabSignApi) {
   return {
     init: function(inputs) {
-      var a, a_is_plus, b, c, ensemble_solution, goodTab, im, ineq, ineqSign, poly, polyTex, racines, re, sol_is_ext, sol_xor, tabS1, tabS2, tabX, tabs, x1, x2;
+      var a, a_is_plus, b, c, ensemble_exterieur, ensemble_interieur, ensemble_solution, goodTab, im, ineq, ineqSign, poly, polyTex, racines, re, sol_is_ext, sol_xor, tabS1, tabS2, tabX, tabs, x1, x2;
       if ((typeof inputs.a !== "undefined") && (typeof inputs.b !== "undefined") && (typeof inputs.c !== "undefined") && (typeof inputs.ineq !== "undefined")) {
         a = Number(inputs.a);
         b = Number(inputs.b);
@@ -53,7 +53,7 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
       switch (racines.length) {
         case 1:
           if (sol_xor) {
-            ensemble_solution = mM.ensemble.singleton(racines[0]);
+            ensemble_interieur = mM.ensemble.singleton(racines[0]);
           } else {
             ensemble_solution = mM.ensemble.vide();
           }
@@ -62,13 +62,13 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
           tabS2 = ",+,z,+,";
           break;
         case 2:
-          ensemble_solution = mM.ensemble.intervalle(sol_xor, racines[0], racines[1], sol_xor);
+          ensemble_interieur = mM.ensemble.intervalle(sol_xor, racines[0], racines[1], sol_xor);
           tabX = ["$-\\infty$", "$x_1$", "$x_2$", "$+\\infty$"];
           tabS1 = ",-,z,+,z,-,";
           tabS2 = ",+,z,-,z,+,";
           break;
         default:
-          ensemble_solution = mM.ensemble.vide();
+          ensemble_interieur = mM.ensemble.vide();
           tabX = ["$-\\infty$", "$+\\infty$"];
           tabS1 = ",-,";
           tabS2 = ",+,";
@@ -84,9 +84,7 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
           texColor: colors.tex(1)
         })).addSignLine(tabS2)
       ];
-      if (sol_is_ext) {
-        ensemble_solution.inverse();
-      }
+      ensemble_exterieur = ensemble_interieur.toClone().inverse();
       if (a_is_plus) {
         goodTab = 1;
       } else {
@@ -94,11 +92,11 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
       }
       ineqSign = ["<", ">", "\\leqslant", "\\geqslant"];
       polyTex = poly.tex();
-      return [polyTex + " " + ineqSign[ineq] + " 0", polyTex, poly, racines, ensemble_solution, tabs, goodTab];
+      return [polyTex + " " + ineqSign[ineq] + " 0", polyTex, poly, racines, ensemble_interieur.tex(), ensemble_exterieur.tex(), sol_is_ext, tabs, goodTab];
     },
     getBriques: function(inputs, options) {
-      var ensemble_solution, goodTab, ineqTex, initTabs, poly, polyTex, racines, ref, tabs;
-      ref = this.init(inputs), ineqTex = ref[0], polyTex = ref[1], poly = ref[2], racines = ref[3], ensemble_solution = ref[4], tabs = ref[5], goodTab = ref[6];
+      var ensemble_exterieur, ensemble_interieur, goodTab, ineqTex, initTabs, poly, polyTex, racines, ref, sol_is_ext, tabs;
+      ref = this.init(inputs), ineqTex = ref[0], polyTex = ref[1], poly = ref[2], racines = ref[3], ensemble_interieur = ref[4], ensemble_exterieur = ref[5], sol_is_ext = ref[6], tabs = ref[7], goodTab = ref[8];
       initTabs = function($container) {
         var initOneTab;
         initOneTab = function(tab) {
@@ -214,20 +212,25 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
           items: [
             {
               type: "text",
-              rank: 1,
-              ps: ["Donnez l'ensemble solution de &nbsp; $" + ineqTex + "$."]
+              ps: ["Choisissez l'ensemble solution de &nbsp; $" + ineqTex + "$."]
             }, {
-              type: "input",
-              rank: 2,
-              waited: "ensemble",
-              name: "ensemble",
+              type: "radio",
               tag: "$\\mathcal{S}$",
-              description: "Ensemble solution",
-              good: ensemble_solution
+              name: "s",
+              radio: ["$" + ensemble_interieur + "$", "$" + ensemble_exterieur + "$"]
             }, {
-              type: "validation",
-              rank: 7,
-              clavier: ["union", "intersection", "reels", "empty", "infini"]
+              type: "validation"
+            }
+          ],
+          validations: {
+            s: "radio:2"
+          },
+          verifications: [
+            {
+              radio: ["$x=a$", "$y=mx+p$"],
+              name: "s",
+              tag: "$\\mathcal{S}$",
+              good: sol_is_ext ? 1 : 0
             }
           ]
         }
@@ -237,8 +240,8 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
       var fct_item, that;
       that = this;
       fct_item = function(inputs, index) {
-        var ensemble_solution, ineqTex, poly, polyTex, racines, ref;
-        ref = that.init(inputs, options), ineqTex = ref[0], polyTex = ref[1], poly = ref[2], racines = ref[3], ensemble_solution = ref[4];
+        var ensemble_exterieur, ensemble_interieur, goodTab, ineqTex, poly, polyTex, racines, ref, sol_is_ext, tabs;
+        ref = that.init(inputs, options), ineqTex = ref[0], polyTex = ref[1], poly = ref[2], racines = ref[3], ensemble_interieur = ref[4], ensemble_exterieur = ref[5], sol_is_ext = ref[6], tabs = ref[7], goodTab = ref[8];
         return {
           type: "enumerate",
           enumi: "1",
@@ -260,8 +263,8 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
       var fct_item, that;
       that = this;
       fct_item = function(inputs, index) {
-        var ensemble_solution, ineqTex, poly, polyTex, racines, ref;
-        ref = that.init(inputs, options), ineqTex = ref[0], polyTex = ref[1], poly = ref[2], racines = ref[3], ensemble_solution = ref[4];
+        var ensemble_exterieur, ensemble_interieur, goodTab, ineqTex, poly, polyTex, racines, ref, sol_is_ext, tabs;
+        ref = that.init(inputs, options), ineqTex = ref[0], polyTex = ref[1], poly = ref[2], racines = ref[3], ensemble_interieur = ref[4], ensemble_exterieur = ref[5], sol_is_ext = ref[6], tabs = ref[7], goodTab = ref[8];
         return {
           type: "enumerate",
           enumi: "1",

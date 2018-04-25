@@ -84,19 +84,29 @@ define(["utils/math", "utils/help"], function(mM, help) {
             }, {
               type: "input",
               rank: 3,
-              waited: "number",
-              name: "xS",
-              tag: "$x_S$",
-              description: "Abscisse de S",
-              good: xS
-            }, {
-              type: "input",
-              rank: 4,
-              waited: "number",
-              name: "yS",
-              tag: "$y_S$",
-              description: "Ordonnée de S",
-              good: yS
+              format: [
+                {
+                  text: "S (",
+                  cols: 3,
+                  "class": "text-right h4"
+                }, {
+                  name: "xS",
+                  cols: 2,
+                  latex: true
+                }, {
+                  text: ";",
+                  cols: 1,
+                  "class": "text-center h4"
+                }, {
+                  name: "yS",
+                  cols: 2,
+                  latex: true
+                }, {
+                  text: ")",
+                  cols: 1,
+                  "class": "h4"
+                }
+              ]
             }, {
               type: "text",
               rank: 5,
@@ -104,11 +114,17 @@ define(["utils/math", "utils/help"], function(mM, help) {
             }, {
               type: "input",
               rank: 6,
-              waited: "liste:number",
-              name: "racines",
-              tag: "$\\mathcal{S}$",
-              description: "Racines de f",
-              good: racines
+              format: [
+                {
+                  text: "Racines :",
+                  cols: 2,
+                  "class": "text-right"
+                }, {
+                  latex: true,
+                  cols: 10,
+                  name: "racines"
+                }
+              ]
             }, {
               type: "text",
               rank: 7,
@@ -116,15 +132,48 @@ define(["utils/math", "utils/help"], function(mM, help) {
             }, {
               type: "input",
               rank: 8,
-              waited: "liste:number",
-              name: "sols",
-              tag: "$\\mathcal{S}$",
-              description: "Solutions",
-              good: solutionsA
+              format: [
+                {
+                  text: "$\\mathcal{S}$ :",
+                  cols: 2,
+                  "class": "text-right"
+                }, {
+                  latex: true,
+                  cols: 10,
+                  name: "sols"
+                }
+              ]
             }, {
               type: "validation",
               rank: 9,
-              clavier: []
+              clavier: ["pow", "sqrt"]
+            }
+          ],
+          validations: {
+            xS: "number",
+            yS: "number",
+            racines: "liste",
+            sols: "liste"
+          },
+          verifications: [
+            {
+              name: "xS",
+              tag: "$x_S$",
+              good: xS
+            }, {
+              name: "yS",
+              tag: "$y_S$",
+              good: yS
+            }, {
+              name: "racines",
+              type: "all",
+              good: racines,
+              tag: "Racines"
+            }, {
+              name: "sols",
+              type: "all",
+              good: solutionsA,
+              tag: "$\\mathcal{S}$"
             }
           ]
         }

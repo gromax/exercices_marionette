@@ -27,13 +27,7 @@ define([
 				if (validation_item && validation_item.error) {
 					// Il y a une erreur qu'il faut afficher
 					$el.addClass("bg-danger text-white");
-					if (_.isArray(validation_item.error)) {
-						_.each(validation_item.error, function(item){
-							$el.append("<small class='js-validation-error'><i class='fa fa-exclamation-triangle'></i> "+item+"</small>");
-						});
-					} else {
-						$el.append("<small class='js-validation-error'><i class='fa fa-exclamation-triangle'></i> "+validation_item.error+"</small>");
-					}
+					$el.append(window.JST["exercices/common/validation-error"]({ error:validation_item.error }));
 				} else {
 					// Pas d'erreur, on efface l'éventuel formatage erreur
 					$el.removeClass("bg-danger text-white");
@@ -65,6 +59,11 @@ define([
 
 	var RadioItemView = DefaultItemView.extend({
 		template: window.JST["exercices/common/radio"],
+		defaultToTrash: true
+	});
+
+	var AideItemView = DefaultItemView.extend({
+		template: window.JST["exercices/common/aide-item"],
 		defaultToTrash: true
 	});
 
@@ -107,6 +106,33 @@ define([
 			}
 			MathJax.Hub.Queue(["Typeset",MathJax.Hub,this.$el[0]]);
 		},
+	});
+
+	var AddInputView = DefaultItemView.extend({
+		template: window.JST["exercices/common/add-input"],
+		defaultToTrash: true,
+		triggers:{
+			"click button.js-add-input": "button:add",
+			"click button.js-remove-input": "button:remove"
+		},
+
+		initialize: function(){
+			this.inputs = [];
+		},
+
+		onButtonAdd: function(view, e){
+			var index = this.inputs.length;
+			var $newInput = $(window.JST["exercices/common/input-del"]({index:index, name:"pwet", tag:"lala", description:"rr"}))
+			view.$el.append($newInput);
+			this.inputs.push($newInput);
+		},
+
+		onButtonRemove: function(view, e){
+			console.log(e);
+			var $el = $(e.currentTarget);
+			var index = Number($el.attr("index"));
+			console.log(index);
+		}
 	});
 
 	var ColorChoiceItemView = DefaultItemView.extend({
@@ -225,6 +251,11 @@ define([
 				case "radio":
 					return RadioItemView;
 					break;
+				case "aide":
+					return AideItemView;
+					break;
+				case "add-input":
+					return AddInputView;
 				default:
 					return DefaultItemView;
 			}

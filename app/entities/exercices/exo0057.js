@@ -59,11 +59,9 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["On vous donne la courbe de &nbsp; $x\\mapsto " + (fct.tex()) + "$.", "On sait que la primitive de cette fonction est &nbsp; $x \\mapsto " + (prim.tex()) + "$.", "On cherche l'aire de la zone sous la courbe allant de &nbsp; $x=" + a + "$ &nbsp; à &nbsp; $x=" + b + "$.", "Donnez cette aire à 0,01 près."]
             }, {
               type: "jsxgraph",
-              rank: 2,
               divId: "jsx" + (Math.random()),
               params: {
                 axis: true,
@@ -74,61 +72,28 @@ define(["utils/math", "utils/help", "utils/colors"], function(mM, help, colors) 
               renderingFunctions: [initGraph]
             }, {
               type: "input",
-              rank: 3,
               tag: "Aire",
               name: "A",
-              description: "Aire sous la courbe",
-              good: integrale,
-              approx: -2,
-              waited: "number"
+              description: "Aire sous la courbe"
             }, {
-              type: "validation",
-              rank: 4,
-              clavier: []
+              type: "validation"
+            }
+          ],
+          validations: {
+            A: "number"
+          },
+          verifications: [
+            {
+              name: "A",
+              tag: "Aire",
+              good: integrale,
+              parameters: {
+                arrondi: -2
+              }
             }
           ]
         }
       ];
-    },
-    tex: function(data) {
-      var courbes, graphique, i, item, itemData, j, len, out, title;
-      if (!isArray(data)) {
-        data = [data];
-      }
-      out = [];
-      for (i = j = 0, len = data.length; j < len; i = ++j) {
-        itemData = data[i];
-        if (itemData.options.a.value === 0) {
-          title = "Identifier la courbe de $f$ et celle de sa dérivée $f'$";
-        } else {
-          title = "Identifier la courbe de $f$ et celle de sa primitive $F$";
-        }
-        courbes = (function() {
-          var k, len1, ref, results;
-          ref = itemData.polys;
-          results = [];
-          for (k = 0, len1 = ref.length; k < len1; k++) {
-            item = ref[k];
-            results.push({
-              color: item.color.tex,
-              expr: item.obj.toClone().simplify().toString().replace(/,/g, '.').replace(/x/g, '(\\x)')
-            });
-          }
-          return results;
-        })();
-        graphique = Handlebars.templates["tex_courbes"]({
-          index: i + 1,
-          max: this.max,
-          courbes: courbes,
-          scale: .6 * this.max / 6,
-          center: true
-        });
-        out.push({
-          title: title,
-          content: graphique
-        });
-      }
-      return out;
     }
   };
 });

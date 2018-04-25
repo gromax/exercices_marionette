@@ -34,9 +34,7 @@
 	class TokenVariable extends TokenObject
 		constructor: (@name) ->
 		toString: -> @name
-		@getRegex: (type) ->
-			if type is "number" then "[#∞πa-zA-Z_\\x7f-\\xff][a-zA-Z0-9_\\x7f-\\xff]*" # les chiffres sont-ils souhaitables ?
-			else "[#π∅ℝ∞a-zA-Z_\\x7f-\\xff][a-zA-Z0-9_\\x7f-\\xff]*"
+		@getRegex: () -> "[#∞πa-zA-Z_\\x7f-\\xff][a-zA-Z0-9_\\x7f-\\xff]*" # les chiffres sont-ils souhaitables ?
 		acceptOperOnLeft: -> true
 		acceptOperOnRight: -> true
 		execute: (stack) -> SymbolManager.makeSymbol @name
@@ -46,9 +44,7 @@
 		constructor: (@opType) ->
 			if @opType is "cdot" then @opType = "*"
 		toString: -> @opType
-		@getRegex: (type) ->
-			if type is "number" then "[\\+\\-\\/\\^÷;]|cdot"
-			else "[\\+\\-\\/\\^;∪∩÷]|cdot"
+		@getRegex: () -> "[\\+\\-\\/\\^÷;]|cdot"
 		setOpposite: ->
 			@opType = "0-"
 			@
@@ -58,8 +54,6 @@
 				when @opType is "0-" then 8
 				when (@opType is "*") or (@opType is "/") or (@opType is "÷") then 7
 				when (@opType is "+") or (@opType is "-") then 6
-				when @opType is "∩" then 5
-				when @opType is "∪" then 4
 				else 1
 		acceptOperOnLeft: -> @opType is "0-"
 		operateOnLeft: -> @opType isnt "0-"
@@ -78,8 +72,6 @@
 					when @opType is "÷" then MultiplyNumber.makeDiv( @operand1, @operand2 )
 					when @opType is "^" then PowerNumber.make( @operand1, @operand2 )
 					when @opType is ";" then new Collection(";", [@operand1, @operand2] )
-					when @opType is "∪" then new Union( @operand1, @operand2 )
-					when @opType is "∩" then new Intersection( @operand1, @operand2 )
 					else new RealNumber()
 	class TokenFunction extends TokenObject
 		operand: null
@@ -105,33 +97,8 @@
 			@type = token
 			@ouvrant = @type is "(" or @type is "{"
 		toString: -> @type
-		@getRegex: (type) ->
-			if type is "ensemble" then "[\\(\\)]"
-			else "[\\(\\{\\[\\]\\}\\)]"
+		@getRegex: -> "[\\(\\{\\}\\)]"
 		acceptOperOnLeft: -> @ouvrant
 		acceptOperOnRight: -> not @ouvrant
 		isOpeningParenthesis: -> @ouvrant
 		isClosingParenthesis: -> not @ouvrant
-	class TokenEnsembleDelimiter extends TokenObject
-		constructor: (@delimiterType) ->
-			@ouvrant = false
-		toString : -> @delimiterType
-		@getRegex: (type) ->
-			if (typeof type is "string") and not(type is "ensemble") then null
-			else "[\\[\\]]"
-		acceptOperOnLeft: -> @ouvrant
-		acceptOperOnRight: -> not @ouvrant
-		setOuvrant: (newValue) ->
-			@ouvrant = newValue
-			# On renvoie false en cas d'erreur
-			true
-		execute: (stack) ->
-			if not @ouvrant
-				ops = []
-				while (depile = stack.pop()) and not (depile instanceof TokenEnsembleDelimiter)
-					if depile instanceof Collection
-						collect = depile.getOperands()
-						ops.unshift op while (op=collect.pop())
-					else ops.unshift depile
-				EnsembleObject.make(depile?.delimiterType,ops,@delimiterType)
-			else @

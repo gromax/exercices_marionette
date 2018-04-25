@@ -210,6 +210,124 @@ define(["utils/math"], function(mM) {
           ]
         }
       ];
+    },
+    getExamBriques: function(inputs_list, options, fixedSettings) {
+      var complexes, fct_item, max, ref, that;
+      max = this.max;
+      that = this;
+      complexes = Number((ref = options.a.value) != null ? ref : 0) === 1;
+      fct_item = function(inputs, index) {
+        var iPts, pt;
+        iPts = that.init(inputs);
+        if (complexes) {
+          return ((function() {
+            var i, len, results;
+            results = [];
+            for (i = 0, len = iPts.length; i < len; i++) {
+              pt = iPts[i];
+              results.push("$z_" + pt.name + " = " + (pt.affixe().tex()) + "$");
+            }
+            return results;
+          })()).join(", &nbsp;");
+        } else {
+          return ((function() {
+            var i, len, results;
+            results = [];
+            for (i = 0, len = iPts.length; i < len; i++) {
+              pt = iPts[i];
+              results.push("$" + (pt.texLine()) + "$");
+            }
+            return results;
+          })()).join(", &nbsp;");
+        }
+      };
+      return {
+        children: [
+          {
+            type: "text",
+            children: complexes ? ["Dans chaque cas, on donne l'affixe des points &nbsp; $A$ &nbsp; à &nbsp;$E$.", "Placez ces points dans un plan complexe."] : ["Dans chaque cas, on donne l'affixe des points &nbsp; $A$ &nbsp; à &nbsp;$E$.", "Placez ces points dans un repère."]
+          }, {
+            type: "enumerate",
+            refresh: true,
+            enumi: "1",
+            children: _.map(inputs_list, fct_item)
+          }
+        ]
+      };
+    },
+    getTex: function(inputs_list, options) {
+      var complexes, fct_item, max, ref, sujet, that;
+      that = this;
+      max = this.max;
+      complexes = Number((ref = options.a.value) != null ? ref : 0) === 1;
+      fct_item = function(inputs, index) {
+        var iPts, pt;
+        iPts = that.init(inputs);
+        if (complexes) {
+          return [
+            ((function() {
+              var i, len, results;
+              results = [];
+              for (i = 0, len = iPts.length; i < len; i++) {
+                pt = iPts[i];
+                results.push("$z_" + pt.name + " = " + (pt.affixe().tex()) + "$");
+              }
+              return results;
+            })()).join(", "), {
+              type: "tikz",
+              left: -max,
+              bottom: -max,
+              right: max,
+              top: max,
+              Ouv: true
+            }
+          ];
+        } else {
+          return [
+            ((function() {
+              var i, len, results;
+              results = [];
+              for (i = 0, len = iPts.length; i < len; i++) {
+                pt = iPts[i];
+                results.push("$" + (pt.texLine()) + "$");
+              }
+              return results;
+            })()).join(", "), {
+              type: "tikz",
+              left: -max,
+              bottom: -max,
+              right: max,
+              top: max,
+              axes: [1, 1]
+            }
+          ];
+        }
+      };
+      if (inputs_list.length === 1) {
+        if (complexes) {
+          sujet = ["On donne l'affixe des points &nbsp; $A$ &nbsp; à &nbsp;$E$.", "Placez ces points dans un plan complexe."];
+        } else {
+          sujet = ["On donne l'affixe des points &nbsp; $A$ &nbsp; à &nbsp;$E$.", "Placez ces points dans un repère."];
+        }
+        return {
+          children: sujet.concat(fct_item(inputs_list[0], 0))
+        };
+      } else {
+        if (complexes) {
+          sujet = ["Dans chaque cas, on donne l'affixe des points &nbsp; $A$ &nbsp; à &nbsp;$E$.", "Placez ces points dans un plan complexe."];
+        } else {
+          sujet = ["Dans chaque cas, on donne l'affixe des points &nbsp; $A$ &nbsp; à &nbsp;$E$.", "Places ces points dans un repère."];
+        }
+        return {
+          children: sujet.concat([
+            {
+              type: "enumerate",
+              enumi: "1)",
+              children: _.map(inputs_list, fct_item)
+            }
+          ])
+        };
+      }
     }
   };
 });

@@ -4,9 +4,6 @@ define ["utils/math","utils/help", "utils/colors", "utils/tab"], (mM, help, colo
 #	description:"Il faut résoudre une inéquation du second degré."
 #	keyWords:["Analyse","Trinome","Équation","Racines","Première"]
 
-# debug : partie portant sur le tableau de signe à améliorer
-# debug pas de solution pour le dernier...
-
 	return {
 		init: (inputs) ->
 			if (typeof inputs.a isnt "undefined") and (typeof inputs.b isnt "undefined") and (typeof inputs.c isnt "undefined") and (typeof inputs.ineq isnt "undefined")
@@ -39,18 +36,18 @@ define ["utils/math","utils/help", "utils/colors", "utils/tab"], (mM, help, colo
 			# on prépare les tableaux de signes
 			switch racines.length
 				when 1
-					if sol_xor then ensemble_solution = mM.ensemble.singleton racines[0]
+					if sol_xor then ensemble_interieur = mM.ensemble.singleton racines[0]
 					else ensemble_solution = mM.ensemble.vide()
 					tabX = ["$-\\infty$", "$x_0$","$+\\infty$"]
 					tabS1 = ",-,z,-,"
 					tabS2 = ",+,z,+,"
 				when 2
-					ensemble_solution = mM.ensemble.intervalle sol_xor,racines[0], racines[1], sol_xor
+					ensemble_interieur = mM.ensemble.intervalle sol_xor,racines[0], racines[1], sol_xor
 					tabX = ["$-\\infty$", "$x_1$", "$x_2$", "$+\\infty$"]
 					tabS1 = ",-,z,+,z,-,"
 					tabS2 = ",+,z,-,z,+,"
 				else
-					ensemble_solution = mM.ensemble.vide()
+					ensemble_interieur = mM.ensemble.vide()
 					tabX = ["$-\\infty$", "$+\\infty$"]
 					tabS1 = ",-,"
 					tabS2 = ",+,"
@@ -58,7 +55,8 @@ define ["utils/math","utils/help", "utils/colors", "utils/tab"], (mM, help, colo
 				(TabSignApi.make(tabX, {hauteur_ligne:25, color:colors.html(0), texColor:colors.tex(0)})).addSignLine(tabS1)
 				(TabSignApi.make(tabX, {hauteur_ligne:25, color:colors.html(1), texColor:colors.tex(1)})).addSignLine(tabS2)
 			]
-			if sol_is_ext then ensemble_solution.inverse()
+			ensemble_exterieur = ensemble_interieur.toClone().inverse()
+
 			if a_is_plus then goodTab = 1
 			else goodTab=0
 			# On définit un tableau donnant la suite des étapes
@@ -69,13 +67,15 @@ define ["utils/math","utils/help", "utils/colors", "utils/tab"], (mM, help, colo
 				polyTex
 				poly
 				racines
-				ensemble_solution
+				ensemble_interieur.tex()
+				ensemble_exterieur.tex()
+				sol_is_ext
 				tabs
 				goodTab
 			]
 
 		getBriques: (inputs, options) ->
-			[ineqTex, polyTex, poly, racines, ensemble_solution, tabs, goodTab] = @init(inputs)
+			[ineqTex, polyTex, poly, racines, ensemble_interieur, ensemble_exterieur, sol_is_ext, tabs, goodTab] = @init(inputs)
 
 			initTabs = ($container)->
 				initOneTab = (tab) ->
@@ -202,33 +202,40 @@ define ["utils/math","utils/help", "utils/colors", "utils/tab"], (mM, help, colo
 					items:[
 						{
 							type:"text"
-							rank: 1
 							ps:[
-								"Donnez l'ensemble solution de &nbsp; $#{ineqTex}$."
+								"Choisissez l'ensemble solution de &nbsp; $#{ineqTex}$."
 							]
 						}
 						{
-							type: "input"
-							rank: 2
-							waited: "ensemble"
-							name:"ensemble"
+							type:"radio"
 							tag:"$\\mathcal{S}$"
-							description: "Ensemble solution"
-							good: ensemble_solution
+							name:"s"
+							radio:[
+								"$#{ensemble_interieur}$"
+								"$#{ensemble_exterieur}$"
+							]
 						}
 						{
 							type: "validation"
-							rank: 7
-							clavier: ["union", "intersection", "reels", "empty", "infini"]
 						}
 					]
+					validations: {
+						s:"radio:2"
+					}
+					verifications: [{
+						radio:[ "$x=a$", "$y=mx+p$" ]
+						name:"s"
+						tag:"$\\mathcal{S}$"
+						good: if sol_is_ext then 1 else 0
+					}]
+
 				}
 			]
 
 		getExamBriques: (inputs_list,options) ->
 			that = @
 			fct_item = (inputs, index) ->
-				[ineqTex, polyTex, poly, racines, ensemble_solution] = that.init(inputs,options)
+				[ineqTex, polyTex, poly, racines, ensemble_interieur, ensemble_exterieur, sol_is_ext, tabs, goodTab] = that.init(inputs,options)
 				return {
 					type: "enumerate"
 					enumi: "1"
@@ -253,7 +260,7 @@ define ["utils/math","utils/help", "utils/colors", "utils/tab"], (mM, help, colo
 		getTex: (inputs_list,options) ->
 			that = @
 			fct_item = (inputs, index) ->
-				[ineqTex, polyTex, poly, racines, ensemble_solution] = that.init(inputs,options)
+				[ineqTex, polyTex, poly, racines, ensemble_interieur, ensemble_exterieur, sol_is_ext, tabs, goodTab] = that.init(inputs,options)
 				return {
 					type: "enumerate"
 					enumi: "1"
