@@ -89,8 +89,7 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
         }
         tab = (TabVarApi.make(tabX, {
           hauteur_ligne: 25,
-          color: colors.html(ranks[i]),
-          texColor: colors.tex(i)
+          color: colors.html(ranks[i])
         })).addVarLine(variations);
         return [polyTex, tab, ranks[i]];
       };
@@ -153,14 +152,17 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
       ];
     },
     getExamBriques: function(inputs_list, options) {
-      var fct_item, that;
+      var fct_item, renderingFunctions, that;
       that = this;
+      renderingFunctions = [];
       fct_item = function(inputs, index) {
-        var initTabs, items, ranks, ref, tabs;
+        var divId, initTabs, items, ranks, ref, tabs;
         ref = that.init(inputs, options), items = ref[0], tabs = ref[1], ranks = ref[2];
         tabs = _.shuffle(tabs);
-        initTabs = function($container) {
-          var initOneTab;
+        divId = "tabs" + Math.round(Math.random() * 10000);
+        initTabs = function(view) {
+          var $container, initOneTab;
+          $container = $("#" + divId, view.$el);
           initOneTab = function(tab) {
             var $el;
             $el = $("<div></div>");
@@ -169,11 +171,11 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
           };
           return _.each(tabs, initOneTab);
         };
+        renderingFunctions.push(initTabs);
         return {
           children: [
             {
-              type: "def",
-              renderingFunctions: [initTabs]
+              divId: divId
             }, {
               type: "enumerate",
               enumi: "a",
@@ -193,7 +195,8 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
             refresh: true,
             children: _.map(inputs_list, fct_item)
           }
-        ]
+        ],
+        renderingFunctions: renderingFunctions
       };
     },
     getTex: function(inputs_list, options) {

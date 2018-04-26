@@ -38,6 +38,12 @@ define(["jst","marionette", "mathjax", "backbone.syphon"], function(JST, Marione
 					});
 				});
 			}
+			var renderingFunctions = this.model.get("renderingFunctions")
+			_.each(renderingFunctions, function(item){
+				if (typeof item == "function") {
+					item(that);
+				}
+			})
 		}
 	});
 

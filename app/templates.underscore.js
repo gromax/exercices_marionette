@@ -728,15 +728,15 @@ __e( el.entetes ) +
 __e( el.x_list ) +
 '}';
 
-					_.each(el.lignes, function(itLigne){
-						if (itLigne.sign) {;
+					_.each(el.lines, function(itLigne){
+						if (itLigne.type=="sign") {;
 __p += '\n\\tkzTabLine{' +
-__e( itLigne.sign ) +
+__e( itLigne.values.join(",")  ) +
 ' }';
 
 						} else {;
 __p += '\n\\tkzTabVar{' +
-__e( itLigne.var ) +
+__e( itLigne.values.join(",") ) +
 '}';
 
 						}
@@ -938,6 +938,22 @@ __p += '\n\t\t</tbody>\n';
 __p += '\n</table>\n</div>\n';
 
 					break;
+				default:
+;
+__p += '<div ';
+ if (el.divId) { ;
+__p += 'id="' +
+__e( el.divId ) +
+'"';
+ } ;
+__p += ' ';
+ if(el.class) { ;
+__p += 'class="' +
+__e( el.class ) +
+'" ';
+ } ;
+__p += '></div>\n';
+
 			}
 		}
 	}

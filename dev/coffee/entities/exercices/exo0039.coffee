@@ -106,24 +106,23 @@ define ["utils/math", "utils/help", "utils/colors", "utils/tab"], (mM, help, col
 
 		getExamBriques: (inputs_list,options) ->
 			that = @
-
+			renderingFunctions = []
 			fct_item = (inputs, index) ->
 				[items, tabs, ranks] = that.init(inputs,options)
 				tabs = _.shuffle(tabs)
-				initTabs = ($container)->
+				divId = "tabs" + Math.round(Math.random()*10000)
+				initTabs = (view)->
+					$container = $("##{divId}", view.$el)
 					initOneTab = (tab) ->
 						$el = $("<div></div>")
 						$container.append($el)
 						tab.render $el[0]
 					_.each(tabs, initOneTab)
-
+				renderingFunctions.push initTabs
 				return {
 					children: [
 						{
-							type: "def"
-							renderingFunctions:[
-								initTabs
-							]
+							divId: divId
 						}
 						{
 							type: "enumerate"
@@ -149,6 +148,7 @@ define ["utils/math", "utils/help", "utils/colors", "utils/tab"], (mM, help, col
 						children: _.map(inputs_list, fct_item)
 					}
 				]
+				renderingFunctions : renderingFunctions
 			}
 
 		getTex: (inputs_list,options) ->

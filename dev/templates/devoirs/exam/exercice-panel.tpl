@@ -80,6 +80,9 @@
 </div>
 <%
 					break;
+				default:
+%><div <% if (el.divId) { %>id="<%- el.divId %>"<% } %> <% if(el.class) { %>class="<%- el.class %>" <% } %>></div>
+<%
 			}
 		}
 	}
