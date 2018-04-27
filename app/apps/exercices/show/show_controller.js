@@ -199,17 +199,13 @@ define([
 							answersData = _.extend(answersData, data);
 
 							if (exo_params.save) {
-								// on recherche tous les items de validation qui ne seraient pas éliminés par toTrash
-								// S'il n'y en a pas, c'est que l'exercice est terminé
-								var finished = _.difference(
-									_.flatten(
-										_.map(
-											exo.get("briquesCollection").models,
-											function(item){ return item.get("items").where({type:"validation"}); }
-										)
-									),
-									toTrash
-								).length ==0 ;
+								// Puisqu'on valide, c'est qu'on a une brique de validation
+								// Si c'est la seule, c'est la dernière et l'exo est terminé.
+
+								var finished = (_.flatten( _.map(
+									exo.get("briquesCollection").models,
+									function(item){ return item.get("items").where({type:"validation"}); }
+								)).length <=1) ;
 
 								// le paramètre save sera une fonction prenant (note, answers, inputs, finished) en argument
 								// L'objet contient une clé ue qui sera accessible avec le bon contexte (d'où l'utilisation de apply)
