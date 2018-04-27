@@ -40,7 +40,7 @@ class exams
         }
 
         $id = (integer) $this->params['id'];
-        $exam=ExoFiche::getObject($id);
+        $exam=Exam::getObject($id);
         if ($exam === null)
         {
             EC::set_error_code(404);
