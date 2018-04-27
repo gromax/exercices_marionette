@@ -149,19 +149,25 @@ define([
 						});
 					}
 
+					var getToTrashItems = function(bV){
+						return bV.itemsView.children.filter(function(it){
+							var tT = it.model.get("toTrash");
+							var def = it.defaultToTrash;
+							return (tT === true) || (tT !== false) &&  def;
+						});
+					}
+
 					// Traitement après vérif
 					// Dans le but d'enchaîner le traitement initial d'un exercice sauvegardé
 					// la fonction renvoie le nouveau focus
-					var traitement_final = function(bv,m,v,tT, mV){
+					var traitement_final = function(bv, m, v, mV){
 						// bv = brique_view => La brique d'exercice dans laquelle s'effectue la vérif
 						// m = model => le model associé à la brique
 						// v = verifs => le résultats des vérifications menées selon les réponse utilisateur aux questions de cette brique
-						// tT = toTrash => liste des items à supprimer
 						// mV = model_validation => les données utilisateur traitées
-
 						pied.set("note",Math.ceil(note));
 						// Suppression des items d'input
-						_.each(tT, function(it){ it.remove(); });
+						_.each(getToTrashItems(bv), function(it){ it.remove(); });
 						// Ajout des items de correction
 						m.get("items").add(v.add);
 						// La brique est marquée comme terminée
@@ -174,13 +180,6 @@ define([
 						return focusedBrique;
 					}
 
-					var getToTrashItems = function(bV){
-						return bV.itemsView.children.filter(function(it){
-							var tT = it.model.get("toTrash");
-							var def = it.defaultToTrash;
-							return (tT === true) || (tT !== false) &&  def;
-						});
-					}
 
 					view.on("brique:form:submit", function(data,brique_view){
 						var model = brique_view.model;
@@ -190,7 +189,6 @@ define([
 
 						var validation_errors = _.compact( _.pluck(_.values( model_validation), "error" ) )
 						if (validation_errors.length == 0) {
-							var toTrash = getToTrashItems(brique_view);
 							var verifs = model.verification(model_validation);
 							// calcul de la note
 
@@ -223,11 +221,11 @@ define([
 										alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/023]");
 									});
 								} else {
-									traitement_final(brique_view, model, verifs, toTrash, model_validation);
+									traitement_final(brique_view, model, verifs, model_validation);
 								}
 							} else {
 								// On ne sauvegarde pas, on exécuter directement le traitement final
-								traitement_final(brique_view, model, verifs, toTrash, model_validation);
+								traitement_final(brique_view, model, verifs, model_validation);
 							}
 						} else {
 							brique_view.onFormDataInvalid(model_validation);
@@ -254,11 +252,10 @@ define([
 								var model_validation = model.validation(answersData);
 								var validation_errors = _.compact( _.pluck(_.values( model_validation), "error" ) )
 								if (validation_errors.length == 0) {
-									var toTrash = getToTrashItems(brique_view);
 									var verifs = model.verification(model_validation);
 									// calcul de la note
 									note = verifs.note*model.get("bareme")*100/baremeTotal + note;
-									model = traitement_final(brique_view, model, verifs, toTrash, model_validation);
+									model = traitement_final(brique_view, model, verifs, model_validation);
 								} else {
 									// La validation n'ayant pas abouti, on ne va pas plus loin
 									go_on = false;

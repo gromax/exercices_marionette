@@ -7,8 +7,8 @@ define(["utils/math", "utils/help"], function(mM, help) {
       if (typeof inputs.cv !== "undefined") {
         cv = Number(inputs.cv);
       } else {
-        if (changementVariable(cv = inputs.cv = mM.alea.real([1, 2, 3]))) {
-
+        if (changementVariable) {
+          cv = inputs.cv = mM.alea.real([1, 2, 3]);
         } else {
           cv = inputs.cv = 0;
         }

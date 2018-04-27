@@ -15,7 +15,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 			changementVariable = Number(options.b.value ? 0) is 1
 			if typeof inputs.cv isnt "undefined" then cv = Number inputs.cv
 			else
-				if changementVariable cv = inputs.cv = mM.alea.real [1,2,3]
+				if changementVariable then cv = inputs.cv = mM.alea.real [1,2,3]
 				else cv = inputs.cv = 0
 				# Les changements de variables sont : ln ; ln(A-y) ; ln(A/y-b)
 			if (typeof inputs.table is "undefined")
