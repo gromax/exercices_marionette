@@ -26,6 +26,12 @@ define([
 				$.when(fetchingData).done(function(exams){
 					var exam = exams.get(id);
 					if (exam){
+						var idFiche = exam.get("idFiche");
+						app.Ariane.add([
+							{ text:"Devoir #"+idFiche, e:"devoir:show", data:idFiche, link:"devoir:"+idFiche},
+							{ text:"Tex", e:"devoir:exams", data:idFiche, link:"devoir:"+idFiche+"/tex"},
+							{ text:"Fiche #"+id}
+						]);
 						var gettingBriques = exam.toExamBriques();
 						$.when(gettingBriques).done(function(result){
 							var view = new View ({nom:exam.get("nom"), locked: exam.get("locked"), collection:result});
@@ -83,7 +89,7 @@ define([
 							app.regions.getRegion('main').show(view);
 						});
 					} else {
-						var view = new MissingView({ message:"Cet exercice n'existe pas !" });
+						var view = new MissingView({ message:"Cette fiche tex n'existe pas !" });
 						app.regions.getRegion('main').show(view);
 					}
 				}).fail(function(response){
