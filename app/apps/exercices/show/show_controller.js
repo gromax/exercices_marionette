@@ -63,7 +63,6 @@ define([
 				inputs = {};
 				answersData = {};
 			}
-
 			var self = this;
 			var channel = this.getChannel();
 			require(["entities/exercice"], function(Exercice){
@@ -175,6 +174,14 @@ define([
 						return focusedBrique;
 					}
 
+					var getToTrashItems = function(bV){
+						return bV.itemsView.children.filter(function(it){
+							var tT = it.model.get("toTrash");
+							var def = it.defaultToTrash;
+							return (tT === true) || (tT !== false) &&  def;
+						});
+					}
+
 					view.on("brique:form:submit", function(data,brique_view){
 						var model = brique_view.model;
 
@@ -183,12 +190,7 @@ define([
 
 						var validation_errors = _.compact( _.pluck(_.values( model_validation), "error" ) )
 						if (validation_errors.length == 0) {
-							var toTrash = brique_view.itemsView.children.filter(function(it){
-								var toTrash = it.model.get("toTrash");
-								var def = it.defaultToTrash;
-								return (toTrash === true) || (toTrash !== false) &&  def;
-							});
-
+							var toTrash = getToTrashItems(brique_view);
 							var verifs = model.verification(model_validation);
 							// calcul de la note
 
@@ -254,12 +256,13 @@ define([
 								var brique_view = view.listView.children.findByModel(model);
 
 								var model_validation = model.validation(answersData);
-								var validation_error = _.some(model_validation, function(item){ return _.has(item, "error"); })
-								if (validation_error === false) {
+								var validation_errors = _.compact( _.pluck(_.values( model_validation), "error" ) )
+								if (validation_errors.length == 0) {
+									var toTrash = getToTrashItems(brique_view);
 									var verifs = model.verification(model_validation);
 									// calcul de la note
 									note = verifs.note*model.get("bareme")*100/baremeTotal + note;
-									model = traitement_final(brique_view, model, verifs);
+									model = traitement_final(brique_view, model, verifs, toTrash, model_validation);
 								} else {
 									// La validation n'ayant pas abouti, on ne va pas plus loin
 									go_on = false;
@@ -546,8 +549,6 @@ define([
 						var showReinitButton = false;
 						if (userfiche.get("actif") && userfiche.get("ficheActive")){
 							// La fiche étant active, l'exercice sera sauvegardé
-							// Il parait aussi logique de permettre de poursuivre la fiche en relancçant l'exercice
-							showReinitButton = true
 							saveFunction = function(note, answers, inputs, finished){
 								var newUE = false;
 								var ue = this.ue; // cette commande nécessite que la fonction soit appelée dans le bon contexte
