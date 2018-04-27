@@ -355,7 +355,7 @@ define([
 					if (exofiche && userfiche){
 						// Il faut récupérer le numéro de l'exercice dans le devoir
 						var liste = exofiches.where({"idFiche":userfiche.get("idFiche")});
-						var index = 1+_.findIndex(liste, function(item){ return item.get("id") == idEF; });
+						var index = _.findIndex(liste, function(item){ return item.get("id") == idEF; });
 						app.Ariane.add([
 							{ text:userfiche.get("nomFiche"), e:"devoir:show", data:idUF, link:"devoir:"+idUF},
 							{ text:"Exercice "+(index+1)+"/"+liste.length, e:"exercice-fiche:run", data:[idEF, idUF], link:"user-fiche:"+idUF+"/exercice-fiche:" + idEF },
