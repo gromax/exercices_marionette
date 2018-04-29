@@ -50,9 +50,11 @@ define([], function(){
 				errors.email = "Ne doit pas être vide";
 			}
 			else {
-				var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-				if (!re.test(attrs.email)){
-					errors.email = "L'email n'est pas valide";
+				if (this.get("rank")!="Root") {
+					var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+					if (!re.test(attrs.email)){
+						errors.email = "L'email n'est pas valide";
+					}
 				}
 			}
 			if(! _.isEmpty(errors)){

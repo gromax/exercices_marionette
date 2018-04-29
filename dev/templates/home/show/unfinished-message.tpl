@@ -1,1 +1,1 @@
-Il vous reste <%- number %> exercice(s) à terminer.
+Il vous reste r <%- number %> exercice(s) à terminer.

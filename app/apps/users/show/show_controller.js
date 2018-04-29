@@ -17,7 +17,6 @@ define([
 			app.trigger("header:loading", true);
 			var channel = this.getChannel();
 			require(["entities/dataManager"], function(){
-				console.log(isMe);
 				if (isMe) {
 					var fetchingUser = channel.request("user:me");
 				} else {

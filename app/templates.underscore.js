@@ -2002,7 +2002,7 @@ this["JST"]["home/show/unfinished-message"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
-__p += 'Il vous reste ' +
+__p += 'Il vous reste r ' +
 __e( number ) +
 ' exercice(s) à terminer.\n';
 
