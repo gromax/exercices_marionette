@@ -225,12 +225,12 @@ define(["marionette","app"], function(Marionette,app){
 			todo();
 		},
 
-		showUnfinished:function(idU){
+		showUnfinished:function(){
 			var auth = app.Auth;
 			var forEleve = function(){
 				app.Ariane.reset([{ text:"Exercices à terminer", e:"faits:unfinished", link:"exercices/a-finir"}]);
 				require(["apps/devoirs/faits/faits_controller"], function(Controller){
-					Controller.listForEleve();
+					Controller.unfinishedForEleve();
 				});
 			}
 
@@ -306,10 +306,10 @@ define(["marionette","app"], function(Marionette,app){
 	});
 
 
-	app.on("faits:unfinished", function(idU){
+	app.on("faits:unfinished", function(){
 		// Voir la liste des exercices faits pas terminés
-		app.navigate("unfinished:" + idU);
-		API.showUnfinished(idU);
+		app.navigate("exercices/a-finir");
+		API.showUnfinished();
 	});
 
 // Router
