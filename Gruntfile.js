@@ -29,14 +29,25 @@ module.exports = function(grunt) {
     },
 
     coffee: {
-      exercices: {
+      entities: {
+        options: {
+          bare: true
+        },
+        files:[{
+            expand: true,     // Enable dynamic expansion.
+            cwd: 'dev/coffee/entities',      // Src matches are relative to this path.
+            src: ['*.coffee'], // Actual pattern(s) to match.
+            dest: 'app/entities/',   // Destination path prefix.
+            ext: '.js',   // Dest filepaths will have this extension.
+            extDot: 'first'   // Extensions in filenames begin after the first dot
+        }]
+      },
+
+      utils: {
         options: {
           bare:true,
-          join:true
         },
         files: {
-          'app/entities/exercice.js' : 'dev/coffee/entities/exercice.coffee',
-          'app/entities/exercices.js' : 'dev/coffee/entities/exercices.coffee',
           'app/utils/help.js' : 'dev/coffee/utils/help.coffee',
           'app/utils/colors.js' : 'dev/coffee/utils/colors.coffee',
           'app/utils/svg.js' : 'dev/coffee/utils/svg.coffee',
@@ -104,6 +115,12 @@ module.exports = function(grunt) {
             options: {
               livereload: true
             }
+        },
+        js:{
+          files:[ 'app/apps/**/*.js'],
+          options:{
+            livereload: true
+          }
         }
     }
   });
