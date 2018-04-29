@@ -1634,11 +1634,11 @@ function print() { __p += __j.call(arguments, '') }
 with (obj) {
 
  if (finished) { ;
-__p += '\n<div class="card text-white bg-success">\n<p class="card-text">L\'exercice est terminé. Votre note est : <b>' +
+__p += '\n<div class="card-header text-white bg-success">\n<h3>L\'exercice est terminé. Votre note est : <b>' +
 __e( note ) +
-'/100</b>.</p>\n</div>\n';
+'/100</b>.</h3>\n</div>\n';
  } else { ;
-__p += '\n<div class="card text-white bg-danger">\n<p class="card-text">L\'exercice n\'est pas terminé.</p>\n</div>\n';
+__p += '\n<div class="card-header text-white bg-danger">\n<h3>L\'exercice n\'est pas terminé.</h3>\n</div>\n';
  } ;
 __p += '\n';
 
@@ -1942,7 +1942,7 @@ this["JST"]["home/show/eleve-view-layout"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
-__p += '<h5>Vos devoirs</h5>\n<div id="devoirs-region"></div>\n<div id="unfinished-region"></div>\n';
+__p += '<h3>Vos devoirs</h3>\n<div id="devoirs-region"></div>\n<div id="unfinished-region"></div>\n';
 
 }
 return __p

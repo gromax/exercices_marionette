@@ -485,6 +485,7 @@ define([
 
 	var PiedView = Marionette.View.extend({
 		template: window.JST["exercices/common/pied"],
+		className: "card"
 	});
 
 	var OptionsView = Marionette.View.extend({
