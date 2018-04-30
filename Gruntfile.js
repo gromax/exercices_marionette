@@ -3,10 +3,25 @@ module.exports = function(grunt) {
 
   //Initializing the configuration object
   grunt.initConfig({
+    pkg: grunt.file.readJSON('package.json'),
     uglify: {
       main: {
         files: {
-          'dist/main.min.js': 'dist/main.js',
+          'dist/main.<%= grunt.file.readJSON("package.json").version %>.min.js': 'dist/main.js',
+        }
+      }
+    },
+
+    'string-replace': {
+      index: {
+        files: {
+          'index.html' : 'dev/index.src'
+        },
+        options: {
+          replacements: [{
+            pattern: '<script data-main="./dist/main.min.js" src="./vendor/requirejs/require.js"></script>',
+            replacement: "<script data-main=\"./dist/main.<%= grunt.file.readJSON('package.json').version %>.min.js\" src=\"./vendor/requirejs/require.js\"></script>"
+          }]
         }
       }
     },
@@ -71,6 +86,22 @@ module.exports = function(grunt) {
         ]
       },
 
+      apps:{
+        options: {
+          bare: true
+        },
+        files: [
+          {
+            expand: true,     // Enable dynamic expansion.
+            cwd: 'dev/coffee/apps',      // Src matches are relative to this path.
+            src: ['**/*.coffee'], // Actual pattern(s) to match.
+            dest: 'app/apps/',   // Destination path prefix.
+            ext: '.js',   // Dest filepaths will have this extension.
+            extDot: 'first'   // Extensions in filenames begin after the first dot
+          },
+        ]
+      },
+
       math: {
         options: {
           bare:false,
@@ -98,11 +129,23 @@ module.exports = function(grunt) {
       }
     },
 
+    version: {
+      project: {
+        src: ['package.json', 'app/app.js']
+      }
+    },
+
+    shell: {
+      r: {
+        command: "r.js -o build.js"
+      }
+    },
+
     watch: {
         jst: {
             // Watch all .tpl files from the template directory)
             files: "dev/templates/**/*.tpl",
-            tasks: ['jst'],
+            tasks: [ 'jst', 'version:project:patch' ],
             // Reloads the browser
             options: {
               livereload: true
@@ -110,17 +153,11 @@ module.exports = function(grunt) {
         },
         coffee: {
             files: [ 'dev/coffee/**/*.coffee'],
-            tasks: [ 'coffee' ],
+            tasks: [ 'coffee', 'version:project:patch' ],
             // Reloads the browser
             options: {
               livereload: true
             }
-        },
-        js:{
-          files:[ 'app/apps/**/*.js'],
-          options:{
-            livereload: true
-          }
         }
     }
   });
@@ -130,8 +167,14 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-jst');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-version');
+  grunt.loadNpmTasks('grunt-string-replace');
+  grunt.loadNpmTasks('grunt-shell');
 
   // Task definition
   grunt.registerTask('default', ['watch']);
+  grunt.registerTask('prod',["string-replace:index", "shell:r", "uglify"]);
+  grunt.registerTask('minor',["version:project:minor", "string-replace:index", "shell:r", "uglify"]);
+  grunt.registerTask('patch',["version:project:patch", "string-replace:index", "shell:r", "uglify"]);
 };
 

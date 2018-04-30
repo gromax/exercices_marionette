@@ -18,7 +18,6 @@
     "popper.js":"latest",
     "bootstrap": "latest",
     "jsxgraph": "latest",
-    "handlebars": "latest",
     "requirejs":"latest",
     "requirejs-text":"latest",
     "requirejs-underscore-tpl":"latest"

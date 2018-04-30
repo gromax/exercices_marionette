@@ -1865,23 +1865,17 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
-__p += '<nav class="navbar navbar-dark bg-primary">\n\t<a class="navbar-brand js-home" href="#Home">Exercices de maths &nbsp; <span class="js-spinner"></span></a>\n\t<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">\n\t\t<span class="navbar-toggler-icon"></span>\n\t</button>\n\n\t<div class="collapse navbar-collapse" id="navbarSupportedContent">\n\t\t';
+__p += '<nav class="navbar navbar-dark bg-primary navbar-expand-lg">\n\t<a class="navbar-brand js-home" href="#Home">Exercices de maths &nbsp; <span class="js-spinner"></span></a>\n\t<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">\n\t\t<span class="navbar-toggler-icon"></span>\n\t</button>\n\n\t<div class="collapse navbar-collapse" id="navbarSupportedContent">\n\t\t';
  if (isOff) { ;
-__p += '\n\t\t\t<ul class="navbar-nav">\n\t\t\t\t<li class="nav-item"><a class="nav-link js-login" href="#login"><i class="fa fa-sign-in" aria-hidden="true"></i> Connexion</a></li>\n\t\t\t</ul>\n\t\t';
-};
-__p += '\n\t\t';
- if (isAdmin) { ;
-__p += '\n\t\t\t<ul class="navbar-nav">\n\t\t\t\t<li class="nav-item"><a class="nav-link js-logout" href="#logout"><i class="fa fa-sign-out" aria-hidden="true"></i> Déconnexion</a></li>\n\t\t\t\t<li class="nav-item dropdown">\n\t\t\t\t\t<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" >\n\t\t\t\t\t' +
+__p += '\n\t\t<ul class="navbar-nav ml-auto">\n\t\t\t<li class="nav-item"><a class="nav-link js-login" href="#login"><i class="fa fa-sign-in" aria-hidden="true"></i> Connexion</a></li>\n\t\t</ul>\n\t\t';
+} else {;
+__p += '\n\t\t<ul class="navbar-nav ml-auto">\n\t\t\t<li class="nav-item active"><a class="nav-link js-edit-me" href="#"><i class="fa fa-user"></i> &nbsp; ' +
 __e( nomComplet ) +
-'\n\t\t\t\t\t</a>\n\t\t\t\t\t<div class="dropdown-menu">\n\t\t\t\t\t\t<a class="dropdown-item js-users" href="#Comptes"><i class="fa fa-users" aria-hidden="true"></i> Voir les utilisateurs</a>\n\t\t\t\t\t\t<div class="dropdown-divider"></div>\n\t\t\t\t\t\t<a class="dropdown-item js-edit-me" href="#edit-me"><i class="fa fa-user" aria-hidden="true"></i> Mon compte</a>\n\t\t\t\t\t</div>\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t';
+'</a></li>\n\t\t\t<li class="nav-item active"><a class="nav-link js-logout" href="#"><i class="fa fa-sign-out"></i> &nbsp; Déconnexion</a></li>\n\t\t</ul>\n\t\t';
 };
-__p += '\n\t\t';
- if (isEleve) { ;
-__p += '\n\t\t\t<ul class="navbar-nav">\n\t\t\t\t<li class="nav-item"></li>\n\t\t\t\t<li class="nav-item dropdown">\n\t\t\t\t\t<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" >\n\t\t\t\t\t' +
-__e( nomComplet ) +
-'\n\t\t\t\t\t</a>\n\t\t\t\t\t<div class="dropdown-menu">\n\t\t\t\t\t\t<a class="dropdown-item js-logout" href="#logout"><i class="fa fa-sign-out" aria-hidden="true"></i> Déconnexion</a>\n\t\t\t\t\t\t<div class="dropdown-divider"></div>\n\t\t\t\t\t\t<a class="dropdown-item js-edit-me" href="#edit-me"><i class="fa fa-user" aria-hidden="true"></i> Mon compte</a>\n\t\t\t\t\t</div>\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t';
-};
-__p += '\n\t</div>\n</nav>\n';
+__p += '\n\t\t<span class="navbar-text">Version ' +
+__e( version ) +
+'</span>\n\t</div>\n</nav>\n';
 
 }
 return __p
@@ -1972,7 +1966,9 @@ this["JST"]["home/show/home-off"] = function(obj) {
 obj || (obj = {});
 var __t, __p = '', __e = _.escape;
 with (obj) {
-__p += '<div class="jumbotron">\n\t<h1>Bienvenue !</h1>\n\t<p>Ce site propose des exercices de mathématiques générés automatiquement afin de vous entraîner et de vous aider à progresser. <a class="js-login" href="#login">Connexion</a></p>\n\t<hr class="my-4">\n\t<p>Vous n\'avez pas encore de compte ? <a class="btn btn-primary btn-lg js-join" href="#rejoindre-une-classe" role="button">Inscrivez-vous !</a></p>\n</div>\n\n<div class="alert alert-info" role="alert">Il y a parfois des problème d\'actualisation de la page et la connexion est alors impossible. Veillez à bien réactualiser. Sur PC, appuyez <b>CTRL+F5</b> ou <b>\t&#x2318; + R</b> sur Apple</div>\n';
+__p += '<div class="jumbotron">\n\t<h1>Bienvenue !</h1>\n\t<p>Ce site propose des exercices de mathématiques générés automatiquement afin de vous entraîner et de vous aider à progresser. <a class="js-login" href="#login">Connexion</a></p>\n\t<hr class="my-4">\n\t<p>Vous n\'avez pas encore de compte ? <a class="btn btn-primary btn-lg js-join" href="#rejoindre-une-classe" role="button">Inscrivez-vous !</a></p>\n</div>\n\n<div class="alert alert-info" role="alert"><b>Version ' +
+__e( version ) +
+'</b> - Il y a parfois des problème d\'actualisation de la page et la connexion est alors impossible. Veillez à bien réactualiser. Sur PC, appuyez <b>CTRL+F5</b> ou <b>\t&#x2318; + R</b> sur Apple</div>\n';
 
 }
 return __p

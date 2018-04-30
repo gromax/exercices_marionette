@@ -25,7 +25,7 @@
 			<div id="dialog-region"></div>
 		</div>
 
-		<script data-main="./dist/main.2.1.1.min.js" src="./vendor/requirejs/require.js"></script>
+		<script data-main="./dist/main.min.js" src="./vendor/requirejs/require.js"></script>
 
 	</body>
 </html>

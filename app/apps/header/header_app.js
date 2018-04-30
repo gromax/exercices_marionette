@@ -1,15 +1,13 @@
-define(["app"], function(app){
-	var API = {
-		showHeader: function(){
-			require(["apps/header/show/show_controller"], function(showController){
-				showController.showHeader();
-			});
-		},
-
-	};
-
-	app.on("header:show", function(){
-		API.showHeader();
-	});
-
+define(["app"], function(app) {
+  var API;
+  API = {
+    showHeader: function() {
+      return require(["apps/header/show/show_controller"], function(showController) {
+        return showController.showHeader();
+      });
+    }
+  };
+  return app.on("header:show", function() {
+    return API.showHeader();
+  });
 });
