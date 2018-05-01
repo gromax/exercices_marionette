@@ -225,6 +225,7 @@ define(["utils/svg"], function(SVGapi) {
         if ((div instanceof jQuery) || (indexOf.call(Object(div), 'jquery') >= 0)) {
           div = div.get(0);
         }
+        $(div).empty();
         this.paper = SVGapi.make(div, longueur, hauteur);
       } else if (this.paper === null) {
         return;
