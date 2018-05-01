@@ -388,6 +388,7 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 					when "exo0056" then require ["entities/exercices/exo0056"], successCB, failedCB
 					when "exo0057" then require ["entities/exercices/exo0057"], successCB, failedCB
 					when "exo0059" then require ["entities/exercices/exo0059"], successCB, failedCB
+					when "exoTest" then require ["entities/exercices/exoTest"], successCB, failedCB
 					else require ["entities/exercices/#{filename}"], successCB, failedCB
 			else
 				defer.reject({ message: "Exercice ##{id} introuvable dans le catalogue."})

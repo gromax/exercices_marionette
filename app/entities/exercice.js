@@ -633,6 +633,9 @@ define(["backbone.radio", "entities/exercices/exercices_catalog", "utils/math"],
           case "exo0059":
             require(["entities/exercices/exo0059"], successCB, failedCB);
             break;
+          case "exoTest":
+            require(["entities/exercices/exoTest"], successCB, failedCB);
+            break;
           default:
             require(["entities/exercices/" + filename], successCB, failedCB);
         }

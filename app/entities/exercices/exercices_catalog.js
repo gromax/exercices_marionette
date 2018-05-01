@@ -518,6 +518,12 @@ define([], function() {
       }, {
         id: 59,
         filename: "exo0059",
+        title: "Loi Exponentielle",
+        description: "Calculer des probabilités avec la loi exponentielle.",
+        keyWords: ["probabilités", "exponentielle", "TSTL"]
+      }, {
+        id: 9999,
+        filename: "exoTest",
         title: "Exercice de test",
         description: "Exercice utilisé pour développer de nouvelles fonctionalités",
         keyWords: [],
