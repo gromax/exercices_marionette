@@ -74,6 +74,7 @@ define ["utils/svg"], (SVGapi) ->
 			if typeof div isnt "undefined"
 				# si on donne le div, le paper est réinistialisé
 				if (div instanceof jQuery) or ('jquery' in Object(div)) then div=div.get(0)
+				$(div).empty()
 				@paper = SVGapi.make(div, longueur, hauteur)
 			else if @paper is null then return
 			@paper.rect(0, 0, longueur, @config.hauteur_ligne, @config.color)		# Rectangle des x
