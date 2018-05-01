@@ -24,6 +24,7 @@
 			</div>
 			<div id="dialog-region"></div>
 		</div>
+		<iframe id="zoomframe" style="width: 1px; height: 1px; visibility: hidden;" ></iframe>
 
 		<script data-main="./dist/main.min.js" src="./vendor/requirejs/require.js"></script>
 

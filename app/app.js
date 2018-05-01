@@ -43,8 +43,16 @@ define(["marionette","jquery-ui","bootstrap"], function(Marionette){
 		};
 	});
 
+	// Morceau de code pour réagir à un changement de zoom
+	var elFrame = $('#zoomframe')[0];
+	$(elFrame.contentWindow).resize(function() {
+		$(window).trigger('zoom');
+		Manager.trigger('zoom', window.devicePixelRatio);
+	});
+
+
 	Manager.on("start", function(){
-		Manager.version = "2.2.0";
+		Manager.version = "2.2.25";
 		var historyStart = function() {
 			require([
 				"apps/header/header_app",
