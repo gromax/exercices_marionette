@@ -51,7 +51,7 @@ module.exports = function(grunt) {
         files:[{
             expand: true,     // Enable dynamic expansion.
             cwd: 'dev/coffee/entities',      // Src matches are relative to this path.
-            src: ['*.coffee'], // Actual pattern(s) to match.
+            src: ['**/*.coffee'], // Actual pattern(s) to match.
             dest: 'app/entities/',   // Destination path prefix.
             ext: '.js',   // Dest filepaths will have this extension.
             extDot: 'first'   // Extensions in filenames begin after the first dot
@@ -68,22 +68,6 @@ module.exports = function(grunt) {
           'app/utils/svg.js' : 'dev/coffee/utils/svg.coffee',
           'app/utils/tab.js' : 'dev/coffee/utils/tab.coffee',
         }
-      },
-
-      exofiles: {
-        options: {
-          bare:true,
-        },
-        files:[
-          {
-            expand: true,     // Enable dynamic expansion.
-            cwd: 'dev/coffee/entities/exercices',      // Src matches are relative to this path.
-            src: ['**/*.coffee'], // Actual pattern(s) to match.
-            dest: 'app/entities/exercices/',   // Destination path prefix.
-            ext: '.js',   // Dest filepaths will have this extension.
-            extDot: 'first'   // Extensions in filenames begin after the first dot
-          },
-        ]
       },
 
       apps:{
@@ -151,9 +135,33 @@ module.exports = function(grunt) {
               livereload: true
             }
         },
-        coffee: {
-            files: [ 'dev/coffee/**/*.coffee'],
-            tasks: [ 'coffee', 'version:project:patch' ],
+        math: {
+            files: [ 'dev/coffee/math/**/*.coffee'],
+            tasks: [ 'coffee:math', 'version:project:patch' ],
+            // Reloads the browser
+            options: {
+              livereload: true
+            }
+        },
+        utils: {
+            files: [ 'dev/coffee/utils/**/*.coffee'],
+            tasks: [ 'coffee:utils', 'version:project:patch' ],
+            // Reloads the browser
+            options: {
+              livereload: true
+            }
+        },
+        apps: {
+            files: [ 'dev/coffee/apps/**/*.coffee'],
+            tasks: [ 'coffee:apps', 'version:project:patch' ],
+            // Reloads the browser
+            options: {
+              livereload: true
+            }
+        },
+        entities: {
+            files: [ 'dev/coffee/entities/**/*.coffee'],
+            tasks: [ 'coffee:entities', 'version:project:patch' ],
             // Reloads the browser
             options: {
               livereload: true
