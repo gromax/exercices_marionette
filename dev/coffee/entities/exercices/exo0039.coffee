@@ -51,7 +51,8 @@ define ["utils/math", "utils/help", "utils/colors", "utils/tab"], (mM, help, col
 			[items, tabs, ranks] = @init(inputs)
 			tabs = _.shuffle(tabs)
 
-			initTabs = ($container)->
+			initTabs = (view)->
+				$container = view.$el
 				initOneTab = (tab) ->
 					$el = $("<div></div>")
 					$container.append($el)

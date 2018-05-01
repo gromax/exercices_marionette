@@ -77,7 +77,8 @@ define ["utils/math","utils/help", "utils/colors", "utils/tab"], (mM, help, colo
 		getBriques: (inputs, options) ->
 			[ineqTex, polyTex, poly, racines, ensemble_interieur, ensemble_exterieur, sol_is_ext, tabs, goodTab] = @init(inputs)
 
-			initTabs = ($container)->
+			initTabs = (view)->
+				$container = view.$el
 				initOneTab = (tab) ->
 					$el = $("<div></div>")
 					$container.append($el)
@@ -169,30 +170,44 @@ define ["utils/math","utils/help", "utils/colors", "utils/tab"], (mM, help, colo
 					items:[
 						{
 							type:"text"
-							rank: 1
 							ps:[
 								"Choisissez le tableau de signe correspondant à &nbsp; $f(x)=#{polyTex}$."
 							]
 						}
 						{
 							type: "def"
-							rank: 2
 							renderingFunctions:[
 								initTabs
 							]
 
 						}
 						{
+							type:"ul"
+							list:[
+								{type:"warning", text:"Affichez avec un zoom à 100% pour un affichage correct."}
+							]
+						}
+						{
 							type:"color-choice"
-							rank: 3
 							name:"it"
-							list: [{rank: goodTab, text:"Bon tableau"}]
+							list: ["Bon tableau"]
 							maxValue:1
 						}
 						{
 							type: "validation"
-							rank: 4
-							clavier: []
+						}
+					]
+					validations:{
+						it:"color:1"
+					}
+					verifications:[
+						{
+							name:"it"
+							colors: if goodTab is 1
+								[1, 0]
+							else
+								[0, 1]
+							items: ["Bon tableau"]
 						}
 					]
 				}
@@ -223,7 +238,10 @@ define ["utils/math","utils/help", "utils/colors", "utils/tab"], (mM, help, colo
 						s:"radio:2"
 					}
 					verifications: [{
-						radio:[ "$x=a$", "$y=mx+p$" ]
+						radio:[
+							"$#{ensemble_interieur}$"
+							"$#{ensemble_exterieur}$"
+						]
 						name:"s"
 						tag:"$\\mathcal{S}$"
 						good: if sol_is_ext then 1 else 0

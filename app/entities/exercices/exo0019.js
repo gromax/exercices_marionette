@@ -97,8 +97,9 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
     getBriques: function(inputs, options) {
       var ensemble_exterieur, ensemble_interieur, goodTab, ineqTex, initTabs, poly, polyTex, racines, ref, sol_is_ext, tabs;
       ref = this.init(inputs), ineqTex = ref[0], polyTex = ref[1], poly = ref[2], racines = ref[3], ensemble_interieur = ref[4], ensemble_exterieur = ref[5], sol_is_ext = ref[6], tabs = ref[7], goodTab = ref[8];
-      initTabs = function($container) {
-        var initOneTab;
+      initTabs = function(view) {
+        var $container, initOneTab;
+        $container = view.$el;
         initOneTab = function(tab) {
           var $el;
           $el = $("<div></div>");
@@ -183,27 +184,35 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
           items: [
             {
               type: "text",
-              rank: 1,
               ps: ["Choisissez le tableau de signe correspondant à &nbsp; $f(x)=" + polyTex + "$."]
             }, {
               type: "def",
-              rank: 2,
               renderingFunctions: [initTabs]
             }, {
-              type: "color-choice",
-              rank: 3,
-              name: "it",
+              type: "ul",
               list: [
                 {
-                  rank: goodTab,
-                  text: "Bon tableau"
+                  type: "warning",
+                  text: "Affichez avec un zoom à 100% pour un affichage correct."
                 }
-              ],
+              ]
+            }, {
+              type: "color-choice",
+              name: "it",
+              list: ["Bon tableau"],
               maxValue: 1
             }, {
-              type: "validation",
-              rank: 4,
-              clavier: []
+              type: "validation"
+            }
+          ],
+          validations: {
+            it: "color:1"
+          },
+          verifications: [
+            {
+              name: "it",
+              colors: goodTab === 1 ? [1, 0] : [0, 1],
+              items: ["Bon tableau"]
             }
           ]
         }, {
@@ -227,7 +236,7 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
           },
           verifications: [
             {
-              radio: ["$x=a$", "$y=mx+p$"],
+              radio: ["$" + ensemble_interieur + "$", "$" + ensemble_exterieur + "$"],
               name: "s",
               tag: "$\\mathcal{S}$",
               good: sol_is_ext ? 1 : 0

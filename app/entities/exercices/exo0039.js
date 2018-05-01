@@ -106,8 +106,9 @@ define(["utils/math", "utils/help", "utils/colors", "utils/tab"], function(mM, h
       var initTabs, items, ranks, ref, tabs;
       ref = this.init(inputs), items = ref[0], tabs = ref[1], ranks = ref[2];
       tabs = _.shuffle(tabs);
-      initTabs = function($container) {
-        var initOneTab;
+      initTabs = function(view) {
+        var $container, initOneTab;
+        $container = view.$el;
         initOneTab = function(tab) {
           var $el;
           $el = $("<div></div>");
