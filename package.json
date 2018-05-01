@@ -4,7 +4,7 @@
     "type": "git",
     "url": "https://github.com/gromax/exercices_marionette"
   },
-  "version": "2.1.25",
+  "version": "2.2.0",
   "description": "Site for mathematics exercices",
   "devDependencies": {
     "grunt": "latest",
