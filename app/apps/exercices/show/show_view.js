@@ -39,7 +39,7 @@ define([
 			var fcts = this.model.get("renderingFunctions");
 			var that = this;
 			if (fcts) {
-				_.each(fcts, function(item){ item(that.$el); });
+				_.each(fcts, function(item){ item(that); });
 			}
 			MathJax.Hub.Queue(["Typeset",MathJax.Hub,this.$el[0]]);
 		},
