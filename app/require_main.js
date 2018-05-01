@@ -61,6 +61,8 @@ requirejs.config({
 	}
 });
 
+// Il y a un problème : dans le js, il y a un require popper.js hors je je ne peux pas mettre popper.js dans le require_main,
+// le js ne passe pas. Donc j'ai dû modifié le bootstrap.js pour mettre popper au lieu de popper.js
 
 require(["popper"], function(p){
 	window.Popper = p;
