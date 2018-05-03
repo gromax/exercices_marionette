@@ -6989,6 +6989,61 @@
         return centre.toClone(symName).mdNumber(new RealNumber(2), false).am(this, true);
       };
 
+      Vector.prototype.texSum = function(name) {
+        var coeff, coeffs, cx, cy, cz, fct_format, i, out;
+        cx = this.x.compositeString({
+          tex: true
+        });
+        cy = this.y.compositeString({
+          tex: true
+        });
+        if (this.z) {
+          cz = this.z.compositeString({
+            tex: true
+          });
+        } else {
+          cz = ["0", true, false, false];
+        }
+        coeffs = [cx, cy, cz];
+        fct_format = function(coeff, indice) {
+          var out, vectors;
+          vectors = ["\\vec{i}", "\\vec{j}", "\\vec{k}"];
+          if (coeff[0] === "1") {
+            out = vectors[indice];
+          } else {
+            out = coeff[0] + "\\cdot" + vectors[indice];
+          }
+          if (coeff[1]) {
+            return "+" + out;
+          } else {
+            return "-" + out;
+          }
+        };
+        out = (function() {
+          var aa, len, results;
+          results = [];
+          for (i = aa = 0, len = coeffs.length; aa < len; i = ++aa) {
+            coeff = coeffs[i];
+            if (coeff[0] !== "0") {
+              results.push(fct_format(coeff, i));
+            }
+          }
+          return results;
+        })();
+        if (out.length === 0) {
+          out = "\\vec{0}";
+        } else {
+          out = out.join("").substr(1);
+        }
+        if (name === true) {
+          return this.name + " = " + out;
+        }
+        if (name) {
+          return name + " = " + out;
+        }
+        return out;
+      };
+
       Vector.prototype.texColumn = function() {
         var output;
         output = this.name + ("\\begin{pmatrix} " + (this.x.tex()) + "\\\\ " + (this.y.tex()));
@@ -7060,6 +7115,15 @@
 
       Vector.prototype.affixe = function() {
         return this.y.toClone().md(new ComplexeNumber(0, 1), false).am(this.x, false);
+      };
+
+      Vector.prototype.scalaire = function(v) {
+        var out;
+        out = this.x.toClone().md(v.x, false).am(this.y.toClone().md(v.y, false), false);
+        if (this.z && v.z) {
+          out = out.am(this.z.toClone().md(v.z, false), false);
+        }
+        return out.simplify();
       };
 
       Vector.prototype.toJSXcoords = function(params) {

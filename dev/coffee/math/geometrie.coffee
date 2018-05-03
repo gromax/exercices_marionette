@@ -33,6 +33,26 @@
 			@
 		milieu: (oVec,milName) -> @toClone(milName).am(oVec, false).mdNumber(new RealNumber(2),true)
 		symetrique: (centre,symName) -> centre.toClone(symName).mdNumber(new RealNumber(2),false).am(@, true)
+		texSum: (name)->
+			# renvoir une somme de forme 2i+3j
+			cx = @x.compositeString({ tex:true })
+			cy = @y.compositeString({ tex:true })
+			if @z then cz = @z.compositeString({ tex:true }) else cz = ["0",true,false,false]
+			coeffs = [ cx, cy, cz ]
+			fct_format = (coeff, indice) ->
+				vectors = [ "\\vec{i}", "\\vec{j}", "\\vec{k}" ]
+				if coeff[0] is "1" then out = vectors[indice]
+				else out = "#{coeff[0]}\\cdot#{vectors[indice]}"
+				if coeff[1] then "+#{out}"
+				else "-#{out}"
+			out = ( fct_format(coeff,i) for coeff, i in coeffs when coeff[0] isnt "0")
+			if out.length is 0 then out = "\\vec{0}"
+			else out = out.join("").substr(1)
+			if name is true
+				return "#{@name} = #{out}"
+			if name
+				return "#{name} = #{out}"
+			out
 		texColumn: ->
 			output = @name+"\\begin{pmatrix} #{@x.tex()}\\\\ #{@y.tex()}"
 			if @z isnt null then output+= "\\\\ #{@z.tex()}"
@@ -67,6 +87,11 @@
 			if @z isnt null then d2=d2.am(@z.toClone().md(@z,false),false)
 			d2.sqrt()
 		affixe: -> return @y.toClone().md(new ComplexeNumber(0,1),false).am(@x,false)
+		scalaire: (v) ->
+			out = @x.toClone().md(v.x, false).am(@y.toClone().md(v.y,false), false)
+			if @z and v.z
+				out = out.am(@z.toClone().md(v.z,false), false)
+			out.simplify()
 		toJSXcoords: (params) -> mM.float [@x, @y], params
 		save: (data) ->
 			data["x#{@name}"] = String @x
