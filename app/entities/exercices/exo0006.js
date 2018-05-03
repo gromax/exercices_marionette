@@ -24,8 +24,8 @@ define(["utils/math"], function(mM) {
         return results;
       })();
     },
-    getBriques: function(inputs, options) {
-      var briqueEnnonce, displayedPts, iPts, initGraph, max, name, optA, pt, ref, strNames, strPts;
+    getBriques: function(inputs, options, fixedSettings) {
+      var briqueEnnonce, complexes, displayedPts, iPts, initGraph, max, name, pt, strNames, strPts;
       max = this.max;
       iPts = this.init(inputs);
       displayedPts = (function() {
@@ -46,22 +46,8 @@ define(["utils/math"], function(mM) {
         }
         return results;
       })();
-      optA = Number((ref = options.a.value) != null ? ref : 0);
-      if (optA === 0) {
-        strPts = ((function() {
-          var i, len, results;
-          results = [];
-          for (i = 0, len = iPts.length; i < len; i++) {
-            pt = iPts[i];
-            results.push("$" + (pt.texLine()) + "$");
-          }
-          return results;
-        })()).join(", &nbsp;");
-        briqueEnnonce = {
-          type: "text",
-          ps: ["On se place dans le repère &nbsp; $(O;I,J)$.", "Vous devez placer les point suivants :", strPts + "."]
-        };
-      } else {
+      complexes = fixedSettings.complexe;
+      if (complexes) {
         strPts = ((function() {
           var i, len, results;
           results = [];
@@ -83,6 +69,20 @@ define(["utils/math"], function(mM) {
         briqueEnnonce = {
           type: "text",
           ps: ["On se place dans le plan complexe.", "Vous devez placer les point  : &nbsp; " + strNames + " &nbsp; dont les affixes sont :", strPts + "."]
+        };
+      } else {
+        strPts = ((function() {
+          var i, len, results;
+          results = [];
+          for (i = 0, len = iPts.length; i < len; i++) {
+            pt = iPts[i];
+            results.push("$" + (pt.texLine()) + "$");
+          }
+          return results;
+        })()).join(", &nbsp;");
+        briqueEnnonce = {
+          type: "text",
+          ps: ["On se place dans le repère &nbsp; $(O;I,J)$.", "Vous devez placer les point suivants :", strPts + "."]
         };
       }
       initGraph = function(graph) {
@@ -118,25 +118,25 @@ define(["utils/math"], function(mM) {
               },
               renderingFunctions: [initGraph],
               getData: function(graph) {
-                var i, j, len, len1, out, p, ref1, ref2;
+                var i, j, len, len1, out, p, ref, ref1;
                 out = {};
-                ref1 = graph.points;
-                for (i = 0, len = ref1.length; i < len; i++) {
-                  p = ref1[i];
+                ref = graph.points;
+                for (i = 0, len = ref.length; i < len; i++) {
+                  p = ref[i];
                   out["x" + p.name] = p.X();
                 }
-                ref2 = graph.points;
-                for (j = 0, len1 = ref2.length; j < len1; j++) {
-                  p = ref2[j];
+                ref1 = graph.points;
+                for (j = 0, len1 = ref1.length; j < len1; j++) {
+                  p = ref1[j];
                   out["y" + p.name] = p.Y();
                 }
                 return out;
               },
               postVerification: function(view, data) {
-                var g_x, g_y, i, j, len, len1, ref1, results;
-                ref1 = view.graph.points;
-                for (i = 0, len = ref1.length; i < len; i++) {
-                  pt = ref1[i];
+                var g_x, g_y, i, j, len, len1, ref, results;
+                ref = view.graph.points;
+                for (i = 0, len = ref.length; i < len; i++) {
+                  pt = ref[i];
                   pt.setAttribute({
                     fixed: true
                   });
@@ -212,10 +212,10 @@ define(["utils/math"], function(mM) {
       ];
     },
     getExamBriques: function(inputs_list, options, fixedSettings) {
-      var complexes, fct_item, max, ref, that;
+      var complexes, fct_item, max, that;
       max = this.max;
       that = this;
-      complexes = Number((ref = options.a.value) != null ? ref : 0) === 1;
+      complexes = fixedSettings.complexe;
       fct_item = function(inputs, index) {
         var iPts, pt;
         iPts = that.init(inputs);
@@ -255,11 +255,11 @@ define(["utils/math"], function(mM) {
         ]
       };
     },
-    getTex: function(inputs_list, options) {
-      var complexes, fct_item, max, ref, sujet, that;
+    getTex: function(inputs_list, options, fixedSettings) {
+      var complexes, fct_item, max, sujet, that;
       that = this;
       max = this.max;
-      complexes = Number((ref = options.a.value) != null ? ref : 0) === 1;
+      complexes = fixedSettings.complexe;
       fct_item = function(inputs, index) {
         var iPts, pt;
         iPts = that.init(inputs);

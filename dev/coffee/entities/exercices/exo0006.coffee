@@ -14,23 +14,13 @@ define ["utils/math"], (mM) ->
 			max=@max
 			return ( mM.alea.vector({ name:name, def:inputs, values:[{min:-max+1, max:max-1}]}).save(inputs) for name in ["A", "B", "C", "D", "E"] )
 
-		getBriques: (inputs, options) ->
+		getBriques: (inputs, options, fixedSettings) ->
 			max = @max
 			iPts = @init(inputs)
 			displayedPts = ( mM.alea.vector({ name:name, values:[{min:-max+1, max:max-1}]}) for name in ["A", "B", "C", "D", "E"] )
 
-			optA = Number(options.a.value ? 0)
-			if optA is 0
-				strPts = ("$#{pt.texLine()}$" for pt in iPts).join(", &nbsp;")
-				briqueEnnonce = {
-					type: "text"
-					ps: [
-						"On se place dans le repère &nbsp; $(O;I,J)$."
-						"Vous devez placer les point suivants :"
-						"#{ strPts }."
-					]
-				}
-			else
+			complexes = fixedSettings.complexe
+			if complexes
 				strPts = ("$z_#{pt.name} = #{pt.affixe().tex()}$" for pt in iPts).join(", &nbsp;")
 				strNames = ("$#{pt.name}$" for pt in iPts).join(", &nbsp;")
 				briqueEnnonce = {
@@ -38,6 +28,16 @@ define ["utils/math"], (mM) ->
 					ps: [
 						"On se place dans le plan complexe."
 						"Vous devez placer les point  : &nbsp; #{strNames} &nbsp; dont les affixes sont :"
+						"#{ strPts }."
+					]
+				}
+			else
+				strPts = ("$#{pt.texLine()}$" for pt in iPts).join(", &nbsp;")
+				briqueEnnonce = {
+					type: "text"
+					ps: [
+						"On se place dans le repère &nbsp; $(O;I,J)$."
+						"Vous devez placer les point suivants :"
 						"#{ strPts }."
 					]
 				}
@@ -132,7 +132,7 @@ define ["utils/math"], (mM) ->
 		getExamBriques: (inputs_list,options, fixedSettings) ->
 			max = @max
 			that = @
-			complexes = Number(options.a.value ? 0) is 1
+			complexes = fixedSettings.complexe
 			fct_item = (inputs, index) ->
 				iPts = that.init(inputs)
 				if complexes
@@ -164,10 +164,10 @@ define ["utils/math"], (mM) ->
 				]
 			}
 
-		getTex: (inputs_list, options) ->
+		getTex: (inputs_list, options, fixedSettings) ->
 			that = @
 			max = @max
-			complexes = Number(options.a.value ? 0) is 1
+			complexes = fixedSettings.complexe
 			fct_item = (inputs, index) ->
 				iPts = that.init(inputs)
 				if complexes

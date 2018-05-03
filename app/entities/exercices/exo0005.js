@@ -1,9 +1,22 @@
 define(["utils/math", "utils/help"], function(mM, help) {
   return {
-    getBriques: function(inputs, options) {
-      var A, B, enonce, gAB, ref, ref1, zA, zB;
+    init: function(inputs) {
+      var A, B;
+      A = mM.alea.vector({
+        name: "A",
+        def: inputs
+      }).save(inputs);
+      B = mM.alea.vector({
+        name: "B",
+        def: inputs,
+        forbidden: [A]
+      }).save(inputs);
+      return [A, B, A.toClone().minus(B).norme()];
+    },
+    getBriques: function(inputs, options, fixedSettings) {
+      var A, B, enonce, gAB, ref, zA, zB;
       ref = this.init(inputs), A = ref[0], B = ref[1], gAB = ref[2];
-      if (((ref1 = options.a) != null ? ref1.value : void 0) === 1) {
+      if (fixedSettings.complexe) {
         zA = A.affixe().tex();
         zB = B.affixe().tex();
         enonce = ["Dans le plan complexe, on donne deux points $A$, d'affixe $z_A=" + zA + "$ et $B$, d'affixe $z_B=" + zB + "$.", "Il faut déterminer la valeur exacte de la distance $AB$."];
@@ -55,26 +68,13 @@ define(["utils/math", "utils/help"], function(mM, help) {
         }
       ];
     },
-    init: function(inputs) {
-      var A, B;
-      A = mM.alea.vector({
-        name: "A",
-        def: inputs
-      }).save(inputs);
-      B = mM.alea.vector({
-        name: "B",
-        def: inputs,
-        forbidden: [A]
-      }).save(inputs);
-      return [A, B, A.toClone().minus(B).norme()];
-    },
-    getExamBriques: function(inputs_list, options) {
-      var fct_item, ref, that;
+    getExamBriques: function(inputs_list, options, fixedSettings) {
+      var fct_item, that;
       that = this;
-      if (((ref = options.a) != null ? ref.value : void 0) === 1) {
+      if (fixedSettings.complexe) {
         fct_item = function(inputs, index) {
-          var A, B, gAB, ref1;
-          ref1 = that.init(inputs, options), A = ref1[0], B = ref1[1], gAB = ref1[2];
+          var A, B, gAB, ref;
+          ref = that.init(inputs, options), A = ref[0], B = ref[1], gAB = ref[2];
           return "$z_A = " + (A.affixe().tex()) + "$ &nbsp; et &nbsp; $z_B = " + (B.affixe().tex()) + "$";
         };
         return {
@@ -92,8 +92,8 @@ define(["utils/math", "utils/help"], function(mM, help) {
         };
       } else {
         fct_item = function(inputs, index) {
-          var A, B, gAB, ref1;
-          ref1 = that.init(inputs, options), A = ref1[0], B = ref1[1], gAB = ref1[2];
+          var A, B, gAB, ref;
+          ref = that.init(inputs, options), A = ref[0], B = ref[1], gAB = ref[2];
           return "$" + (A.texLine()) + "$ &nbsp; et &nbsp; $" + (B.texLine()) + "$";
         };
         return {
@@ -111,13 +111,13 @@ define(["utils/math", "utils/help"], function(mM, help) {
         };
       }
     },
-    getTex: function(inputs_list, options) {
-      var fct_item, ref, that;
+    getTex: function(inputs_list, options, fixedSettings) {
+      var fct_item, that;
       that = this;
-      if (((ref = options.a) != null ? ref.value : void 0) === 1) {
+      if (fixedSettings.complexe) {
         fct_item = function(inputs, index) {
-          var A, B, gAB, ref1;
-          ref1 = that.init(inputs, options), A = ref1[0], B = ref1[1], gAB = ref1[2];
+          var A, B, gAB, ref;
+          ref = that.init(inputs, options), A = ref[0], B = ref[1], gAB = ref[2];
           return "$z_A = " + (A.affixe().tex()) + "$ et $z_B = " + (B.affixe().tex()) + "$";
         };
         return {
@@ -130,8 +130,8 @@ define(["utils/math", "utils/help"], function(mM, help) {
         };
       } else {
         fct_item = function(inputs, index) {
-          var A, B, gAB, ref1;
-          ref1 = that.init(inputs, options), A = ref1[0], B = ref1[1], gAB = ref1[2];
+          var A, B, gAB, ref;
+          ref = that.init(inputs, options), A = ref[0], B = ref[1], gAB = ref[2];
           return "$" + (A.texLine()) + "$ et $" + (B.texLine()) + "$";
         };
         return {

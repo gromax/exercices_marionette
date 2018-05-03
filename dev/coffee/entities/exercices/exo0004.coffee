@@ -17,10 +17,10 @@
 				B.toClone("E").minus(A).plus(C)
 			]
 
-		getBriques: (inputs, options) ->
+		getBriques: (inputs, options, fixedSettings) ->
 			[A, B, C, good, goodABDC] = @init(inputs)
-			optA = options.a?.value ? 0
-			if Number(optA) is 1
+			complexe = fixedSettings.complexe
+			if complexe
 				# Exercice en affixes complexes
 				[
 					{
@@ -164,10 +164,10 @@
 					}
 				]
 
-		getExamBriques: (inputs_list,options) ->
-			optA = options.a?.value ? 0
+		getExamBriques: (inputs_list,options, fixedSettings) ->
+			complexe = fixedSettings.complexe
 			that = @
-			if Number(optA) is 1
+			if complexe
 				fct_item = (inputs, index) ->
 					[A, B, C, good, goodABDC] = that.init(inputs,options)
 					return "$z_A=#{A.affixe().tex()}$ &nbsp; ; &nbsp; $z_B=#{B.affixe().tex()}$ &nbsp; et &nbsp; $z_C=#{C.affixe().tex()}$"
@@ -213,10 +213,10 @@
 					]
 				}
 
-		getTex: (inputs_list, options) ->
-			optA = options.a?.value ? 0
+		getTex: (inputs_list, options, fixedSettings) ->
+			complexe = fixedSettings.complexe
 			that = @
-			if Number(optA) is 1
+			if complexe
 				fct_item = (inputs, index) ->
 					[A, B, C, good, goodABDC] = that.init(inputs,options)
 					return "$z_A=#{A.affixe().tex()}$ ; $z_B=#{B.affixe().tex()}$ et $z_C=#{C.affixe().tex()}$"

@@ -5,9 +5,18 @@
 	# keyWords:["Géométrie", "Repère", "Seconde", "Complexes", "1STL"]
 
 	return {
-		getBriques: (inputs,options) ->
+		init: (inputs) ->
+			A = mM.alea.vector({ name:"A", def:inputs }).save(inputs)
+			B = mM.alea.vector({ name:"B", def:inputs, forbidden:[A] }).save(inputs)
+			[
+				A
+				B
+				A.toClone().minus(B).norme()
+			]
+
+		getBriques: (inputs,options, fixedSettings) ->
 			[A, B, gAB] = @init(inputs)
-			if options.a?.value is 1
+			if fixedSettings.complexe
 				zA = A.affixe().tex()
 				zB = B.affixe().tex()
 				enonce = [
@@ -60,19 +69,10 @@
 				}
 			]
 
-		init: (inputs) ->
-			A = mM.alea.vector({ name:"A", def:inputs }).save(inputs)
-			B = mM.alea.vector({ name:"B", def:inputs, forbidden:[A] }).save(inputs)
-			[
-				A
-				B
-				A.toClone().minus(B).norme()
-			]
-
-		getExamBriques: (inputs_list,options) ->
+		getExamBriques: (inputs_list,options, fixedSettings) ->
 			that = @
 
-			if options.a?.value is 1
+			if fixedSettings.complexe
 				fct_item = (inputs, index) ->
 					[A, B, gAB] = that.init(inputs,options)
 					return "$z_A = #{A.affixe().tex()}$ &nbsp; et &nbsp; $z_B = #{B.affixe().tex()}$"
@@ -117,9 +117,9 @@
 					]
 				}
 
-		getTex: (inputs_list, options) ->
+		getTex: (inputs_list, options, fixedSettings) ->
 			that = @
-			if options.a?.value is 1
+			if fixedSettings.complexe
 				fct_item = (inputs, index) ->
 					[A, B, gAB] = that.init(inputs,options)
 					return "$z_A = #{A.affixe().tex()}$ et $z_B = #{B.affixe().tex()}$"

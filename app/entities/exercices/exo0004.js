@@ -22,11 +22,11 @@ define(["utils/math", "utils/help"], function(mM, help) {
       }).save(inputs);
       return [A, B, C, A.toClone("D").minus(B).plus(C), B.toClone("E").minus(A).plus(C)];
     },
-    getBriques: function(inputs, options) {
-      var A, B, C, good, goodABDC, optA, ref, ref1, ref2;
+    getBriques: function(inputs, options, fixedSettings) {
+      var A, B, C, complexe, good, goodABDC, ref;
       ref = this.init(inputs), A = ref[0], B = ref[1], C = ref[2], good = ref[3], goodABDC = ref[4];
-      optA = (ref1 = (ref2 = options.a) != null ? ref2.value : void 0) != null ? ref1 : 0;
-      if (Number(optA) === 1) {
+      complexe = fixedSettings.complexe;
+      if (complexe) {
         return [
           {
             bareme: 100,
@@ -178,14 +178,14 @@ define(["utils/math", "utils/help"], function(mM, help) {
         ];
       }
     },
-    getExamBriques: function(inputs_list, options) {
-      var fct_item, optA, ref, ref1, that;
-      optA = (ref = (ref1 = options.a) != null ? ref1.value : void 0) != null ? ref : 0;
+    getExamBriques: function(inputs_list, options, fixedSettings) {
+      var complexe, fct_item, that;
+      complexe = fixedSettings.complexe;
       that = this;
-      if (Number(optA) === 1) {
+      if (complexe) {
         fct_item = function(inputs, index) {
-          var A, B, C, good, goodABDC, ref2;
-          ref2 = that.init(inputs, options), A = ref2[0], B = ref2[1], C = ref2[2], good = ref2[3], goodABDC = ref2[4];
+          var A, B, C, good, goodABDC, ref;
+          ref = that.init(inputs, options), A = ref[0], B = ref[1], C = ref[2], good = ref[3], goodABDC = ref[4];
           return "$z_A=" + (A.affixe().tex()) + "$ &nbsp; ; &nbsp; $z_B=" + (B.affixe().tex()) + "$ &nbsp; et &nbsp; $z_C=" + (C.affixe().tex()) + "$";
         };
         return {
@@ -203,8 +203,8 @@ define(["utils/math", "utils/help"], function(mM, help) {
         };
       } else {
         fct_item = function(inputs, index) {
-          var A, B, C, good, goodABDC, ref2;
-          ref2 = that.init(inputs, options), A = ref2[0], B = ref2[1], C = ref2[2], good = ref2[3], goodABDC = ref2[4];
+          var A, B, C, good, goodABDC, ref;
+          ref = that.init(inputs, options), A = ref[0], B = ref[1], C = ref[2], good = ref[3], goodABDC = ref[4];
           return "$" + (A.texLine()) + "$ &nbsp; ; &nbsp; $" + (B.texLine()) + "$ &nbsp; et &nbsp; $" + (C.texLine()) + "$";
         };
         return {
@@ -222,14 +222,14 @@ define(["utils/math", "utils/help"], function(mM, help) {
         };
       }
     },
-    getTex: function(inputs_list, options) {
-      var fct_item, optA, ref, ref1, that;
-      optA = (ref = (ref1 = options.a) != null ? ref1.value : void 0) != null ? ref : 0;
+    getTex: function(inputs_list, options, fixedSettings) {
+      var complexe, fct_item, that;
+      complexe = fixedSettings.complexe;
       that = this;
-      if (Number(optA) === 1) {
+      if (complexe) {
         fct_item = function(inputs, index) {
-          var A, B, C, good, goodABDC, ref2;
-          ref2 = that.init(inputs, options), A = ref2[0], B = ref2[1], C = ref2[2], good = ref2[3], goodABDC = ref2[4];
+          var A, B, C, good, goodABDC, ref;
+          ref = that.init(inputs, options), A = ref[0], B = ref[1], C = ref[2], good = ref[3], goodABDC = ref[4];
           return "$z_A=" + (A.affixe().tex()) + "$ ; $z_B=" + (B.affixe().tex()) + "$ et $z_C=" + (C.affixe().tex()) + "$";
         };
         return {
@@ -242,8 +242,8 @@ define(["utils/math", "utils/help"], function(mM, help) {
         };
       } else {
         fct_item = function(inputs, index) {
-          var A, B, C, good, goodABDC, ref2;
-          ref2 = that.init(inputs, options), A = ref2[0], B = ref2[1], C = ref2[2], good = ref2[3], goodABDC = ref2[4];
+          var A, B, C, good, goodABDC, ref;
+          ref = that.init(inputs, options), A = ref[0], B = ref[1], C = ref[2], good = ref[3], goodABDC = ref[4];
           return "$" + (A.texLine()) + "$ ; $" + (B.texLine()) + "$ et $" + (C.texLine()) + "$";
         };
         return {
