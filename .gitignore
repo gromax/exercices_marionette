@@ -4,5 +4,6 @@ config/bddConfig.php
 vendor
 php/meekrodb
 app.old
+src
 *.gz
 *.old
