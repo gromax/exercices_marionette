@@ -1869,9 +1869,9 @@ __p += '<nav class="navbar navbar-dark bg-primary navbar-expand-lg">\n\t<a class
  if (isOff) { ;
 __p += '\n\t\t<ul class="navbar-nav ml-auto">\n\t\t\t<li class="nav-item"><a class="nav-link js-login" href="#login"><i class="fa fa-sign-in" aria-hidden="true"></i> Connexion</a></li>\n\t\t</ul>\n\t\t';
 } else {;
-__p += '\n\t\t<ul class="navbar-nav ml-auto">\n\t\t\t<li class="nav-item active"><a class="nav-link js-edit-me" href="#"><i class="fa fa-user"></i> &nbsp; ' +
+__p += '\n\t\t<ul class="navbar-nav ml-auto">\n\t\t\t<li class="nav-item"><a class="nav-link js-edit-me" href="#"><i class="fa fa-user"></i> &nbsp; ' +
 __e( nomComplet ) +
-'</a></li>\n\t\t\t<li class="nav-item active"><a class="nav-link js-logout" href="#"><i class="fa fa-sign-out"></i> &nbsp; Déconnexion</a></li>\n\t\t</ul>\n\t\t';
+'</a></li>\n\t\t\t<li class="nav-item"><a class="nav-link js-logout" href="#"><i class="fa fa-sign-out"></i> &nbsp; Déconnexion</a></li>\n\t\t</ul>\n\t\t';
 };
 __p += '\n\t\t<span class="navbar-text">Version ' +
 __e( version ) +
