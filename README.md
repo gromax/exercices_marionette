@@ -11,3 +11,26 @@ Installation (Ubuntu)
 * "npm install" pour installer les dépendances indiquées dans package.json
 * compiler avec "grunt coffee" et "grunt jst"
 
+Dépendances pas gérées
+-
+Le dossier vendor2 contient des dépendances que je n'ai pas su mettre avec bower.json :
+* spin.jquery.js
+* spin.js
+
+Il faut télécharger à la main dans vendor :
+* mathquill-0.10.1
+* font-awesome-4.7.0
+* bootstrap 4 ?
+
+Dans css, j'ai déplacé :
+* animate.css
+
+
+
+Problème
+-
+* Dans bootstrap.js, il y a un require popper.js qui ne passe pas car je ne peux pas mettre popper.js dans le require_main, le js ne passe pas. Donc il faut modifier le bootstrap.js et mettre popper au lieu de popper.js
+
+
+
+
