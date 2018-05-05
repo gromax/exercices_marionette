@@ -514,6 +514,12 @@ define([], function() {
           complexe: true
         }
       }, {
+        id: 65,
+        filename: "exo0065",
+        title: "Limite d'une suite",
+        description: "Déterminer la limite d'une suite.",
+        keyWords: ["suites", "limites", "1STL", "TSTL"]
+      }, {
         id: 9999,
         filename: "exoTest",
         title: "Exercice de test",
