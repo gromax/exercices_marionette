@@ -31,6 +31,15 @@ Problème
 -
 * Dans bootstrap.js, il y a un require popper.js qui ne passe pas car je ne peux pas mettre popper.js dans le require_main, le js ne passe pas. Donc il faut modifier le bootstrap.js et mettre popper au lieu de popper.js
 
-
-
+Exercices à faire
+-
+* Calculs d'intégrale
+* Calculs de X tels qu'on a une proba (6,7 page 288 du livre)
+* Graphiquement std et moyenne sur un graphique en batons / id avec une loi normale
+* somme termes suite géométrique
+* produit scalaire avec normes et angle
+* produit scalaire, déterminer un angle
+* produit scalaire dans un rectangle
+* produit scalaire : côté dans un quadrilatère en utilisant sin A/a
+* produit scalaire : coordonnées à déterminer pour avoir u.v = 0
 
