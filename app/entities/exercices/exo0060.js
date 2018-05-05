@@ -26,16 +26,21 @@ define(["utils/math", "utils/help"], function(mM, help) {
         });
         b = values[3] = mM.alea.real({
           min: 5,
-          max: 20
+          max: 20,
+          sign: true
         });
-        s = values[4] = mM.alea["in"]([90, 95, 99]);
+        if (b > 0) {
+          s = values[4] = mM.alea["in"]([90, 95, 99]);
+        } else {
+          s = values[4] = mM.alea["in"]([110, 105, 101]);
+        }
         inputs.v = values.join(";");
       }
-      return [mM.exec([A, a, b, q / 1000, "symbol:n", "^", "*", "-", "*"]).tex(), A * a, s, Math.ceil(Math.log(a / b * (100 - s) / 100) / Math.log(q / 1000))];
+      return [mM.exec([A, a, b, q / 1000, "symbol:n", "^", "*", "-", "*"]).tex(), A * a, s, Math.ceil(Math.log(a / b * (100 - s) / 100) / Math.log(q / 1000)), b > 0];
     },
     getBriques: function(inputs, options) {
-      var expr, lim, nLim, ref, seuil;
-      ref = this.init(inputs), expr = ref[0], lim = ref[1], seuil = ref[2], nLim = ref[3];
+      var croissante, expr, lim, nLim, ref, seuil;
+      ref = this.init(inputs), expr = ref[0], lim = ref[1], seuil = ref[2], nLim = ref[3], croissante = ref[4];
       return [
         {
           bareme: 30,
@@ -79,7 +84,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
           items: [
             {
               type: "text",
-              ps: ["La quantité &nbsp; $A_n$ &nbsp; est croissante.", "Donnez l'entier &nbsp; $n$ &nbsp; à partir duquel &nbsp; $A_n \\geqslant " + seuil + "\\% A_{\\infty}$."]
+              ps: croissante ? ["La quantité &nbsp; $A_n$ &nbsp; est croissante.", "Donnez l'entier &nbsp; $n$ &nbsp; à partir duquel &nbsp; $A_n \\geqslant " + seuil + "\\% A_{\\infty}$."] : ["La quantité &nbsp; $A_n$ &nbsp; est décroissante.", "Donnez l'entier &nbsp; $n$ &nbsp; à partir duquel &nbsp; $A_n \\leqslant " + seuil + "\\% A_{\\infty}$."]
             }, {
               type: "input",
               format: [

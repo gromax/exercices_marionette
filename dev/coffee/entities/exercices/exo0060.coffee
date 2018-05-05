@@ -15,8 +15,9 @@ define ["utils/math","utils/help"], (mM, help) ->
 				q = 900 + values[0]
 				A = values[1] = mM.alea.real { min:10, max:100 }
 				a = values[2] = mM.alea.real { min:1, max:20 }
-				b = values[3] = mM.alea.real { min:5, max:20 }
-				s = values[4] = mM.alea.in [90, 95, 99]
+				b = values[3] = mM.alea.real { min:5, max:20, sign:true }
+				if b>0 then s = values[4] = mM.alea.in [90, 95, 99]
+				else s = values[4] = mM.alea.in [110, 105, 101]
 				inputs.v = values.join(";")
 
 			[
@@ -24,10 +25,11 @@ define ["utils/math","utils/help"], (mM, help) ->
 				A*a # valeur limite
 				s # valeur du seuil
 				Math.ceil(Math.log(a/b*(100-s)/100)/Math.log(q/1000)) # n limite
+				b>0 #croissante
 			]
 
 		getBriques: (inputs,options) ->
-			[expr, lim, seuil, nLim] = @init(inputs)
+			[expr, lim, seuil, nLim, croissante] = @init(inputs)
 
 			[
 				{
@@ -77,10 +79,16 @@ define ["utils/math","utils/help"], (mM, help) ->
 					items:[
 						{
 							type:"text"
-							ps: [
-								"La quantité &nbsp; $A_n$ &nbsp; est croissante."
-								"Donnez l'entier &nbsp; $n$ &nbsp; à partir duquel &nbsp; $A_n \\geqslant #{seuil}\\% A_{\\infty}$."
-							]
+							ps: if croissante
+								[
+									"La quantité &nbsp; $A_n$ &nbsp; est croissante."
+									"Donnez l'entier &nbsp; $n$ &nbsp; à partir duquel &nbsp; $A_n \\geqslant #{seuil}\\% A_{\\infty}$."
+								]
+							else
+								[
+									"La quantité &nbsp; $A_n$ &nbsp; est décroissante."
+									"Donnez l'entier &nbsp; $n$ &nbsp; à partir duquel &nbsp; $A_n \\leqslant #{seuil}\\% A_{\\infty}$."
+								]
 						}
 						{
 							type:"input"
