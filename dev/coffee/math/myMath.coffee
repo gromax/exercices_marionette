@@ -208,7 +208,7 @@
 						op2 = pile.pop()
 						op1 = pile.pop()
 						pile.push(new Intersection(op1,op2))
-					when arg in ["x","y","t","i","pi","e","∞"] then pile.push SymbolManager.makeSymbol(arg)
+					when arg in ["x","y","t","i","pi","e","∞", "infini"] then pile.push SymbolManager.makeSymbol(arg)
 					when (typeof arg is "string") and (FunctionNumber.functions[arg]?) then pile.push(new FunctionNumber(arg,pile.pop()))
 					when typeof arg is "number" then pile.push(new RealNumber(arg))
 					when (typeof arg is "string") and (m = arg.match /// ^symbol:([a-zA-Z_']+)$ ///i) then pile.push SymbolManager.makeSymbol(m[1])

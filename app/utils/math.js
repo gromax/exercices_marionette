@@ -8817,7 +8817,7 @@
               op1 = pile.pop();
               pile.push(new Intersection(op1, op2));
               break;
-            case arg !== "x" && arg !== "y" && arg !== "t" && arg !== "i" && arg !== "pi" && arg !== "e" && arg !== "∞":
+            case arg !== "x" && arg !== "y" && arg !== "t" && arg !== "i" && arg !== "pi" && arg !== "e" && arg !== "∞" && arg !== "infini":
               pile.push(SymbolManager.makeSymbol(arg));
               break;
             case !((typeof arg === "string") && (FunctionNumber.functions[arg] != null)):
