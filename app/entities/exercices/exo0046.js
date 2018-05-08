@@ -38,20 +38,35 @@ define(["utils/math", "utils/help"], function(mM, help) {
               ps: ["On donne &nbsp; $A$ &nbsp; d'affixe &nbsp; $z_A=" + (zA.tex()) + "$, &nbsp; $B$ &nbsp; d'affixe &nbsp; $z_B=" + (zB.tex()) + "$ &nbsp; et &nbsp; $C$ &nbsp; d'affixe &nbsp; $z_C=" + (zC.tex()) + "$.", "On notera &nbsp; $z_1$ &nbsp; l'affixe de &nbsp; $\\overrightarrow{AC}$ &nbsp; et &nbsp; $z_2$ &nbsp; l'affixe de &nbsp; $\\overrightarrow{AB}$."]
             }, {
               type: "input",
-              tag: "$z_1$",
-              name: "z1",
-              description: "Affixe de AC"
+              format: [
+                {
+                  text: "$z_1 =$",
+                  cols: 2,
+                  "class": "text-right"
+                }, {
+                  latex: true,
+                  cols: 10,
+                  name: "z1"
+                }
+              ]
             }, {
               type: "input",
-              tag: "$z_1$",
-              name: "z2",
-              description: "Affixe de AB"
+              format: [
+                {
+                  text: "$z_2 =$",
+                  cols: 2,
+                  "class": "text-right"
+                }, {
+                  latex: true,
+                  cols: 10,
+                  name: "z2"
+                }
+              ]
             }, {
               type: "validation",
               clavier: ["aide"]
             }, {
-              type: type,
-              "aide": "aide",
+              type: "aide",
               list: help.complexes.affixeVecteur
             }
           ],
@@ -72,16 +87,24 @@ define(["utils/math", "utils/help"], function(mM, help) {
           ]
         }, {
           bareme: 30,
-          title: "Produit &nbsp; $z_1\\cdot\\overline{z_2}$",
+          title: "Produit $z_1\\cdot\\overline{z_2}$",
           items: [
             {
               type: "text",
               ps: ["Calculez le produit &nbsp; $z_1\\cdot\\overline{z_2}$ &nbsp; sous sa forme algébrique."]
             }, {
               type: "input",
-              tag: "$z$",
-              name: "z",
-              description: "Forme x+iy"
+              format: [
+                {
+                  text: "$z_1 \\cdot \\overline{z_2}=$",
+                  cols: 2,
+                  "class": "text-right"
+                }, {
+                  latex: true,
+                  cols: 10,
+                  name: "z"
+                }
+              ]
             }, {
               type: "validation"
             }
@@ -98,7 +121,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
           ]
         }, {
           bareme: 40,
-          title: "Angle &nbsp; $\\widehat{BAC}$",
+          title: "Angle $\\widehat{BAC}$",
           items: [
             {
               type: "text",
@@ -113,8 +136,7 @@ define(["utils/math", "utils/help"], function(mM, help) {
               type: "validation",
               clavier: ["aide"]
             }, {
-              type: type,
-              "aide": "aide",
+              type: "aide",
               list: help.complexes.argument
             }
           ],

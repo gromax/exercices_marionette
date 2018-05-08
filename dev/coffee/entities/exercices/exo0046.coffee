@@ -21,7 +21,6 @@
 
 		getBriques: (inputs, options) ->
 			[zA, zB, zC, zAB, zAC, z, ang] = @init(inputs)
-
 			[
 				{
 					bareme: 30
@@ -35,22 +34,24 @@
 						}
 						{
 							type: "input"
-							tag: "$z_1$"
-							name:"z1"
-							description:"Affixe de AC"
+							format: [
+								{ text:"$z_1 =$", cols:2, class:"text-right" }
+								{ latex:true, cols:10, name:"z1" }
+							]
 						}
 						{
 							type: "input"
-							tag: "$z_1$"
-							name:"z2"
-							description:"Affixe de AB"
+							format: [
+								{ text:"$z_2 =$", cols:2, class:"text-right" }
+								{ latex:true, cols:10, name:"z2" }
+							]
 						}
 						{
 							type: "validation"
 							clavier: ["aide"]
 						}
 						{
-							type; "aide"
+							type: "aide"
 							list: help.complexes.affixeVecteur
 						}
 					]
@@ -73,7 +74,7 @@
 				}
 				{
 					bareme: 30
-					title: "Produit &nbsp; $z_1\\cdot\\overline{z_2}$"
+					title: "Produit $z_1\\cdot\\overline{z_2}$"
 					items: [
 						{
 							type:"text"
@@ -83,9 +84,10 @@
 						}
 						{
 							type: "input"
-							tag: "$z$"
-							name:"z"
-							description:"Forme x+iy"
+							format: [
+								{ text:"$z_1 \\cdot \\overline{z_2}=$", cols:2, class:"text-right" }
+								{ latex:true, cols:10, name:"z" }
+							]
 						}
 						{
 							type: "validation"
@@ -104,7 +106,7 @@
 				}
 				{
 					bareme: 40
-					title:"Angle &nbsp; $\\widehat{BAC}$"
+					title:"Angle $\\widehat{BAC}$"
 					items: [
 						{
 							type:"text"
@@ -124,7 +126,7 @@
 							clavier: ["aide"]
 						}
 						{
-							type; "aide"
+							type: "aide"
 							list: help.complexes.argument
 						}
 					]
