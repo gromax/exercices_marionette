@@ -189,17 +189,17 @@ define(["jst", "marionette", "mathjax", "mathquill", "backbone.syphon"], functio
     className: "card-body text-center",
     template: window.JST["exercices/common/jsxgraph-item"],
     onRender: function() {
-      var divId, fctTO, model, params, that;
+      var divId, model, params, that;
       model = this.model;
       params = model.get("params");
       that = this;
       divId = model.get("divId");
-      fctTO = function() {
-        return $el.height($el.width());
-      };
       this.$el.find(".jxgbox").each(function() {
-        var $el;
+        var $el, fctTO;
         $el = $(this);
+        fctTO = function() {
+          return $el.height($el.width());
+        };
         return setTimeout(fctTO, 0);
       });
       return require(["jsxgraph"], function() {

@@ -175,9 +175,9 @@ define [
 			that = @
 			divId = model.get("divId")
 
-			fctTO = ()-> $el.height($el.width())
 			@$el.find(".jxgbox").each(()->
 				$el = $(this);
+				fctTO = ()-> $el.height($el.width())
 				# Astuce bricoleuse sans laquelle le width() renvoir systématiquement 0
 				setTimeout(fctTO,0)
 			)
