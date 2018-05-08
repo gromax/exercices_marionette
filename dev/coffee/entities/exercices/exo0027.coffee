@@ -39,27 +39,31 @@
 						}
 						{
 							type:"input"
-							tag:"$z_1 + z_2$"
-							name:"s"
-							description:"Somme"
+							format: [
+								{ text: "$z_1 + z_2 =$", cols:4, class:"text-right"}
+								{ latex: true, cols:8, name:"s"}
+							]
 						}
 						{
 							type:"input"
-							tag:"$z_1\\times z_2$"
-							name:"p"
-							description:"Produit"
+							format: [
+								{ text: "$z_1\\cdot z_2 =$", cols:4, class:"text-right"}
+								{ latex: true, cols:8, name:"p"}
+							]
 						}
 						{
 							type:"input"
-							tag:"$\\frac{1}{z_1}$"
-							name:"i"
-							description:"Inverse"
+							format: [
+								{ text: "$\\frac{1}{z_1} =$", cols:4, class:"text-right"}
+								{ latex: true, cols:8, name:"i"}
+							]
 						}
 						{
 							type:"input"
-							tag:"$\\frac{z_1}{z_2}$"
-							name:"q"
-							description:"Quotient"
+							format: [
+								{ text: "$\\frac{z_1}{z_2} =$", cols:4, class:"text-right"}
+								{ latex: true, cols:8, name:"q"}
+							]
 						}
 						{
 							type: "validation"
