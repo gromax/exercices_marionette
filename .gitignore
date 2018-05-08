@@ -5,5 +5,8 @@ vendor
 php/meekrodb
 app.old
 src
+app/utils
+app/entities/exercices
+app/templates.underscore.js
 *.gz
 *.old
