@@ -478,7 +478,7 @@
 						# On vérifie d'abord qu'on est juste au moins dans l'approx
 						# Une difficulté : Si la réponse attendue est ,4,10236 à 0,01. L'utilisateur répond 4,10 ou 4,1 ce qui est
 						# pris identique pour la machine et peut provoquer une erreur
-						if (erreur.exact or erreur.float and ((erreur.ordre<=config.arrondi) or (erreur.p_user<=config.arrondi)))
+						if (erreur.exact or erreur.float and (erreur.ordre<=config.arrondi))
 
 							# Maintenant on peut vérifier si l'utilisateur respecte le format
 							if not erreur.float

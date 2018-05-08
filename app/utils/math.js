@@ -9239,7 +9239,7 @@
           switch (false) {
             case typeof config.arrondi !== "number":
               approx = Math.pow(10, config.arrondi);
-              if (erreur.exact || erreur.float && ((erreur.ordre <= config.arrondi) || (erreur.p_user <= config.arrondi))) {
+              if (erreur.exact || erreur.float && (erreur.ordre <= config.arrondi)) {
                 if (!erreur.float) {
                   errors.push({
                     type: "warning",
