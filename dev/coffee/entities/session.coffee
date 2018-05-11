@@ -1,0 +1,140 @@
+define ["backbone.radio"], (Radio) ->
+
+	Session = Backbone.Model.extend {
+		urlRoot: "api/session"
+		initialize: ->
+			that = @
+			# Hook into jquery
+			# Use withCredentials to send the server cookies
+			# The server must allow this through response headers
+			$.ajaxPrefilter( ( options, originalOptions, jqXHR) ->
+				options.xhrFields = {
+					withCredentials: true
+				}
+			)
+
+		validate: (attrs, options)->
+			errors = {};
+			if not attrs.identifiant
+				errors.identifiant = "L'email ne doit pas être vide"
+			if not attrs.pwd
+				errors.pwd = "Le mot de passe ne doit pas être vide"
+			if not _.isEmpty(errors)
+				return errors
+
+		toJSON: ->
+			return {
+				identifiant: @get("identifiant")
+				pwd: @get("pwd")
+			}
+
+		parse: (data)->
+			if data.logged
+				logged = data.logged
+			else
+				logged = data
+			if not logged.nomClasse
+				logged.nomClasse = "N/A"
+			logged.isRoot = (logged.rank is "Root")
+			logged.isAdmin = (logged.rank is "Root") or (logged.rank is "Admin")
+			logged.isProf = (logged.rank is "Prof");
+			logged.isEleve = (logged.rank is "Élève");
+			logged.logged_in = (logged.rank isnt "Off");
+			if logged.logged_in
+				logged.nomComplet = logged.prenom+" "+logged.nom
+			else
+				logged.nomComplet = ""
+			logged.isOff = not logged.logged_in
+			return logged
+
+		refresh: (data)->
+			@set(@parse(data))
+
+		getAuth: (callback)->
+			# getAuth is wrapped around our router
+			# before we start any routers let us see if the user is valid
+			@fetch({
+				success: callback
+			})
+
+		getWithForgottenKey: (key) ->
+			that = @
+			defer = $.Deferred()
+			request = $.ajax("api/forgotten/"+key,{
+				method:'GET'
+				dataType:'json'
+			})
+			request.done( (response)->
+				that.refresh(response)
+				defer.resolve()
+			).fail( (response)->
+				defer.reject(response)
+			)
+			return defer.promise()
+
+		isAdmin: ->
+			rank = @get("rank")
+			return (rank is "Root") or (rank is "Admin")
+
+		isProf: ->
+			@get("rank") is "Prof"
+
+		mapItem: (itemsList) ->
+			itemsList = itemsList ? {}
+			rank = @get("rank")
+			switch rank
+				when "Root"
+					if _.has(itemsList,"Root")
+						return itemsList["Root"]
+					else if _.has(itemsList,"Admin")
+						return itemsList["Admin"]
+					else
+						return itemsList.def
+				when "Admin"
+					if _.has(itemsList,"Admin")
+						return itemsList["Admin"]
+					else
+						return itemsList.def
+				when "Prof"
+					if _.has(itemsList,"Prof")
+						return itemsList["Prof"]
+					else
+						return itemsList.def
+				when "Élève"
+					if _.has(itemsList,"Eleve")
+						return itemsList["Eleve"]
+					else
+						return itemsList.def
+				else
+					if _.has(itemsList,"Off")
+						return itemsList["Off"]
+					else
+						return itemsList.def
+	}
+
+	API = {
+		getSession: (callback)->
+			Auth = new Session()
+			Auth.on "destroy", ()->
+				@unset("id")
+				channel = Radio.channel('entities')
+				channel.request("data:purge")
+			Auth.getAuth(callback)
+			return Auth
+
+		sendForgottenEmail: (email)->
+			return request = $.ajax(
+				"api/forgotten",
+				{
+					method:'POST'
+					dataType:'json'
+					data: { email:email }
+				}
+			)
+	}
+
+	channel = Radio.channel('entities')
+	channel.reply('session:entity', API.getSession )
+	channel.reply('forgotten:password', API.sendForgottenEmail )
+
+	return # Pas nécessaire de retourner l'objet Session
