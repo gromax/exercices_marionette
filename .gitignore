@@ -6,7 +6,8 @@ php/meekrodb
 app.old
 src
 app/utils
-app/entities/exercices
+app/entities
 app/templates.underscore.js
 *.gz
 *.old
+index.html
