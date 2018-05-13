@@ -26,47 +26,35 @@
 				coeffs = []
 				for i in degres
 					coeff = if i is degre and (config.coeffDom isnt null) then @number config.coeffDom
-					else @number {values:config.values, denominator:config.denominators}
+					else @number { numerator:config.values, denominator:config.denominators }
 					if i is degre # Si c'est le degré dominant, il ne doit pas être nul
-						coeff = @number({values:config.values, denominator:config.denominators}) while coeff.isNul()
+						coeff = @number({numerator:config.values, denominator:config.denominators}) while coeff.isNul()
 					if not coeff.isNul()
 						if i isnt 0 then coeff = new Monome( coeff, {name:config.variable, power:i})
 						coeffs.push coeff
 				if coeffs.length is 1 then coeffs.pop()
 				else new PlusNumber(coeffs.reverse()...)
 			number : (params) ->
-				# Si params.values est indéfini, on envoie directement params à Proba.alea
-				unless params?.values?
-					console.log "pwet"
-					return new RealNumber Proba.alea(params)
-				config = mergeObj {
-					sign: false 		# produit un signe aléatoire
-					denominator : null 	# null-> entier, nombre-> impose une valeur, tableau-> valeurs possibles, { min, max } -> intervalle de valeurs
-				}, params
-				num = Proba.alea config.values
-				if config.coeff? then num *= config.coeff
-				if config.denominator?
-					deno = Proba.alea config.denominator
+				###
+				Paramètres de proba.alea avec possibilité de séparer entre numerator et dénominatoravec des trucs en plus
+				- un dénominateur
+				###
+				if (numParams = params.numerator)? and (denParams = params.denominator)?
+					numerator = Proba.alea(numParams)
+					denominator = Proba.alea(denParams)
 					if deno is 0 then deno = 1
-					out = (new RationalNumber num,deno).simplify()
-				else out = new RealNumber num
-				if (config.sign is true) and (Math.random()<.5) then out.opposite()
-				out
+					(new RationalNumber num,deno).simplify()
+				else
+					new RealNumber Proba.alea(params)
 			real: (params) ->
 				# Même principe que précédent mais avec simple retour d'un nombre
-				unless params?.values? then return Proba.alea(params)
-				config = mergeObj {
-					sign: false 		# produit un signe aléatoire
-					denominator : null 	# null-> entier, nombre-> impose une valeur, tableau-> valeurs possibles, { min, max } -> intervalle de valeurs
-				}, params
-				num = Proba.alea config.values
-				if config.denominator?
-					deno = Proba.alea config.denominator
-					if deno is 0 then deno = 1
-					out = num/deno
-				else out = num
-				if (config.sign is true) and (Math.random()<.5) then out *= -1
-				out
+				if (numParams = params.numerator)? and (denParams = params.denominator)?
+					numerator = Proba.alea(numParams)
+					denominator = Proba.alea(denParams)
+					if deno is 0 then numerator
+					else numerator/denominator
+				else
+					Proba.alea(params)
 			dice: (up,down) ->
 				# renvoie vrai ou faux pour un alea à la proba up/down
 				Math.random()*down < up
@@ -582,7 +570,7 @@
 				note = 0
 				errors = []
 				goodMessage = false
-				if not _.isArray(processedAnswerList)
+				if not isArray(processedAnswerList)
 					processedAnswerList = _.compact([processedAnswerList])
 				if processedAnswerList.length is 0
 					# L'utilisateur a répondu ensemble vide

@@ -1,7 +1,19 @@
 
 	class Proba
 		@alea: (input) ->
-			# produit un nombre aléatoire dont la valeur dépend du type de paramètre
+			###
+			produit un nombre aléatoire dont la valeur dépend du type de paramètre
+			- indéfini -> 1
+			- nombre -> nombre lui même
+			- {... gaussian:{}} -> alea gaussien
+			- { min: , max: } -> alea prenant en compte :
+				- sign: True/False
+				- no: Array de valeurs interdites
+				- real : True/False nombre décimal ou entier
+				- coeff : coefficient multiplicateur
+			- Array -> valeur aléatoire du tableau
+			###
+
 			unless input? then return 1
 			switch
 				when input is null then 1
@@ -24,7 +36,7 @@
 							else out = sign* Math.floor((Math.random() * (mx+1-mn)) + mn)
 					if input.coeff? then out *= @alea(input.coeff)
 					out
-				when _.isArray(input) then input[ Math.floor((Math.random() * input.length) ) ]
+				when isArray(input) then input[ Math.floor((Math.random() * input.length) ) ]
 				else 1
 		@aleaEntreBornes: (a,b,sign=false) ->
 			if sign then Math.floor((Math.random() * (b+1-a)) + a)*(Math.floor(Math.random()*2)-.5)*2
