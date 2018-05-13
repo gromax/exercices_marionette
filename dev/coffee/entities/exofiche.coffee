@@ -27,20 +27,21 @@ define ["entities/exercices/exercices_catalog"], (catalog) ->
 				return errors
 
 		calcNote: (notesArray) ->
-			num = Math.max(this.get("num"), 1)
-
+			num = Math.max(@get("num"), 1)
 			noteExo = 0
 			poidsExo = 0
 			l = notesArray.length
 			# Il faut que l'élève ait fait au moins num fois l'exercice
 			# Sinon, on complète en considérant qu'il y a des 0
 
-			poidsExo = poidsExo*.9 + 1 for i in [1..num-l]
+			if l<num
+				poidsExo = poidsExo*.9 + 1 for i in [1..num-l]
+
+
 			for n in notesArray
 				note = Number n.note
 				noteExo = noteExo*.9 + note;
 				poidsExo = poidsExo*.9 + 1;
-
 			Math.ceil(noteExo/poidsExo);
 
 		parse: (data) ->
