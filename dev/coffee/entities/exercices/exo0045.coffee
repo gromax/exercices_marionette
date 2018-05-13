@@ -67,7 +67,7 @@
 			that = @
 			fct_item = (inputs, index) ->
 				[z, m, angleRad] = that.init(inputs,options)
-				return "$|z| = #{ m.tex()}$ &nbsp; et &nbsp; $arg(z)=#{angleRad}$"
+				return "$|z| = #{ m.tex()}$ &nbsp; et &nbsp; $arg(z)=#{angleRad.tex()}$"
 
 			return {
 				children: [
@@ -90,7 +90,7 @@
 			that = @
 			fct_item = (inputs, index) ->
 				[z, m, angleRad] = that.init(inputs,options)
-				return "$|z| = #{ m.tex()}$ et $arg(z)=#{angleRad}$"
+				return "$|z| = #{ m.tex()}$ et $arg(z)=#{angleRad.tex()}$"
 
 			return {
 				children: [
