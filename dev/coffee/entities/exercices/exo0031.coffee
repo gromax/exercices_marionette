@@ -9,7 +9,7 @@
 		init: (inputs) ->
 			if inputs.r? then r = mM.toNumber inputs.r
 			else
-				r = mM.alea.number { values:{min:1, max:12, sign:true}, denominator:{min:2, max:6} }
+				r = mM.alea.number { numerator:{min:1, max:12, sign:true}, denominator:{min:2, max:6} }
 				inputs.r = String r
 			r = mM.exec [r, "pi", "*"], {simplify:true}
 

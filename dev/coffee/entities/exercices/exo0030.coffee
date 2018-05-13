@@ -16,13 +16,13 @@
 				inputs.ranks = ranks.join(";")
 
 			if inputs.q1? then q1 = Number inputs.q1
-			else q1 = inputs.q1 = mM.alea.real( { values:{min:1, max:10}, sign:true } )
+			else q1 = inputs.q1 = mM.alea.real( { min:1, max:10, sign:true } )
 			if inputs.q2? then q2 = Number inputs.q2
-			else q2 = inputs.q2 = mM.alea.real( { values:{min:1, max:10}, sign:true } )
+			else q2 = inputs.q2 = mM.alea.real( { min:1, max:10, sign:true } )
 			if inputs.u1? then u1 = Number inputs.u1
-			else u1 = inputs.u1 = mM.alea.real( { values:{min:1, max:10}, sign:true } )
+			else u1 = inputs.u1 = mM.alea.real( { min:1, max:10, sign:true } )
 			if inputs.u2? then u2 = Number inputs.u2
-			else u2 = inputs.u2 = mM.alea.real( { values:{min:1, max:10}, sign:true } )
+			else u2 = inputs.u2 = mM.alea.real( { min:1, max:10, sign:true } )
 			# u1 et q1 sont le premier terme et la raison pour une paire de suites arithmétique - géométrique. u2 et q2 pour une deuxième paire
 			# La première suite est arithmétique
 			u=mM.suite.arithmetique { premierTerme:{ valeur:u1, rang:0 }, raison:q1 }

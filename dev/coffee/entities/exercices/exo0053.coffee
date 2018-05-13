@@ -62,12 +62,12 @@ define ["utils/math","utils/help"], (mM, help) ->
 								if a is 0
 									domaine = "L'équation est définie pour &nbsp; $x>0$"
 							# Il faut d'abord résoudre une équation du second degré, puis prendre le ln (si a=1) ou le exp (si a=0) Donc on prend une parabole. Pour le cas a=1, on place un sommet xS>0 pour garantir l'existence d'une racine positive, s'il y a des racines
-							if a is 0 then xS = mM.alea.real { values:{min:-10, max:10} }
-							else xS = mM.alea.real { values:{min:0, max:10} }
+							if a is 0 then xS = mM.alea.real { min:-10, max:10 }
+							else xS = mM.alea.real { min:0, max:10 }
 							# Une fois sur 8 on prend le cas d'une fonction du second degré sans racine
 							# Je ne prend que des parabole convexe
 							if mM.alea.dice(1,8)
-								yS = mM.alea.real { values:{min:1, max:20} }
+								yS = mM.alea.real { min:1, max:20 }
 								expr1 = mM.exec [ "x", xS, "-", 2, "^", yS, "+"], { simplify:true, developp:true }
 							else
 								sqrtYS = mM.alea.real { min:1, max:10 }

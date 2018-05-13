@@ -20,7 +20,7 @@
 			if inputs.poly then inputs.fct = inputs.poly
 			if (typeof inputs.fct is "undefined")
 				if (optD is 0) then operands = [
-					mM.alea.number { denominator:[1,2,3], values:{ min:-10, max:10} }
+					mM.alea.number { denominator:[1,2,3], numerator:{ min:-10, max:10} }
 				]
 				else operands = [
 					mM.alea.poly { degre:{min:1, max:optD }, coeffDom:[1,2,3], denominators:[1,2,3], values:{ min:-10, max:10} }
@@ -29,7 +29,7 @@
 					# Il y aura un ln que l'on va multiplier par :
 					# Soit du a, soit du ax, soit du ax^2+bx,au pire par du degré 2
 					if mM.alea.dice(2,3) then coeff = mM.exec [ mM.alea.poly({ degre:[0,1], coeffDom:[1,2,3], values:{ min:-10, max:10} }), "x", "*" ], { simplify:true, developp:true }
-					else coeff = mM.alea.number { denominators:[1,2], values:{ min:-10, max:10} }
+					else coeff = mM.alea.number { denominator:[1,2], numerator:{ min:-10, max:10} }
 					operands.push coeff
 					if optA is 2
 						a = mM.alea.real {min:1, max:10}

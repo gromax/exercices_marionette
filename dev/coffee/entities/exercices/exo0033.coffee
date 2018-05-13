@@ -14,12 +14,12 @@ define ["utils/math", "utils/help"], (mM, help) ->
 			b = mM.toNumber b
 			if inputs.ang1? then ang1= mM.toNumber inputs.ang1
 			else
-				ang1 = mM.alea.number { values:{min:1, max:6}, sign:true, coeff:30}
+				ang1 = mM.alea.number { min:1, max:6, sign:true, coeff:30}
 				inputs.ang1 = String ang1
 			ang1 = mM.trigo.degToRad ang1
 			if inputs.ang2? then ang2= mM.toNumber inputs.ang2
 			else
-				ang2 = mM.alea.number { values:{min:1, max:6}, sign:true, coeff:30 }
+				ang2 = mM.alea.number { min:1, max:6, sign:true, coeff:30 }
 				inputs.ang2 = String ang2
 			ang2 = mM.trigo.degToRad ang2
 
