@@ -71,11 +71,11 @@ _.each(el.lignes, function(row){%>
 \begin{tikzpicture}[scale=<% if (el.scale){ %><%- el.scale %><% } else { %>1<% } %>, >=stealth]<%
 if (el.index) { %>
 \draw (<%- el.left %>,<%- el.top %>) node[below right,color=white,fill=black]{\textbf{<%- el.index %> }};<% } %>
-\draw [color=black, line width=.1pt] (<%- el.left %> , <%- el.top %>) grid[<% if(el.step){%><%-el.step %><% } else { %>step=1<% } %>] (<%- el.right %>, <%- el.top %>);
+\draw [color=black, line width=.1pt] (<%- el.left %> , <%- el.bottom %>) grid[<% if(el.step){%><%-el.step %><% } else { %>step=1<% } %>] (<%- el.right %>, <%- el.top %>);
 <% if (el.axes){ %>\draw[line width=1pt] (0,0) node[below left, fill=white]{$O$} (<%- el.axes[0] %>,-2pt) node[below, fill=white]{\np{<%- el.axes[0] %>}} --++(0,4pt) (-2pt,<%- el.axes[1] %>) node[left, fill=white]{\np{<%- el.axes[1] %>}}--++(4pt,0);
 \draw[line width=1.5pt](<%- el.left %>,0)--(<%- el.right %>,0) (0,<%- el.bottom %>)--(0,<%- el.top %>);
 <% }
-if (el.Ouv){ %>\draw[line width=1pt] (0,0) node[below left, fill=white]{$O$} (.5,0) node[below, fill=white]{\vec{u}} (0,.5) node[left, fill=white]{\vec{v}}
+if (el.Ouv){ %>\draw[line width=1pt] (0,0) node[below left, fill=white]{$O$} (.5,0) node[below, fill=white]{$\vec{u}$} (0,.5) node[left, fill=white]{$\vec{v}$};
 \draw[line width=1.5pt, <->](0,1)|-(1,0);
 <% }
 if (el.courbes) {%>
