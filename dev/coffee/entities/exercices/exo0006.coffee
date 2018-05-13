@@ -80,8 +80,8 @@ define ["utils/math"], (mM) ->
 									uy = data["y#{name}"].processed
 
 									if ux isnt g_x or uy isnt g_y
-										graph.create 'point',[ux,uy], {name:name, fixed:true, size:4, color:'blue'}
-										graph.create 'point',[g_x,g_y], {name:name, fixed:true, size:4, color:'red'}
+										graph.create 'point',[ux,uy], {name:name, face:"cross", fixed:true, size:4, color:'red'}
+										graph.create 'point',[g_x,g_y], {name:name, fixed:true, size:6, color:'green'}
 									else
 										graph.create 'point',[g_x,g_y], {name:name, fixed:true, size:4, color:'green'}
 						}
