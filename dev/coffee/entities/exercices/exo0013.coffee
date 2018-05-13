@@ -61,7 +61,7 @@ define ["utils/math"], (mM) ->
 								out["x"+p.name] = p.X() for p in graph.points
 								out["y"+p.name] = p.Y() for p in graph.points
 								out
-							postVerification: (view, data)->
+							postVerificationRender: (view, data)->
 								for pt in view.graph.points
 									pt.setAttribute {fixed:true, x:data["x"+pt.name].processed, y: data["y"+pt.name].processed}
 								view.graph.create('line',droite.float_2_points(max), {strokeColor:'blue',strokeWidth:2,fixed:true})

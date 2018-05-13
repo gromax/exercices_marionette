@@ -67,14 +67,23 @@ define ["utils/math"], (mM) ->
 								out["x"+p.name] = p.X() for p in graph.points
 								out["y"+p.name] = p.Y() for p in graph.points
 								out
-							postVerification: (view, data)->
+							postVerificationRender: (view, data)->
+								graph = view.graph
 								for pt in view.graph.points
-									pt.setAttribute {fixed:true}
+									graph.removeObject pt
+									# pt.setAttribute {fixed:true}
 								for pt in iPts
 									name=pt.name
 									g_x = mM.float(pt.x)
 									g_y = mM.float(pt.y)
-									view.graph.create 'point',[g_x,g_y], {name:name, fixed:true, size:4, color:'green'}
+									ux = data["x#{name}"].processed
+									uy = data["y#{name}"].processed
+
+									if ux isnt g_x or uy isnt g_y
+										graph.create 'point',[ux,uy], {name:name, fixed:true, size:4, color:'blue'}
+										graph.create 'point',[g_x,g_y], {name:name, fixed:true, size:4, color:'red'}
+									else
+										graph.create 'point',[g_x,g_y], {name:name, fixed:true, size:4, color:'green'}
 						}
 						{
 							type: "validation"

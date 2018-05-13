@@ -51,7 +51,7 @@ define ["utils/math"], (mM) ->
 								dU = Math.round (Math.acos graph.M.X())*180/Math.PI
 								if graph.M.Y()<0 then dU *= -1
 								{ a:dU }
-							postVerification: (view, data)->
+							postVerificationRender: (view, data)->
 								graph = view.graph
 								radU = data.a.processed*Math.PI/180
 								radG = deg*Math.PI/180

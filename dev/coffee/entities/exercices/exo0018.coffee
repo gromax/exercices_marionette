@@ -63,7 +63,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 								out["x"+p.name] = p.X() for p in graph.points
 								out["y"+p.name] = p.Y() for p in graph.points
 								out
-							postVerification:(view, data)->
+							postVerificationRender:(view, data)->
 								graph = view.graph
 								for pt in graph.points
 									pt.setAttribute {fixed:true, x:u[pt.name].x, y:u[pt.name].y}
