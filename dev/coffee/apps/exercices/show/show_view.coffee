@@ -38,13 +38,16 @@ define [
 				item(that) for item in fcts
 			MathJax.Hub.Queue(["Typeset",MathJax.Hub,this.$el[0]])
 
+			if @postVerificationRenderData? and typeof(post = @model.get("postVerificationRender")) is "function"
+				post(@, @postVerificationRenderData)
+				@postVerificationRenderData = null
+
 		remove: ()->
 			@model.destroy()
 			Marionette.View.prototype.remove.call(@)
 
-		execPostVerification: (data)->
-			post = @model.get("postVerification")
-			if typeof post is "function" then post(@, data)
+		setPostVerificationRenderData: (data)->
+			@postVerificationRenderData = data
 	}
 
 	RadioItemView = DefaultItemView.extend {
@@ -186,6 +189,11 @@ define [
 				that.graph = JXG.JSXGraph.initBoard(divId, params);
 				if fcts = model.get("renderingFunctions")
 					item(that.graph) for item in fcts
+
+				if that.postVerificationRenderData? and typeof(post = that.model.get("postVerificationRender")) is "function"
+					post(that, that.postVerificationRenderData)
+					that.postVerificationRenderData = null
+
 	}
 
 	BriqueItemsListView = Marionette.CollectionView.extend {
@@ -339,9 +347,9 @@ define [
 		unsetFocus: ->
 			@$el.find(".card-header").each () -> $(this).removeClass("text-white bg-warning")
 
-		execPostVerification: (data) ->
-			list = this.itemsView.children.filter (item) -> item.model.has("postVerification")
-			_.each list, (item) -> item.execPostVerification(data)
+		setPostVerificationRenderData: (data) ->
+			list = this.itemsView.children.filter (item) -> item.model.has("postVerificationRender")
+			item.setPostVerificationRenderData(data) for item in list
 	}
 
 	BriquesListView = Marionette.CollectionView.extend {
