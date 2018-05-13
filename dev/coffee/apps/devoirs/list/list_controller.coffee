@@ -22,13 +22,13 @@ define [
 		list: ->
 			app.trigger("header:loading", true)
 			listItemsLayout = new Layout()
-			listItemsPanel = new Panel()
+			listItemsPanel = new Panel({ showInactifs: app.settings.showDevoirsInactifs is true })
 			channel = @getChannel()
 
 			require ["entities/devoir", "entities/dataManager"], (Item) ->
 				fetching = channel.request("custom:entities",["fiches"])
 				$.when(fetching).done( (fiches)->
-					listItemsView = new ListView { collection: fiches }
+					listItemsView = new ListView { collection: fiches, showInactifs: app.settings.showDevoirsInactifs is true }
 
 					listItemsLayout.on "render", ()->
 						listItemsLayout.getRegion('panelRegion').show(listItemsPanel)
@@ -67,6 +67,13 @@ define [
 								view.triggerMethod("form:data:invalid",newItem.validationError)
 
 						app.regions.getRegion('dialog').show(view)
+
+					listItemsPanel.on "devoir:toggle:showInactifs", ()->
+						showInactifs = app.settings.showDevoirsInactifs is true
+						showInactifs = app.settings.showDevoirsInactifs = not showInactifs
+						listItemsPanel.options.showInactifs = showInactifs
+						listItemsPanel.render()
+						listItemsView.setShowInactifs showInactifs
 
 					listItemsView.on "item:show", (childView, args)->
 						model = childView.model
