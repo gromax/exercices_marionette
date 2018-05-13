@@ -9,7 +9,7 @@
 			# On choisit un argument parmi ceux dont les cos et sin sont connus
 			if inputs.a? then a = mM.toNumber inputs.a
 			else
-				a = mM.alea.number mM.trigo.angles()
+				a = mM.toNumber mM.alea.in mM.trigo.angles()
 				inputs.a = String a
 			if inputs.m? then m = mM.toNumber inputs.m
 			else

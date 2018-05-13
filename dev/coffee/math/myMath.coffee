@@ -36,7 +36,9 @@
 				else new PlusNumber(coeffs.reverse()...)
 			number : (params) ->
 				# Si params.values est indéfini, on envoie directement params à Proba.alea
-				unless params?.values? then return new RealNumber Proba.alea(params)
+				unless params?.values?
+					console.log "pwet"
+					return new RealNumber Proba.alea(params)
 				config = mergeObj {
 					sign: false 		# produit un signe aléatoire
 					denominator : null 	# null-> entier, nombre-> impose une valeur, tableau-> valeurs possibles, { min, max } -> intervalle de valeurs

@@ -24,7 +24,7 @@
 							else out = sign* Math.floor((Math.random() * (mx+1-mn)) + mn)
 					if input.coeff? then out *= @alea(input.coeff)
 					out
-				when isArray(input) then input[ Math.floor((Math.random() * input.length) ) ]
+				when _.isArray(input) then input[ Math.floor((Math.random() * input.length) ) ]
 				else 1
 		@aleaEntreBornes: (a,b,sign=false) ->
 			if sign then Math.floor((Math.random() * (b+1-a)) + a)*(Math.floor(Math.random()*2)-.5)*2
