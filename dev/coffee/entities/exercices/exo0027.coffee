@@ -34,7 +34,7 @@
 							type:"text"
 							ps:[
 								"On considère deux nombres complexes &nbsp; $z_1 = #{zA.tex()}$ &nbsp; et &nbsp; $z_2 = #{zB.tex()}$."
-								"Donnez les résultats des calculs suivants :"
+								"Donnez sous forme algébrique les résultats des calculs suivants :"
 							]
 						}
 						{
