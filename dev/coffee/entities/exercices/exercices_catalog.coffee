@@ -543,6 +543,13 @@ define [], () ->
 				keyWords : ["suites", "limites", "1STL", "TSTL"]
 			}
 			{
+				id:66
+				filename:"exo0066"
+				title: "Produit scalaire dans une figure"
+				description: "On donne une figure géométrique et on demande de calculer quelques produits scalaires."
+				keyWords : ["géométrie", "scalaire", "1STL"]
+			}
+			{
 				id:9999
 				filename: "exoTest"
 				title: "Exercice de test"
