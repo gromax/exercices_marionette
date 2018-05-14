@@ -79,10 +79,10 @@ define ["utils/svg"], (SVGapi) ->
 			else if @paper is null then return
 			@paper.rect(0, 0, longueur, @config.hauteur_ligne, @config.color)		# Rectangle des x
 			@paper.rect(0, 0, @config.espace_gauche, @config.hauteur_ligne, @config.color)	# Rectangle entête des x
-			@paper.text(@config.x_tag, @config.espace_gauche/2, @config.hauteur_ligne/2, @config.espace_gauche, @config.hauteur_ligne, "center", "center")
+			@paper.foreignText(@config.x_tag, @config.espace_gauche/2, @config.hauteur_ligne/2, @config.espace_gauche, @config.hauteur_ligne, "center", "center")
 			x0 = @config.espace_gauche+@config.marge # Origine x pour les valeurs du tableau
 			for x,i in @x_list
-				@paper.text(x, x0+@config.espace_entre_valeurs*i, @config.hauteur_ligne/2, @config.espace_entre_valeurs,@config.hauteur_ligne,"center","center")
+				@paper.foreignText(x, x0+@config.espace_entre_valeurs*i, @config.hauteur_ligne/2, @config.espace_entre_valeurs,@config.hauteur_ligne,"center","center")
 			lineY = 1	# Origine Y (en nombre de lignes) de la nouvelle ligne à afficher
 			for line in @lines
 				if line.type is "var" then @renderVarLine(line,lineY)
@@ -98,7 +98,7 @@ define ["utils/svg"], (SVGapi) ->
 			y0= (lineY + line.hauteur/2)*@config.hauteur_ligne # Centre vertical de la linge
 
 			@paper.rect(0, lineY*h0, @config.espace_gauche, line.hauteur*h0, @config.color) # Rectangle de l'entête
-			@paper.text(line.tag, @config.espace_gauche/2, y0, x0, line.hauteur*h0, "center", "center")
+			@paper.foreignText(line.tag, @config.espace_gauche/2, y0, x0, line.hauteur*h0, "center", "center")
 			for item,j in line.values
 				i = j/2 # Position x en nombre de cases
 				if j%2 is 0
@@ -107,7 +107,7 @@ define ["utils/svg"], (SVGapi) ->
 						when item is "z"
 							# ligne avec zéro
 							@paper.line(x0+i*d,lineY*h0,x0+i*d,(lineY+line.hauteur)*h0,{dash:'5,5', width:.5})
-							@paper.text("$0$",x0+d*i, y0, d,h0, "center", "center")
+							@paper.foreignText("$0$",x0+d*i, y0, d,h0, "center", "center")
 						when item is "d"
 							# double barre
 							@paper.line(x0+i*d-2,lineY*h0,x0+i*d-2,(lineY+line.hauteur)*h0)
@@ -119,7 +119,7 @@ define ["utils/svg"], (SVGapi) ->
 					# En face d'une zone
 					switch
 						when (item is "+") or (item is "-")
-							@paper.text("$"+item+"$",x0+d*i, y0, d,h0, "center", "center")
+							@paper.foreignText("$"+item+"$",x0+d*i, y0, d,h0, "center", "center")
 					# Sinon, pour l'instant, rien
 		renderVarLine: (line,lineY) ->
 			h = line.hauteur*@config.hauteur_ligne
@@ -127,7 +127,7 @@ define ["utils/svg"], (SVGapi) ->
 			x0=@config.espace_gauche + @config.marge
 			d=@config.espace_entre_valeurs
 			@paper.rect(0, lineY*@config.hauteur_ligne, @config.espace_gauche, h, @config.color) # Rectangle de l'entête
-			@paper.text(line.tag, @config.espace_gauche/2, (lineY+line.hauteur/2)*@config.hauteur_ligne, x0, h, "center", "center")
+			@paper.foreignText(line.tag, @config.espace_gauche/2, (lineY+line.hauteur/2)*@config.hauteur_ligne, x0, h, "center", "center")
 			arrowPath = [] # Chemin des flèches
 			for item,i in line.svgValues
 				switch
@@ -164,7 +164,7 @@ define ["utils/svg"], (SVGapi) ->
 				else
 					y=valign*h
 					valign = "center"
-			@paper.text(tag, @config.espace_gauche+@config.marge+@config.espace_entre_valeurs*rang, (line+y)*@config.hauteur_ligne, @config.espace_entre_valeurs,@config.hauteur_ligne, align, valign, css)
+			@paper.foreignText(tag, @config.espace_gauche+@config.marge+@config.espace_entre_valeurs*rang, (line+y)*@config.hauteur_ligne, @config.espace_entre_valeurs,@config.hauteur_ligne, align, valign, css)
 			# On retourne un objet pour le arrowPath
 			{ x:@config.espace_gauche+@config.marge+@config.espace_entre_valeurs*rang, y:(y*(h-1)/h+1/2+line)*@config.hauteur_ligne, rang:rang, break_path:false}
 		renderArrow: (it1,it2)->

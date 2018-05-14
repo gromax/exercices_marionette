@@ -36,7 +36,13 @@ define [], () ->
 			obj.setAttribute('stroke-width', 3)
 			obj.setAttribute('fill', 'white')
 			@node.appendChild(obj)
-		text: (text,x,y,width,height,align,valign,css) ->
+		text:(text, x, y, color) ->
+			obj = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+			obj.setAttribute('x', x)
+			obj.setAttribute('y', y)
+			obj.setAttribute('val', text)
+			@node.appendChild(obj)
+		foreignText: (text,x,y,width,height,align,valign,css) ->
 			newNode = document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject') #Create a rect in SVG's namespace
 			switch
 				when align is "right" then x = x-width
