@@ -42,7 +42,7 @@ class User
 		else $this->date = date('Y-m-d H:i:s');
 		if(isset($options['rank'])) $this->rank = $options['rank'];
 		if(isset($options['pwd'])) $this->updatePwd($options['pwd']);
-		if(isset($options['pref'])) $this->pref($options['pref']);
+		if(isset($options['pref'])) $this->pref=$options['pref'];
 	}
 
 	public static function getList($params=array())
