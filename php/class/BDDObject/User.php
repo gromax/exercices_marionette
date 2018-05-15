@@ -23,6 +23,7 @@ class User
 	protected $nom = 'Disconnected';
 	protected $prenom ='';
 	protected $email ='';
+	protected $pref = '';
 	protected $date = null;
 	protected $bcryptHash = null;
 
@@ -41,6 +42,7 @@ class User
 		else $this->date = date('Y-m-d H:i:s');
 		if(isset($options['rank'])) $this->rank = $options['rank'];
 		if(isset($options['pwd'])) $this->updatePwd($options['pwd']);
+		if(isset($options['pref'])) $this->pref($options['pref']);
 	}
 
 	public static function getList($params=array())
@@ -287,23 +289,32 @@ class User
 
 		if(isset($params['nom']))
 		{
-			$this->nom = $params['nom']; $bddModif=true;
+			$this->nom = $params['nom'];
+			$bddModif=true;
 		}
 		if(isset($params['prenom']))
 		{
-			$this->prenom = $params['prenom']; $bddModif=true;
+			$this->prenom = $params['prenom'];
+			$bddModif=true;
 		}
 		if(isset($params['rank']))
 		{
-			$this->rank = $params['rank']; $bddModif=true;
+			$this->rank = $params['rank'];
+			$bddModif=true;
 		}
 		if(isset($params['email']))
 		{
-			$this->email = $params['email']; $bddModif=true;
+			$this->email = $params['email'];
+			$bddModif=true;
 		}
 		if(isset($params['pwd']))
 		{
 			$this->updatePwd($params['pwd']);
+			$bddModif=true;
+		}
+		if(isset($params['pref']))
+		{
+			$this->pref = $params['pref'];
 			$bddModif=true;
 		}
 
@@ -369,6 +380,7 @@ class User
 			'email'=>$this->email,
 			'rank'=>$this->rank,
 			'date'=>$this->date,
+			'pref'=>$this->pref
 		);
 		if ($this->id !== null) $answer['id']=$this->id;
 		if ($this->idClasse !== null) $answer['idClasse'] = $this->idClasse;
@@ -385,6 +397,7 @@ class User
 			'email'=>$this->email,
 			'rank'=>$this->rank,
 			'date'=>$this->date,
+			'pref'=>$this->pref
 		);
 
 		if ($this->id !== null) $answer['id']=$this->id;
