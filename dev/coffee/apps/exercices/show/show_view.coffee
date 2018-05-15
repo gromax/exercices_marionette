@@ -1,10 +1,12 @@
 define [
+	"app",
 	"jst",
 	"marionette",
 	"mathjax",
 	"mathquill",
 	"backbone.syphon"
 ], (
+	app,
 	JST,
 	Marionette,
 	MathJax
@@ -68,6 +70,10 @@ define [
 			"focusin textarea": "form:input:focusin"
 		},
 
+		serializeData: ()->
+			out = _.clone(@model.attributes)
+			out.pref = app.Auth.get("pref")
+			out
 		onRender: ()->
 			that = @
 			format = @model.get("format")
