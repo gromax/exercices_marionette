@@ -8,7 +8,6 @@
 	// Utilisateurs
 	define("PSEUDO_MIN_SIZE", 6);
 	define("PSEUDO_MAX_SIZE", 20);
-	define("USE_PSEUDO",false);
 
 	// Classes
 	define("NOMCLASSE_MIN_SIZE", 3);
