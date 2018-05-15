@@ -10,6 +10,12 @@ define [], () ->
 			rank:"Off"
 		},
 
+		toJSON: ()->
+			output = _.clone(_.omit(@attributes,"pref"))
+			if (pref = @attributes.pref) isnt false
+				output.pref = JSON.stringify(pref)
+			return output
+
 		parse: (data) ->
 			if (data.id)
 				data.id = Number(data.id)
@@ -19,6 +25,9 @@ define [], () ->
 				data.nomClasse = "N/A"
 			data.nomComplet = data.nom+" "+data.prenom
 			data.isEleve = (data.rank == "Élève")
+			if typeof data.pref is "string" and data.pref isnt ""
+				data.pref = JSON.parse(data.pref)
+			else data.pref = false
 			return data
 
 		testClasseMdp: (mdp) ->
