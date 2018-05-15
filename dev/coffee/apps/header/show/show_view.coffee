@@ -17,7 +17,7 @@ define ["marionette","app","jst"], (Marionette,app,JST)->
 			@isProf = auth.isProf ? false;
 			@isEleve = auth.isEleve ? false;
 			@isOff = auth.isOff ? false;
-			@nomComplet = auth.nomComplet ? "Déconnecté";
+			@nomComplet = if @isOff then "Déconnecté" else auth.prenom+" "+auth.nom
 
 		serializeData: () ->
 			{
