@@ -45,6 +45,11 @@ define ["backbone.radio"], (Radio) ->
 			else
 				logged.nomComplet = ""
 			logged.isOff = not logged.logged_in
+			if typeof logged.pref is "string" and logged.pref isnt ""
+				logged.pref = JSON.parse(logged.pref)
+			else logged.pref = {
+				mathquill:true
+			}
 			return logged
 
 		refresh: (data)->
