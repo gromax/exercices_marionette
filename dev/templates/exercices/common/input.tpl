@@ -9,7 +9,7 @@
 		_.each(format, function(item){ %>
 	<div class="col-sm-<%- item.cols %> <%- item.class %>"><%
 			if (item.name) {
-				if (item.latex) { %>
+				if (pref.mathquill && item.latex) { %>
 		<span class="js-mathquill" id="mq-exo-<%- item.name %>" style="width:100%;"></span>
 		<input type="hidden" id="exo-<%- item.name %>" name="<%- item.name %>" value="" <% if(item.description) { %> placeholder="<%- item.description %>" <% } %> >
 				<% } else { %>
