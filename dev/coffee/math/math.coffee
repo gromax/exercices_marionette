@@ -1296,16 +1296,23 @@
 			else if @denominator.isNegative()
 				@denominator.opposite()
 				@numerator.opposite()
-		compositeString: (options) ->
+		compositeString: (options, complement=false) ->
 			if options.floatNumber is true
 				_num = @numerator.float()
 				_den = @denominator.float()
-				return [ String(Math.abs(_num)/_den), _num>=0, false, false]
+				if complement
+					return [ String(Math.abs(_num)/_den)+" "+complement, _num>=0, false, true]
+				else
+					return [ String(Math.abs(_num)/_den)+" "+complement, _num>=0, false, true]
 			num = @numerator.compositeString options
 			den = @denominator.compositeString options
-			if den[0] is "1" then return num
-			if options.tex then out = ["\\frac{#{num[0]}}{#{den[0]}}", num[1], false, true]
-			else out = ["#{num[0]}/#{den[0]}", num[1], false, true]
+			if den[0] is "1" then out = num
+			else
+				if options.tex then out = ["\\frac{#{num[0]}}{#{den[0]}}", num[1], false, true]
+				else out = ["#{num[0]}/#{den[0]}", num[1], false, true]
+			if complement
+				out[0] = out[0]+" "+complement
+				out[3] = true
 			out
 		simplify: (infos=null) ->
 			if @isNaN() then return new RealNumber()
