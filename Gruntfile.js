@@ -129,7 +129,7 @@ module.exports = function(grunt) {
         jst: {
             // Watch all .tpl files from the template directory)
             files: "dev/templates/**/*.tpl",
-            tasks: [ 'jst', 'version:project:patch' ],
+            tasks: [ 'jst' ],
             // Reloads the browser
             options: {
               livereload: true
@@ -137,7 +137,7 @@ module.exports = function(grunt) {
         },
         math: {
             files: [ 'dev/coffee/math/**/*.coffee'],
-            tasks: [ 'coffee:math', 'version:project:patch' ],
+            tasks: [ 'coffee:math' ],
             // Reloads the browser
             options: {
               livereload: true
@@ -145,7 +145,7 @@ module.exports = function(grunt) {
         },
         utils: {
             files: [ 'dev/coffee/utils/**/*.coffee'],
-            tasks: [ 'coffee:utils', 'version:project:patch' ],
+            tasks: [ 'coffee:utils' ],
             // Reloads the browser
             options: {
               livereload: true
@@ -153,7 +153,7 @@ module.exports = function(grunt) {
         },
         apps: {
             files: [ 'dev/coffee/apps/**/*.coffee'],
-            tasks: [ 'coffee:apps', 'version:project:patch' ],
+            tasks: [ 'coffee:apps' ],
             // Reloads the browser
             options: {
               livereload: true
@@ -161,7 +161,7 @@ module.exports = function(grunt) {
         },
         entities: {
             files: [ 'dev/coffee/entities/**/*.coffee'],
-            tasks: [ 'coffee:entities', 'version:project:patch' ],
+            tasks: [ 'coffee:entities' ],
             // Reloads the browser
             options: {
               livereload: true
