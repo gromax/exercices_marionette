@@ -1,4 +1,4 @@
-define ["jst","marionette"], (JST,Marionette) ->
+define ["app", "jst", "marionette"], (app, JST, Marionette) ->
 	noView = Marionette.View.extend {
 		template:  window.JST["devoirs/list/devoir-list-none"]
 		tagName: "tr"
@@ -7,7 +7,11 @@ define ["jst","marionette"], (JST,Marionette) ->
 
 	Item = Marionette.View.extend {
 		tagName: "tr"
-		template: window.JST["devoirs/list/devoir-list-item"]
+		template: (data)->
+			if app.Auth.isAdmin()
+				window.JST["devoirs/list/devoir-list-admin-item"](data)
+			else
+				window.JST["devoirs/list/devoir-list-prof-item"](data)
 		triggers: {
 			"click button.js-delete": "item:delete"
 			"click button.js-actif": "item:setActivity"
@@ -26,7 +30,7 @@ define ["jst","marionette"], (JST,Marionette) ->
 		remove: ->
 			self = @
 			@$el.fadeOut( ()->
-				self.trigger("model:destroy", this.model)
+				self.trigger("model:destroy", @model)
 				Marionette.View.prototype.remove.call(self)
 			)
 	}
@@ -40,7 +44,11 @@ define ["jst","marionette"], (JST,Marionette) ->
 	Liste = Marionette.View.extend {
 		tagName: "table"
 		className:"table table-hover"
-		template: window.JST["devoirs/list/devoir-list"]
+		template: (data)->
+			if app.Auth.isAdmin()
+				window.JST["devoirs/list/devoir-list-admin"](data)
+			else
+				window.JST["devoirs/list/devoir-list-prof"](data)
 		regions: {
 			body: {
 				el:'tbody'
@@ -62,7 +70,7 @@ define ["jst","marionette"], (JST,Marionette) ->
 						else
 							return 1
 				else
-					this.collection.comparator=name
+					@collection.comparator=name
 				@collection.sort();
 
 		onRender: ->
