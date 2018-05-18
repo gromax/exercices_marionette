@@ -1,1 +1,1 @@
-<td colspan="7">Aucun utilisateur à afficher.</td>
+<td colspan="5">Aucun utilisateur à afficher.</td>
