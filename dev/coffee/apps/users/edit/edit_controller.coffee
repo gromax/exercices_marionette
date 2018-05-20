@@ -40,7 +40,6 @@ define [
 						view = new EditView {
 							model: user
 							generateTitle: true
-							showPref: isMe
 						}
 
 						view.on "form:submit", (data) ->
