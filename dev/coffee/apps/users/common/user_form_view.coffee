@@ -6,7 +6,7 @@ define ["jst","apps/common/item_form_view"], (JST,FormView) ->
 		serializeData: () ->
 			data = _.clone(@model.attributes)
 			data.showPWD = @showPWD or false
-			data.showPref = @options.showPref ? false
+			data.showPref = @showPref or false
 			data.ranks = @ranks or false
 			return data
 	}
