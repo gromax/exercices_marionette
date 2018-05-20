@@ -394,6 +394,7 @@ define [
 					if ue
 						idEF = ue.get("aEF")
 						idUF = ue.get("aUF")
+
 						userfiche = userfiches.get(idUF)
 						nomCompletUser = userfiche.get("nomCompletUser")
 						exofiche = exofiches.get(idEF)
@@ -404,12 +405,28 @@ define [
 							return it.get("id") is idEF
 						)
 
+						list = faits.where({aEF:idEF, aUF:idUF})
+						i = list.indexOf(ue)
+						# Recherche du précédent
+						if i>0
+							itemPrev = list[i-1]
+							arianePrev = itemPrev.get("id")
+						else
+							arianePrev = false
+
+						# Recherche du suivant
+						if i<list.length-1
+							itemNext = list[i+1]
+							arianeNext = itemNext.get("id")
+						else
+							arianeNext = false
+
 						app.Ariane.add([
 							{ text:"Devoir #"+idFiche, e:"devoir:show", data:idFiche, link:"devoir:"+idFiche},
 							{ text:"Fiches élèves", e:"devoir:showUserfiches", data:idFiche, link:"devoir:"+idFiche+"/fiches-eleves"},
 							{ text:nomCompletUser+" #"+idUF, e:"devoirs:fiche-eleve:show", data:idUF, link:"devoirs/fiche-eleve:"+idUF },
 							{ text:"Exercice "+(index+1), e:"devoirs:fiche-eleve:faits", data:[idUF, idEF], link:"devoirs/fiche-eleve:"+idUF+"/exercice:"+idEF },
-							{ text:"Essai #"+idUE, e:"exercice-fait:run", data:idUE, link:"exercice-fait:"+idUE }
+							{ text:"Essai #"+idUE, e:"exercice-fait:run", data:idUE, link:"exercice-fait:"+idUE, prev: arianePrev, next:arianeNext }
 						])
 
 
