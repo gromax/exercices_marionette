@@ -37,8 +37,8 @@
 
 	<% if (showPref) {%>
 	<div class="form-group form-check">
-		<input type="checkbox" class="form-check-input" name="pref[mathquill]" id="mathquillCheck" <% if (pref && pref.mathquill) { %>Checked<% } %> >
-		<label class="form-check-label" for="mathquillCheck">Champs nombres avec mathquill</label>
+		<input type="checkbox" class="form-check-input" name="pref[mathquill]" id="mathquillCheck" <% if (!pref || pref.mathquill) { %>Checked<% } %> >
+		<label class="form-check-label" for="mathquillCheck">Champs de saisie intuitifs</label>
 	</div>
 	<%}%>
 
