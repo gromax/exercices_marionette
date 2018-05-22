@@ -1,7 +1,7 @@
 <td><span class="badge badge-pill badge-primary"><%- id %></span></td>
 <td><%- nom %></td>
 <td><%- nomOwner %></td>
-<td><% if(ouverte) {%>Ouverte<%} else {%>Fermée <%}%></td>
+<td><% if(ouverte) {%><span class="text-success">Ouverte</span><%} else {%><span class="text-danger">Fermée</span><%}%></td>
 <td><%- date %></td> <!-- à parser -->
 <td align="right">
 	<div class="btn-group" role="group">
