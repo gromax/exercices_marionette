@@ -58,47 +58,109 @@ define ["utils/math"], (mM) ->
 
 			# C'est la même chose mais avec le a/b calculé en flotant parce que sinon
 			# lors de la comparaison, 7/2 et 3,5 sont pris comme différents
-			expoF = mM.exec [b/a, "*-", "t", "*", "exp"], {simplify:true}
 			if (u1 isnt 0) or (u0 isnt 0) then operands = [ u1, "t", "*", u0, "+", expo, "*"]
 			else operands = [ 0 ]
 			if Y isnt 0 then operands.push(Y,"+")
 			c = mM.exec operands, { simplify:true }
 			premier_membre_tex = mM.exec([a,"symbol:y'","*",b,"symbol:y","*","+"],{simplify:true}).tex()
 			second_membre_tex = c.tex(altFunctionTex:["exp"])
-			good_y0 = mM.exec ["symbol:K", expo, "*"], {simplify:true}
-			good_y0F = mM.exec ["symbol:K", expoF, "*"], {simplify:true}
+
+			good_y0 =  mM.exec [b, a, "/", "*-", "t", "*"], {simplify:true}
 			# On précise la forme de la solution générale
-			good_y1 = mM.exec [u1, "t", "t", 2, "/", "*", "*", u0, "t", "*", "+", a , "/", expo, "*", Y, b, "/", "+"], { simplify:true }
-			good_y1F = mM.exec [u1, "t", "t", 2, "/", "*", "*", u0, "t", "*", "+", a, "/", expoF, "*", Y, b, "/", "+"], { simplify:true }
+			#good_y1 = mM.exec [u1, "t", "t", 2, "/", "*", "*", u0, "t", "*", "+", a , "/", expo, "*", Y, b, "/", "+"], { simplify:true }
 			K_good = mM.exec [ y0, Y, b, "/", "-"], { simplify:true }
-			good_y = mM.exec [u1, "t", "t", 2, "/", "*", "*", u0, "t", "*", "+", a, "/", K_good, "+", expo, "*", Y, b, "/", "+"], { simplify:true }
-			good_yF = mM.exec [u1, "t", "t", 2, "/", "*", "*", u0, "t", "*", "+", a, "/", K_good, "+", expoF, "*", Y, b, "/", "+"], { simplify:true }
+			#good_y = mM.exec [u1, "t", "t", 2, "/", "*", "*", u0, "t", "*", "+", a, "/", K_good, "+", expo, "*", Y, b, "/", "+"], { simplify:true }
+			C_good = mM.exec [Y, b, "/"], {simplify:true}
+			a_good = mM.exec [u0, a, "/"], {simplify:true}
+			b_good = mM.exec [u1, a, "/"], {simplify:true}
+
 			switch
 				when u_nul
 					# On est sûr que Y<>0
 					forme_y1_tex = "C"
+					sol_gen_tex = mM.exec([ "symbol:K", good_y0, "exp", "*", C_good, "+"],{simplify:true}).tex()
+					format_y1 = [
+						{ text:"$y_1(t) = $", cols:3, class:"text-right" }
+						{ name:"C", cols:1, latex:true }
+					]
 					symboles_a_trouver = ["$C$"]
+					symbols_validation = { C:"number"}
+					symbols_verifications = [
+						{name:"C", good:C_good }
+					]
 				when (Y is 0) and (u1 is 0)
 					# On est sûr que u0<>0
-					forme_y1_tex = mM.exec([ "symbol:a", "t", "*", expo, "*" ]).tex(altFunctionTex:["exp"])
+					forme_y1_tex = mM.exec([ "symbol:a", "t", "*"]).tex()+"\\cdot \\exp (#{good_y0.tex()})"
+					sol_gen_tex = mM.exec([ a_good, "t", "*", "symbol:K", "+", good_y0, "exp", "*"],{simplify:true}).tex()
+					format_y1 = [
+						{ text:"$y_1(t) = $", cols:3, class:"text-right" }
+						{ name:"a", cols:1, latex:true }
+						{ text:"$\\cdot t \\cdot \\exp(#{good_y0.tex()})$", cols:2 }
+					]
+					symbols_validation = { a:"number" }
 					symboles_a_trouver = ["$a$"]
+					symbols_verifications = [
+						{name:"a", good:a_good }
+					]
+
 				when u1 is 0
 					# On est sûr que u0<>0 et Y<>0
-					forme_y1_tex = mM.exec([ "symbol:a", "t", "*", expo, "*", "symbol:C", "+" ]).tex(altFunctionTex:["exp"])
+					forme_y1_tex = mM.exec([ "symbol:a", "t", "*"]).tex()+"\\cdot \\exp (#{good_y0.tex()}) + C"
+					sol_gen_tex = mM.exec([ a_good, "t", "*", "symbol:K", "+", good_y0, "exp", "*", C_good, "+"],{simplify:true}).tex()
+					format_y1 = [
+						{ text:"$y_1(t) = $", cols:3, class:"text-right" }
+						{ name:"a", cols:1, latex:true }
+						{ text:"$\\cdot t \\cdot \\exp(#{good_y0.tex()}) + $", cols:2 }
+						{ name:"C", cols:1, latex:true }
+					]
 					symboles_a_trouver = ["$a$", "$C$"]
+					symbols_validation = { a:"number", C:"number"}
+					symbols_verifications = [
+						{name:"C", good:C_good }
+						{name:"a", good:a_good }
+					]
+
 				when (Y is 0)
 					# On est sûr que u1<>0 puisque le cas u1 = 0 et Y = 0 a déjà été traité. On ne sait pas pour u0
-					forme_y1_tex = mM.exec([ "symbol:a", "t", 2, "^", "*", "symbol:b", "t", "*", "+", expo, "*"]).tex(altFunctionTex:["exp"])
+					forme_y1_tex = mM.exec([ "symbol:a", "t", 2, "^", "*", "symbol:b", "t", "*", "+" ]).tex()+"\\cdot \\exp (#{good_y0.tex()})"
+					sol_gen_tex = mM.exec([ b_good, "t", 2, "^", "*", a_good, "t", "*", "+", "symbol:K", "+",good_y0, "exp", "*" ],{simplify:true}).tex()
+					format_y1 = [
+						{ text:"$y_1(t) = ($", cols:3, class:"text-right" }
+						{ name:"a", cols:1, latex:true }
+						{ text:"$\\cdot t^2 + $", cols:1 }
+						{ name: "b", cols:1, latex:true }
+						{ text: "$\\cdot t) \\cdot \\exp(#{good_y0.tex()})$", cols:2 }
+					]
 					symboles_a_trouver = ["$a$", "$b$"]
+					symbols_validation = { a:"number", b:"number"}
+					symbols_verifications = [
+						{name:"a", good:b_good }
+						{name:"b", good:a_good }
+					]
 				else
 					# On est sûr que u1<>0 puisque le cas u1 = 0 a déjà été envisagé
-					forme_y1_tex = mM.exec([ "symbol:a", "t", 2, "^", "*", "symbol:b", "t", "*", "+", expo, "*", "symbol:C", "+"]).tex(altFunctionTex:["exp"])
+					forme_y1_tex = mM.exec([ "symbol:a", "t", 2, "^", "*", "symbol:b", "t", "*", "+" ]).tex()+"\\cdot \\exp (#{good_y0.tex()}) + C"
+					sol_gen_tex = mM.exec([ b_good, "t", 2, "^", "*", a_good, "t", "*", "+", "symbol:K", "+", good_y0, "exp", "*", C_good, "+" ],{simplify:true}).tex()
+					format_y1 = [
+						{ text:"$y_1(t) = ($", cols:3, class:"text-right" }
+						{ name:"a", cols:1, latex:true }
+						{ text:"$\\cdot t^2 + $", cols:1 }
+						{ name: "b", cols:1, latex:true }
+						{ text: "$\\cdot t) \\cdot \\exp(#{good_y0.tex()}) + $", cols:2 }
+						{ name:"C", cols:1, latex:true }
+					]
 					symboles_a_trouver = ["$a$", "$b$", "$C$"]
+					symbols_validation = { a:"number", b:"number", C:"number"}
+					symbols_verifications = [
+						{name:"C", good:C_good }
+						{name:"a", good:b_good }
+						{name:"b", good:a_good }
+					]
 
-			[premier_membre_tex, second_membre_tex, good_y0, good_y0F, forme_y1_tex, symboles_a_trouver, good_y1, good_y1F, y0, good_y, good_yF]
+			[premier_membre_tex, second_membre_tex, good_y0, forme_y1_tex, format_y1, symboles_a_trouver, symbols_validation, symbols_verifications, y0, K_good, sol_gen_tex]
 
 		getBriques: (inputs,options)->
-			[premier_membre_tex, second_membre_tex, good_y0, good_y0F, forme_y1_tex, symboles_a_trouver, good_y1, good_y1F, y0, good_y, good_yF] = @init(inputs, options)
+			[premier_membre_tex, second_membre_tex, good_y0, forme_y1_tex, format_y1, symboles_a_trouver, symbols_validation, symbols_verifications, y0, K_good, sol_gen_tex] = @init(inputs, options)
 
 			[
 				{
@@ -110,14 +172,6 @@ define ["utils/math"], (mM) ->
 								"Soit l'équation différentielle $(E):#{premier_membre_tex} = #{second_membre_tex}$"
 							]
 						}
-						{
-							type:"ul"
-							rank:1
-							list: [
-								{type:"warning", text:"Écrivez exp(...) et pas e^..."}
-								{type:"warning", text:"Utilisez &nbsp; $K$ &nbsp; comme constante et quand vous écrivez &nbsp; $K \\exp(\\cdots)$, faites attention de séparer &nbsp; $K$ &nbsp; et &nbsp; $\\exp$ &nbsp; au minimum d'une espace."}
-							]
-						}
 					]
 				}
 				{
@@ -126,7 +180,6 @@ define ["utils/math"], (mM) ->
 					items: [
 						{
 							type:"text"
-							rank:0
 							ps:[
 								"Donnez l'expression de &nbsp; $y_0$, solution générale de l'équation : &nbsp; $\\left(E_0\\right) : #{premier_membre_tex} = 0$."
 								"Vous noterez &nbsp; $K$ &nbsp; la constante utile."
@@ -134,19 +187,28 @@ define ["utils/math"], (mM) ->
 						}
 						{
 							type:"input"
-							rank:1
-							waited:"number"
-							tag:"$y_0(t)$"
-							name:"y0"
-							description:"Solution générale de E0"
-							alias:{K:["K","k","A","C"]}
-							good:[good_y0, good_y0F]
-							goodTex:good_y0.tex(altFunctionTex:["exp"])
+							format:[
+								{ text:"$y_0 = K \\cdot \\exp($", cols:3, class:"text-right" }
+								{ name:"y0", latex:true, cols:2 }
+								{ text:"$)$", cols:1 }
+							]
 						}
 						{
 							type: "validation"
-							rank: 2
-							clavier: []
+						}
+					]
+					validations:{
+						y0:"number"
+					}
+					verifications:[
+						{
+							name:"y0"
+							good: good_y0
+							tag: (data)->
+								"Vous avez répondu &nbsp; $y_0(t) = K\\cdot \\exp (#{data.y0.processed.tex} )$"
+							parameters:{
+								goodTex: "K\\cdot\\exp (#{good_y0.tex()})"
+							}
 						}
 					]
 				}
@@ -156,7 +218,6 @@ define ["utils/math"], (mM) ->
 					items: [
 						{
 							type: "text"
-							rank: 0
 							ps: [
 								"Il existe une solution particulière de &nbsp; $(E)$ &nbsp; dont l'expression est de la forme &nbsp; $y_1(t) = #{forme_y1_tex} $."
 								"Donnez cette solution en précisant le(s) valeur(s) de &nbsp; #{symboles_a_trouver.join(", &nbsp; ")}."
@@ -164,20 +225,15 @@ define ["utils/math"], (mM) ->
 						}
 						{
 							type: "input"
-							rank: 1
-							waited: "number"
-							tag:"$y_1(t)$"
-							name:"y1"
-							description:"Solution particulière de E"
-							good:[good_y1, good_y1F]
-							goodTex:good_y1.tex(altFunctionTex:["exp"])
+							format: format_y1
 						}
 						{
 							type: "validation"
-							rank: 2
-							clavier: []
 						}
 					]
+					validations: symbols_validation
+					verifications: symbols_verifications
+
 				}
 				{
 					title: "Solution avec contrainte"
@@ -185,26 +241,31 @@ define ["utils/math"], (mM) ->
 					items: [
 						{
 							type:"text"
-							rank:0
 							ps: [
-								"Soit &nbsp; $y$ &nbsp; une solution de &nbsp; $(E)$ &nbsp; qui vérifie &nbsp; $y(0) = #{y0}$."
-								"Donnez l'expression de &nbsp; $y$."
+								"On sait maintenant qu'une solution générale de &nbsp; $(E)$ &nbsp; s'écrit :"
+								"$y(t) = #{sol_gen_tex}$"
+								"Soit &nbsp; $f$ &nbsp; une solution de &nbsp; $(E)$ &nbsp; qui vérifie &nbsp; $f(0) = #{y0}$."
+								"Donnez la valeur de &nbsp; $K$."
 							]
 						}
 						{
 							type: "input"
-							rank: 1
-							waited: "number"
-							tag:"$y(t)$"
-							name:"y"
-							description:"Solution telle que y(0) = #{y0}"
-							good:[good_y, good_yF]
-							goodTex:good_y.tex(altFunctionTex:["exp"])
+							format: [
+								{ text:"$K = $", cols:2, class:"text-right" }
+								{ name:"K", latex:true, cols:4 }
+							]
 						}
 						{
 							type: "validation"
-							rank: 2
-							clavier: []
+						}
+					]
+					validations: {
+						K: "number"
+					}
+					verifications:[
+						{
+							name:"K"
+							good:K_good
 						}
 					]
 				}
