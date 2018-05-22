@@ -90,8 +90,8 @@ define ["utils/math","utils/help"], (mM, help) ->
 						{
 							type: "input"
 							format: [
-								{ text:"$\\mathcal{S} = $", cols:2, class:"text-right" }
-								{ name:"solutions", cols:10, latex:true }
+								{ text:"$\\mathcal{S} = $", cols:3, class:"text-right" }
+								{ name:"solutions", cols:8, latex:true }
 							]
 						}
 						{

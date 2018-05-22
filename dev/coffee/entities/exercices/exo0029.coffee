@@ -34,8 +34,8 @@ define ["utils/math","utils/help"], (mM, help) ->
 						{
 							type: "input"
 							format: [
-								{ text: "$\\mathcal{S} =$", cols:2, class:"text-right" }
-								{ latex: true, cols:10, name:"solutions"}
+								{ text: "$\\mathcal{S} =$", cols:3, class:"text-right" }
+								{ latex: true, cols:9, name:"solutions"}
 							]
 						}
 						{

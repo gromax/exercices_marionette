@@ -24,9 +24,9 @@
 							type:"input"
 							format:[
 								{ text:"A' (", cols:3, class:"text-right h4"}
-								{ name:"xAp", cols:2, latex:true }
+								{ name:"xAp", cols:3, latex:true }
 								{ text:";", cols:1, class:"text-center h4"}
-								{ name:"yAp", cols:2, latex:true }
+								{ name:"yAp", cols:3, latex:true }
 								{ text:")", cols:1, class:"h4"}
 							]
 						}

@@ -23,9 +23,9 @@ define ["utils/math","utils/help"], (mM, help) ->
 							type:"input"
 							format:[
 								{ text:"M (", cols:3, class:"text-right h4"}
-								{ name:"xM", cols:2, latex:true }
+								{ name:"xM", cols:3, latex:true }
 								{ text:";", cols:1, class:"text-center h4"}
-								{ name:"yM", cols:2, latex:true }
+								{ name:"yM", cols:3, latex:true }
 								{ text:")", cols:1, class:"h4"}
 							]
 						}

@@ -109,9 +109,9 @@ define ["utils/math","utils/help"], (mM, help) ->
 							format:[
 								{ text: "$I_F =$", cols:2, class:"text-right" }
 								{ text:"[", cols:1, class:"text-right h3"}
-								{ name:"low", cols:2 }
+								{ name:"low", cols:3 }
 								{ text:";", cols:1, class:"text-center h3"}
-								{ name:"high", cols:2 }
+								{ name:"high", cols:3 }
 								{ text:"]", cols:1, class:"h3"}
 							]
 						}

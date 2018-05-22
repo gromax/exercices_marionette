@@ -70,8 +70,8 @@
 						{
 							type: "input"
 							format: [
-								{ text: "$P(x) =$", cols:2, class:"text-right" }
-								{ latex: true, cols:10, name:"p"}
+								{ text: "$P(x) =$", cols:3, class:"text-right" }
+								{ latex: true, cols:9, name:"p"}
 							]
 						}
 						{

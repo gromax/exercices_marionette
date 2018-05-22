@@ -47,8 +47,8 @@ define ["utils/math","utils/help"], (mM, help) ->
 						{
 							type: "input"
 							format: [
-								{ text:"$\\Delta =$", cols:2, class:"text-right" }
-								{ name:"delta", cols:10, latex:true }
+								{ text:"$\\Delta =$", cols:3, class:"text-right" }
+								{ name:"delta", cols:5, latex:true }
 							]
 						}
 						{
@@ -87,8 +87,8 @@ define ["utils/math","utils/help"], (mM, help) ->
 						{
 							type: "input"
 							format: [
-								{ text:"$\\mathcal{S} = $", cols:2, class:"text-right" }
-								{ name:"solutions", cols:10, latex:true }
+								{ text:"$\\mathcal{S} = $", cols:3, class:"text-right" }
+								{ name:"solutions", cols:8, latex:true }
 							]
 						}
 						{

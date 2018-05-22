@@ -99,8 +99,8 @@
 						{
 							type: "input"
 							format: [
-								{ text: "$f'(x) =$", cols:2, class:"text-right" }
-								{ latex: true, cols:10, name:"d"}
+								{ text: "$f'(x) =$", cols:3, class:"text-right" }
+								{ latex: true, cols:9, name:"d"}
 							]
 						}
 						{
@@ -179,8 +179,8 @@
 						{
 							type: "input"
 							format: [
-								{ text: "$\\mathcal{T} :$", cols:2, class:"text-right" }
-								{ latex: true, cols:10, name:"e"}
+								{ text: "$\\mathcal{T} :$", cols:3, class:"text-right" }
+								{ latex: true, cols:9, name:"e"}
 							]
 						}
 						{

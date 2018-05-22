@@ -42,8 +42,8 @@
 						{
 							type: "input"
 							format: [
-								{ text: "$AB =$", cols:2, class:"text-right" }
-								{ latex: true, cols:10, name:"AB"}
+								{ text: "$AB =$", cols:3, class:"text-right" }
+								{ latex: true, cols:5, name:"AB"}
 							]
 						}
 						{

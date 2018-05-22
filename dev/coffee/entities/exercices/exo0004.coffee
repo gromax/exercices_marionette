@@ -113,9 +113,9 @@
 								type:"input"
 								format:[
 									{ text:"D (", cols:3, class:"text-right h4"}
-									{ name:"x", cols:2, latex:true }
+									{ name:"x", cols:3, latex:true }
 									{ text:";", cols:1, class:"text-center h4"}
-									{ name:"y", cols:2, latex:true }
+									{ name:"y", cols:3, latex:true }
 									{ text:")", cols:1, class:"h4"}
 								]
 							}
