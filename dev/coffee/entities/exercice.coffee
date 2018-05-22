@@ -143,9 +143,14 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 						if verifItem.rank? then out.add.rank = verifItem.rank
 					else
 						ver = mM.verification.isSame(data[verifItem.name].processed, verifItem.good, verifItem.parameters)
-						tag = verifItem.tag ? verifItem.name
+						if typeof verifItem.tag is "function"
+							tagText = verifItem.tag(data)
+						else
+							tag = verifItem.tag ? verifItem.name
+							tagText = "<b>#{tag}</b> &nbsp; :</b>&emsp; Vous avez répondu &nbsp; $#{data[verifItem.name].processed.tex}$"
+
 						list = [
-							{ type:"normal", text:"<b>#{tag}</b> &nbsp; :</b>&emsp; Vous avez répondu &nbsp; $#{data[verifItem.name].processed.tex}$" }
+							{ type:"normal", text: tagText }
 							ver.goodMessage
 						]
 						out = {
