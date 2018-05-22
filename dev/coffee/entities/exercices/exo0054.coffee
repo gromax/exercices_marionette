@@ -71,8 +71,8 @@ define ["utils/math"], (mM) ->
 			K_good = mM.exec [ y0, Y, b, "/", "-"], { simplify:true }
 			#good_y = mM.exec [u1, "t", "t", 2, "/", "*", "*", u0, "t", "*", "+", a, "/", K_good, "+", expo, "*", Y, b, "/", "+"], { simplify:true }
 			C_good = mM.exec [Y, b, "/"], {simplify:true}
-			a_good = mM.exec [u0, a, "/"], {simplify:true}
-			b_good = mM.exec [u1, a, "/"], {simplify:true}
+			coeff_t_good = mM.exec [u0, a, "/"], {simplify:true}
+			coeff_t2_good = mM.exec [u1, a, "/"], {simplify:true}
 
 			switch
 				when u_nul
@@ -90,8 +90,8 @@ define ["utils/math"], (mM) ->
 					]
 				when (Y is 0) and (u1 is 0)
 					# On est sûr que u0<>0
-					forme_y1_tex = mM.exec([ "symbol:a", "t", "*"]).tex()+"\\cdot \\exp (#{good_y0.tex()})"
-					sol_gen_tex = mM.exec([ a_good, "t", "*", "symbol:K", "+", good_y0, "exp", "*"],{simplify:true}).tex()
+					forme_y1_tex = mM.exec([ "symbol:a", "t", "*", good_y0, "exp", "*" ]).tex()
+					sol_gen_tex = mM.exec([ coeff_t_good, "t", "*", "symbol:K", "+", good_y0, "exp", "*"],{simplify:true}).tex()
 					format_y1 = [
 						{ text:"$y_1(t) = $", cols:3, class:"text-right" }
 						{ name:"a", cols:1, latex:true }
@@ -100,13 +100,13 @@ define ["utils/math"], (mM) ->
 					symbols_validation = { a:"number" }
 					symboles_a_trouver = ["$a$"]
 					symbols_verifications = [
-						{name:"a", good:a_good }
+						{name:"a", good:coeff_t_good }
 					]
 
 				when u1 is 0
 					# On est sûr que u0<>0 et Y<>0
-					forme_y1_tex = mM.exec([ "symbol:a", "t", "*"]).tex()+"\\cdot \\exp (#{good_y0.tex()}) + C"
-					sol_gen_tex = mM.exec([ a_good, "t", "*", "symbol:K", "+", good_y0, "exp", "*", C_good, "+"],{simplify:true}).tex()
+					forme_y1_tex = mM.exec([ "symbol:a", "t", "*", good_y0, "exp", "*", "symbol:C", "+"]).tex()
+					sol_gen_tex = mM.exec([ coeff_t_good, "t", "*", "symbol:K", "+", good_y0, "exp", "*", C_good, "+"],{simplify:true}).tex()
 					format_y1 = [
 						{ text:"$y_1(t) = $", cols:3, class:"text-right" }
 						{ name:"a", cols:1, latex:true }
@@ -117,13 +117,13 @@ define ["utils/math"], (mM) ->
 					symbols_validation = { a:"number", C:"number"}
 					symbols_verifications = [
 						{name:"C", good:C_good }
-						{name:"a", good:a_good }
+						{name:"a", good:coeff_t_good }
 					]
 
 				when (Y is 0)
 					# On est sûr que u1<>0 puisque le cas u1 = 0 et Y = 0 a déjà été traité. On ne sait pas pour u0
-					forme_y1_tex = mM.exec([ "symbol:a", "t", 2, "^", "*", "symbol:b", "t", "*", "+" ]).tex()+"\\cdot \\exp (#{good_y0.tex()})"
-					sol_gen_tex = mM.exec([ b_good, "t", 2, "^", "*", a_good, "t", "*", "+", "symbol:K", "+",good_y0, "exp", "*" ],{simplify:true}).tex()
+					forme_y1_tex = mM.exec([ "symbol:a", "t", 2, "^", "*", "symbol:b", "t", "*", "+", good_y0, "exp", "*" ]).tex()
+					sol_gen_tex = mM.exec([ coeff_t2_good, "t", 2, "^", "*", coeff_t_good, "t", "*", "+", "symbol:K", "+",good_y0, "exp", "*" ],{simplify:true}).tex()
 					format_y1 = [
 						{ text:"$y_1(t) = ($", cols:3, class:"text-right" }
 						{ name:"a", cols:1, latex:true }
@@ -134,13 +134,13 @@ define ["utils/math"], (mM) ->
 					symboles_a_trouver = ["$a$", "$b$"]
 					symbols_validation = { a:"number", b:"number"}
 					symbols_verifications = [
-						{name:"a", good:b_good }
-						{name:"b", good:a_good }
+						{name:"a", good:coeff_t2_good }
+						{name:"b", good:coeff_t_good }
 					]
 				else
 					# On est sûr que u1<>0 puisque le cas u1 = 0 a déjà été envisagé
-					forme_y1_tex = mM.exec([ "symbol:a", "t", 2, "^", "*", "symbol:b", "t", "*", "+" ]).tex()+"\\cdot \\exp (#{good_y0.tex()}) + C"
-					sol_gen_tex = mM.exec([ b_good, "t", 2, "^", "*", a_good, "t", "*", "+", "symbol:K", "+", good_y0, "exp", "*", C_good, "+" ],{simplify:true}).tex()
+					forme_y1_tex = mM.exec([ "symbol:a", "t", 2, "^", "*", "symbol:b", "t", "*", "+", good_y0, "exp", "*", "symbol:C", "+" ]).tex()
+					sol_gen_tex = mM.exec([ coeff_t2_good, "t", 2, "^", "*", coeff_t_good, "t", "*", "+", "symbol:K", "+", good_y0, "exp", "*", C_good, "+" ],{simplify:true}).tex()
 					format_y1 = [
 						{ text:"$y_1(t) = ($", cols:3, class:"text-right" }
 						{ name:"a", cols:1, latex:true }
@@ -153,15 +153,16 @@ define ["utils/math"], (mM) ->
 					symbols_validation = { a:"number", b:"number", C:"number"}
 					symbols_verifications = [
 						{name:"C", good:C_good }
-						{name:"a", good:b_good }
-						{name:"b", good:a_good }
+						{name:"a", good:coeff_t2_good }
+						{name:"b", good:coeff_t_good }
 					]
 
-			[premier_membre_tex, second_membre_tex, good_y0, forme_y1_tex, format_y1, symboles_a_trouver, symbols_validation, symbols_verifications, y0, K_good, sol_gen_tex]
+			[premier_membre_tex, second_membre_tex, forme_y1_tex, y0, sol_gen_tex, symboles_a_trouver, [good_y0, K_good], [format_y1, symbols_validation, symbols_verifications]]
 
 		getBriques: (inputs,options)->
-			[premier_membre_tex, second_membre_tex, good_y0, forme_y1_tex, format_y1, symboles_a_trouver, symbols_validation, symbols_verifications, y0, K_good, sol_gen_tex] = @init(inputs, options)
-
+			[premier_membre_tex, second_membre_tex, forme_y1_tex, y0, sol_gen_tex, symboles_a_trouver, goods, itemsPourSolPart] = @init(inputs, options)
+			[good_y0, K_good] = goods
+			[format_y1, symbols_validation, symbols_verifications] = itemsPourSolPart
 			[
 				{
 					items:[
@@ -275,22 +276,22 @@ define ["utils/math"], (mM) ->
 		getExamBriques: (inputs_list,options) ->
 			that = @
 			fct_item = (inputs, index) ->
-				[premier_membre_tex, second_membre_tex, good_y0, good_y0F, forme_y1_tex, symboles_a_trouver, good_y1, good_y1F, y0, good_y, good_yF] = that.init(inputs,options)
+				[premier_membre_tex, second_membre_tex, forme_y1_tex, y0, sol_gen_tex, symboles_a_trouver,goods, itemsPourSolPart] = that.init(inputs,options)
 				return {
 					children:[
 						{
 							type: "text"
 							children: [
-								"Soit l'équation différentielle &nbsp; $(E):#{premier_membre} = #{second_membre}$"
+								"Soit l'équation différentielle &nbsp; $(E):#{premier_membre_tex} = #{premier_membre_tex}$"
 							]
 						}
 						{
 							type:"enumerate"
 							enumi: "1"
 							children:[
-								"Donnez &nbsp; $y_0(t)$, expression de la solution générale de &nbsp; $\\left(E_0\\right):#{premier_membre} = 0$"
-								"Une solution générale de &nbsp; $(E)$ &nbsp; est de la forme &nbsp; $y_1(t) = #{forme_y1_tex}$. Donnez cette solution en précisant le(s) valeur(s) de &nbsp; #{itData.tex.symboles_a_trouver.join(", &nbsp; ")}."
-								"Soit &nbsp; $y$ &nbsp; une solution de &nbsp; $(E)$ &nbsp; qui vérifie &nbsp; $y(0) = #{y0}$. Donnez l'expression de &nbsp; $y$."
+								"Donnez &nbsp; $y_0(t)$, expression de la solution générale de &nbsp; $\\left(E_0\\right):#{premier_membre_tex} = 0$"
+								"Une solution générale de &nbsp; $(E)$ &nbsp; est de la forme &nbsp; $y_1(t) = #{forme_y1_tex}$. Donnez cette solution en précisant le(s) valeur(s) de #{symboles_a_trouver.join(", ")}."
+								"Soit &nbsp; $f$ &nbsp; une solution de &nbsp; $(E)$ &nbsp; qui vérifie &nbsp; $f(0) = #{y0}$. Donnez l'expression de &nbsp; $f$."
 							]
 						}
 					]
@@ -310,17 +311,17 @@ define ["utils/math"], (mM) ->
 		getTex: (inputs_list, options) ->
 			that = @
 			fct_item = (inputs, index) ->
-				[premier_membre_tex, second_membre_tex, good_y0, good_y0F, forme_y1_tex, symboles_a_trouver, good_y1, good_y1F, y0, good_y, good_yF] = that.init(inputs,options)
+				[premier_membre_tex, second_membre_tex, forme_y1_tex, y0, sol_gen_tex, symboles_a_trouver,goods, itemsPourSolPart] = that.init(inputs,options)
 				return {
 					children:[
-						"Soit l'équation différentielle &nbsp; $(E):#{premier_membre} = #{second_membre}$"
+						"Soit l'équation différentielle &nbsp; $(E):#{premier_membre_tex} = #{second_membre_tex}$"
 						{
 							type:"enumerate"
 							enumi: "1)"
 							children:[
-								"Donnez $y_0(t)$, expression de la solution générale de $\\left(E_0\\right):#{premier_membre} = 0$"
-								"Une solution générale de $(E)$ est de la forme $y_1(t) = #{forme_y1_tex}$. Donnez cette solution en précisant le(s) valeur(s) de #{itData.tex.symboles_a_trouver.join(", ")}."
-								"Soit $y$ une solution de $(E)$ qui vérifie $y(0) = #{y0}$. Donnez l'expression de $y$."
+								"Donnez $y_0(t)$, expression de la solution générale de $\\left(E_0\\right):#{premier_membre_tex} = 0$"
+								"Une solution générale de $(E)$ est de la forme $y_1(t) = #{forme_y1_tex}$. Donnez cette solution en précisant le(s) valeur(s) de #{symboles_a_trouver.join(", ")}."
+								"Soit $f$ une solution de $(E)$ qui vérifie $f(0) = #{y0}$. Donnez l'expression de $f$."
 							]
 						}
 					]
