@@ -40,17 +40,21 @@ define [], () ->
 
 		validate: (attrs, options) ->
 			errors = {}
-			if not attrs.prenom
-				errors.prenom = "Ne doit pas être vide"
-			if not attrs.nom
-				errors.nom = "Ne doit pas être vide"
+			if @get("rank") is "Root"
+				attrs.prenom = ""
+				attrs.nom = "Root"
+				attrs.email = "root"
 			else
-				if attrs.nom.length<2
-					errors.nom = "Trop court"
-			if not attrs.email
-				errors.email = "Ne doit pas être vide"
-			else
-				if @get("rank")!="Root"
+				if not attrs.prenom
+					errors.prenom = "Ne doit pas être vide"
+				if not attrs.nom
+					errors.nom = "Ne doit pas être vide"
+				else
+					if attrs.nom.length<2
+						errors.nom = "Trop court"
+				if not attrs.email
+					errors.email = "Ne doit pas être vide"
+				else
 					re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 					if not re.test(attrs.email)
 						errors.email = "L'email n'est pas valide"
