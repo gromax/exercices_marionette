@@ -1,4 +1,5 @@
 <form>
+	<% if (rank!="Root"){ %>
 	<div class="form-group">
 		<label for="user-prenom" class="control-label">Prénom :</label>
 		<input class="form-control" id="user-prenom" name="prenom" type="text" value="<%- prenom %>" placeHolder="Prénom"/>
@@ -8,10 +9,13 @@
 		<input class="form-control" id="user-nom" name="nom" type="text" value="<%- nom %>" placeHolder="Nom"/>
 	</div>
 
-	<% if (rank!="Root"){ %>
 	<div class="form-group">
 		<label for="user-email" class="control-label">@ :</label>
 		<input class="form-control" id="user-email" name="email" type="text" value="<%- email %>" placeHolder="email"/>
+	</div>
+	<% } else {%>
+	<div class="alert alert-warning" role="alert">
+		Root ne peut pas modifier son nom, son prénom ou son email.
 	</div>
 	<% } %>
 	<% if (showPWD){ %>
@@ -36,6 +40,7 @@
 	<%}%>
 
 	<% if (showPref) {%>
+	<h4>Préférences</h4>
 	<div class="form-group form-check">
 		<input type="checkbox" class="form-check-input" name="pref[mathquill]" id="mathquillCheck" <% if (!pref || pref.mathquill) { %>Checked<% } %> >
 		<label class="form-check-label" for="mathquillCheck">Champs de saisie intuitifs</label>
