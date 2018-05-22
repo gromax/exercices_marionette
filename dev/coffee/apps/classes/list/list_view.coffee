@@ -1,4 +1,4 @@
-define ["jst","marionette"], (JST,Marionette) ->
+define ["app", "jst", "marionette"], (app, JST, Marionette) ->
 	noView = Marionette.View.extend {
 		template:  window.JST["classes/list/classe-list-none"]
 		tagName: "tr"
@@ -7,7 +7,11 @@ define ["jst","marionette"], (JST,Marionette) ->
 
 	Item = Marionette.View.extend {
 		tagName: "tr"
-		template: window.JST["classes/list/classe-list-item"]
+		template: (data)->
+			if app.Auth.isAdmin()
+				window.JST["classes/list/classe-list-admin-item"](data)
+			else
+				window.JST["classes/list/classe-list-prof-item"](data)
 		triggers: {
 			"click td a.js-edit": "item:edit"
 			"click button.js-delete": "item:delete"
@@ -37,7 +41,11 @@ define ["jst","marionette"], (JST,Marionette) ->
 	Liste = Marionette.View.extend {
 		tagName: "table"
 		className:"table table-hover"
-		template: window.JST["classes/list/classe-list"]
+		template: (data)->
+			if app.Auth.isAdmin()
+				window.JST["classes/list/classe-list-admin"](data)
+			else
+				window.JST["classes/list/classe-list-prof"](data)
 		regions:{
 			body:{
 				el:'tbody'

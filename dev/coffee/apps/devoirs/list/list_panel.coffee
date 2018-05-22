@@ -1,6 +1,10 @@
-define ["jst","marionette"], (JST,Marionette) ->
+define ["app", "jst", "marionette"], (app, JST, Marionette) ->
 	Panel = Marionette.View.extend {
-		template: window.JST["devoirs/list/devoir-list-panel"]
+		template: (data)->
+			if app.Auth.isAdmin()
+				window.JST["devoirs/list/devoir-list-panel-admin"](data)
+			else
+				window.JST["devoirs/list/devoir-list-panel-prof"](data)
 
 		serializeData: ->
 			{
