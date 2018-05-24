@@ -310,7 +310,7 @@ define [], () ->
 				id:37
 				filename: "exo0037"
 				title:"Dérivée d'une fonction trigonométrique"
-				description:"Dériver une fonction de la forme &nbsp; $f(t)=A\\sin(\\omega t+\\varphi)$."
+				description:"Dériver une fonction de la forme $f(t)=A\\sin(\\omega t+\\varphi)$."
 				keyWords:["Dérivation","Trigonométrie","Première"]
 			}
 			{
@@ -548,6 +548,37 @@ define [], () ->
 				title: "Produit scalaire dans une figure"
 				description: "On donne une figure géométrique et on demande de calculer quelques produits scalaires."
 				keyWords : ["géométrie", "scalaire", "1STL"]
+				options: {
+					a:{ tag:"Nombres de questions" , options:[3,1,2,4,5] }
+				}
+			}
+			{
+				id:67
+				filename:"exo0067"
+				title: "Produit scalaire avec coordonnées"
+				description: "On donne deux vecteurs ou des points. Il faut donner un produit scalaire."
+				keyWords : ["géométrie", "scalaire", "1STL"]
+			}
+			{
+				id:68
+				filename:"exo0068"
+				title: "Équation et produit scalaire"
+				description: "On donne deux vecteurs dont une coordonnée est inconnue. Il faut trouver la valeur de l'inconnue pour que le produit scalaire soit nul."
+				keyWords : ["géométrie", "scalaire", "1STL"]
+			}
+			{
+				id:69
+				filename:"exo0069"
+				title: "Droite perpendiculaire"
+				description: "On donne trois poins A, B et C. On cherche l'équaiton de la droite passant par C et prependiculaire à (AB)."
+				keyWords : ["géométrie", "équation", "droite", "scalaire", "1STL"]
+			}
+			{
+				id:70
+				filename:"exo0070"
+				title: "Calcul d'angle"
+				description: "On donne les coordonnées de trois poins A, B et C. Via le calcul de produit scalaire ou le théorème de Pythagore généralisé, on cherche à déterminer l'angle $\\widehat{BAC}$."
+				keyWords : ["géométrie", "Trigonométrie", "scalaire", "1STL"]
 			}
 			{
 				id:9999
