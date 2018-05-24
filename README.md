@@ -43,3 +43,10 @@ Exercices à faire
 * produit scalaire : côté dans un quadrilatère en utilisant sin A/a
 * produit scalaire : coordonnées à déterminer pour avoir u.v = 0
 
+Commandes grunt
+-
+* grunt jst : pour compiler les templates
+* grunt coffee:entities / apps / utils / maths : compilation des différents
+* grunt prod : production d'une version production
+* grunt patch : même chose avec changement de numéro et maj du numéro dans index.html
+* grunt minor : même chose mais changement du 2e chiffre du numéro
