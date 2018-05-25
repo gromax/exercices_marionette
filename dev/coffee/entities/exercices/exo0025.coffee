@@ -106,6 +106,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 				}
 				{
 					bareme:40
+					title:"Intervalle de fluctuation"
 					items:[
 						{
 							type:"text"
