@@ -1,9 +1,20 @@
 ﻿define ["utils/math", "utils/help"], (mM, help) ->
 	return {
-		init: (inputs) ->
+		init: (inputs, options) ->
+
 			A = mM.alea.vector({ name:"\\vec{u}", def:inputs }).save(inputs)
 			B = mM.alea.vector({ name:"\\vec{v}", def:inputs }).save(inputs)
-			if mM.alea.dice(1,2)
+			if inputs.sas?
+				showAsSum = (inputs.sas is "1")
+			else
+				opt = Number options.a?.value ? 0
+				switch opt
+					when 0 then showAsSum = false
+					when 1 then showAsSum = true
+					else showAsSum = mM.alea.dice(1,2)
+				if showAsSum then inputs.sas = "1" else inputs.sas = "0"
+
+			if showAsSum
 				Atex = A.texColumn()
 				Btex = B.texColumn()
 			else
@@ -16,7 +27,7 @@
 			]
 
 		getBriques: (inputs, options) ->
-			[Atex, Btex, gAB] = @init(inputs)
+			[Atex, Btex, gAB] = @init(inputs, options)
 
 			[
 				{
