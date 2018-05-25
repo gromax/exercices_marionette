@@ -504,6 +504,9 @@ define [], () ->
 				title: "Produit scalaire"
 				description: "Calculer le produit scalaire de deux vecteurs."
 				keyWords : ["Géométrie", "Vecteurs", "1STL"]
+				options: {
+					a:{ tag:"Format", options:["Coordonnées", "Combinaison linéaire", "Coordonnées et combi linéaire"]}
+				}
 			}
 			{
 				id:62
@@ -555,9 +558,12 @@ define [], () ->
 			{
 				id:67
 				filename:"exo0067"
-				title: "Produit scalaire avec coordonnées"
-				description: "On donne deux vecteurs ou des points. Il faut donner un produit scalaire."
+				title: "Produit scalaire et points"
+				description: "On donne des points dans un repère. Vous devez caculer des vecteurs, leur produit scalaire et éventuellement un angle."
 				keyWords : ["géométrie", "scalaire", "1STL"]
+				options:{
+					a:{ tag:"Calculer l'angle", options:["Non", "Oui"]}
+				}
 			}
 			{
 				id:68
