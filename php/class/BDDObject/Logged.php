@@ -130,7 +130,8 @@ class Logged extends User
 		if ($this->isConnected === null){
 			if ($this->rank==self::RANK_DISCONNECTED) $this->isConnected=false;
 			else {
-				$this->isConnected= ( ((time()-$this->lastTime)<self::TIME_OUT) && ($this->ip == $_SERVER['REMOTE_ADDR']) && ($this->id !== null));
+				//$this->isConnected= ( ((time()-$this->lastTime)<self::TIME_OUT) && ($this->ip == $_SERVER['REMOTE_ADDR']) && ($this->id !== null));
+				$this->isConnected= ( ((time()-$this->lastTime)<self::TIME_OUT) && ($this->id !== null));
 			}
 		}
 		if ($this->isConnected) $this->lastTime = time();
