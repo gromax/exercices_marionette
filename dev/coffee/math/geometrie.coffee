@@ -34,7 +34,7 @@
 		milieu: (oVec,milName) -> @toClone(milName).am(oVec, false).mdNumber(new RealNumber(2),true)
 		symetrique: (centre,symName) -> centre.toClone(symName).mdNumber(new RealNumber(2),false).am(@, true)
 		texSum: (name)->
-			# renvoir une somme de forme 2i+3j
+			# renvoie une somme de forme 2i+3j
 			cx = @x.compositeString({ tex:true })
 			cy = @y.compositeString({ tex:true })
 			if @z then cz = @z.compositeString({ tex:true }) else cz = ["0",true,false,false]
@@ -46,8 +46,11 @@
 				if coeff[1] then "+#{out}"
 				else "-#{out}"
 			out = ( fct_format(coeff,i) for coeff, i in coeffs when coeff[0] isnt "0")
-			if out.length is 0 then out = "\\vec{0}"
-			else out = out.join("").substr(1)
+			console.log out
+			switch
+				when out.length is 0 then out = "\\vec{0}"
+				when coeffs[0][1] then out = out.join("").substr(1) # commence par un +
+				else out = out.join("")
 			if name is true
 				return "#{@name} = #{out}"
 			if name
