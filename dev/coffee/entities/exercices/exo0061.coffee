@@ -15,11 +15,11 @@
 				if showAsSum then inputs.sas = "1" else inputs.sas = "0"
 
 			if showAsSum
-				Atex = A.texColumn()
-				Btex = B.texColumn()
-			else
 				Atex = A.texSum(true)
 				Btex = B.texSum(true)
+			else
+				Atex = A.texColumn()
+				Btex = B.texColumn()
 			[
 				Atex
 				Btex
