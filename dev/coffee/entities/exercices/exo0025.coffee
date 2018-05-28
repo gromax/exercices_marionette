@@ -24,8 +24,8 @@ define ["utils/math","utils/help"], (mM, help) ->
 			flow=Xlow/n
 			fhigh=Xhigh/n
 			IF = {
-				low: mM.misc.toPrecision(Xlow/n,2)
-				high: mM.misc.toPrecision(Xhigh/n,2)
+				low: mM.misc.toPrecision(Xlow/n,3)
+				high: mM.misc.toPrecision(Xhigh/n,3)
 			}
 
 			[
@@ -57,15 +57,17 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type:"input"
-							tag:"$E(X)=$"
-							name:"esp"
-							description:"Espérance à 0,01 près"
+							format:[
+								{ text:"$E(X)=$", cols:3, class:"text-right" }
+								{ name:"esp", cols:4, description:"Espérance à 0,01 près"}
+							]
 						}
 						{
 							type:"input"
-							tag:"$\\sigma(X)$"
-							name:"std"
-							description:"Écart-type à 0,01 près"
+							format:[
+								{ text:"$\\sigma(X)=$", cols:3, class:"text-right" }
+								{ name:"std", cols:4, description:"Écart-type à 0,01 près"}
+							]
 						}
 						{
 							type: "validation"
@@ -127,24 +129,26 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type:"input"
-							tag:"a"
-							name:"a"
-							description:"X minimum"
+							format:[
+								{ text: "$a=$", cols:3, class:"text-right" }
+								{ name: "a", cols:5, description:"X minimum" }
+							]
 						}
 						{
 							type:"input"
-							tag:"b"
-							name:"b"
-							description:"X maximum"
+							format:[
+								{ text:"$b=$", cols:3, class:"text-right" }
+								{ name:"b", cols:5, description:"X maximum" }
+							]
 						}
 						{
 							type:"input"
 							format:[
 								{ text: "$I_F =$", cols:3, class:"text-right" }
 								{ text:"[", cols:1, class:"text-right h3"}
-								{ name:"l", cols:3 }
+								{ name:"l", cols:3, description:"à 0,001 près" }
 								{ text:";", cols:1, class:"text-center h3"}
-								{ name:"h", cols:3 }
+								{ name:"h", cols:3, description:"à 0,001 près" }
 								{ text:"]", cols:1, class:"h3"}
 							]
 						}
