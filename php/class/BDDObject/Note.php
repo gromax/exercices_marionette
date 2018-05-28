@@ -120,7 +120,7 @@ final class Note
 
 	public function getExoFiche()
 	{
-		return ExoFiche::getObject($this->idFiche);
+		return ExoFiche::getObject($this->aEF);
 	}
 
 	public function getFiche()
