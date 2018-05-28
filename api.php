@@ -86,7 +86,12 @@ if ($response === false) {
 } else {
 	if (isset($response["errors"]) && (count($response["errors"])==0)) {
 		unset($response["errors"]);
-	}
+	}/* else {
+		$messages = EC::messages();
+		if (count($messages)>0) {
+			$response["errors"] = $messages;
+		}
+	}*/
 	echo json_encode($response);
 }
 
