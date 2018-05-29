@@ -28,7 +28,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 			if calcSup
 				quest = "p(#{X} \\leqslant T)"
 			else
-				quest = "$p(T \\leqslant #{X})$"
+				quest = "p(T \\leqslant #{X})"
 			[mM.toNumber(E), l, calcE, quest, pX]
 
 		getBriques: (inputs,options) ->
@@ -93,7 +93,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 					]
 				}
 				{
-					bareme:"50"
+					bareme:50
 					title: "Calcul de probabilité"
 					items:[
 						{
