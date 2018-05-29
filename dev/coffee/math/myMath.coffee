@@ -42,8 +42,8 @@
 				if (numParams = params.numerator)? and (denParams = params.denominator)?
 					numerator = Proba.alea(numParams)
 					denominator = Proba.alea(denParams)
-					if deno is 0 then deno = 1
-					(new RationalNumber num,deno).simplify()
+					if denominator is 0 then denominator = 1
+					(new RationalNumber numerator,denominator).simplify()
 				else
 					new RealNumber Proba.alea(params)
 			real: (params) ->
@@ -51,7 +51,7 @@
 				if (numParams = params.numerator)? and (denParams = params.denominator)?
 					numerator = Proba.alea(numParams)
 					denominator = Proba.alea(denParams)
-					if deno is 0 then numerator
+					if denominator is 0 then numerator
 					else numerator/denominator
 				else
 					Proba.alea(params)
