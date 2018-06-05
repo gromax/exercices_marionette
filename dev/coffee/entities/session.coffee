@@ -14,11 +14,11 @@ define ["backbone.radio"], (Radio) ->
 			)
 
 		validate: (attrs, options)->
-			errors = {};
+			errors = []
 			if not attrs.identifiant
-				errors.identifiant = "L'email ne doit pas être vide"
+				errors.push { success:false, message:"L'email ne doit pas être vide" }
 			if not attrs.pwd
-				errors.pwd = "Le mot de passe ne doit pas être vide"
+				errors.push { success:false, message:"Le mot de passe ne doit pas être vide" }
 			if not _.isEmpty(errors)
 				return errors
 
