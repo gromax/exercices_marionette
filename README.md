@@ -13,7 +13,7 @@ Installation (Ubuntu)
 
 Dépendances pas gérées
 -
-Le dossier vendor2 contient des dépendances que je n'ai pas su mettre avec bower.json :
+Le dossier app/utils contient des dépendances que je n'ai pas su mettre avec bower.json :
 * spin.jquery.js
 * spin.js
 
