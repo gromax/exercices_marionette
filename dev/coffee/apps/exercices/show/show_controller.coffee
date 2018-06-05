@@ -122,15 +122,14 @@ define [
 								channel.once "update:note", (note)->
 									app.trigger("header:loading", true)
 									savingUE = exo_params.ue.save()
-									$.when(savingUE).fail( (response)->
+									failFct = (response)->
 										if response.status is 401
 											alert("Vous devez vous (re)connecter !")
 											app.trigger("home:logout")
 										else
-											alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code "+response.status+"/023]")
-									).always( ()->
+											alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code #{response.status}/023]")
 										app.trigger("header:loading", false)
-									)
+									$.when(savingUE).fail( failFct )
 
 								self.show(id, exo_params)
 							app.regions.getRegion('dialog').show(aView)
@@ -201,11 +200,22 @@ define [
 								###
 								savingUE = exo_params.save.apply(exo_params,[note, answersData, exo.get("inputs"), finished])
 								if savingUE
-									$.when(savingUE).done( ()->
+									doneFct = ()->
 										traitement_final(brique_view, model, verifs)
-									).fail( (response)->
-										alert "Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code #{response.status}/023]"
-									)
+									failFct = (response)->
+										if response.status is 401
+											logoutFct = ()->
+												app.trigger("home:logout")
+											retryFct = ()->
+												savingUE = exo_params.save.apply(exo_params,[note, answersData, exo.get("inputs"), finished])
+												$.when(savingUE).done( doneFct ).fail( failFct )
+											app.trigger("home:relogin", { done: retryFct, fail:logoutFct})
+											#alert("Vous devez vous (re)connecter !")
+											#app.trigger("home:logout")
+										else
+											alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code #{response.status}/023]")
+										app.trigger("header:loading", false)
+									$.when(savingUE).done( doneFct ).fail( failFct )
 								else
 									traitement_final(brique_view, model, verifs, model_validation)
 							else
