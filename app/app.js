@@ -30,6 +30,7 @@ define(["marionette","jquery-ui","bootstrap"], function(Marionette){
 				self.stopListening();
 				self.empty();
 				self.$el.dialog("destroy");
+				view.trigger("dialog:closed");
 			};
 			this.listenTo(view, "dialog:close", closeDialog);
 			this.$el.dialog({
@@ -52,7 +53,7 @@ define(["marionette","jquery-ui","bootstrap"], function(Marionette){
 
 
 	Manager.on("start", function(){
-		Manager.version = "2.2.316";
+		Manager.version = "2.2.324";
 		var historyStart = function() {
 			require([
 				"apps/header/header_app",
