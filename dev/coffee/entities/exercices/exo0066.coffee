@@ -50,10 +50,6 @@ define ["utils/math"], (mM) ->
 					<text x="#{m+LL-t}" y="#{m+.5*hh}" >J</text>
 					<text x="#{m+.5*LL}" y="#{m+hh+t}" >K</text>
 					<text x="#{m-t}" y="#{m+.5*hh}" >L</text>
-					<line x1="#{m}" y1="#{m-.5*t}" x2="#{LL+m}" y2="#{m-.5*t}" stroke-width="2" stroke="black" />
-					<text x="#{m+.5*LL}" y="#{m-t}" >#{L}</text>
-					<line x1="#{m+LL+.5*t}" y1="#{m}" x2="#{m+LL+.5*t}" y2="#{m+hh}" stroke-width="2" stroke="black" />
-					<text x="#{m+LL+t}" y="#{m+.5*hh}" >#{h}</text>
 					</svg></center>"""
 				when "TR"
 					if inputs.dims then dims = ( Number x for x in inputs.dims.split(";") )
@@ -92,11 +88,7 @@ define ["utils/math"], (mM) ->
 					<text x="#{m-t}" y="#{hh+m+t}" >C</text>
 					<text x="#{m+.5*LL}" y="#{m+t}" >I</text>
 					<text x="#{m+.5*LL+t}" y="#{m+.5*hh+t}" >J</text>
-					<text x="#{m+.5*t}" y="#{m+.5*hh}" >K</text>
-					<line x1="#{m}" y1="#{m-.5*t}" x2="#{LL+m}" y2="#{m-.5*t}" stroke-width="2" stroke="black" />
-					<text x="#{m+.5*LL}" y="#{m-t}" >#{L}</text>
-					<line x1="#{m-.5*t}" y1="#{m}" x2="#{m-.5*t}" y2="#{m+hh}" stroke-width="2" stroke="black" />
-					<text x="#{m-1.5*t}" y="#{m+.5*hh}" >#{h}</text>
+					<text x="#{m-t}" y="#{m+.5*hh}" >K</text>
 					</svg></center>"""
 				when "TE"
 					if inputs.dims then L = dims = Number input.dims
@@ -110,25 +102,21 @@ define ["utils/math"], (mM) ->
 						["J", [L, 3, "*", 4, "/"], [L, 3, "sqrt", 4, "/", "*"]]
 						["K", [L, 4, "/"], [L, 3, "sqrt", 4, "/", "*"]]
 					]
-					LL=L*2
-					m = 50
 					t = 20
-					svg = """<center><svg height="#{LL+m*2}" width="#{LL+m*2}">
-					<polygon points="#{m},#{m} #{LL+m},#{m} #{LL*.5+m},#{LL*.866+m}" style="fill:lime;stroke:black;stroke-width:3" />
-					<circle cx="#{m}" cy="#{m}" r="2" stroke="black" stroke-width="3" />
-					<circle cx="#{m+LL}" cy="#{m}" r="2" stroke="black" stroke-width="3" />
-					<circle cx="#{m+.5*LL}" cy="#{m+.866*LL}" r="2" stroke="black" stroke-width="3" />
-					<circle cx="#{m+.5*LL}" cy="#{m}" r="2" stroke="black" stroke-width="3" />
-					<circle cx="#{m+.75*LL}" cy="#{m+.433*LL}" r="2" stroke="black" stroke-width="3" />
-					<circle cx="#{m+.25*LL}" cy="#{m+.433*LL}" r="2" stroke="black" stroke-width="3" />
-					<text x="#{m-t}" y="#{m-t}" >A</text>
-					<text x="#{m+t+LL}" y="#{m-t}" >B</text>
-					<text x="#{m+.5*LL}" y="#{.866*LL+t+m}" >C</text>
-					<text x="#{m+.5*LL}" y="#{m+t}" >I</text>
-					<text x="#{m+.75*LL+t}" y="#{m+.433*LL+t}" >J</text>
-					<text x="#{m+.25*LL+.5*t}" y="#{m+.433*LL}" >K</text>
-					<line x1="#{m}" y1="#{m-.5*t}" x2="#{LL+m}" y2="#{m-.5*t}" stroke-width="2" stroke="black" />
-					<text x="#{m+.5*LL}" y="#{m-t}" >#{L}</text>
+					svg = """<center><svg height="200" width="200" viewbox="-50 -50 300 300">
+					<polygon points="0,0 200,0 100,173" style="fill:lime;stroke:black;stroke-width:3" />
+					<circle cx="0" cy="0" r="2" stroke="black" stroke-width="3" />
+					<circle cx="200" cy="0" r="2" stroke="black" stroke-width="3" />
+					<circle cx="100" cy="173" r="2" stroke="black" stroke-width="3" />
+					<circle cx="100" cy="0" r="2" stroke="black" stroke-width="3" />
+					<circle cx="150" cy="87" r="2" stroke="black" stroke-width="3" />
+					<circle cx="50" cy="87" r="2" stroke="black" stroke-width="3" />
+					<text x="#{-t}" y="#{-t}" >A</text>
+					<text x="#{t+200}" y="#{-t}" >B</text>
+					<text x="#{100}" y="#{173+t}" >C</text>
+					<text x="#{100}" y="#{t}" >I</text>
+					<text x="#{150+t}" y="#{87+t}" >J</text>
+					<text x="#{50+.5*t}" y="#{87}" >K</text>
 					</svg></center>"""
 			if inputs.choix?
 				choix = (sommets[Number it] for it in inputs.choix.split(";"))
@@ -155,14 +143,28 @@ define ["utils/math"], (mM) ->
 					items:[
 						{
 							type: "text"
-							ps:[
-								switch forme
-									when "R" then "On donne le rectangle ABCD ci-dessous."
-									when "TR" then "On donne le triangle rectangle ABC ci-dessous."
-									else "On donne le triangle équilatéral ABC ci-dessous."
-								if quests.length>1 then "Calculez les produits scalaires."
-								else "Calculez le produit scalaire."
-							]
+							ps: switch forme
+								when "R" then [
+									"On donne le rectangle ABCD ci-dessous."
+									"AB = #{dims[0]} et AD=#{dims[1]}"
+									"I, J, K et L sont les milieux des côtés."
+									if quests.length>1 then "Calculez les produits scalaires."
+									else "Calculez le produit scalaire."
+								]
+								when "TR" then [
+									"On donne le triangle ABC ci-dessous, rectangle en A."
+									"AB = #{dims[0]} et AC=#{dims[1]}"
+									"I, J et K sont les milieux des côtés."
+									if quests.length>1 then "Calculez les produits scalaires."
+									else "Calculez le produit scalaire."
+								]
+								else [
+									"On donne le triangle équilatéral ABC ci-dessous."
+									"AB = #{dims}"
+									"I, J et K sont les milieux des côtés."
+									if quests.length>1 then "Calculez les produits scalaires."
+									else "Calculez le produit scalaire."
+								]
 						}
 						{
 							type: "def"
