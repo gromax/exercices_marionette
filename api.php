@@ -19,6 +19,7 @@ $router = Router::getInstance();
 
 // session
 $router->addRule('api/session', 'session', 'fetch', 'GET'); // Session active
+$router->addRule('api/session/:id', 'session', 'insert', 'PUT'); // reconnexion
 $router->addRule('api/session', 'session', 'insert', 'POST'); // Tentative de connexion
 $router->addRule('api/session/:id', 'session', 'delete', 'DELETE'); // Déconnexion
 $router->addRule('api/session/test', 'session', 'logged', 'GET'); // Vérifie l'état de connexion
