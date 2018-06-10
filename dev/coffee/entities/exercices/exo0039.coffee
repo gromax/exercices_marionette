@@ -51,14 +51,6 @@ define ["utils/math", "utils/help", "utils/colors", "utils/tab"], (mM, help, col
 			[items, tabs, ranks] = @init(inputs)
 			tabs = _.shuffle(tabs)
 
-			initTabs = (view)->
-				$container = view.$el
-				initOneTab = (tab) ->
-					$el = $("<div></div>")
-					$container.append($el)
-					tab.render $el[0]
-				_.each(tabs, initOneTab)
-
 			[
 				{
 					bareme:100
@@ -71,13 +63,16 @@ define ["utils/math", "utils/help", "utils/colors", "utils/tab"], (mM, help, col
 								"Pour cela appuyez sur les carrés pour sélectionner la bonne couleur."
 							]
 						}
-						{
-							type: "def"
-							renderingFunctions:[
-								initTabs
-							]
-
-						}
+					].concat(
+						_.map(tabs, (item)->
+							{
+								type:"svg"
+								renderingFunctions:[
+									(view) -> item.render(view.draw, view.$el.width())
+								]
+							}
+						)
+					,[
 						{
 							type:"color-choice"
 							name:"it"
@@ -91,7 +86,7 @@ define ["utils/math", "utils/help", "utils/colors", "utils/tab"], (mM, help, col
 							type: "aide"
 							list: help.trinome.canonique_et_parabole.concat(help.trinome.a_et_concavite_parabole)
 						}
-					]
+					])
 					validations:{
 						it:"color:4"
 					}
