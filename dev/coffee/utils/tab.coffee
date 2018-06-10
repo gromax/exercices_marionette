@@ -56,11 +56,11 @@ define [], () ->
 			d = @config.espace_entre_valeurs
 			longueur = c.espace_gauche+(@x_list.length-1)*d+2*c.marge
 			containerWidth = Math.min(longueur, maxWidth ? longueur+1)
-			spin = draw.fo(20,20).appendChild($("<i class='fa fa-spinner fa-spin'></i>")[0])
 			hauteur = @linesNumber() * c.hauteur_ligne
 			draw.size(longueur, hauteur)
 			draw.rect(longueur, c.hauteur_ligne).stroke({ color: c.color, width: 2 }).fill({ color:"#fff"}) # Rectangle des x
 			draw.rect(c.espace_gauche, c.hauteur_ligne).stroke({ color: c.color, width:2 }).fill({ color:"#fff"}) # Rectangle entête des x
+			spin = draw.fo(20,20).appendChild($("<i class='fa fa-spinner fa-spin'></i>")[0])
 			div = $("<div>")
 			div.append("<div x=#{c.espace_gauche/2} y=#{c.hauteur_ligne/2} class='js-MJ'>#{c.x_tag}</div>")
 			#draw.fo(@config.espace_gauche, @config.hauteur_ligne).appendChild(document.createTextNode(@config.x_tag))
