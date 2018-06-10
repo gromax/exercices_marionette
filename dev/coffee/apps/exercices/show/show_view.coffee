@@ -199,7 +199,23 @@ define [
 				if that.postVerificationRenderData? and typeof(post = that.model.get("postVerificationRender")) is "function"
 					post(that, that.postVerificationRenderData)
 					that.postVerificationRenderData = null
+	}
 
+	SVGItemView = DefaultItemView.extend {
+		className: "card-body text-center"
+		onRender: () -> null
+		onAttach: ->
+			svgId = "svg#{Math.random()}"
+			@$el.attr("id",svgId)
+			fcts = @model.get("renderingFunctions")
+			v = @
+			require ["utils/svg.add"], (SVG) ->
+				v.draw = SVG(svgId)
+				if fcts
+					item(v) for item in fcts
+				if v.postVerificationRenderData? and typeof(post = v.model.get("postVerificationRender")) is "function"
+					post(v, v.postVerificationRenderData)
+					v.postVerificationRenderData = null
 	}
 
 	BriqueItemsListView = Marionette.CollectionView.extend {
@@ -207,6 +223,7 @@ define [
 			type = model.get("type")
 			switch type
 				when "jsxgraph" then return JsxgraphItemView;
+				when "svg" then return SVGItemView;
 				when "validation" then return ValidationItemView;
 				when "color-choice" then return ColorChoiceItemView;
 				when "color-list" then return ColorListItemView;
