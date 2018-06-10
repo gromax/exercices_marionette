@@ -65,8 +65,8 @@ module.exports = function(grunt) {
         files: {
           'app/utils/help.js' : 'dev/coffee/utils/help.coffee',
           'app/utils/colors.js' : 'dev/coffee/utils/colors.coffee',
-          'app/utils/svg.js' : 'dev/coffee/utils/svg.coffee',
           'app/utils/tab.js' : 'dev/coffee/utils/tab.coffee',
+          'app/utils/svg.add.js' : 'dev/coffee/utils/svg.add.coffee',
         }
       },
 
