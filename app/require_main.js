@@ -17,14 +17,19 @@ requirejs.config({
 		popper:"../vendor/popper.js/dist/umd/popper.min",
 		bootstrap:"../vendor/bootstrap/dist/js/bootstrap",
 		jst:"./templates.underscore",
-		mathjax: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML",
+		//mathjax: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML",
+		mathjax: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_SVG",
 		jsxgraph: "https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.6/jsxgraphcore",
-		mathquill: "../vendor/mathquill-0.10.1/mathquill.min"
+		mathquill: "../vendor/mathquill-0.10.1/mathquill.min",
+		svg:"./utils/svg.min"
 	},
 
 	shim: {
 		underscore: {
 			exports: "_"
+		},
+		svg:{
+			exports: "SVG"
 		},
 		backbone: {
 			deps: ["jquery", "underscore", "json2"],
@@ -52,7 +57,12 @@ requirejs.config({
 		mathjax: {
 			exports: "MathJax",
 			init: function () {
-				MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+				// jax semble inutile car écrasé par la config dans l'appel de mathjax
+				MathJax.Hub.Config({
+					jax:["output/SVG"],
+					tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+					SVG:{ scale:120 }
+				});
 				MathJax.Hub.Startup.onload();
 				return MathJax;
 			}
