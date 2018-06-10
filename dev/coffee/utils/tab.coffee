@@ -56,7 +56,7 @@ define [], () ->
 			d = @config.espace_entre_valeurs
 			longueur = c.espace_gauche+(@x_list.length-1)*d+2*c.marge
 			containerWidth = Math.min(longueur, maxWidth ? longueur+1)
-
+			spin = draw.fo(20,20).appendChild($("<i class='fa fa-spinner fa-spin'></i>")[0])
 			hauteur = @linesNumber() * c.hauteur_ligne
 			draw.size(longueur, hauteur)
 			draw.rect(longueur, c.hauteur_ligne).stroke({ color: c.color, width: 2 }).fill({ color:"#fff"}) # Rectangle des x
@@ -190,6 +190,7 @@ define [], () ->
 							arrow_last = {x:x+w+12, y:y-h/2}
 						else
 							arrow_last = null
+					spin.remove()
 				MathJax.Hub.Queue(["Typeset",MathJax.Hub,div[0]])
 				MathJax.Hub.Queue fct
 			if (scale = containerWidth/longueur) isnt 1
