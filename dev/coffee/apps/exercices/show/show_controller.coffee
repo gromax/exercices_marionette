@@ -144,11 +144,10 @@ define [
 					# Traitement après vérif
 					# Dans le but d'enchaîner le traitement initial d'un exercice sauvegardé
 					# la fonction renvoie le nouveau focus
-					traitement_final = (bv, m, v, mV)->
+					traitement_final = (bv, m, v)->
 						# bv = brique_view => La brique d'exercice dans laquelle s'effectue la vérif
 						# m = model => le model associé à la brique
 						# v = verifs => le résultats des vérifications menées selon les réponse utilisateur aux questions de cette brique
-						# mV = model_validation => les données utilisateur traitées
 						pied.set("note",Math.ceil(note))
 						# Suppression des items d'input
 						it.remove() for it in getToTrashItems(bv)
@@ -159,11 +158,6 @@ define [
 						bv.unsetFocus()
 						# recherche du prochain focus
 						focusedBrique = MAJ_briques(view)
-						# Exécution de traitemens posts typiquement sur un graphique
-						# Ils doivent être effectués après le render pour que l'objet du dom existe
-						# on se contente donc de placer un lien sur les données qui s'efface dès l'action effectuée,
-						# au moment du render
-						bv.setPostVerificationRenderData(mV)
 						return focusedBrique
 
 					view.on "brique:form:submit", (data,brique_view)->
@@ -202,6 +196,8 @@ define [
 								if savingUE
 									doneFct = ()->
 										traitement_final(brique_view, model, verifs)
+										# Les briques ayant un postVerifRender sont déjà affichée -> on peut lancer le postRender
+										brique_view.postVerifRender(model_validation)
 									failFct = (response)->
 										if response.status is 401
 											logoutFct = ()->
@@ -217,10 +213,14 @@ define [
 										app.trigger("header:loading", false)
 									$.when(savingUE).done( doneFct ).fail( failFct )
 								else
-									traitement_final(brique_view, model, verifs, model_validation)
+									traitement_final(brique_view, model, verifs)
+									# Les briques ayant un postVerifRender sont déjà affichée -> on peut lancer le postRender
+									brique_view.postVerifRender(model_validation)
 							else
 								# On ne sauvegarde pas, on exécuter directement le traitement final
-								traitement_final(brique_view, model, verifs, model_validation)
+								traitement_final(brique_view, model, verifs)
+								# Les briques ayant un postVerifRender sont déjà affichée -> on peut lancer le postRender
+								brique_view.postVerifRender(model_validation)
 						else
 							brique_view.onFormDataInvalid(model_validation)
 
@@ -249,6 +249,14 @@ define [
 									# calcul de la note
 									note = verifs.note*model.get("bareme")*100/baremeTotal + note
 									model = traitement_final(brique_view, model, verifs, model_validation)
+									# Certains éléments sont présents avant et après correction
+									# avec une modification après correction
+									# ils ont alors un traitement postVerificationRender
+									# Dans le cas d'une lecture d'exercice sauvegardé,
+									# la vérification arrive avant même que l'élément soit affiché.
+									# c'est pourquoi on sauvegarde les données utiles de façon que
+									# à la suite du render, on exécute aussitôt postVerificationRender
+									brique_view.setPostVerificationRenderData(model_validation)
 								else
 									# La validation n'ayant pas abouti, on ne va pas plus loin
 									go_on = false
