@@ -77,14 +77,6 @@ define ["utils/math","utils/help", "utils/colors", "utils/tab"], (mM, help, colo
 		getBriques: (inputs, options) ->
 			[ineqTex, polyTex, poly, racines, ensemble_interieur, ensemble_exterieur, sol_is_ext, tabs, goodTab] = @init(inputs)
 
-			initTabs = (view)->
-				$container = view.$el
-				initOneTab = (tab) ->
-					$el = $("<div></div>")
-					$container.append($el)
-					tab.render $el[0]
-				_.each(tabs, initOneTab)
-
 			[
 				{
 					bareme:20
@@ -99,9 +91,10 @@ define ["utils/math","utils/help", "utils/colors", "utils/tab"], (mM, help, colo
 						}
 						{
 							type: "input"
-							name:"delta"
-							tag:"$\\Delta$"
-							description: "Discriminant"
+							format: [
+								{ text:"$\\Delta =$", cols:3, class:"text-right" }
+								{ name:"delta", cols:3, description:"Discriminant" }
+							]
 						}
 						{
 							type: "validation"
@@ -174,19 +167,16 @@ define ["utils/math","utils/help", "utils/colors", "utils/tab"], (mM, help, colo
 								"Choisissez le tableau de signe correspondant à &nbsp; $f(x)=#{polyTex}$."
 							]
 						}
-						{
-							type: "def"
-							renderingFunctions:[
-								initTabs
-							]
-
-						}
-						{
-							type:"ul"
-							list:[
-								{type:"warning", text:"Affichez avec un zoom à 100% pour un affichage correct."}
-							]
-						}
+					].concat(
+						_.map(tabs, (item)->
+							{
+								type:"svg"
+								renderingFunctions:[
+									(view) -> item.render(view.draw, view.$el.width())
+								]
+							}
+						)
+					,[
 						{
 							type:"color-choice"
 							name:"it"
@@ -196,7 +186,7 @@ define ["utils/math","utils/help", "utils/colors", "utils/tab"], (mM, help, colo
 						{
 							type: "validation"
 						}
-					]
+					])
 					validations:{
 						it:"color:1"
 					}
