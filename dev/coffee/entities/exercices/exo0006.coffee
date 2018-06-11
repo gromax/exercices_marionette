@@ -52,7 +52,6 @@ define ["utils/math"], (mM) ->
 						briqueEnnonce
 						{
 							type:"jsxgraph"
-							divId: "jsx#{Math.random()}"
 							params: {
 								axis:true
 								grid:true
