@@ -175,28 +175,36 @@ define [
 
 	JsxgraphItemView = DefaultItemView.extend {
 		className: "card-body text-center"
-		template: window.JST["exercices/common/jsxgraph-item"]
-
-		onRender: ->
+		#template: window.JST["exercices/common/jsxgraph-item"]
+		onRender: -> null
+		onAttach: ->
 			model = @model
 			params = model.get("params")
-
 			that = @
-			divId = model.get("divId")
 
-			@$el.find(".jxgbox").each(()->
-				$el = $(this);
-				fctTO = ()-> $el.height($el.width())
-				# Astuce bricoleuse sans laquelle le width() renvoir systématiquement 0
-				setTimeout(fctTO,0)
-			)
+			jsxId = "jsx#{Math.random()}"
+			div = $("<div id='#{jsxId}'></div>")
+			@$el.append(div)
+			if model.has("size")
+				size = model.get("size")
+
+				if typeof size is "number"
+					h = w = size
+				else
+					w = size[0]
+					h = size[1]
+			else
+				w = h = 500
+			containerWidth = @$el.width()*.95
+			scale = Math.min(w,containerWidth)/w
+			div.height(Math.round(h*scale))
+			div.width(Math.round(w.scale))
 
 			require ["jsxgraph"], ()->
-				that.graph = JXG.JSXGraph.initBoard(divId, params);
+				that.graph = JXG.JSXGraph.initBoard(jsxId, params);
 				if fcts = model.get("renderingFunctions")
 					item(that.graph) for item in fcts
-
-				if that.postVerificationRenderData? and typeof(post = that.model.get("postVerificationRender")) is "function"
+				if that.postVerificationRenderData? and typeof(post = model.get("postVerificationRender")) is "function"
 					post(that, that.postVerificationRenderData)
 					that.postVerificationRenderData = null
 	}
@@ -373,6 +381,12 @@ define [
 		setPostVerificationRenderData: (data) ->
 			list = this.itemsView.children.filter (item) -> item.model.has("postVerificationRender")
 			item.setPostVerificationRenderData(data) for item in list
+		postVerifRender: (data)->
+			list = this.itemsView.children.filter (item) -> item.model.has("postVerificationRender")
+			for item in list
+				fct = item.model.get("postVerificationRender")
+				fct(item,data)
+				item.setPostVerificationRenderData(null)
 	}
 
 	BriquesListView = Marionette.CollectionView.extend {
