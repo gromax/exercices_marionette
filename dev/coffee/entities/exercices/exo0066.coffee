@@ -28,29 +28,29 @@ define ["utils/math"], (mM) ->
 						["L", 0, [h, 2, "/"]]
 					]
 
-					LL=L*2
-					hh=h*2
-					m = 50
-					t = 20
-					svg = """<center><svg height="#{hh+m*2}" width="#{LL+m*2}">
-					<polygon points="#{m},#{m} #{LL+m},#{m} #{LL+m},#{hh+m} #{m},#{hh+m}" style="fill:lime;stroke:black;stroke-width:3" />
-					<circle cx="#{m}" cy="#{m}" r="2" stroke="black" stroke-width="3" />
-					<circle cx="#{m+LL}" cy="#{m}" r="2" stroke="black" stroke-width="3" />
-					<circle cx="#{m+LL}" cy="#{m+hh}" r="2" stroke="black" stroke-width="3" />
-					<circle cx="#{m}" cy="#{m+hh}" r="2" stroke="black" stroke-width="3" />
-					<circle cx="#{m+.5*LL}" cy="#{m}" r="2" stroke="black" stroke-width="3" />
-					<circle cx="#{m+LL}" cy="#{m+.5*hh}" r="2" stroke="black" stroke-width="3" />
-					<circle cx="#{m+.5*LL}" cy="#{m+hh}" r="2" stroke="black" stroke-width="3" />
-					<circle cx="#{m}" cy="#{m+.5*hh}" r="2" stroke="black" stroke-width="3" />
-					<text x="#{m-t}" y="#{m-t}" >A</text>
-					<text x="#{m+t+LL}" y="#{m-t}" >B</text>
-					<text x="#{LL+m+t}" y="#{hh+m+t}" >C</text>
-					<text x="#{m-t}" y="#{hh+m+t}" >D</text>
-					<text x="#{m+.5*LL}" y="#{m+t}" >I</text>
-					<text x="#{m+LL-t}" y="#{m+.5*hh}" >J</text>
-					<text x="#{m+.5*LL}" y="#{m+hh+t}" >K</text>
-					<text x="#{m-t}" y="#{m+.5*hh}" >L</text>
-					</svg></center>"""
+					svg = (view)->
+						draw = view.draw
+						containerWidth = view.$el.width()
+						m = 50
+						r = 10
+						w = Math.min(containerWidth*.9-2*m, 400)
+						lS = 20 # letterSize
+						hh = Math.round(h/L*w)
+						draw.size(w+2*m,hh+2*m)
+						group = draw.group()
+						group.polygon("0,0 #{w},0 #{w},#{hh} 0,#{hh}").fill('lime').stroke({ width: 3 })
+						for pt in [[0,0], [w/2,0], [w,0], [w,hh/2], [w,hh], [w/2,hh], [0,hh], [0,hh/2]]
+							group.circle(r).center(pt[0],pt[1]).fill("black")
+						group.text("A").cx(0).y(hh+r+2)
+						group.text("B").cx(w).y(hh+r+2)
+						group.text("C").cx(w).y(0-r-2-lS)
+						group.text("D").cx(0).y(0-r-2-lS)
+						group.text("I").cx(w/2).y(hh+r+2)
+						group.text("J").x(w+2+r).cy(hh/2)
+						group.text("K").cx(w/2).y(0-r-2-lS)
+						group.text("L").x(0-r-lS).cy(hh/2)
+						group.translate(m, m)
+
 				when "TR"
 					if inputs.dims then dims = ( Number x for x in inputs.dims.split(";") )
 					else
@@ -69,27 +69,26 @@ define ["utils/math"], (mM) ->
 						["J", [L, 2, "/"], [h, 2, "/"]]
 						["K", 0, [h, 2, "/"]]
 					]
-					LL=L*2
-					hh=h*2
-					m = 50
-					t = 20
-					r = 20
-					svg = """<center><svg height="#{hh+m*2}" width="#{LL+m*2}">
-					<polygon points="#{m},#{m} #{LL+m},#{m} #{m},#{hh+m}" style="fill:lime;stroke:black;stroke-width:3" />
-					<polygon points="#{m},#{m} #{r+m},#{m} #{r+m},#{r+m} #{m},#{r+m}" style="fill:lime;stroke:black;stroke-width:3" />
-					<circle cx="#{m}" cy="#{m}" r="2" stroke="black" stroke-width="3" />
-					<circle cx="#{m+LL}" cy="#{m}" r="2" stroke="black" stroke-width="3" />
-					<circle cx="#{m}" cy="#{m+hh}" r="2" stroke="black" stroke-width="3" />
-					<circle cx="#{m+.5*LL}" cy="#{m}" r="2" stroke="black" stroke-width="3" />
-					<circle cx="#{m+.5*LL}" cy="#{m+.5*hh}" r="2" stroke="black" stroke-width="3" />
-					<circle cx="#{m}" cy="#{m+.5*hh}" r="2" stroke="black" stroke-width="3" />
-					<text x="#{m-t}" y="#{m-t}" >A</text>
-					<text x="#{m+t+LL}" y="#{m-t}" >B</text>
-					<text x="#{m-t}" y="#{hh+m+t}" >C</text>
-					<text x="#{m+.5*LL}" y="#{m+t}" >I</text>
-					<text x="#{m+.5*LL+t}" y="#{m+.5*hh+t}" >J</text>
-					<text x="#{m-t}" y="#{m+.5*hh}" >K</text>
-					</svg></center>"""
+					svg = (view)->
+						draw = view.draw
+						containerWidth = view.$el.width()
+						m = 50
+						r = 10
+						w = Math.min(containerWidth*.9-2*m, 400)
+						lS = 20 # letterSize
+						hh = Math.round(h/L*w)
+						draw.size(w+2*m,hh+2*m)
+						group = draw.group()
+						group.polygon("0,0 #{w},#{hh} 0,#{hh}").fill('lime').stroke({ width: 3 })
+						for pt in [[0,hh], [w/2,hh], [w,hh], [w/2,hh/2], [0,0], [0,hh/2]]
+							group.circle(r).center(pt[0],pt[1]).fill("black")
+						group.text("A").cx(0).y(hh+r+2)
+						group.text("B").cx(w).y(hh+r+2)
+						group.text("C").cx(0).y(0-r-2-lS)
+						group.text("I").cx(w/2).y(hh+r+2)
+						group.text("J").cx(w/2).y(hh/2-lS-r-2)
+						group.text("K").x(0-r-lS).cy(hh/2)
+						group.translate(m, m)
 				when "TE"
 					if inputs.dims then L = dims = Number input.dims
 					else
@@ -103,21 +102,25 @@ define ["utils/math"], (mM) ->
 						["K", [L, 4, "/"], [L, 3, "sqrt", 4, "/", "*"]]
 					]
 					t = 20
-					svg = """<center><svg height="200" width="200" viewbox="-50 -50 300 300">
-					<polygon points="0,0 200,0 100,173" style="fill:lime;stroke:black;stroke-width:3" />
-					<circle cx="0" cy="0" r="2" stroke="black" stroke-width="3" />
-					<circle cx="200" cy="0" r="2" stroke="black" stroke-width="3" />
-					<circle cx="100" cy="173" r="2" stroke="black" stroke-width="3" />
-					<circle cx="100" cy="0" r="2" stroke="black" stroke-width="3" />
-					<circle cx="150" cy="87" r="2" stroke="black" stroke-width="3" />
-					<circle cx="50" cy="87" r="2" stroke="black" stroke-width="3" />
-					<text x="#{-t}" y="#{-t}" >A</text>
-					<text x="#{t+200}" y="#{-t}" >B</text>
-					<text x="#{100}" y="#{173+t}" >C</text>
-					<text x="#{100}" y="#{t}" >I</text>
-					<text x="#{150+t}" y="#{87+t}" >J</text>
-					<text x="#{50+.5*t}" y="#{87}" >K</text>
-					</svg></center>"""
+
+					svg = (view)->
+						r = 10
+						lS = 20 # letterSize
+						draw = view.draw
+						size = Math.min(view.$el.width(),500)
+						draw.size(size,size)
+						group = draw.viewbox(-50,-50,300,300)
+						group.polygon("0,0 200,0 100,173").fill('lime').stroke({ width: 3 })
+						for pt in [[0,0], [100,0], [200,0], [150,87], [100,173], [50,87]]
+							group.circle(r).center(pt[0],pt[1]).fill("black")
+						m = 50
+						group.text("A").cx(0).y(0-r-2-lS)
+						group.text("I").cx(100).y(0-r-2-lS)
+						group.text("B").cx(200).y(0-r-2-lS)
+						group.text("C").cx(100).y(173+r+2)
+						group.text("J").cx(150).y(87+r+2)
+						group.text("K").cx(50).y(87+r+2)
+
 			if inputs.choix?
 				choix = (sommets[Number it] for it in inputs.choix.split(";"))
 			else
@@ -133,9 +136,9 @@ define ["utils/math"], (mM) ->
 		getBriques: (inputs,options) ->
 			[ forme, dims, sommets, quests, svg ] = @init(inputs, options)
 
-			initSVG = (view)->
-				$container = view.$el
-				$container.append(svg)
+			#initSVG = (view)->
+			#	$container = view.$el
+			#	$container.append(svg)
 
 			[
 				{
@@ -167,9 +170,9 @@ define ["utils/math"], (mM) ->
 								]
 						}
 						{
-							type: "def"
+							type: "svg"
 							renderingFunctions:[
-								initSVG
+								svg
 							]
 
 						}
