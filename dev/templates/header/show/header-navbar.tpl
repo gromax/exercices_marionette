@@ -11,6 +11,7 @@
 		</ul>
 		<%} else {%>
 		<ul class="navbar-nav ml-auto">
+			<li class="nav-item"><a class="nav-link js-messages" href="#messages"><i class="fa fa-comment"></i> &nbsp; <%- unread %></a></li>
 			<li class="nav-item"><a class="nav-link js-edit-me" href="#"><i class="fa fa-user"></i> &nbsp; <%- nomComplet %></a></li>
 			<li class="nav-item"><a class="nav-link js-logout" href="#"><i class="fa fa-sign-out"></i> &nbsp; Déconnexion</a></li>
 		</ul>
