@@ -9,6 +9,7 @@ use BDDObject\Note;
 use BDDObject\Fiche;
 use BDDObject\User;
 use BDDObject\Exam;
+use BDDObject\Message;
 
 class data
 {
@@ -44,7 +45,8 @@ class data
             return array(
                 "aEFs" => ExoFiche::getList(array("idUser"=>$uLog->getId())),
                 "aUFs" => AssoUF::getList(array("idUser"=> $uLog->getId() )),
-                "aUEs" => Note::getList(array("idUser"=>$uLog->getId()))
+                "aUEs" => Note::getList(array("idUser"=>$uLog->getId())),
+                "messages" => Message::getList($uLog->getId())
             );
         } else {
             EC::set_error_code(403);
@@ -117,6 +119,17 @@ class data
                 }
             }
 
+            if (in_array("messages", $asks)){
+                $answer =  Message::getList($uLog->getId());
+                if (isset($answer["error"]) && $answer["error"]) {
+                    EC::addError($answer["message"]);
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $output["messages"] = $answer;
+                }
+            }
+
             return $output;
         }
 
@@ -180,6 +193,17 @@ class data
                     return false;
                 } else {
                     $output["exams"] = $answer;
+                }
+            }
+
+            if (in_array("messages", $asks)){
+                $answer = Message::getList($uLog->getId());
+                if (isset($answer["error"]) && $answer["error"]) {
+                    EC::addError($answer["message"]);
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $output["messages"] = $answer;
                 }
             }
 
@@ -254,6 +278,17 @@ class data
                     return false;
                 } else {
                     $output["exams"] = $answer;
+                }
+            }
+
+            if (in_array("messages", $asks)){
+                $answer = Message::getList($uLog->getId());
+                if (isset($answer["error"]) && $answer["error"]) {
+                    EC::addError($answer["message"]);
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $output["messages"] = $answer;
                 }
             }
 
