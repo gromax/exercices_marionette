@@ -11,7 +11,7 @@ abstract class Item
 	const	SAVE_IN_SESSION = true;
 	protected $id = null;
 	protected $values = null;
-	protected static $myName = "Item";
+	protected static $BDDName = "Item";
 
 	##################################### METHODES STATIQUES #####################################
 
@@ -27,15 +27,11 @@ abstract class Item
 		return array();
 	}
 
-	protected static function defValues()
-	{
-		return array();
-	}
-
 	public function __construct($options=array())
 	{
 		$arr = static::champs();
-		$this->values = static::defValues();
+		$arr_types = array_combine(array_keys($arr), array_column($arr,"type"));
+		$this->values = array_combine(array_keys($arr), array_column($arr,"def"));
 		if (isset($options["id"])) {
 			$this->id = (integer) $options["id"];
 			$this->values["id"] = $this->id;
@@ -72,7 +68,7 @@ abstract class Item
 			$id = (integer) $idInput;
 		} else return null;
 		if (self::SAVE_IN_SESSION) {
-			$item = SC::get()->getParamInCollection(static::$myName, $id, null);
+			$item = SC::get()->getParamInCollection(static::$BDDName, $id, null);
 			if ($item !== null){
 				return $item;
 			}
@@ -81,16 +77,16 @@ abstract class Item
 		// Pas trouvé dans la session, il faut chercher en bdd
 		require_once BDD_CONFIG;
 		try {
-			$bdd_result=DB::queryFirstRow("SELECT ".join(self::keys(),",")." FROM ".PREFIX_BDD.static::$myName." WHERE id=%i", $id);
+			$bdd_result=DB::queryFirstRow("SELECT ".join(self::keys(),",")." FROM ".PREFIX_BDD.static::$BDDName." WHERE id=%i", $id);
 			if ($bdd_result === null) return null;
 
 			$item = new static($bdd_result);
 			if (self::SAVE_IN_SESSION) {
-				SC::get()->setParamInCollection(static::$myName, $item->id, $item);
+				SC::get()->setParamInCollection(static::$BDDName, $item->id, $item);
 			}
 			return $item;
 		} catch(MeekroDBException $e) {
-			EC::addBDDError($e->getMessage(),static::$myName."/getObject");
+			EC::addBDDError($e->getMessage(),static::$BDDName."/getObject");
 		}
 		return null;
 	}
@@ -100,9 +96,9 @@ abstract class Item
 	public function __toString()
 	{
 		if ($this->id!==null) {
-			return static::$myName."@".$this->id;
+			return static::$BDDName."@".$this->id;
 		} else {
-			return static::$myName."@?";
+			return static::$BDDName."@?";
 		}
 	}
 
@@ -118,66 +114,74 @@ abstract class Item
 		}
 		try {
 			// Suppression des assoc liées
+			$message = $this." supprimé avec succès.";
 			if (method_exists(get_called_class(),"getAssocs")) {
 				$arr = static::getAssocs();
 				foreach ($arr as $table => $col) {
 					DB::delete(PREFIX_BDD.$table, '%s=%i', $col, $this->id);
+					if (static::SAVE_IN_SESSION) $session=SC::get()->unsetParam($table);
 				}
 			}
-			DB::delete(PREFIX_BDD.static::$myName, 'id=%i', $this->id);
-			EC::add("L'item a bien été supprimée.");
-			if (static::SAVE_IN_SESSION) $session=SC::get()->unsetParamInCollection(static::$myName, $this->id);
+			DB::delete(PREFIX_BDD.static::$BDDName, 'id=%i', $this->id);
+			EC::add($message);
+			if (static::SAVE_IN_SESSION) $session=SC::get()->unsetParamInCollection(static::$BDDName, $this->id);
 			return true;
 		} catch(MeekroDBException $e) {
-			EC::addBDDError($e->getMessage(), static::$myName."/delete");
+			EC::addBDDError($e->getMessage(), static::$BDDName."/delete");
 		}
 		return false;
 	}
 
-	public function insertion($force = false)
+	public function insertion()
 	{
 		// $force permet de passer les tests
-		if ((!$force)&&(method_exists($this, "okToInsert"))&&(!$this->okToInsert())) {
-			return null;
+		if (method_exists($this, "parseBeforeInsert")) {
+			$toInsert = $this->parseBeforeInsert();
+		} else {
+			$toInsert = $this->values;
 		}
-		require_once BDD_CONFIG;
-		try {
-			DB::insert(PREFIX_BDD.static::$myName, $this->toArray());
-		} catch(MeekroDBException $e) {
-			EC::addBDDError($e->getMessage());
+
+		if ($toInsert === false) {
 			return null;
 		}
 
+		require_once BDD_CONFIG;
+		try {
+			DB::insert(PREFIX_BDD.static::$BDDName, $toInsert);
+		} catch(MeekroDBException $e) {
+			EC::addBDDError($e->getMessage(), static::$BDDName."/insertion");
+			return null;
+		}
 		$this->id=DB::insertId();
 		$this->values["id"] = $this->id;
-		EC::add($this." a bien été ajouté.");
+		EC::add($this." créé avec succès.");
 		return $this->id;
 	}
 
 	public function update($params=array(),$updateBDD=true)
 	{
 		if ($this->id===false) {
-			EC::addDebugError(static::$myName."/update : Id manquant.");
+			EC::addDebugError(static::$BDDName."/update : Id manquant.");
 			return false;
 		}
 		$bddModif=(method_exists($this,"okToUpdate") && ($this->okToUpdate($params)));
 
 		if (!$bddModif) {
-			EC::add(static::$myName."/update : Aucune modification.");
+			EC::add(static::$BDDName."/update : Aucune modification.");
 			return false;
 		}
 		if (!$updateBDD) {
-			EC::add(static::$myName."/update : Succès.");
+			EC::add(static::$BDDName."/update : Succès.");
 			return true;
 		}
 		require_once BDD_CONFIG;
 		try{
-			DB::update(PREFIX_BDD.static::$myName, $this->toArray(),"id=%i",$this->id);
+			DB::update(PREFIX_BDD.static::$BDDName, $this->toArray(),"id=%i",$this->id);
 		} catch(MeekroDBException $e) {
-			EC::addBDDError($e->getMessage(), static::$myName."/update");
+			EC::addBDDError($e->getMessage(), static::$BDDName."/update");
 			return false;
 		}
-		EC::add(static::$myName."/update : Succès.");
+		EC::add(static::$BDDName."/update : Succès.");
 		return true;
 	}
 
@@ -189,6 +193,11 @@ abstract class Item
 	public function getId()
 	{
 		return $this->id;
+	}
+
+	public function getValues()
+	{
+		return $this->values;
 	}
 
 	public function toArray()
