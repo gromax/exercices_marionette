@@ -66,10 +66,10 @@ $router->addRule('api/notes/:id', 'notes', 'delete', 'DELETE');
 $router->addRule('api/notes/:id', 'notes', 'update', 'PUT');
 $router->addRule('api/notes', 'notes', 'insert', 'POST');
 
-// Connexions
-$router->addRule('api/cons', 'cons', 'fetch', 'GET');
-$router->addRule('api/cons/:id', 'cons', 'delete', 'DELETE');
-$router->addRule('api/cons', 'cons', 'purge', 'DELETE');
+// messages
+$router->addRule('api/messages', 'messages', 'insert', 'POST');
+$router->addRule('api/messages/:id', 'messages', 'delete', 'DELETE');
+$router->addRule('api/messages/:id/lu', 'messages', 'setLu', 'PUT');
 
 // data
 $router->addRule('api/eleveData', 'data', 'eleveFetch', 'GET');
@@ -83,7 +83,7 @@ $router->addRule('api/forgotten/:key', 'session', 'reinitMDP', 'GET'); // Essaie
 $response = $router->load();
 EC::header(); // Doit être en premier !
 if ($response === false) {
-	echo json_encode(array("messages"=>EC::messages()));
+	echo json_encode(array("ajaxMessages"=>EC::messages()));
 } else {
 	if (isset($response["errors"]) && (count($response["errors"])==0)) {
 		unset($response["errors"]);
@@ -93,6 +93,7 @@ if ($response === false) {
 			$response["errors"] = $messages;
 		}
 	}*/
+
 	echo json_encode($response);
 }
 
