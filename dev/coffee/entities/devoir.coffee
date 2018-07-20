@@ -25,7 +25,7 @@ define [], ()->
 		validate: (attrs, options)->
 			errors = {}
 			if not attrs.nom
-				errors.nom = "Ne doit pas être vide";
+				errors.nom = "Ne doit pas être vide"
 			else
 				if attrs.nom.length<2
 					errors.nom = "Trop court"
@@ -33,4 +33,4 @@ define [], ()->
 				return errors
 	}
 
-	return Item;
+	return Item
