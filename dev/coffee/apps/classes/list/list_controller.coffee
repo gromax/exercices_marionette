@@ -54,7 +54,7 @@ define [
 								).fail( (response)->
 									switch response.status
 										when 422
-											view.triggerMethod("form:data:invalid", response.responseJSON.errors)
+											view.triggerMethod("form:data:invalid", response.responseJSON.ajaxMessages)
 										when 401
 											alert("Vous devez vous (re)connecter !")
 											view.trigger("dialog:close")
@@ -87,7 +87,7 @@ define [
 								).fail( (response)->
 									switch response.status
 										when 422
-											view.triggerMethod("form:data:invalid", response.responseJSON.errors)
+											view.triggerMethod("form:data:invalid", response.responseJSON.ajaxMessages)
 										when 401
 											alert("Vous devez vous (re)connecter !")
 											view.trigger("dialog:close")
