@@ -206,6 +206,12 @@ final class Note
 			DB::delete(PREFIX_BDD.'assocUE', 'id=%i', $this->id);
 			EC::add("La note a bien été supprimée.");
 			if (self::SAVE_IN_SESSION) $session=SC::get()->unsetParamInCollection('notes', $this->id);
+			// Il faut supprimer tous les commentaires liés
+			// D'abord les asso message/dest
+			DB::query(PREFIX_BDD."d FROM (".PREFIX_BDD."destMEssages d JOIN ".PREFIX_BDD."messages m ON m.id=d.idMessage) WHERE m.aUE = %i", $this->id);
+			// Puis les messages eux-mêmes
+			DB::delete(PREFIX_BDD."messages","idMessage=%i", $this->id);
+			if (static::SAVE_IN_SESSION) $session=SC::get()->unsetParam("messages");
 			return true;
 		} catch(MeekroDBException $e) {
 			EC::addBDDError($e->getMessage(), "Note/Suppression");
