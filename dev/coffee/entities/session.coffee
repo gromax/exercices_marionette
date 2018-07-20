@@ -35,6 +35,7 @@ define ["backbone.radio"], (Radio) ->
 				logged = data
 			if not logged.nomClasse
 				logged.nomClasse = "N/A"
+			logged.unread = Number logged.unread ? 0
 			logged.isRoot = (logged.rank is "Root")
 			logged.isAdmin = (logged.rank is "Root") or (logged.rank is "Admin")
 			logged.isProf = (logged.rank is "Prof");
@@ -83,6 +84,9 @@ define ["backbone.radio"], (Radio) ->
 
 		isProf: ->
 			@get("rank") is "Prof"
+
+		isOff: ->
+			@get("isOff")
 
 		mapItem: (itemsList) ->
 			itemsList = itemsList ? {}
