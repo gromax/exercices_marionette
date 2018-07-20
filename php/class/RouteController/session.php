@@ -3,12 +3,9 @@
 namespace RouteController;
 use ErrorController as EC;
 use SessionController as SC;
-use BDDObject\User;
 use BDDObject\Classe;
-use BDDObject\Fiche;
-use BDDObject\ExoFiche;
-use BDDObject\Note;
 use BDDObject\Logged;
+use BDDObject\AssoDM;
 
 class session
 {
@@ -59,7 +56,11 @@ class session
         }
         else
         {
-            return $logged->toArray();
+            return array_merge(
+                $logged->toArray(),
+                array("unread"=>AssoDM::unReadNumber($logged->getId()) )
+            );
+            //return $logged->toArray();
         }
     }
 
@@ -79,39 +80,34 @@ class session
         if ($uLog->connexionOk()) {
             if($uLog->isRoot()) {
                 return array(
-                    "logged"=>$uLog->toArray(),
-                    //"users" => User::getList(array('ranks'=>array(User::RANK_ADMIN, User::RANK_ELEVE, User::RANK_PROF))),
-                    //"classes" => Classe::getList(),
-                    //"fiches" => Fiche::getList(),
+                    "logged"=>array_merge(
+                        $uLog->toArray(),
+                        array("unread"=>AssoDM::unReadNumber($uLog->getId()) )
+                    ),
                     "messages"=>EC::messages()
                 );
             } elseif ($uLog->isAdmin()) {
                 return array(
-                    "logged"=>$uLog->toArray(),
-                    //"users" => User::getList(array('ranks'=>array(User::RANK_ELEVE, User::RANK_PROF))),
-                    //"classes" => Classe::getList(),
-                    //"fiches" => Fiche::getList(),
+                    "logged"=>array_merge(
+                        $uLog->toArray(),
+                        array("unread"=>AssoDM::unReadNumber($uLog->getId()) )
+                    ),
                     "messages"=>EC::messages()
                 );
             } elseif ($uLog->isProf()) {
                 return array(
-                    "logged"=>$uLog->toArray(),
-                    //"users" => User::getList(array('classes'=>array_keys( $uLog->ownerOf() ))),
-                    //"classes" => Classe::getList(array('ownerIs'=> $uLog->getId() )),
-                    //"fiches" => Fiche::getList(array("owner"=> $uLog->getId() )),
+                    "logged"=>array_merge(
+                        $uLog->toArray(),
+                        array("unread"=>AssoDM::unReadNumber($uLog->getId()) )
+                    ),
                     "messages"=>EC::messages()
                 );
             } else {
                 return array(
-                    "logged"=>$uLog->toArray(),
-                    //"users" => array(),
-                    //"classes" => Classe::getList(array('forEleve'=> $uLog->getId() )),
-                    //"fiches" => Fiche::getList(array("eleve"=> $uLog->getId() )),
-                    // Dans le cas d'un élève, on charge d'emblée l'ensemble des notes
-                    // et la structure des fiches
-                    //"exosfiches" => ExoFiche::getList(array("idUser"=>$uLog->getId())),
-                    //"faits" => Note::getList(array("idUser"=>$uLog->getId())),
-                    //"fichesAssoc" => $uLog->fichesAssoc(),
+                    "logged"=>array_merge(
+                        $uLog->toArray(),
+                        array("unread"=>AssoDM::unReadNumber($uLog->getId()) )
+                    ),
                     "messages"=>EC::messages()
                 );
             }
