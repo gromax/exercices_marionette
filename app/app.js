@@ -53,7 +53,7 @@ define(["marionette","jquery-ui","bootstrap"], function(Marionette){
 
 
 	Manager.on("start", function(){
-		Manager.version = "2.2.324";
+		Manager.version = "2.2.326";
 		var historyStart = function() {
 			require([
 				"apps/header/header_app",
@@ -63,7 +63,8 @@ define(["marionette","jquery-ui","bootstrap"], function(Marionette){
 				"apps/classes/apps",
 				"apps/devoirs/apps",
 				"apps/exercices/apps",
-				"apps/home/apps"
+				"apps/home/apps",
+				"apps/messages/apps"
 			], function(){
 				Manager.trigger("ariane:show");
 				Manager.trigger("header:show");
