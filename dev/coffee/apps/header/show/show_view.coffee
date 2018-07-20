@@ -6,26 +6,21 @@ define ["marionette","app","jst"], (Marionette,app,JST)->
 			"click a.js-edit-me": "home:editme"
 			"click a.js-login": "home:login"
 			"click a.js-logout": "home:logout"
-			"click a.js-users": "users:list"
+			"click a.js-message": "messages:list"
 		}
 
 		initialize: (options) ->
 			options = options ? {};
-			auth = _.clone(app.Auth.attributes)
-
-			@isAdmin = auth.isAdmin ? false;
-			@isProf = auth.isProf ? false;
-			@isEleve = auth.isEleve ? false;
-			@isOff = auth.isOff ? false;
-			@nomComplet = if @isOff then "Déconnecté" else auth.prenom+" "+auth.nom
+			@auth = _.clone(app.Auth.attributes)
 
 		serializeData: () ->
 			{
-				isAdmin: @isAdmin
-				isProf: @isProf
-				isEleve: @isEleve
-				isOff: @isOff
-				nomComplet: @nomComplet
+				isAdmin: @auth.isAdmin ? false
+				isProf: @auth.isProf ? false
+				isEleve: @auth.isEleve ? false
+				isOff: @auth.isOff ? false
+				nomComplet: if @auth.isOff then "Déconnecté" else @auth.prenom+" "+@auth.nom
+				unread: @auth.unread ? 0
 				version: app.version
 			}
 
@@ -45,8 +40,8 @@ define ["marionette","app","jst"], (Marionette,app,JST)->
 		onHomeLogout: (e) ->
 			app.trigger("home:logout")
 
-		onUsersList: (e) ->
-			app.trigger("users:list")
+		onMessagesList: (e) ->
+			app.trigger("messages:list")
 
 		spin: (set_on) ->
 			if (set_on)
