@@ -149,7 +149,7 @@ define [
 								{ text:"Utilisateur inconnu", e:"user:show", data:id, link:"user:"+id }
 								{ text:"Modification du mot de passe", e:"user:editPwd", data:id, link:"user:"+id+"/password" }
 							]
-						view = new ExosManager.UsersApp.Show.MissingUser();
+						view = new MissingView({message:"Utilisateur indéfini !"});
 					app.regions.getRegion('main').show(view);
 				).fail( (response)->
 					if response.status is 401
