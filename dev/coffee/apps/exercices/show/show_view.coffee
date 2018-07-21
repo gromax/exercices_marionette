@@ -426,15 +426,18 @@ define [
 	View = Marionette.View.extend {
 		template: window.JST["exercices/show/show-view"]
 		regions: {
+			messages: {
+				el: '#messages'
+			}
 			collection: {
 				el: '#collection'
-			},
+			}
 			pied: {
 				el: '#exercice-pied'
-			},
+			}
 			options: {
 				el: '#options'
-			},
+			}
 		},
 
 		ui:{
@@ -460,6 +463,9 @@ define [
 			# Mathjax pour le titre général et les titres de briques
 			@$el.find(".card-header").each ()-> MathJax.Hub.Queue(["Typeset",MathJax.Hub,this])
 
+		showMessagesView: (mView)->
+			@showChildView('messages',mView)
+
 		formSubmit: (data,view)->
 			@trigger("brique:form:submit",data,view)
 
@@ -480,6 +486,7 @@ define [
 			data.showOptionsButton = @options.showOptionsButton
 			data.showReinitButton = @options.showReinitButton
 			data.showAnswersButton = @options.showAnswersButton
+			data.showAddMessageButton = @options.showAddMessageButton
 			data
 
 		showOptionsView: (optionsModel)->
