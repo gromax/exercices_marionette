@@ -24,20 +24,10 @@ define ["app", "jst", "marionette"], (app, JST, Marionette) ->
 		serializeData: ->
 			data = _.clone(@model.attributes)
 			data.opened = @opened
+			data.showExoLink = @options.showExoLink
 			data
 
-		flash: (cssClass) ->
-			$view = @$el
-			$view.hide().toggleClass("table-"+cssClass).fadeIn(800, ()->
-				setTimeout( ()->
-					$view.toggleClass("table-"+cssClass)
-				, 500)
-			)
 
-		remove: ->
-			self = @
-			@$el.fadeOut ()->
-				Marionette.View.prototype.remove.call(self)
 	}
 
 	CollectionView = Marionette.CollectionView.extend {
@@ -45,6 +35,22 @@ define ["app", "jst", "marionette"], (app, JST, Marionette) ->
 		className:'list-group'
 		childView:Item
 		emptyView:noView
+
+		initialize: () ->
+			@options = @options ? {}
+			unless @options.aUE?
+				@options.aUE = false
+
+		filter: (child, index, collection) ->
+			criterion = @filterCriterion
+			if (@options.aUE is false) or (@options.aUE is child.get("aUE"))
+				return true
+			return false
+
+		childViewOptions: (model, index) ->
+			return {
+				showExoLink: @options.aUE is false
+			}
 	}
 
 	return CollectionView
