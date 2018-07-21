@@ -6,7 +6,7 @@ define [], () ->
 			idOwner: ""
 			dests: []
 			message: ""
-			context: 0
+			aUE: 0
 			lu: false
 			date: "2000-01-01 00:00:00"
 			ownerName: "?"
