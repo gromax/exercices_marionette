@@ -4,14 +4,16 @@ define [
 	"apps/common/alert_view",
 	"apps/common/missing_item_view",
 	"apps/exercices/show/show_view",
-	"apps/exercices/show/answers_view"
+	"apps/exercices/show/answers_view",
+	"apps/messages/list/list_view"
 ], (
 	app,
 	Marionette,
 	AlertView,
 	MissingView,
 	View,
-	AnswersView
+	AnswersView,
+	MListView
 ) ->
 	# Il faudra envisager un exercice vide
 	# Ou un exercice dont le fichier js n'existe pas
@@ -54,6 +56,7 @@ define [
 				showAnswersButton:false
 				ue: false
 				save:null
+				messages: false
 			}
 			exo_params = _.extend( exo_default_params, params)
 			if exo_params.ue
@@ -75,6 +78,7 @@ define [
 						showOptionsButton: exo_params.showOptionsButton
 						showReinitButton: exo_params.showReinitButton
 						showAnswersButton: exo_params.showAnswersButton
+						showAddMessageButton: exo_params.messages isnt false
 					}
 					note = 0
 
@@ -266,6 +270,14 @@ define [
 								exo_params.ue.set("note",note)
 								channel.trigger("update:note")
 
+					if exo_params.ue and exo_params.messages
+						idUE = exo_params.ue.get("id")
+						list = exo_params.messages.where({aUE:idUE})
+						if list.length>0
+							mListView = new MListView({ collection: exo_params.messages, aUE: idUE })
+							view.showMessagesView(mListView)
+
+
 					app.regions.getRegion('main').show(view)
 
 				).fail( (response)->
@@ -386,7 +398,7 @@ define [
 
 								return savingUE
 
-						self.show(idE, { optionsValues:exoficheOptions, save:saveFunction, showReinitButton:true })
+						self.show(idE, { optionsValues:exoficheOptions, save:saveFunction, showReinitButton:true, showAddMessageButton:true })
 					else
 						view = new MissingView({ message:"Cet exercice n'existe pas !" })
 						app.regions.getRegion('main').show(view)
@@ -474,7 +486,7 @@ define [
 								else
 									return false
 
-						self.show(idE, { optionsValues:exoficheOptions, save:saveFunction, showReinitButton:showReinitButton, ue:ue, showAnswersButton:true })
+						self.show(idE, { optionsValues:exoficheOptions, save:saveFunction, showReinitButton:showReinitButton, ue:ue, showAnswersButton:true, showAddMessageButton:true })
 
 					else
 						app.Ariane.add([
@@ -499,8 +511,8 @@ define [
 			channel = @getChannel()
 			app.trigger("header:loading", true)
 			require ["entities/dataManager"], ->
-				fetchingData = channel.request("custom:entities", ["userfiches", "exofiches", "faits"])
-				$.when(fetchingData).done( (userfiches, exofiches, faits)->
+				fetchingData = channel.request("custom:entities", ["userfiches", "exofiches", "faits", "messages"])
+				$.when(fetchingData).done( (userfiches, exofiches, faits, messages)->
 					ue = faits.get(idUE)
 					if ue
 						idEF = ue.get("aEF")
@@ -556,8 +568,7 @@ define [
 								return savingUE
 
 
-						self.show(idE, { optionsValues:exoficheOptions, save:saveFunction, showReinitButton:showReinitButton, ue:ue })
-
+						self.show(idE, { optionsValues:exoficheOptions, save:saveFunction, showReinitButton:showReinitButton, showAddMessageButton:true, ue:ue, messages })
 					else
 						view = new MissingView({ message:"Cette sauvegarde de votre travail n'existe pas !" })
 						app.regions.getRegion('main').show(view)
