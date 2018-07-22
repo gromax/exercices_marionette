@@ -118,7 +118,7 @@ abstract class Item
 			if (method_exists(get_called_class(),"getAssocs")) {
 				$arr = static::getAssocs();
 				foreach ($arr as $table => $col) {
-					DB::delete(PREFIX_BDD.$table, '%s=%i', $col, $this->id);
+					DB::delete(PREFIX_BDD.$table, $col.'= %i', $this->id);
 					if (static::SAVE_IN_SESSION) $session=SC::get()->unsetParam($table);
 				}
 			}
