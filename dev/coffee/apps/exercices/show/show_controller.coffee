@@ -5,7 +5,10 @@ define [
 	"apps/common/missing_item_view",
 	"apps/exercices/show/show_view",
 	"apps/exercices/show/answers_view",
-	"apps/messages/list/list_view"
+	"apps/messages/list/list_view",
+	"apps/messages/list/list_layout"
+	"apps/messages/list/add_panel",
+	"entities/message"
 ], (
 	app,
 	Marionette,
@@ -13,7 +16,10 @@ define [
 	MissingView,
 	View,
 	AnswersView,
-	MListView
+	MListView,
+	MLayout,
+	MAdd,
+	Message
 ) ->
 	# Il faudra envisager un exercice vide
 	# Ou un exercice dont le fichier js n'existe pas
@@ -78,7 +84,7 @@ define [
 						showOptionsButton: exo_params.showOptionsButton
 						showReinitButton: exo_params.showReinitButton
 						showAnswersButton: exo_params.showAnswersButton
-						showAddMessageButton: exo_params.messages isnt false
+						showMessagesButton: exo_params.messages isnt false
 					}
 					note = 0
 
@@ -270,15 +276,105 @@ define [
 								exo_params.ue.set("note",note)
 								channel.trigger("update:note")
 
+					affMessages = (messages, idUE) ->
+						mLayout = new MLayout()
+
+						mListView = new MListView {
+							collection: messages
+							aUE: idUE
+							openWhenRead: true
+							idUser: app.Auth.get("id")
+						}
+
+						mAdd = new MAdd()
+
+						mLayout.on "render", ()->
+							@showChildView('itemsRegion',mListView)
+							@showChildView 'addRegion', mAdd
+
+						mAdd.on "message:send", (view, data) ->
+							# Si le message est vide, aucune réaction
+							nMessage = new Message()
+							data.aUE = idUE
+							savingMessage = nMessage.save(data)
+							if savingMessage
+								# Pour un élève, le destinataire est forcément le prof
+								# pas besoin de le préciser
+								app.trigger("header:loading", true)
+
+								$.when(savingMessage).done( ()->
+									messages.add(nMessage)
+									nMessageView = mListView.children.findByModel(nMessage)
+									if nMessageView
+										nMessageView.open()
+									mAdd.onMessageToggle()
+								).fail( (response)->
+									switch response.status
+										when 422
+											view.triggerMethod("form:data:invalid", response.responseJSON.errors)
+										when 401
+											alert("Vous devez vous (re)connecter !")
+											view.trigger("dialog:close")
+											app.trigger("home:logout")
+										else
+											alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code #{response.status}/035]")
+								).always( ()->
+									app.trigger("header:loading", false)
+								)
+							else
+								view.triggerMethod("form:data:invalid",nMessage.validationError)
+
+
+						mListView.on "childview:message:show", (view) ->
+							view.opened = not view.opened
+							model = view.model
+							if (not model.get("lu"))
+								setLuProcessing = model.setLu()
+								$.when(setLuProcessing).done( ()->
+									model.set("lu",true)
+									app.Auth.set("unread", app.Auth.get("unread")-1)
+								).fail( (response)->
+									switch response.status
+										when 422
+											view.triggerMethod("form:data:invalid", response.responseJSON.errors)
+										when 401
+											alert("Vous devez vous (re)connecter !")
+											view.trigger("dialog:close")
+											app.trigger("home:logout")
+										else
+											alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code #{response.status}/030]")
+								)
+							view.render()
+
+						mListView.on "childview:message:delete", (childView,e)->
+							model = childView.model
+							if confirm("Supprimer le message ?")
+								destroyRequest = model.destroy()
+								app.trigger("header:loading", true)
+								$.when(destroyRequest).done( ()->
+									childView.remove()
+								).fail( (response)->
+									alert("Erreur. Essayez à nouveau !")
+								).always( ()->
+									app.trigger("header:loading", false)
+								)
+
+						view.showChildView('messages',mLayout)
+
+					app.regions.getRegion('main').show(view)
+
 					if exo_params.ue and exo_params.messages
 						idUE = exo_params.ue.get("id")
 						list = exo_params.messages.where({aUE:idUE})
-						if list.length>0
-							mListView = new MListView({ collection: exo_params.messages, aUE: idUE })
-							view.showMessagesView(mListView)
 
-
-					app.regions.getRegion('main').show(view)
+						if list.length >0
+							# Il faut afficher
+							affMessages(exo_params.messages, idUE)
+						view.on "button:messages", ()->
+							if view.getRegion("messages").hasView()
+								view.getRegion("messages").reset()
+							else
+								affMessages(exo_params.messages, idUE)
 
 				).fail( (response)->
 					view = new MissingView({ message:"Cet exercice n'existe pas !" })
@@ -418,8 +514,8 @@ define [
 			channel = @getChannel()
 			app.trigger("header:loading", true)
 			require ["entities/dataManager"], ->
-				fetchingData = channel.request("custom:entities", ["userfiches", "exofiches", "faits"])
-				$.when(fetchingData).done( (userfiches, exofiches, faits)->
+				fetchingData = channel.request("custom:entities", ["userfiches", "exofiches", "faits", "messages"])
+				$.when(fetchingData).done( (userfiches, exofiches, faits, messages)->
 					ue = faits.get(idUE)
 					if ue
 						idEF = ue.get("aEF")
@@ -486,7 +582,7 @@ define [
 								else
 									return false
 
-						self.show(idE, { optionsValues:exoficheOptions, save:saveFunction, showReinitButton:showReinitButton, ue:ue, showAnswersButton:true, showAddMessageButton:true })
+						self.show(idE, { optionsValues:exoficheOptions, save:saveFunction, showReinitButton:showReinitButton, ue, showAnswersButton:true, messages })
 
 					else
 						app.Ariane.add([
