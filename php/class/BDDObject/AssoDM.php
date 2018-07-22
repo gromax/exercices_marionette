@@ -22,6 +22,17 @@ final class AssoDM extends Item
 			);
 	}
 
+	public static function getFullNames($idList)
+	{
+		// utile pour construire la réponse lors d'une insertion de message
+		require_once BDD_CONFIG;
+		try {
+			return DB::query("SELECT CONCAT(u.id,':',u.nom,' ',u.prenom) as fullname FROM ".PREFIX_BDD."users u WHERE u.id IN %ls",$idList);
+		} catch(MeekroDBException $e) {
+			if (BDD_DEBUG_ON) return array('error'=>true, 'message'=>"#User/getList : ".$e->getMessage());
+			return array();
+		}
+	}
 
 	public static function setRead($idDest, $idMessage)
 	{
