@@ -14,15 +14,16 @@ define [], () ->
 
 		toJSON: ->
 			data = this.attributes
-			return {
+			output = {
 				id: data.id
 				idOwner: data.idOwner
 				message: data.message
-				date: data.date
 				lu: data.lu
-				dests: ( it.id for it in data.dests ).join(";")
 				aUE: data.aUE
 			}
+			if not _.isEmpty(data.dests)
+				output.dests = ( it.id for it in data.dests ).join(";")
+			return  output
 
 		parse: (data) ->
 			if data.id then data.id = Number data.id
@@ -46,8 +47,10 @@ define [], () ->
 
 		validate: (attr, options) ->
 			errors = {}
-			if not attrs.message
+			if not attr.message
 				errors.message = "Ne doit pas être vide"
+			if not _.isEmpty(errors)
+				return errors
 	}
 
 	return Item
