@@ -29,7 +29,7 @@ final class Message extends Item
 		try {
 			// en tant qu'expéditeur
 			//$expediteur_bdd_result = DB::query("SELECT m.id, m.idOwner, m.message, m.typeContext, m.dataContext, m.date, GROUP_CONCAT(d.idDest SEPARATOR ';') AS dests, 1 AS lu FROM (".PREFIX_BDD."messages m JOIN ".PREFIX_BDD."destMessages d ON d.idMessage = m.id) WHERE m.idOwner=%i", $idUser);
-			$expediteur_bdd_result = DB::query("SELECT m.id, m.idOwner, m.message, m.aUE, m.date, 'Moi' AS ownerName, GROUP_CONCAT(CONCAT(d.idDest,':',u.nom,' ',u.prenom) SEPARATOR ';') AS dests, 1 AS lu FROM ((".PREFIX_BDD."messages m JOIN ".PREFIX_BDD."destMessages d ON d.idMessage = m.id) JOIN ".PREFIX_BDD."users u ON u.id=d.idDest) WHERE m.idOwner=%i", $idUser);
+			$expediteur_bdd_result = DB::query("SELECT m.id, m.idOwner, m.message, m.aUE, m.date, 'Moi' AS ownerName, GROUP_CONCAT(CONCAT(d.idDest,':',u.nom,' ',u.prenom) SEPARATOR ';') AS dests, 1 AS lu FROM ((".PREFIX_BDD."messages m JOIN ".PREFIX_BDD."destMessages d ON d.idMessage = m.id) JOIN ".PREFIX_BDD."users u ON u.id=d.idDest) WHERE m.idOwner=%i GROUP BY m.id", $idUser);
 			// en tant que récepteur
 			//$recepteur_bdd_result=DB::query("SELECT m.id, m.idOwner, m.message, m.typeContext, m.dataContext, m.date, ".$idUser." AS dests, d.lu FROM (".PREFIX_BDD."messages m JOIN ".PREFIX_BDD."destMessages d ON d.idMessage = m.id) WHERE d.idDest=%i", $idUser);
 			$recepteur_bdd_result=DB::query("SELECT m.id, m.idOwner, m.message, m.aUE, m.date, CONCAT(u.prenom, ' ', u.nom) AS ownerName, '".$idUser.":Moi' AS dests, d.lu FROM ((".PREFIX_BDD."messages m JOIN ".PREFIX_BDD."destMessages d ON d.idMessage = m.id) JOIN ".PREFIX_BDD."users u ON u.id=m.idOwner) WHERE d.idDest=%i", $idUser);
@@ -70,7 +70,7 @@ final class Message extends Item
 
 	public function isOwnedBy($user)
 	{
-		return $this->idOwner == $user->getId();
+		return $this->values['idOwner'] == $user->getId();
 	}
 }
 
