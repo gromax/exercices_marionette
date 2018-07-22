@@ -118,8 +118,16 @@ final class Fiche
 	{
 		require_once BDD_CONFIG;
 		try {
+			if (self::SAVE_IN_SESSION) {
+				SC::get()->unsetParamInCollection('fiches', $this->id);
+				SC::get()->unsetParam("messages");
+				SC::get()->unsetParam("notes");
+			}
 			// Suppression des exams liés à la fiche
 			DB::delete(PREFIX_BDD."exams", "idFiche=%i", $this->id);
+			// Suppression des messages liés à des exercices de la fiche
+			DB::query("DELETE ".PREFIX_BDD."d FROM (((".PREFIX_BDD."destMessages d JOIN ".PREFIX_BDD."messages m ON m.id = d.idMessage) JOIN ".PREFIX_BDD."assocUE a ON a.id = m.aUE) JOIN ".PREFIX_BDD."assocEF f ON f.id=a.aEF) WHERE f.idFiche=%i", $this->id);
+			DB::query("DELETE ".PREFIX_BDD."m FROM ((".PREFIX_BDD."messages JOIN ".PREFIX_BDD."assocUE a ON a.id = m.aUE) JOIN ".PREFIX_BDD."assocEF f ON f.id=a.aEF) WHERE f.idFiche=%i", $this->id);
 			// Suppression des notes liées aux exercices contenues dans la fiche
 			DB::query("DELETE ".PREFIX_BDD."assocUE FROM ".PREFIX_BDD."assocUE INNER JOIN ".PREFIX_BDD."assocEF f ON (aEF = f.id) WHERE f.idFiche=%i", $this->id);
 			// Suppression des exercices de la fiche
@@ -127,7 +135,6 @@ final class Fiche
 			// Suppression de la fiche
 			DB::delete(PREFIX_BDD.'fiches', 'id=%i', $this->id);
 			EC::add("Le devoir a bien été supprimé.");
-			if (self::SAVE_IN_SESSION) $session=SC::get()->unsetParamInCollection('fiches', $this->id);
 			return true;
 		} catch(MeekroDBException $e) {
 			EC::addBDDError($e->getMessage(), "Fiche/Suppression");

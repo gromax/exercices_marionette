@@ -195,6 +195,11 @@ class User
 		}
 
 		require_once BDD_CONFIG;
+		if (self::SAVE_IN_SESSION) {
+			$session=SC::get()->unsetParamInCollection('users', $this->id);
+			$session=SC::get()->unsetParam('notes');
+			$session=SC::get()->unsetParam('messages');
+		}
 		if ($this->isEleve()) {
 			try {
 				// Suppression de toutes les notes liées
@@ -207,8 +212,12 @@ class User
 		}
 		try {
 			DB::delete(PREFIX_BDD.'users', 'id=%i', $this->id);
+			// Suppression de tous les messages
+			DB::query("DELETE d FROM (".PREFIX_BDD."destMessages d JOIN ".PREFIX_BDD."messages m ON m.id=d.idMessage) WHERE m.idOwner = %i OR d.idDest", $this->id, $this->id);
+			DB::query("DELETE m FROM (".PREFIX_BDD."messages m LEFT JOIN ".PREFIX_BDD."destMessages d ON m.id=d.idMessage) WHERE d.idMessage IS NULL");
 			EC::add("L'utilisateur a bien été supprimée.");
-			if (self::SAVE_IN_SESSION) $session=SC::get()->unsetParamInCollection('users', $this->id);
+
+
 			return true;
 		} catch(MeekroDBException $e) {
 			EC::addBDDError($e->getMessage(), "User/Suppression");
@@ -450,6 +459,17 @@ class User
 		$classe = $this->getClasse();
 		if (($classe !== null) && $classe->isOwnedBy($account)) return true;
 		return false;
+	}
+
+	public function getMyTeacher()
+	{
+		if ($this->isEleve()) {
+			$classe = $this->getClasse();
+			if ($classe !== null) {
+				return $classe.getOwner();
+			}
+		}
+		return null;
 	}
 
 
