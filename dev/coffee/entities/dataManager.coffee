@@ -167,6 +167,8 @@ define ["backbone.radio"], (Radio)->
 				API.stored_data.userfiches.remove(userfichesToPurge)
 			if (API.stored_data.faits)
 				delete API.stored_data.faits
+			if (API.stored_data.messages)
+				delete API.stored_data.messages
 
 		ficheDestroyUpdate: (idFiche) ->
 			# Assure le cache quand un user est supprimé
@@ -178,6 +180,12 @@ define ["backbone.radio"], (Radio)->
 				API.stored_data.exofiches.remove(exofichesToPurge)
 			if API.stored_data.faits
 				delete API.stored_data.faits
+			if (API.stored_data.messages)
+				delete API.stored_data.messages
+
+		aUEDestroyUpdate: ->
+			if (API.stored_data.messages)
+				delete API.stored_data.messages
 	}
 
 	channel = Radio.channel('entities')
@@ -189,3 +197,4 @@ define ["backbone.radio"], (Radio)->
 	channel.reply('user:me', API.getMe )
 	channel.reply('user:destroy:update', API.userDestroyUpdate )
 	channel.reply('fiche:destroy:update', API.ficheDestroyUpdate )
+	channel.reply('aUE:destroy:update', API.aUEDestroyUpdate )
