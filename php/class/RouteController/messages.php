@@ -6,6 +6,7 @@ use BDDObject\Message;
 use BDDObject\AssoDM;
 use BDDObject\User;
 use BDDObject\Logged;
+use BDDObject\Note;
 
 class messages
 {
@@ -34,15 +35,10 @@ class messages
             EC::set_error_code(401);
             return false;
         }
-        elseif ($uLog->isEleve())
-        {
-            EC::set_error_code(403);
-            return false;
-        }
         else
         {
             $id = (integer) $this->params['id'];
-            $message=Messages::getObject($id);
+            $message=Message::getObject($id);
             if ($message === null)
             {
                 EC::set_error_code(404);
@@ -73,23 +69,62 @@ class messages
         }
         $data = json_decode(file_get_contents("php://input"),true);
         $data["idOwner"] = $uLog->getId();
+        if (!isset($data["aUE"])) {
+            $aUE = 0;
+            $data["aUE"] = 0;
+        } else {
+            $aUE = (integer) $data["aUE"];
+            if ($aUE !==0) {
+                // Il s'agit de savoir si l'insertion est authorisée
+                $oUE = Note::getObject($aUE);
+                if ($oUE === null) {
+                    EC::set_error_code(404);
+                    return false;
+                }
+                // maintenant toute personne pouvant modifier la fiche peut écrire un message
+                if (!$oUE->writeAllowed($uLog)) {
+                    EC::set_error_code(403);
+                    return false;
+                }
+                // Dans le cas où l'auteur n'est pas un admin, le destinataire est forcément l'élève
+                if (!$uLog->isEleve()) {
+                    $data["dests"] = $oUE->idOwner();
+                }
+            }
+        }
+
         $message = new Message($data);
-        $id = $message->insertion();
-        if ($id!==null) {
+        $idMessage = $message->insertion();
+        if ($idMessage!==null) {
             // insertion des des dests liés
+            // Si l'utilisateur est élève, le dest est forcément le prof
+            if ($uLog->isEleve()) {
+                $classe = $uLog->getClasse();
+                if ($classe ==null) {
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $data["dests"] = $classe->toArray()["idOwner"];
+                }
+            }
+
             if (isset($data["dests"])){
-                $dests = explode(';', $data["dests"]);
-                $idOwnerMessage = $id;
-                foreach ($dests as $value) {
-                    $asso = new AssoDM(array("idDest"=>$value, "idMessage"=>$id, "read"=>false));
+                $dests = $data["dests"];
+                $aDests = explode(';', $dests);
+                foreach ($aDests as $value) {
+                    $asso = new AssoDM(array("idDest"=>$value, "idMessage"=>$idMessage, "lu"=>false));
                     $asso->insertion();
                 }
+                # Il faut récupérer les noms des dests
+                $dests = implode(';',array_column(AssoDM::getFullNames($aDests), "fullname"));
             } else {
-                $dests = "";
+                EC::set_error_code(501);
+                return false;
             }
             $output = $message->toArray();
             $output["dests"] = $dests;
-            $output["read"] = true;
+            $output["lu"] = true;
+            $output["ownerName"] = "Moi";
             return $output;
         }
         // Si on en arrive là, erreur
