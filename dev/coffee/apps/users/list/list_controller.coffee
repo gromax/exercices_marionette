@@ -56,6 +56,7 @@ define [
 							# Mais la fonction renvoie false directement si le save n'est pas permis pour ne pas vérifier des conditions comme un terme vide
 							savingUser = newUser.save(data)
 							if savingUser
+								app.trigger("header:loading", true)
 								$.when(savingUser).done( ()->
 									users.add(newUser)
 									view.trigger("dialog:close")
@@ -74,6 +75,8 @@ define [
 											app.trigger("home:logout")
 										else
 											alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code #{response.status}/030]")
+								).always(()->
+									app.trigger("header:loading", false)
 								)
 							else
 								view.triggerMethod("form:data:invalid",newUser.validationError)
