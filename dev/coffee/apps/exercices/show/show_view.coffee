@@ -444,12 +444,14 @@ define [
 			reinit:"button.js-reinit"
 			setoptions:"button.js-options"
 			setanswers:"button.js-answers"
+			showmessages:"button.js-show-messages"
 		},
 
 		triggers: {
 			"click @ui.reinit":"button:reinit"
 			"click @ui.setoptions":"button:options"
 			"click @ui.setanswers":"button:answers"
+			"click @ui.showmessages":"button:messages"
 		}
 
 		onRender: ->
@@ -462,9 +464,6 @@ define [
 			@listenTo(@options.pied, "change:finished", @piedView.render)
 			# Mathjax pour le titre général et les titres de briques
 			@$el.find(".card-header").each ()-> MathJax.Hub.Queue(["Typeset",MathJax.Hub,this])
-
-		showMessagesView: (mView)->
-			@showChildView('messages',mView)
 
 		formSubmit: (data,view)->
 			@trigger("brique:form:submit",data,view)
@@ -486,7 +485,7 @@ define [
 			data.showOptionsButton = @options.showOptionsButton
 			data.showReinitButton = @options.showReinitButton
 			data.showAnswersButton = @options.showAnswersButton
-			data.showAddMessageButton = @options.showAddMessageButton
+			data.showMessagesButton = @options.showMessagesButton
 			data
 
 		showOptionsView: (optionsModel)->
