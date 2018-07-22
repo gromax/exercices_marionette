@@ -1,4 +1,9 @@
-define ["app", "jst", "marionette"], (app, JST, Marionette) ->
+define [
+	"app"
+	"jst"
+	"marionette"
+	"mathjax"
+], (app, JST, Marionette, MathJax) ->
 	noView = Marionette.View.extend {
 		template:  window.JST["messages/list/list-none"]
 		tagName: "li"
@@ -10,9 +15,12 @@ define ["app", "jst", "marionette"], (app, JST, Marionette) ->
 		template: window.JST["messages/list/list-item"]
 		triggers: {
 			"click a.js-show-exercice" : "exercice:show"
+			"click button.js-delete" : "message:delete"
 			"click":"message:show"
 		}
-		opened: false
+
+		initialize: ->
+			@opened = @options.openWhenRead and @model.get("lu")
 
 		className: ->
 			if @model.get("idOwner") is app.Auth.get("id")
@@ -21,10 +29,28 @@ define ["app", "jst", "marionette"], (app, JST, Marionette) ->
 			else
 				"list-group-item list-group-item-info"
 
+		remove: ()->
+			self = @
+			@$el.fadeOut( ()->
+				#self.model.destroy()
+				self.trigger("model:destroy", @model)
+				Marionette.View.prototype.remove.call(self)
+			)
+
+		open: ->
+			if not @opened
+				@opened = true
+				@render()
+
+		onRender: ->
+			if @opened
+				MathJax.Hub.Queue(["Typeset", MathJax.Hub, @.$el[0]])
+
 		serializeData: ->
 			data = _.clone(@model.attributes)
 			data.opened = @opened
 			data.showExoLink = @options.showExoLink
+			data.enableDelete = @options.idUser is data.idOwner
 			data
 
 
@@ -36,7 +62,7 @@ define ["app", "jst", "marionette"], (app, JST, Marionette) ->
 		childView:Item
 		emptyView:noView
 
-		initialize: () ->
+		initialize: ->
 			@options = @options ? {}
 			unless @options.aUE?
 				@options.aUE = false
@@ -50,6 +76,8 @@ define ["app", "jst", "marionette"], (app, JST, Marionette) ->
 		childViewOptions: (model, index) ->
 			return {
 				showExoLink: @options.aUE is false
+				openWhenRead: @options.openWhenRead is true
+				idUser: @options.idUser ? false
 			}
 	}
 
