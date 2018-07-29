@@ -286,11 +286,16 @@ define [
 							idUser: app.Auth.get("id")
 						}
 
-						mAdd = new MAdd()
+						mAdd = new MAdd {
+							dest: if app.Auth.isEleve() then "Prof" else "Élève"
+						}
 
 						mLayout.on "render", ()->
 							@showChildView('itemsRegion',mListView)
 							@showChildView 'addRegion', mAdd
+
+						mAdd.on "message:cancel:click", ()->
+							mAdd.onMessageToggle()
 
 						mAdd.on "message:send", (view, data) ->
 							# Si le message est vide, aucune réaction
