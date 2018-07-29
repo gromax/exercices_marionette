@@ -213,10 +213,8 @@ class User
 		try {
 			DB::delete(PREFIX_BDD.'users', 'id=%i', $this->id);
 			// Suppression de tous les messages
-			DB::query("DELETE d FROM (".PREFIX_BDD."destMessages d JOIN ".PREFIX_BDD."messages m ON m.id=d.idMessage) WHERE m.idOwner = %i OR d.idDest", $this->id, $this->id);
-			DB::query("DELETE m FROM (".PREFIX_BDD."messages m LEFT JOIN ".PREFIX_BDD."destMessages d ON m.id=d.idMessage) WHERE d.idMessage IS NULL");
+			DB::query("DELETE FROM ".PREFIX_BDD."messages WHERE idOwner = %i OR idDest = %i", $this->id, $this->id);
 			EC::add("L'utilisateur a bien été supprimée.");
-
 
 			return true;
 		} catch(MeekroDBException $e) {

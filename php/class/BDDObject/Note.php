@@ -215,10 +215,7 @@ final class Note
 				SC::get()->unsetParam("messages");
 			}
 			// Il faut supprimer tous les commentaires liés
-			// D'abord les asso message/dest
-			DB::query("DELETE d FROM (".PREFIX_BDD."destMessages d JOIN ".PREFIX_BDD."messages m ON m.id=d.idMessage) WHERE m.aUE = %i", $this->id);
-			// Puis les messages eux-mêmes
-			DB::delete(PREFIX_BDD."messages","idMessage=%i", $this->id);
+			DB::delete(PREFIX_BDD."messages","aUE=%i", $this->id);
 			return true;
 		} catch(MeekroDBException $e) {
 			EC::addBDDError($e->getMessage(), "Note/Suppression");
