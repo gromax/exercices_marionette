@@ -121,12 +121,24 @@ class data
 
             if (in_array("messages", $asks)){
                 $answer =  Message::getList($uLog->getId());
+
                 if (isset($answer["error"]) && $answer["error"]) {
                     EC::addError($answer["message"]);
                     EC::set_error_code(501);
                     return false;
                 } else {
-                    $output["messages"] = $answer;
+                    // On filtre les noms de sorte que quand dest ou owner n'est pas l'utilisateur, on écrit prof
+
+                    $filtreNomProf = function ($item)
+                    {
+                        // Pour masquer le nom prof
+                        if ($item["ownerName"] == "Moi") { $item["destName"] = "Prof"; }
+                        elseif ($item["destName"] == "Moi") { $item["ownerName"] = "Prof"; }
+                        return $item;
+                    };
+
+                    $filteredAnswer = array_map($filtreNomProf, $answer);
+                    $output["messages"] = $filteredAnswer;
                 }
             }
 
