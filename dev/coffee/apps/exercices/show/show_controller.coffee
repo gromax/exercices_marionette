@@ -286,50 +286,6 @@ define [
 							idUser: app.Auth.get("id")
 						}
 
-						mAdd = new MAdd {
-							dest: if app.Auth.isEleve() then "Prof" else "Élève"
-						}
-
-						mLayout.on "render", ()->
-							@showChildView('itemsRegion',mListView)
-							@showChildView 'addRegion', mAdd
-
-						mAdd.on "message:cancel:click", ()->
-							mAdd.onMessageToggle()
-
-						mAdd.on "message:send", (view, data) ->
-							# Si le message est vide, aucune réaction
-							nMessage = new Message()
-							data.aUE = idUE
-							savingMessage = nMessage.save(data)
-							if savingMessage
-								# Pour un élève, le destinataire est forcément le prof
-								# pas besoin de le préciser
-								app.trigger("header:loading", true)
-
-								$.when(savingMessage).done( ()->
-									messages.add(nMessage)
-									nMessageView = mListView.children.findByModel(nMessage)
-									if nMessageView
-										nMessageView.open()
-									mAdd.onMessageToggle()
-								).fail( (response)->
-									switch response.status
-										when 422
-											view.triggerMethod("form:data:invalid", response.responseJSON.errors)
-										when 401
-											alert("Vous devez vous (re)connecter !")
-											view.trigger("dialog:close")
-											app.trigger("home:logout")
-										else
-											alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code #{response.status}/035]")
-								).always( ()->
-									app.trigger("header:loading", false)
-								)
-							else
-								view.triggerMethod("form:data:invalid",nMessage.validationError)
-
-
 						mListView.on "childview:message:show", (view) ->
 							view.opened = not view.opened
 							model = view.model
@@ -363,6 +319,51 @@ define [
 								).always( ()->
 									app.trigger("header:loading", false)
 								)
+
+
+						mAdd = new MAdd {
+							dest: if app.Auth.isEleve() then "Prof" else "Élève"
+						}
+
+						mLayout.on "render", ()->
+							@showChildView('itemsRegion',mListView)
+							@showChildView 'addRegion', mAdd
+
+						mAdd.on "message:cancel:click", ()->
+							mAdd.onMessageToggle()
+
+						mAdd.on "message:send", (view, data) ->
+							# Si le message est vide, aucune réaction
+
+							nMessage = new Message()
+							data.aUE = idUE
+							savingMessage = nMessage.save(data)
+							if savingMessage
+								# Pour un élève, le destinataire est forcément le prof
+								# pas besoin de le préciser
+								app.trigger("header:loading", true)
+
+								$.when(savingMessage).done( ()->
+									messages.add(nMessage)
+									nMessageView = mListView.children.findByModel(nMessage)
+									if nMessageView
+										nMessageView.open()
+									mAdd.onMessageToggle()
+								).fail( (response)->
+									switch response.status
+										when 422
+											view.triggerMethod("form:data:invalid", response.responseJSON.errors)
+										when 401
+											alert("Vous devez vous (re)connecter !")
+											view.trigger("dialog:close")
+											app.trigger("home:logout")
+										else
+											alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code #{response.status}/035]")
+								).always( ()->
+									app.trigger("header:loading", false)
+								)
+							else
+								view.triggerMethod("form:data:invalid",nMessage.validationError)
 
 						view.showChildView('messages',mLayout)
 
@@ -499,7 +500,7 @@ define [
 
 								return savingUE
 
-						self.show(idE, { optionsValues:exoficheOptions, save:saveFunction, showReinitButton:true, showAddMessageButton:true })
+						self.show(idE, { optionsValues:exoficheOptions, save:saveFunction, showReinitButton:true })
 					else
 						view = new MissingView({ message:"Cet exercice n'existe pas !" })
 						app.regions.getRegion('main').show(view)
