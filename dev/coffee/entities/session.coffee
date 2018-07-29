@@ -85,6 +85,9 @@ define ["backbone.radio"], (Radio) ->
 		isProf: ->
 			@get("rank") is "Prof"
 
+		isEleve: ->
+			@get("rank") is "Élève"
+
 		isOff: ->
 			@get("isOff")
 
