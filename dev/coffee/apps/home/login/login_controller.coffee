@@ -23,7 +23,7 @@ define [
 						app.trigger("home:show");
 					).fail( (response)->
 						if response.status is 422
-							view.triggerMethod("form:data:invalid", response.responseJSON.errors);
+							view.triggerMethod("form:data:invalid", response.responseJSON.ajaxMessages);
 						else
 							alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code #{response.status}/025]")
 					).always( ()->
