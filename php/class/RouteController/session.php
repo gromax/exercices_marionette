@@ -5,7 +5,7 @@ use ErrorController as EC;
 use SessionController as SC;
 use BDDObject\Classe;
 use BDDObject\Logged;
-use BDDObject\AssoDM;
+use BDDObject\Message;
 
 class session
 {
@@ -58,7 +58,7 @@ class session
         {
             return array_merge(
                 $logged->toArray(),
-                array("unread"=>AssoDM::unReadNumber($logged->getId()) )
+                array("unread"=>Message::unReadNumber($logged->getId()) )
             );
             //return $logged->toArray();
         }
@@ -82,7 +82,7 @@ class session
                 return array(
                     "logged"=>array_merge(
                         $uLog->toArray(),
-                        array("unread"=>AssoDM::unReadNumber($uLog->getId()) )
+                        array("unread"=>Message::unReadNumber($uLog->getId()) )
                     ),
                     "messages"=>EC::messages()
                 );
@@ -90,7 +90,7 @@ class session
                 return array(
                     "logged"=>array_merge(
                         $uLog->toArray(),
-                        array("unread"=>AssoDM::unReadNumber($uLog->getId()) )
+                        array("unread"=>Message::unReadNumber($uLog->getId()) )
                     ),
                     "messages"=>EC::messages()
                 );
@@ -98,7 +98,7 @@ class session
                 return array(
                     "logged"=>array_merge(
                         $uLog->toArray(),
-                        array("unread"=>AssoDM::unReadNumber($uLog->getId()) )
+                        array("unread"=>Message::unReadNumber($uLog->getId()) )
                     ),
                     "messages"=>EC::messages()
                 );
@@ -106,7 +106,7 @@ class session
                 return array(
                     "logged"=>array_merge(
                         $uLog->toArray(),
-                        array("unread"=>AssoDM::unReadNumber($uLog->getId()) )
+                        array("unread"=>Message::unReadNumber($uLog->getId()) )
                     ),
                     "messages"=>EC::messages()
                 );
