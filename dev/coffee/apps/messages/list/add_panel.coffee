@@ -1,8 +1,11 @@
-define ["jst","marionette", "backbone.syphon"], (JST,Marionette) ->
+define [
+	"jst"
+	"marionette"
+	"backbone.syphon"
+], (JST,Marionette) ->
 	Panel = Marionette.View.extend {
 		template: window.JST["messages/list/add-panel"]
 
-		closedMode: true
 		className: "alert alert-warning"
 
 		triggers: {
@@ -11,12 +14,15 @@ define ["jst","marionette", "backbone.syphon"], (JST,Marionette) ->
 
 		triggers: {
 			"click button.js-add": "message:toggle"
-			"click button.js-cancel": "message:toggle"
+			"click button.js-cancel": "message:cancel:click"
 			"click button.js-submit": "message:submit:click"
 		}
 
+		initialize: ->
+			@options.closedMode = (@options.closedMode isnt false)
+
 		onMessageToggle: ->
-			@closedMode = not @closedMode
+			@options.closedMode = not @options.closedMode
 			@render()
 
 		onMessageSubmitClick: (view)->
@@ -25,11 +31,11 @@ define ["jst","marionette", "backbone.syphon"], (JST,Marionette) ->
 
 		serializeData: ->
 			{
-				closedMode: @closedMode
+				closedMode: @options.closedMode
+				dest:@options.dest ? "?"
 			}
 
 		onFormDataInvalid: (errors)->
-			console.log errors
 			$view = @$el
 			clearFormErrors = ()->
 				$form = $view.find("form")
