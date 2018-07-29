@@ -16,6 +16,7 @@ define [
 		triggers: {
 			"click a.js-show-exercice" : "exercice:show"
 			"click button.js-delete" : "message:delete"
+			"click button.js-reply" : "message:reply"
 			"click":"message:show"
 		}
 
@@ -51,9 +52,8 @@ define [
 			data.opened = @opened
 			data.showExoLink = @options.showExoLink
 			data.enableDelete = @options.idUser is data.idOwner
+			data.showReply = @options.enableReply and (data.idDest is app.Auth.get("id"))
 			data
-
-
 	}
 
 	CollectionView = Marionette.CollectionView.extend {
@@ -78,6 +78,7 @@ define [
 				showExoLink: @options.aUE is false
 				openWhenRead: @options.openWhenRead is true
 				idUser: @options.idUser ? false
+				enableReply: @options.enableReply ? false
 			}
 	}
 
