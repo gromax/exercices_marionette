@@ -17,8 +17,8 @@ define ["utils/math","utils/help"], (mM, help) ->
 				n
 				p
 				k
-				mM.distribution.binomial(n, p, k)
-				mM.repartition.binomial(n, p, k)
+				mM.distribution.binomial(n, p/100, k)
+				mM.repartition.binomial(n, p/100, k)
 			]
 
 		getBriques: (inputs,options) ->
@@ -39,15 +39,19 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type:"input"
-							tag:"$p(X=#{inp.k})$"
-							name:"pXegalK"
-							description:"Valeur à 0,001 près"
+							format:[
+								{ text:"p(X=#{k}) =", cols:3, class:"text-right"}
+								{ name:"pXegalK", cols:3, latex:false }
+								{ text:" à 0,001 près", cols:3}
+							]
 						}
 						{
 							type:"input"
-							tag:"$p(X\\leqslant #{inp.k})$"
-							name:"pXinfK"
-							description:"Valeur à 0,001 près"
+							format:[
+								{ text:"p(X≤#{k}) =", cols:3, class:"text-right"}
+								{ name:"pXinfK", cols:3, latex:false }
+								{ text:" à 0,001 près", cols:3}
+							]
 						}
 						{
 							type:"validation"
@@ -65,7 +69,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 					verifications: [
 						{
 							name:"pXegalK"
-							tag: "$p(X=#{inp.k})$"
+							tag: "p(X=#{k})"
 							good: pXegalK_good
 							parameters: {
 								arrondi: -3
@@ -73,7 +77,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							name:"pXinfK"
-							tag: "$p(X=#{inp.k})$"
+							tag: "p(X≤#{k})"
 							good: pXinfK_good
 							parameters: {
 								arrondi: -3
