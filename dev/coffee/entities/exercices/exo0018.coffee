@@ -9,8 +9,8 @@ define ["utils/math","utils/help"], (mM, help) ->
 		init: (inputs) ->
 			max = 10
 
-			A = mM.alea.vector({ name:"A", def:inputs, values:[{min:-max, max:max}, {min:1, max:max}] }).save(inputs)
-			B = mM.alea.vector({ name:"B", def:inputs, values:[{min:-max, max:max}, {min:-max, max:-1}], forbidden:[ {axe:"x", coords:A} ] }).save(inputs)
+			A = mM.alea.vector({ name:"A", def:inputs, values:[{min:-max+2, max:max-2}, 0] }).save(inputs)
+			B = mM.alea.vector({ name:"B", def:inputs, values:[{min:-max+1, max:max-1}, {min:1, max:max-2}], forbidden:[ {axe:"x", coords:A} ] }).save(inputs)
 			[
 				A
 				B
@@ -44,6 +44,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 								"Dans le repère ci-contre, on vous demande de tracer la courbe de la fonction &nbsp; $f$ &nbsp;:"
 								"$f:x\\mapsto\\left|#{droite.reduiteObject().tex()}\\right|$."
 								"Pour cela, ajustez les positions des points &nbsp; $A$, &nbsp; $B$ et &nbsp; $C$."
+								"<i>Pour vous aider :</i> vous pouvez chercher la solution de &nbsp; $#{droite.reduiteObject().tex()} = 0$ qui vous donnera le point de contact avec l'axe horizontal."
 							]
 						}
 						{
@@ -53,7 +54,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 								axis:true
 								grid:true
 								boundingbox:[-max, max, max, -max]
-								keepaspectratio: true
+								keepaspectratio: false
 							}
 							renderingFunctions:[
 								initGraph
@@ -66,7 +67,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 							postVerificationRender:(view, data)->
 								graph = view.graph
 								for pt in graph.points
-									pt.setAttribute {fixed:true, x:u[pt.name].x, y:u[pt.name].y}
+									pt.setAttribute {fixed:true, x:data["x"+pt.name].processed, y:data["y"+pt.name].processed}
 								y1 = Math.abs(droite.float_y(-max))
 								y2 = Math.abs(droite.float_y(max))
 								x0 = droite.float_x(0)
@@ -89,14 +90,13 @@ define ["utils/math","utils/help"], (mM, help) ->
 					}
 					verifications:[
 						(data) ->
+							console.log data
 							dmax = .2
 							messages = []
 							note = 0
-							u = {}
 							for p in ["A", "B", "C"]
-								x = Number answers_data["x"+p]
-								y = Number answers_data["y"+p]
-								u[p] = { x:x, y:y }
+								x = data["x"+p].processed
+								y = data["y"+p].processed
 								if droite.float_y(x)>0 then d = droite.float_distance(x,y)
 								else d = droite.float_distance(x,-y)
 								if d<dmax
