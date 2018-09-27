@@ -79,7 +79,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 							type: "text"
 							ps:[
 								"Donnez les racines de &nbsp; $P(x)$ &nbsp; dans $\\mathbb{#{if dansR then "R" else "C"}}$."
-								"Autrement dit, donnez les solutions de &npsp; $#{poly.tex()} = 0$"
+								"Autrement dit, donnez les solutions de &nbsp; $#{poly.tex()} = 0$"
 								"Séparez les solutions par ;"
 								"Si aucune solution, entrez ∅"
 							]
