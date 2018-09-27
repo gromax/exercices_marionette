@@ -73,34 +73,20 @@ define ["utils/math","utils/help"], (mM, help) ->
 							]
 						}
 						{
-							type:"text"
-							rank:3
-							ps:[
-								"Donnez l'image de #{xi} par &nbsp; $f$."
+							type:"input"
+							rank: 4
+							format:[
+								{ text:"Image de #{xi} : ", cols:4, class:"text-right"}
+								{ name:"i", cols:3, latex:false }
 							]
 						}
 						{
 							type:"input"
-							rank:4
-							waited: "number"
-							tag:"Image"
-							description:"Image de #{xi}"
-							name: "i"
-							good: yi
-						}
-						{
-							type:"text"
-							rank:5
-							ps:[
-								"Donnez un antécédent de #{ya} par &nbsp; $f$."
+							rank: 6
+							format:[
+								{ text:"Un antécédent de #{ya} : ", cols:4, class:"text-right"}
+								{ name:"a", cols:3, latex:false }
 							]
-						}
-						{
-							type:"input"
-							rank:6
-							tag:"Antécédent"
-							description:"Antécédent de #{ya}"
-							name: "a"
 						}
 						{
 							type:"validation"
