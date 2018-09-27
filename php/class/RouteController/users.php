@@ -5,6 +5,8 @@ use ErrorController as EC;
 use BDDObject\User;
 use BDDObject\Logged;
 use BDDObject\Classe;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 class users
 {
@@ -297,7 +299,44 @@ class users
         $key = $user->initKey();
         if ($key!==null)
         {
-            send_html_mail($user->identifiant(),"Mot de passe oublié","<b>".NOM_SITE.".</b> Vous avez oublié votre mot de passe. Suivez ce lien pour pour modifier votre mot de passe : <a href='".PATH_TO_SITE."/#forgotten:$key'>Réinitialisation du mot de passe</a>.");
+            //send_html_mail($user->identifiant(),"Mot de passe oublié","<b>".NOM_SITE.".</b> Vous avez oublié votre mot de passe. Suivez ce lien pour pour modifier votre mot de passe : <a href='".PATH_TO_SITE."/#forgotten:$key'>Réinitialisation du mot de passe</a>.");
+            $mail = new PHPMailer(true);                              // Passing `true` enables exceptions
+            try{
+                //Server settings
+                $mail->CharSet = 'UTF-8';
+                //$mail->SMTPDebug = 2;                                 // Enable verbose debug output
+                $mail->isSMTP();                                      // Set mailer to use SMTP
+                $mail->Host = SMTP_HOST;                     // Specify main and backup SMTP servers
+                $mail->SMTPAuth = true;                               // Enable SMTP authentication
+                $mail->Username = SMTP_USER;                 // SMTP username
+                $mail->Password = SMTP_PASSWORD;                           // SMTP password
+                $mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
+                $mail->Port = SMTP_PORT;                                    // TCP port to connect to
+
+                //Recipients
+                $mail->setFrom(EMAIL_FROM, PSEUDO_FROM);
+                $arrUser = $user->toArray();
+                $mail->addAddress($user->identifiant(), $arrUser['prenom']." ".$arrUser['nom']);     // Add a recipient
+                //$mail->addReplyTo('info@example.com', 'Information');
+                //$mail->addCC('cc@example.com');
+                //$mail->addBCC('bcc@example.com');
+
+                //Attachments
+                //$mail->addAttachment('/var/tmp/file.tar.gz');         // Add attachments
+                //$mail->addAttachment('/tmp/image.jpg', 'new.jpg');    // Optional name
+
+                //Content
+                $mail->isHTML(true);                                  // Set email format to HTML
+                $mail->Subject = "Mot de passe oublié";
+                $mail->Body    = "<b>".NOM_SITE.".</b> Vous avez oublié votre mot de passe. Suivez ce lien pour pour modifier votre mot de passe : <a href='".PATH_TO_SITE."/#forgotten:$key'>Réinitialisation du mot de passe</a>.";
+                $mail->AltBody = NOM_SITE." Vous avez oublié votre mot de passe. Copiez ce lien dans votre navigateur pour vous connecter et modifier votre mot de passe : ".PATH_TO_SITE."/#forgotten:$key";
+
+                $mail->send();
+            }   catch (Exception $e) {
+                EC::addError("Le message n'a pu être envoyé. Erreur :".$mail->ErrorInfo);
+                EC::set_error_code(501);
+                return false;
+            }
             $uLog=Logged::getConnectedUser();
             if ($uLog->isAdmin() || $user->isMyTeacher($uLog)){
                 return array("message"=>"Email envoyé.", "key"=>$key);
