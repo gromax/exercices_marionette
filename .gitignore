@@ -3,6 +3,7 @@ dist
 config/bddConfig.php
 vendor
 php/meekrodb
+php/class/PHPMailer
 app.old
 src
 app/utils
