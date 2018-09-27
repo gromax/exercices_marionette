@@ -27,7 +27,7 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 					inputs["f"+i] = String f
 				poly = mM.exec [ B.y, A.y, "-", B.x, A.x, "-", 2, "^", "/", "x", A.x, "-", 2, "^", "*", A.y, "+" ], { simplify:true, developp:f isnt 1 }
 				[
-					text:"$x \\mapsto #{poly.tex()}$"
+					"$x \\mapsto #{poly.tex()}$"
 					poly
 					ranks[i]
 				]
@@ -61,7 +61,7 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 								axis:true
 								grid:true
 								boundingbox:[-max,max,max,-max]
-								keepaspectratio: true
+								keepaspectratio: false
 							}
 							renderingFunctions:[
 								initGraph
