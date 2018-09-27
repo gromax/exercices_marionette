@@ -84,7 +84,7 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 								axis:true
 								grid:true
 								boundingbox:[-max,max,max,-max]
-								keepaspectratio: true
+								keepaspectratio: false
 							}
 							renderingFunctions:[
 								initGraph
