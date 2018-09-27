@@ -7,9 +7,10 @@ define ["utils/math","utils/help"], (mM, help) ->
 	return {
 		init: (inputs) ->
 			if (typeof inputs.poly is "undefined")
-				degre = mM.alea.real { min:1, max:4 }
+				degre = mM.alea.real { min:2, max:4 }
 				coeffs = [ 0 ]
-				coeffs.push mM.alea.real({ min:-7, max:7 }) for i in [0..degre-1]
+				coeffs.push mM.alea.real({ min:-7, max:7 }) for i in [0..degre-2]
+				coeffs.push mM.alea.real({ min:1, max:7 })
 				poly = mM.polynome.make { coeffs:coeffs }
 				inputs.poly = String poly
 			else
@@ -44,6 +45,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type: "validation"
+							clavier: ["pow"]
 						}
 					]
 					validations: {
@@ -53,24 +55,24 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 					}
 					verifications:[
-						ver = mM.verification.isSame(data.p.processed, poly, { developp: true })
-						tag = verifItem.tag ? verifItem.name
-						if ver.note is 0
-							ver2 = mM.verification.isSame(data.p.processed, polySansC, { developp: true })
-							if ver2.note >0
-								ver = ver2
-								ver.errors.push["Vous avez oublié la constante &nbsp; $c$"]
-								ver.note = ver.note * .5
-						out = {
-							note: ver.note
-							add: {
-								type:"ul"
-								list: [
-									{ type:"normal", text:"<b>#{tag}</b> &nbsp; :</b>&emsp; Vous avez répondu &nbsp; $#{data[verifItem.name].processed.tex}$" }
-									ver.goodMessage
-								].conctat(ver.errors)
+						(data)->
+							ver = mM.verification.isSame(data.p.processed, poly, { developp: true })
+							if ver.note is 0
+								ver2 = mM.verification.isSame(data.p.processed, polySansC, { developp: true })
+								if ver2.note >0
+									ver = ver2
+									ver.errors.push { type:"warning", text:"Vous avez oublié la constante &nbsp; $c$" }
+									ver.note = ver.note * .75
+							{
+								note: ver.note
+								add: {
+									type:"ul"
+									list: [
+										{ type:"normal", text:"Vous avez répondu &nbsp; $#{data.p.processed.tex}$" }
+										ver.goodMessage
+									].concat(ver.errors)
+								}
 							}
-						}
 					]
 				}
 			]
