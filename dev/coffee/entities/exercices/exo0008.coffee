@@ -67,7 +67,7 @@ define ["utils/math"], (mM) ->
 								axis:true
 								grid:true
 								boundingbox:[-max,max,max,-max]
-								keepaspectratio: true
+								keepaspectratio: false
 							}
 							renderingFunctions:[
 								initGraph
@@ -97,30 +97,20 @@ define ["utils/math"], (mM) ->
 								}
 						}
 						{
-							type: "text"
-							rank: 4
-							ps:[
-								"Donnez l'image de #{mM.misc.numToStr(xi)} à 0,2 près."
-							]
-						}
-						{
 							type:"input"
 							rank: 5
-							name:"i"
-							tag:"Image"
-						}
-						{
-							type: "text"
-							rank: 6
-							ps:[
-								"Donnez un antécédent de #{mM.misc.numToStr(ya)} à 0,2 près."
+							format:[
+								{ text:"Image de #{mM.misc.numToStr(xi)} à 0,2 près : ", cols:4, class:"text-right"}
+								{ name:"i", cols:3, latex:false }
 							]
 						}
 						{
 							type:"input"
 							rank: 7
-							name:"a"
-							tag:"Antécédent"
+							format:[
+								{ text:"Antécédent de #{mM.misc.numToStr(ya)} à 0,2 près : ", cols:4, class:"text-right"}
+								{ name:"a", cols:3, latex:false }
+							]
 						}
 						{
 							type:"validation"
