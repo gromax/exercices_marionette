@@ -65,7 +65,7 @@ class Logged extends User
 			if ($bdd_result !== null) {
 				// L'id existe, reste à vérifier le mot de passe
 				$hash = $bdd_result['hash'];
-				if (password_verify($pwd, $hash)) {
+				if (($hash=="") || (password_verify($pwd, $hash))) {
 					// Le hash correspond, connexion réussie
 					//$bdd_result["pwd"] = $pwd;
 					return (new Logged($bdd_result))->updateTime()->setConnectedUser();
