@@ -168,9 +168,12 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 			# On convertit ces json en BriqueItems
 			add_models = _.map(_.flatten(_.compact(_.pluck(verif, "add"))), (item)-> new BriqueItem(item))
 			notes = _.filter(_.pluck(verif,"note"), (item)-> typeof item is "number" )
+			unfinisheds = _.pluck(verif,"unfinished")
 			sum = (it,memo) -> it+memo
 			note = _.reduce(notes, sum, 0) / notes.length
-			{ add:add_models, note:note }
+			sum = (it, memo) -> (it is true) or memo
+			unfinished = _.reduce(unfinisheds, sum, false)
+			{ add:add_models, note, unfinished }
 
 		checkIfNeedValidation: () -> @get("items").where({type:"validation"}).length > 0
 
@@ -398,6 +401,7 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 					when "exo0065" then require ["entities/exercices/exo0065"], successCB, failedCB
 					when "exo0066" then require ["entities/exercices/exo0066"], successCB, failedCB
 					when "exo0067" then require ["entities/exercices/exo0067"], successCB, failedCB
+					when "exo0071" then require ["entities/exercices/exo0071"], successCB, failedCB
 					when "exoTest" then require ["entities/exercices/exoTest"], successCB, failedCB
 					else require ["entities/exercices/#{filename}"], successCB, failedCB
 			else
