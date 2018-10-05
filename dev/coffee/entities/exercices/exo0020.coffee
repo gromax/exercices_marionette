@@ -12,8 +12,8 @@ define ["utils/math","utils/help"], (mM, help) ->
 				resolution = mM.alea.real [0.5, 1, 5, 10]
 				std = mM.alea.real({min:100, max:200})/100*resolution
 				moy = mM.alea.real({min:4, max:10})*std
-				min = quantifyNumber(moy,resolution) - 5*resolution
-				max = quantifyNumber(moy,resolution) + 5*resolution
+				min = moy - 5*resolution
+				max = moy + 5*resolution
 				N = mM.alea.real({min:50, max:200})
 				table = ( mM.alea.real { gaussian: { moy:moy, std:std, min:min, max:max, delta:resolution} } for i in [1..N] )
 				serie = new SerieStat( table )
