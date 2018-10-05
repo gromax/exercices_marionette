@@ -154,27 +154,31 @@ define [
 					# Traitement après vérif
 					# Dans le but d'enchaîner le traitement initial d'un exercice sauvegardé
 					# la fonction renvoie le nouveau focus
-					traitement_final = (bv, m, v)->
+					traitement_final = (bv, m, v, n)->
 						# bv = brique_view => La brique d'exercice dans laquelle s'effectue la vérif
 						# m = model => le model associé à la brique
 						# v = verifs => le résultats des vérifications menées selon les réponse utilisateur aux questions de cette brique
-						pied.set("note",Math.ceil(note))
+						# n = note
+						pied.set("note",Math.ceil(n))
 						# Suppression des items d'input
-						it.remove() for it in getToTrashItems(bv)
+						if v.unfinished isnt true
+							it.remove() for it in getToTrashItems(bv)
 						# Ajout des items de correction
 						m.get("items").add(v.add)
-						# La brique est marquée comme terminée
-						m.set({ done: true, focus: false })
-						bv.unsetFocus()
-						# recherche du prochain focus
-						focusedBrique = MAJ_briques(view)
-						return focusedBrique
+						if v.unfinished isnt true
+							# La brique est marquée comme terminée
+							m.set({ done: true, focus: false })
+							bv.unsetFocus()
+							# recherche du prochain focus
+							focusedBrique = MAJ_briques(view)
+							return focusedBrique
+						else
+							return bv
 
 					view.on "brique:form:submit", (data,brique_view)->
 						model = brique_view.model
 
 						model_validation = model.validation(data)
-
 
 						validation_errors = _.compact( _.pluck(_.values( model_validation), "error" ) )
 						if validation_errors.length is 0
@@ -190,7 +194,7 @@ define [
 								# Si c'est la seule, c'est la dernière et l'exo est terminé.
 
 								bWithValidation = (item.get("items").where({type:"validation"}) for item in exo.get("briquesCollection").models)
-								finished = _.flatten( bWithValidation).length <=1
+								finished = _.flatten( bWithValidation).length <=1 and verifs.unfinished isnt true
 
 								###
 								 le paramètre save sera une fonction prenant (note, answers, inputs, finished) en argument
@@ -205,7 +209,7 @@ define [
 								savingUE = exo_params.save.apply(exo_params,[note, answersData, exo.get("inputs"), finished])
 								if savingUE
 									doneFct = ()->
-										traitement_final(brique_view, model, verifs)
+										traitement_final(brique_view, model, verifs, note)
 										# Les briques ayant un postVerifRender sont déjà affichée -> on peut lancer le postRender
 										brique_view.postVerifRender(model_validation)
 									failFct = (response)->
@@ -223,12 +227,12 @@ define [
 										app.trigger("header:loading", false)
 									$.when(savingUE).done( doneFct ).fail( failFct )
 								else
-									traitement_final(brique_view, model, verifs)
+									traitement_final(brique_view, model, verifs, note)
 									# Les briques ayant un postVerifRender sont déjà affichée -> on peut lancer le postRender
 									brique_view.postVerifRender(model_validation)
 							else
 								# On ne sauvegarde pas, on exécuter directement le traitement final
-								traitement_final(brique_view, model, verifs)
+								traitement_final(brique_view, model, verifs, note)
 								# Les briques ayant un postVerifRender sont déjà affichée -> on peut lancer le postRender
 								brique_view.postVerifRender(model_validation)
 						else
