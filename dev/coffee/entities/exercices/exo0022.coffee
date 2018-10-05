@@ -54,7 +54,7 @@
 
 
 		getBriques: (inputs, options) ->
-			[poly, polyTex, polyDev, polyDevTex] = @init(inputs)
+			[poly, polyTex, polyDev, polyDevTex] = @init(inputs, options)
 
 			[
 				{
@@ -79,21 +79,43 @@
 							clavier: ["pow"]
 						}
 					]
-				}
-				validations: {
-					p:"number"
-				}
-				verifications: [
-					{
-						name:"p"
-						tag:"$P(x)$"
-						good: polyDev
-						goodTex: polyDevTex
-						parameters: {
-							developp: true
-						}
+					validations: {
+						p:"number"
 					}
-				]
+					verifications: [
+						(data) ->
+							parameters = {
+								developp: true
+								p_forme: 2
+								formes: "FRACTION"
+							}
+							ver = mM.verification.isSame(data.p.processed, polyDev, parameters )
+
+							list = [
+								{ type:"normal", text:"Vous avez répondu &nbsp; $P(x) = #{data.p.processed.tex}$" }
+							]
+
+							unfinished = false
+							switch ver.note
+								when 0 then list.push { type:"error", text:"La bonne réponse était &nbsp; $P(x) = #{polyDevTex}$."}
+								when 2
+									# cela veut dire qu'il faut améliorer l'affichage
+									ver.note = 0
+									unfinished = true
+								when 1 then list.push { type:"success", text:"Bonne réponse." }
+								else
+									list.push { type:"error", text:"La bonne réponse était &nbsp; $P(x) = #{polyDevTex}$."}
+
+							out = {
+								note: ver.note
+								add: {
+									type:"ul"
+									list: list.concat(ver.errors)
+								}
+								unfinished: unfinished
+							}
+					]
+				}
 			]
 
 		getExamBriques: (inputs_list,options) ->
