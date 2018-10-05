@@ -587,6 +587,13 @@ define [], () ->
 				keyWords : ["géométrie", "Trigonométrie", "scalaire", "1STL"]
 			}
 			{
+				id:71
+				filename:"exo0071"
+				title: "Somme d'une suite géométrique"
+				description: "Déterminez la somme des termes d'une suite géométrique."
+				keyWords : ["suites", "série", "TSTL"]
+			}
+			{
 				id:9999
 				filename: "exoTest"
 				title: "Exercice de test"
