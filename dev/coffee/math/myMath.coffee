@@ -515,6 +515,8 @@
 				errors = []
 				goodMessage = false
 
+				goodObjectList = ( mM.toNumber(it) for it in goodObjectList ) # assure que les items passés sont bien des numberobjects
+
 				if processedAnswerList.length is 0
 					# L'utilisateur a répondu ensemble vide
 					if (goodObjectList.length is 0)
