@@ -206,6 +206,7 @@ define [
 								 ajoutera au savingUE le when -> faits.add() le cas échéant
 								 retournera le savingUE à l'exercice pour qu'il puisse y lier le when -> traitement_final()
 								###
+
 								savingUE = exo_params.save.apply(exo_params,[note, answersData, exo.get("inputs"), finished])
 								if savingUE
 									doneFct = ()->
@@ -262,7 +263,7 @@ define [
 									verifs = model.verification(model_validation)
 									# calcul de la note
 									note = verifs.note*model.get("bareme")*100/baremeTotal + note
-									model = traitement_final(brique_view, model, verifs, model_validation)
+									model = traitement_final(brique_view, model, verifs, note)
 									# Certains éléments sont présents avant et après correction
 									# avec une modification après correction
 									# ils ont alors un traitement postVerificationRender
