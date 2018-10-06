@@ -23,7 +23,7 @@
 			canoniqueTex = polyCanonique.tex()
 			poly = mM.exec [ polyFacto ], {simplify:true, developp:true }
 			normalTex = poly.tex()
-			yA = mM.exec [a, xA, xS, "-", 2, "^", yS, "+"], { simplify:true }
+			yA = mM.exec [a, xA, xS, "-", 2, "^", "*", yS, "+"], { simplify:true, developp:true }
 			if xA is (x1+x2)/2 then solutionsA = [ mM.toNumber(xA) ]
 			else solutionsA = [ mM.toNumber(xA), mM.toNumber(x1+x2-xA) ]
 
