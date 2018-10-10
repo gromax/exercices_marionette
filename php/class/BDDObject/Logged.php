@@ -44,6 +44,26 @@ class Logged extends User
 		return self::$_connectedUser;
 	}
 
+	public static function tryConnexionOnCasId($casId)
+	{
+		if ($casId !==''){
+			require_once BDD_CONFIG;
+			try {
+				$bdd_result = DB::queryFirstRow("SELECT id, idClasse, nom, prenom, email, rank, pref FROM ".PREFIX_BDD."users WHERE cas=%s", $casId);
+			} catch(MeekroDBException $e) {
+				EC::set_error_code(501);
+				EC::addBDDError($e->getMessage(), 'Logged/tryConnexion');
+				return null;
+			}
+			if ($bdd_result !== null) {
+				return (new Logged($bdd_result))->updateTime()->setConnectedUser();
+			}
+		}
+		EC::addError("Id cas invalide.");
+		EC::set_error_code(422);
+		return null;
+	}
+
 	public static function tryConnexion($identifiant, $pwd, $idClasse = null)
 	{
 		if ($identifiant !== ''){
