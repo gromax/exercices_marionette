@@ -15,6 +15,7 @@
 		</div>
 		<button type="submit" class="btn btn-primary js-submit">Valider</button>
 		<% if (showForgotten) {%><button class="btn btn-warning js-forgotten">Mot de passe oublié</button><% } %>
+		<a class="btn btn-success" href="./api/auth" role="button">Connexion par l'ENT</a>
 		<div id="messages"></div>
 	</form>
 </div>
