@@ -48,9 +48,9 @@ define ["marionette","app"], (Marionette,app)->
 				app.Ariane.reset [{text:"Réinitialisation de mot de passe"}]
 				app.trigger("header:loading", true)
 				require ["apps/home/show/show_controller"], (showController)->
-					fetching = app.Auth.getWithForgottenKey(key);
+					fetching = app.Auth.getWithForgottenKey(key)
 					$.when(fetching).done( ()->
-						showController.showLogOnForgottenKey(true);
+						showController.showLogOnForgottenKey(true)
 					).fail( (response)->
 						if response.status is 401
 							showController.showLogOnForgottenKey(false)
@@ -59,6 +59,15 @@ define ["marionette","app"], (Marionette,app)->
 					).always( ()->
 						app.trigger("header:loading", false)
 					)
+		casloginfailed: ->
+			if app.Auth.get("logged_in")
+				app.trigger("notFound")
+			else
+				app.Ariane.reset [{text:"Échec d'identification par l'ENT"}]
+				app.trigger("header:loading", true)
+				require ["apps/home/show/show_controller"], (showController)->
+					showController.casloginfailed()
+					app.trigger("header:loading", false)
 	}
 
 	app.on "home:show", ()->
@@ -89,6 +98,7 @@ define ["marionette","app"], (Marionette,app)->
 			"logout" : "logout"
 			"rejoindre-une-classe": "showSignin"
 			"forgotten::key": "forgotten"
+			"casloginfailed": "casloginfailed"
 		}
 	}
 
