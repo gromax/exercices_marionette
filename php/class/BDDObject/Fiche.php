@@ -126,9 +126,9 @@ final class Fiche
 			// Suppression des exams liés à la fiche
 			DB::delete(PREFIX_BDD."exams", "idFiche=%i", $this->id);
 			// Suppression des messages liés à des exercices de la fiche
-			DB::query("DELETE ".PREFIX_BDD."m FROM ((".PREFIX_BDD."messages JOIN ".PREFIX_BDD."assocUE a ON a.id = m.aUE) JOIN ".PREFIX_BDD."assocEF f ON f.id=a.aEF) WHERE f.idFiche=%i", $this->id);
+			DB::query("DELETE ".PREFIX_BDD."messages FROM ((".PREFIX_BDD."messages JOIN ".PREFIX_BDD."assocUE ON ".PREFIX_BDD."assocUE.id = ".PREFIX_BDD."messages.aUE) JOIN ".PREFIX_BDD."assocEF ON ".PREFIX_BDD."assocEF.id=".PREFIX_BDD."assocUE.aEF) WHERE ".PREFIX_BDD."assocEF.idFiche=%i", $this->id);
 			// Suppression des notes liées aux exercices contenues dans la fiche
-			DB::query("DELETE ".PREFIX_BDD."assocUE FROM ".PREFIX_BDD."assocUE INNER JOIN ".PREFIX_BDD."assocEF f ON (aEF = f.id) WHERE f.idFiche=%i", $this->id);
+			DB::query("DELETE ".PREFIX_BDD."assocUE FROM ".PREFIX_BDD."assocUE INNER JOIN ".PREFIX_BDD."assocEF ON (".PREFIX_BDD."assocUE.aEF = ".PREFIX_BDD."assocEF.id) WHERE ".PREFIX_BDD."assocEF.idFiche=%i", $this->id);
 			// Suppression des exercices de la fiche
 			DB::delete(PREFIX_BDD.'assocEF', 'idFiche=%i', $this->id);
 			// Suppression de la fiche
