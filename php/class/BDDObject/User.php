@@ -24,6 +24,7 @@ class User
 	protected $prenom ='';
 	protected $email ='';
 	protected $pref = '';
+	protected $cas = '';
 	protected $date = null;
 	protected $bcryptHash = null;
 
@@ -43,6 +44,7 @@ class User
 		if(isset($options['rank'])) $this->rank = $options['rank'];
 		if(isset($options['pwd'])) $this->updatePwd($options['pwd']);
 		if(isset($options['pref'])) $this->pref=$options['pref'];
+		if(isset($options['cas'])) $this->cas=$options['cas'];
 	}
 
 	public static function getList($params=array())
@@ -53,16 +55,16 @@ class User
 		require_once BDD_CONFIG;
 		try {
 			// on n'utilise pas le champ pseudo
-			if (isset($params['ranks'])) return DB::query("SELECT u.id, idClasse, c.nom AS nomClasse, u.nom, prenom, email, rank, pref, u.date FROM (".PREFIX_BDD."users u LEFT JOIN ".PREFIX_BDD."classes c ON u.idClasse = c.id) WHERE rank IN %ls ORDER BY u.date DESC",$params['ranks']);
-			elseif (isset($params['classe'])) return DB::query("SELECT u.id, c.nom AS nomClasse, idClasse, u.nom, prenom, email, rank, pref, u.date FROM (".PREFIX_BDD."users u LEFT JOIN ".PREFIX_BDD."classes c ON u.idClasse = c.id) WHERE idClasse=%i",$params['classe']);
+			if (isset($params['ranks'])) return DB::query("SELECT u.id, idClasse, c.nom AS nomClasse, u.nom, prenom, email, rank, pref, u.date, u.cas FROM (".PREFIX_BDD."users u LEFT JOIN ".PREFIX_BDD."classes c ON u.idClasse = c.id) WHERE rank IN %ls ORDER BY u.date DESC",$params['ranks']);
+			elseif (isset($params['classe'])) return DB::query("SELECT u.id, c.nom AS nomClasse, idClasse, u.nom, prenom, email, rank, pref, u.date, u.cas FROM (".PREFIX_BDD."users u LEFT JOIN ".PREFIX_BDD."classes c ON u.idClasse = c.id) WHERE idClasse=%i",$params['classe']);
 			elseif (isset($params['classes'])) {
 				if (count($params['classes'])>0) {
-					return DB::query("SELECT u.id, c.nom AS nomClasse, idClasse, u.nom, prenom, email, rank, pref, u.date FROM (".PREFIX_BDD."users u LEFT JOIN ".PREFIX_BDD."classes c ON u.idClasse = c.id) WHERE idClasse IN %ls",$params['classes']);
+					return DB::query("SELECT u.id, c.nom AS nomClasse, idClasse, u.nom, prenom, email, rank, pref, u.date, u.cas FROM (".PREFIX_BDD."users u LEFT JOIN ".PREFIX_BDD."classes c ON u.idClasse = c.id) WHERE idClasse IN %ls",$params['classes']);
 				} else {
 					return array();
 				}
 			}
-			else return DB::query("SELECT u.id, c.nom AS nomClasse, idClasse, u.nom, prenom, email, rank, pref, u.date FROM (".PREFIX_BDD."users u LEFT JOIN ".PREFIX_BDD."classes c ON u.idClasse = c.id)");
+			else return DB::query("SELECT u.id, c.nom AS nomClasse, idClasse, u.nom, prenom, email, rank, pref, u.date, u.cas FROM (".PREFIX_BDD."users u LEFT JOIN ".PREFIX_BDD."classes c ON u.idClasse = c.id)");
 		} catch(MeekroDBException $e) {
 			if (BDD_DEBUG_ON) return array('error'=>true, 'message'=>"#User/getList : ".$e->getMessage());
 			return array('error'=>true, 'message'=>'Erreur BDD');
@@ -130,6 +132,21 @@ class User
 			if (DB::count()>0) return $results[0]["id"];
 		} catch(MeekroDBException $e) {
 			EC::addBDDError($e->getMessage());
+		}
+		return false;
+	}
+
+	public static function casExists($cas)
+	{
+		if ($cas!='') {
+			require_once BDD_CONFIG;
+			try {
+				// Vérification que l'id cas n'existe pas déjà
+				$results = DB::query("SELECT id FROM ".PREFIX_BDD."users WHERE cas=%s",$cas);
+				if (DB::count()>0) return $results[0]["id"];
+			} catch(MeekroDBException $e) {
+				EC::addBDDError($e->getMessage());
+			}
 		}
 		return false;
 	}
@@ -234,6 +251,8 @@ class User
 			$email_errors[] = "L'identifiant (email) existe déjà.";
 		if (count($email_errors)>0)
 			$errors['email'] = $email_errors;
+		if (self::casExists($this->cas))
+			$errors['cas'] = "L'identifiant CAS existe déjà";
 		if (count($errors)>0)
 			return $errors;
 		else
@@ -279,6 +298,13 @@ class User
 		{
 			$errors['rank'] = array("Le rang ne peut pas être modifié.");
 		}
+		if (isset($params['cas']) && ($params['cas']!==$this->cas))
+		{
+			if (self::casExists($params['cas']))
+			{
+				$errors['cas'] = "L'identifiant CAS existe déjà.";
+			}
+		}
 		if (count($errors)>0)
 			return $errors;
 		else
@@ -322,6 +348,12 @@ class User
 		if(isset($params['pref']))
 		{
 			$this->pref = $params['pref'];
+			$bddModif=true;
+		}
+
+		if(isset($params['cas']))
+		{
+			$this->cas = $params['cas'];
 			$bddModif=true;
 		}
 
@@ -387,7 +419,8 @@ class User
 			'email'=>$this->email,
 			'rank'=>$this->rank,
 			'date'=>$this->date,
-			'pref'=>$this->pref
+			'pref'=>$this->pref,
+			'cas' =>$this->cas
 		);
 		if ($this->id !== null) $answer['id']=$this->id;
 		if ($this->idClasse !== null) $answer['idClasse'] = $this->idClasse;
@@ -404,7 +437,8 @@ class User
 			'email'=>$this->email,
 			'rank'=>$this->rank,
 			'date'=>$this->date,
-			'pref'=>$this->pref
+			'pref'=>$this->pref,
+			'cas' =>$this->cas
 		);
 
 		if ($this->id !== null) $answer['id']=$this->id;
