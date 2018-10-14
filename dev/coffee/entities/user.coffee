@@ -8,6 +8,7 @@ define [], () ->
 			email: ""
 			nomClasse: "N/A"
 			rank:"Off"
+			cas:""
 		},
 
 		toJSON: ()->
