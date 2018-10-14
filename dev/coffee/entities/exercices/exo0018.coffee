@@ -67,7 +67,11 @@ define ["utils/math","utils/help"], (mM, help) ->
 							postVerificationRender:(view, data)->
 								graph = view.graph
 								for pt in graph.points
-									pt.setAttribute {fixed:true, x:data["x"+pt.name].processed, y:data["y"+pt.name].processed}
+									name = pt.name
+									graph.removeObject pt
+									graph.create('point', [data["x"+name].processed,data["y"+name].processed], {name:name, fixed:true, size:4, color:'blue', showInfoBox:false})
+									graph.create('line',["A","B"], {strokeColor:'#00ff00',strokeWidth:2, straightLast:false })
+									graph.create('line',["B","C"], {strokeColor:'#00ff00',strokeWidth:2, straightFirst:false})
 								y1 = Math.abs(droite.float_y(-max))
 								y2 = Math.abs(droite.float_y(max))
 								x0 = droite.float_x(0)
@@ -90,7 +94,6 @@ define ["utils/math","utils/help"], (mM, help) ->
 					}
 					verifications:[
 						(data) ->
-							console.log data
 							dmax = .2
 							messages = []
 							note = 0
