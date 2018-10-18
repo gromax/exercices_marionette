@@ -26,7 +26,10 @@ define [
 			criterion = criterion ? ""
 			app.trigger("header:loading", true)
 			usersListLayout = new Layout()
-			usersListPanel = new Panel({filterCriterion:criterion})
+			usersListPanel = new Panel {
+				filterCriterion:criterion
+				showAddButton:app.Auth.isAdmin()
+			}
 			channel = @getChannel()
 
 			require ["entities/user","entities/dataManager"], (User)->
@@ -49,6 +52,7 @@ define [
 						newUser = new User()
 						view = new NewView {
 							model: newUser
+							editorIsAdmin:app.Auth.isAdmin()
 						}
 
 						view.on "form:submit", (data)->
@@ -60,7 +64,7 @@ define [
 								$.when(savingUser).done( ()->
 									users.add(newUser)
 									view.trigger("dialog:close")
-									newUserView = usersListView.children.findByModel(newUser)
+									newUserView = usersListView.subCollectionView.children.findByModel(newUser)
 									# check whether the new user view is displayed (it could be
 									# invisible due to the current filter criterion)
 									if newUserView
@@ -91,7 +95,7 @@ define [
 						model = childView.model
 						view = new EditView {
 							model:model
-							editorIsAdmin:app.Auth.isAdmin
+							editorIsAdmin:app.Auth.isAdmin()
 						}
 
 						view.on "form:submit", (data)->
