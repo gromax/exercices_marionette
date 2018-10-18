@@ -17,6 +17,7 @@ define ["jst","marionette"], (JST,Marionette) ->
 		serializeData: ()->
 			{
 				filterCriterion: @options.filterCriterion or ""
+				showAddButton: @options.showAddButton is true
 			}
 
 		filterUsers: (e)->
