@@ -10,6 +10,7 @@ use BDDObject\Fiche;
 use BDDObject\User;
 use BDDObject\Exam;
 use BDDObject\Message;
+use BDDObject\Classe;
 
 class data
 {
@@ -142,6 +143,17 @@ class data
                 }
             }
 
+            if (in_array("classes", $asks)){
+                $answer =  Classe::getList(array('forEleve'=> $uLog->getId() ));
+                if (isset($answer["error"]) && $answer["error"]) {
+                    EC::addError($answer["message"]);
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $output["classes"] = $answer;
+                }
+            }
+
             return $output;
         }
 
@@ -216,6 +228,17 @@ class data
                     return false;
                 } else {
                     $output["messages"] = $answer;
+                }
+            }
+
+            if (in_array("classes", $asks)){
+                $answer = Classe::getList(array('ownerIs'=> $uLog->getId() ));
+                if (isset($answer["error"]) && $answer["error"]) {
+                    EC::addError($answer["message"]);
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $output["classes"] = $answer;
                 }
             }
 
@@ -301,6 +324,17 @@ class data
                     return false;
                 } else {
                     $output["messages"] = $answer;
+                }
+            }
+
+            if (in_array("classes", $asks)){
+                $answer = Classe::getList();
+                if (isset($answer["error"]) && $answer["error"]) {
+                    EC::addError($answer["message"]);
+                    EC::set_error_code(501);
+                    return false;
+                } else {
+                    $output["classes"] = $answer;
                 }
             }
 
