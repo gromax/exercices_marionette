@@ -91,6 +91,7 @@ define [
 						model = childView.model
 						view = new EditView {
 							model:model
+							editorIsAdmin:app.Auth.isAdmin
 						}
 
 						view.on "form:submit", (data)->
