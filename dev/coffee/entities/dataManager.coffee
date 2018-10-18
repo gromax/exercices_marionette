@@ -61,7 +61,8 @@ define ["backbone.radio"], (Radio)->
 						"entities/aUEs",
 						"entities/users",
 						"entities/exams",
-						"entities/messages"
+						"entities/messages",
+						"entities/classes"
 					], (
 						devoir_collec,
 						UF_collec,
@@ -69,7 +70,8 @@ define ["backbone.radio"], (Radio)->
 						UE_collec,
 						U_collec,
 						Ex_collec,
-						M_collec
+						M_collec,
+						classe_collec
 					) ->
 						if data.fiches
 							API.stored_data.fiches = new devoir_collec(data.fiches, { parse:true })
@@ -91,6 +93,9 @@ define ["backbone.radio"], (Radio)->
 							API.stored_time.exams = t
 						if data.messages
 							API.stored_data.messages = new M_collec(data.messages, {parse:true})
+						if data.classes
+							API.stored_data.classes = new classe_collec(data.classes, { parse:true })
+							API.stored_time.classes = t
 						defer.resolve.apply(null,_.map(ask, (item)-> API.stored_data[item] ))
 				).fail( (response)->
 					defer.reject(response)
