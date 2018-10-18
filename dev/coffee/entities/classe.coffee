@@ -17,6 +17,15 @@ define [], () ->
 				data.ouverte = (Number(data.ouverte)==1)
 			return data
 
+		fill: (liste) ->
+			console.log(liste)
+			promise = $.ajax( "api/classe/#{@get('id')}/fill", {
+				data:  { liste:liste }
+				dataType: "json"
+				method: "POST"
+			})
+			return promise;
+
 		validate: (attrs, options) ->
 			errors = {}
 			if not attrs.nom
