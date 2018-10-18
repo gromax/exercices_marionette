@@ -35,11 +35,11 @@ define ["marionette","app"], (Marionette,app)->
 			if auth.get("id") is id
 				app.Ariane.reset []
 				require ["apps/users/edit/edit_controller"], (editController) ->
-					editController.editUser(id, true)
+					editController.editUser(id, true, app.Auth.isAdmin)
 			else if  auth.isAdmin() or auth.isProf()
 				app.Ariane.reset [{ text:"Utilisateurs", e:"users:list", link:"users"}]
 				require ["apps/users/edit/edit_controller"], (editController) ->
-					editController.editUser(id, false)
+					editController.editUser(id, false, app.Auth.isAdmin)
 			else
 				app.trigger("notFound")
 
