@@ -8,6 +8,7 @@ define ["jst","apps/common/item_form_view"], (JST,FormView) ->
 			data.showPWD = @showPWD or false
 			data.showPref = @showPref or false
 			data.ranks = @ranks or false
+			data.editorIsAdmin = @options.editorIsAdmin
 			return data
 	}
 
