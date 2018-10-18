@@ -271,5 +271,82 @@ class classes
         return array("message"=>"Mot de passe correct");
     }
 
+    public function fill()
+    {
+        $uLog=Logged::getConnectedUser();
+        if (!$uLog->connexionOk())
+        {
+            EC::set_error_code(401);
+            return false;
+        }
+
+        if ($uLog->isAdmin())
+        {
+            $idClasse = (integer) $this->params['id'];
+            $classe = Classe::getObject($idClasse);
+            if ($classe === null)
+            {
+                EC::set_error_code(404);
+                return false;
+            }
+            $messages = array();
+            $inserteds = array();
+            $data = $_POST; //json_decode(file_get_contents("php://input"),true);
+            if (isset($data["liste"])) { $liste= $data["liste"]; } else { $liste=""; }
+            $arr_liste = explode(PHP_EOL, $liste);
+            foreach ($arr_liste as $item) {
+                $arr_item = explode(";",$item);
+                if (count($arr_item)==3) {
+                    $arr_item[] = "";
+                }
+                if (count($arr_item)<4) {
+                    $messages[] = "$item => mal formatté";
+                } else if (($arr_item[2]=="")&&($arr_item[3]=="")){
+                    $messages[] = "$item => cas et email vides";
+                } else {
+                    if ($arr_item[3]=='') { $arr_item[3] = $arr_item[2]."@".CAS_MAIL_DOMAIN; }
+                    $itData = array("nom"=>$arr_item[0], "prenom"=>$arr_item[1], "cas"=>$arr_item[2], "email"=>$arr_item[3], "pwd"=>"dfge_sx".rand(1000,9999), "idClasse"=>$idClasse, "rank"=>User::RANK_ELEVE);
+                    $user=new User($itData);
+                    $validation = $user->insertion_validation();
+                    if ($validation === true)
+                    {
+                        $id = $user->insertion();
+                        if ($id!==null)
+                        {
+                            $inserteds[] = $user->toArray();
+                        }
+                        else
+                        {
+                            $messages[] = "$item => Échec d'insertion";
+                        }
+                    }
+                    else
+                    {
+                        $errorMessage = array();
+                        foreach ($validation as $k => $v) {
+                            if (is_array($v)) {
+                                $errorMessage[] = "($k) ".implode(" & ",$v);
+                            } else {
+                                $errorMessage[] = "($k) $v";
+                            }
+                        }
+                        $messages[] = "$item => Invalide [".implode("+", $errorMessage)."]";
+                    }
+                }
+            }
+
+
+            return array("inserteds"=>$inserteds, "message"=>$messages);
+        }
+        else
+        {
+            // Interdit, pas admin
+            EC::set_error_code(403);
+            return false;
+        }
+
+
+    }
+
 }
 ?>
