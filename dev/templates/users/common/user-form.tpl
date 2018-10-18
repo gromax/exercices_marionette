@@ -14,7 +14,7 @@
 		<input class="form-control" id="user-email" name="email" type="text" value="<%- email %>" placeHolder="email"/>
 	</div>
 
-		<% if (!isEleve) { %>
+		<% if (editorIsAdmin) { %>
 	<div class="form-group">
 		<label for="user-cas" class="control-label">id cas :</label>
 		<input class="form-control" id="user-cas" name="cas" type="text" value="<%- cas %>" placeHolder="identifiant cas"/>
