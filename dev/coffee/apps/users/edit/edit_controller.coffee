@@ -16,7 +16,7 @@ define [
 	Controller = Marionette.Object.extend {
 		channelName: "entities"
 
-		editUser: (id, isMe)->
+		editUser: (id, isMe, isAdmin)->
 			app.trigger("header:loading", true)
 			channel = @getChannel()
 			require ["entities/dataManager"], ()->
@@ -40,6 +40,7 @@ define [
 						view = new EditView {
 							model: user
 							generateTitle: true
+							editorIsAdmin: isAdmin
 						}
 
 						view.on "form:submit", (data) ->
