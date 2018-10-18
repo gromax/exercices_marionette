@@ -53,12 +53,15 @@ define [], () ->
 				else
 					if attrs.nom.length<2
 						errors.nom = "Trop court"
-				if not attrs.email
-					errors.email = "Ne doit pas être vide"
-				else
-					re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-					if not re.test(attrs.email)
-						errors.email = "L'email n'est pas valide"
+				# en présence d'un cas, peut importe l'email
+				reCas =  /^[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$/
+				if not reCas.test(attrs.cas)
+					if not attrs.email
+						errors.email = "Ne doit pas être vide"
+					else
+						reEmail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+						if not reEmail.test(attrs.email)
+							errors.email = "L'email n'est pas valide"
 			if not _.isEmpty(errors)
 				return errors
 
