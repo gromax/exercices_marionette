@@ -165,6 +165,7 @@ class users
         if ($uLog->isAdmin()) {
             $data = json_decode(file_get_contents("php://input"),true);
             $userAdd = new User($data);
+            $userAdd->casToEmail(); // met à jour l'email s'il n'est pas défini
             if ($userAdd->isEleve())
             {
                 // Les élèves doivent s'inscrire eux-mêmes
