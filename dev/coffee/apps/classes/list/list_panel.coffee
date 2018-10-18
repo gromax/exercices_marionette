@@ -1,10 +1,11 @@
-define ["app", "jst", "marionette"], (app, JST, Marionette)->
+define ["jst", "marionette"], (JST, Marionette)->
 	Panel = Marionette.View.extend {
-		template: ->
-			if app.Auth.isAdmin()
-				window.JST["classes/list/classe-list-panel-admin"]
-			else
-				window.JST["classes/list/classe-list-panel-prof"]
+		template: window.JST["classes/list/classe-list-panel"]
+		serializeData: ->
+			{
+				showAddButton: @options.showAddButton is true
+				addToProf: @options.addToProf ? false
+			}
 
 		triggers: {
 			"click button.js-new": "classe:new"

@@ -7,14 +7,11 @@ define ["app", "jst", "marionette"], (app, JST, Marionette) ->
 
 	Item = Marionette.View.extend {
 		tagName: "tr"
-		template: (data)->
-			if app.Auth.isAdmin()
-				window.JST["classes/list/classe-list-admin-item"](data)
-			else
-				window.JST["classes/list/classe-list-prof-item"](data)
+		template: window.JST["classes/list/classe-list-item"]
 		triggers: {
 			"click td a.js-edit": "item:edit"
 			"click button.js-delete": "item:delete"
+			"click td a.js-fill": "item:fill"
 			"click": "item:show"
 		}
 
@@ -26,6 +23,12 @@ define ["app", "jst", "marionette"], (app, JST, Marionette) ->
 				, 500)
 			)
 
+		serializeData: ->
+			data = _.clone(@model.attributes)
+			data.showProfName = @options.showProfName
+			data.showFillClassButton = @options.showFillClassButton
+			data
+
 		remove: ->
 			self = @
 			@$el.fadeOut ()->
@@ -36,16 +39,17 @@ define ["app", "jst", "marionette"], (app, JST, Marionette) ->
 		tagName:'tbody'
 		childView:Item
 		emptyView:noView
+		childViewOptions: (model)->
+			{
+				showFillClassButton: @options.showFillClassButton
+				showProfName: @options.showProfName
+			}
 	}
 
 	Liste = Marionette.View.extend {
 		tagName: "table"
 		className:"table table-hover"
-		template: (data)->
-			if app.Auth.isAdmin()
-				window.JST["classes/list/classe-list-admin"](data)
-			else
-				window.JST["classes/list/classe-list-prof"](data)
+		template: window.JST["classes/list/classe-list"]
 		regions:{
 			body:{
 				el:'tbody'
@@ -53,20 +57,31 @@ define ["app", "jst", "marionette"], (app, JST, Marionette) ->
 			}
 		}
 
+		serializeData: ->
+			{
+				showProfName: @options.showProfName
+			}
+
 		onRender: ->
 			@subCollection = new CollectionView {
 				collection:@collection
+				showProfName:@options.showProfName
+				showFillClassButton:@options.showFillClassButton
 			}
-			@listenTo(@subCollection,"childview:item:show", @showItem);
-			@listenTo(@subCollection,"childview:item:edit", @editItem);
-			@listenTo(@subCollection,"childview:item:delete", @deleteItem);
-			@showChildView('body', @subCollection);
+			@listenTo(@subCollection,"childview:item:show", @showItem)
+			@listenTo(@subCollection,"childview:item:fill", @fillItem)
+			@listenTo(@subCollection,"childview:item:edit", @editItem)
+			@listenTo(@subCollection,"childview:item:delete", @deleteItem)
+			@showChildView('body', @subCollection)
 
 		showItem: (childView)->
 			@trigger("item:show",childView)
 
 		editItem: (childView)->
 			@trigger("item:edit",childView)
+
+		fillItem: (childView)->
+			@trigger("item:fill",childView)
 
 		deleteItem: (childView)->
 			@trigger("item:delete",childView)
