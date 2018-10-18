@@ -128,7 +128,7 @@ define [
 			listItemsView.on "item:fill", (childView, args)->
 				model = childView.model
 				view = new FillView {
-					nomProf: prof.get("nomComplet")
+					nomProf: model.get("nomOwner")
 				}
 
 				view.on "form:submit", (data)->
