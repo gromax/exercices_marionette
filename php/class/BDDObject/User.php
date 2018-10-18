@@ -158,6 +158,16 @@ class User
 		return $this->nom;
 	}
 
+	public function casToEmail($force=false)
+	{
+		// si cas est défini, écrase email
+		// si email vide, ou si force
+		if (($this->cas!="") && ( $force || ($this->email=="")  ))
+		{
+			$this->email = $this->cas."@".CAS_MAIL_DOMAIN;
+		}
+	}
+
 	public function identifiant()
 	{
 		return $this->email;
