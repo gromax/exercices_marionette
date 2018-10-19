@@ -49,7 +49,7 @@ class Logged extends User
 		if ($casId !==''){
 			require_once BDD_CONFIG;
 			try {
-				$bdd_result = DB::queryFirstRow("SELECT id, idClasse, nom, prenom, email, rank, pref FROM ".PREFIX_BDD."users WHERE cas=%s", $casId);
+				$bdd_result = DB::queryFirstRow("SELECT id, idClasse, nom, prenom, email, rank, pref, cas FROM ".PREFIX_BDD."users WHERE cas=%s", $casId);
 			} catch(MeekroDBException $e) {
 				EC::set_error_code(501);
 				EC::addBDDError($e->getMessage(), 'Logged/tryConnexion');
@@ -75,7 +75,7 @@ class Logged extends User
 
 			require_once BDD_CONFIG;
 			try {
-				$bdd_result = DB::queryFirstRow("SELECT id, idClasse, nom, prenom, email, rank, pref, hash FROM ".PREFIX_BDD."users WHERE email=%s", $identifiant);
+				$bdd_result = DB::queryFirstRow("SELECT id, idClasse, nom, prenom, email, rank, pref, hash, cas FROM ".PREFIX_BDD."users WHERE email=%s", $identifiant);
 			} catch(MeekroDBException $e) {
 				EC::set_error_code(501);
 				EC::addBDDError($e->getMessage(), 'Logged/tryConnexion');
@@ -105,7 +105,7 @@ class Logged extends User
 			if ($initKeys_result !== null) {
 				$idUser = (integer) $initKeys_result['idUser'];
 				DB::delete(PREFIX_BDD.'initKeys', 'idUser=%i', $idUser);
-				$bdd_result = DB::queryFirstRow("SELECT id, idClasse, nom, prenom, email, pref, rank FROM ".PREFIX_BDD."users WHERE id=%i", $idUser);
+				$bdd_result = DB::queryFirstRow("SELECT id, idClasse, nom, prenom, email, pref, rank, cas FROM ".PREFIX_BDD."users WHERE id=%i", $idUser);
 				if ($bdd_result !== null) { // Connexion réussie
 					return (new Logged($bdd_result))->updateTime()->setConnectedUser();
 				}
