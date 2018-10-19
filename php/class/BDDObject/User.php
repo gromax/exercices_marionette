@@ -88,7 +88,7 @@ class User
 		// Pas trouvé dans la session, il faut chercher en bdd
 		require_once BDD_CONFIG;
 		try {
-			$bdd_result=DB::queryFirstRow("SELECT id, idClasse, nom, prenom, email, rank, date FROM ".PREFIX_BDD."users WHERE id=%s", $idUser);
+			$bdd_result=DB::queryFirstRow("SELECT id, idClasse, nom, prenom, email, rank, date, cas FROM ".PREFIX_BDD."users WHERE id=%s", $idUser);
 			if ($bdd_result === null) return null;
 
 			if ($returnObject || self::SAVE_IN_SESSION) {
