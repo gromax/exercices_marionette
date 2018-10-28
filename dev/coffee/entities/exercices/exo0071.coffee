@@ -5,7 +5,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 			u0 = false
 			if typeof inputs.v isnt "undefined"
 				values = inputs.v.split(";")
-				q = (900 + Number values[0])/1000
+				q = (900 + Number values[0])
 				u0 = Number values[1]
 				n0 = Number values[2]
 				nf = Number values[3]
@@ -17,9 +17,9 @@ define ["utils/math","utils/help"], (mM, help) ->
 				n0 = values[2] = mM.alea.real { min:0, max:5 }
 				nf = values[3] = mM.alea.real { min:n0+10, max:n0+30 }
 				inputs.v = values.join(";")
-				expr = "u_{n+1} = #{mM.exec([q/1000, "symbol:u_n", "*"]).tex()}"
-				qq = q/1000
-				s = u0*Math.pow(qq,n0)*(1-Math.pow(qq,nf-n0+1))/(1-qq)
+			expr = "u_{n+1} = #{mM.exec([q/1000, "symbol:u_n", "*"]).tex()}"
+			qq = q/1000
+			s = u0*Math.pow(qq,n0)*(1-Math.pow(qq,nf-n0+1))/(1-qq)
 
 			[
 				expr # expression
