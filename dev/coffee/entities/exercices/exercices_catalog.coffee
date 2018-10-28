@@ -107,7 +107,7 @@ define [], () ->
 				title: "Tracer une droite dont on connaît l'équation réduite"
 				description: "On donne l'équation réduite d'une droite. Il faut tracer cette droite."
 				keyWords : ["Géométrie","Droite","Équation","Seconde"]
-				fixedSettings: { affine:false }
+				fixedSettings: { affine:false, point: false }
 			}
 			{
 				id:14
@@ -118,7 +118,7 @@ define [], () ->
 				options: {
 					n:{ tag:"Nombre de courbes" , options:["3", "4", "5", "6", "7"] }
 				}
-				fixedSettings: { affine:true }
+				fixedSettings: { affine:true, point:false }
 			}
 			{
 				id:15
@@ -592,6 +592,27 @@ define [], () ->
 				title: "Somme d'une suite géométrique"
 				description: "Déterminez la somme des termes d'une suite géométrique."
 				keyWords : ["suites", "série", "TSTL"]
+			}
+			{
+				id:72
+				filename:"exo0072"
+				title: "Taux d'accroissement"
+				description: "Déterminez le taux d'accroissement d'une fonction entre deux points."
+				keyWords : ["Analyse", "Dérivation", "1STL"]
+				options: {
+					d: {
+						tag:"Calcul avec h quelconque"
+						options:["non", "oui"]
+					}
+				}
+			}
+			{
+				id:73
+				filename:"exo0013"
+				title: "Tracer une droite avec point et m"
+				description: "On donne le coefficient d'une droite et un de ses points. Il faut tracer cette droite."
+				keyWords : ["Géométrie","Droite","Équation","Seconde"]
+				fixedSettings: { affine:false, point:true }
 			}
 			{
 				id:9999
