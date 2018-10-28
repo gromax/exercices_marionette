@@ -6,7 +6,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 			u0 = false
 			if typeof inputs.v isnt "undefined"
 				values = inputs.v.split(";")
-				q = (900 + Number values[0])/1000
+				q = (900 + Number values[0])
 				if values.length is 3
 					# Cas non récurrent
 					a = Number values[1]
@@ -32,7 +32,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 				switch
 					when q>1000
 						l = mM.exec ["infini"]
-					when q is 1
+					when q is 1000
 						l = mM.exec [u0]
 					else
 						l = mM.exec [0]
@@ -41,7 +41,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 				switch
 					when q>1000
 						l = mM.exec ["infini"]
-					when q is 1
+					when q is 1000
 						l = mM.exec [a, b, "+"]
 					else
 						l = mM.exec [a]
