@@ -12,7 +12,7 @@
 		alea: {
 			# Ensemble des objets produits aléatoirement
 			poly : (params) ->
-				config = mergeObj {
+				config = _.extend {
 					variable:"x" 	# variable du polynome
 					degre:0 		# impose le degré ou sinon {min, max}
 					monome:false 	# simple monome
@@ -20,13 +20,18 @@
 					values:1		# numérateurs possibles
 					denominators : null	# null-> entiers, nombre-> tous le même, tableau-> valeurs possibles, { min, max } -> intervalle de valeurs
 				}, params
+
 				degre = Proba.alea config.degre
 				if degre<0 then degre =0
 				if config.monome then degres = [degre] else degres = [0..degre]
 				coeffs = []
 				for i in degres
 					coeff = if i is degre and (config.coeffDom isnt null) then @number config.coeffDom
-					else @number { numerator:config.values, denominator:config.denominators }
+					else
+						if config.denominators  isnt null
+							@number { numerator:config.values, denominator:config.denominators }
+						else
+							@number config.values
 					if i is degre # Si c'est le degré dominant, il ne doit pas être nul
 						coeff = @number({numerator:config.values, denominator:config.denominators}) while coeff.isNul()
 					if not coeff.isNul()
@@ -249,6 +254,8 @@
 				when value instanceof NumberObject then value.floatify(params).float(decimals)
 				when value instanceof Polynome then value.floatify(params).float(decimals)
 				else NaN
+		assignValueToSymbol: (nO, liste) ->
+			nO.toClone().assignValueToSymbol(liste).simplify()
 		calc:(op1,op2,op)->
 			Oop1 = @toNumber op1
 			Oop2 = @toNumber op2
