@@ -18,7 +18,10 @@ define ["utils/math"], (mM) ->
 		getBriques: (inputs, options, fixedSettings) ->
 			max = @max
 			dmax = .3
-			[A, B, droite] = @init(inputs)
+			[A, B, droite] = @init(inputs, fixedSettings)
+			M = A.toClone("")
+			m = droite.m().simplify()
+
 
 			initGraph = (graph)->
 				pA = graph.create("point", [-max+1,1], {name:'A', fixed:false, size:4, snapToGrid:false, color:'blue', showInfoBox:true})
@@ -38,10 +41,16 @@ define ["utils/math"], (mM) ->
 									"Placez les points &nbsp; $A$ &nbsp; et &nbsp; $B$ &nbsp; de sorte que &nbsp; $(AB)$ &nbsp; soit la courbe représentative de la fonction."
 								]
 							else
-								[
-									"On considère la droite &nbsp; $\\mathcal{D}$ &nbsp; d'équation réduite &nbsp; $#{droite.reduiteTex()}$."
-									"Placez les points &nbsp; $A$ &nbsp; et &nbsp; $B$ &nbsp; de sorte que &nbsp; $(AB) = \\mathcal{D}$."
-								]
+								if fixedSettings.point
+									[
+										"On considère la droite &nbsp; $\\mathcal{D}$ &nbsp; de coefficient directeur &nbsp; $m=#{m.tex()}$ &nbsp; et passant par le point de coordonnées &nbsp; $#{M.texLine()}$."
+										"Placez les points &nbsp; $A$ &nbsp; et &nbsp; $B$ &nbsp; de sorte que &nbsp; $(AB) = \\mathcal{D}$."
+									]
+								else
+									[
+										"On considère la droite &nbsp; $\\mathcal{D}$ &nbsp; d'équation réduite &nbsp; $#{droite.reduiteTex()}$."
+										"Placez les points &nbsp; $A$ &nbsp; et &nbsp; $B$ &nbsp; de sorte que &nbsp; $(AB) = \\mathcal{D}$."
+									]
 						}
 						{
 							type:"jsxgraph"
@@ -137,7 +146,11 @@ define ["utils/math"], (mM) ->
 				if fixedSettings.affine
 					return "$#{droite.affineTex("f_{"+index+"}","x")}$"
 				else
-					return "$#{droite.reduiteTex()}$"
+					if fixedSettings.point
+						m = droite.m().simplify()
+						return "$m=#{m.tex()}$ &nbsp; et &nbsp; $#{A.texLine()}$"
+					else
+						return "$#{droite.reduiteTex()}$"
 
 			return {
 				children: [
@@ -147,7 +160,10 @@ define ["utils/math"], (mM) ->
 							if fixedSettings.affine
 								"Tracez dans un repère les courbes des fonctions affines suivantes :"
 							else
-								"Tracez dans un repère les droites dont les équations sont :"
+								if fixedSettings.point
+									"Dans chaque cas, tracez dans un repère les droites dont le coefficient directeur est &nbsp; $m$ &nbsp; et passant par le point &nbsp; $A$."
+								else
+									"Tracez dans un repère les droites dont les équations sont :"
 						]
 					}
 					{
@@ -159,12 +175,24 @@ define ["utils/math"], (mM) ->
 				]
 			}
 
-		getTex: (inputs_list, options) ->
+		getTex: (inputs_list, options, fixedSettings) ->
 			that = @
 			max = @max
-			fct_item = (inputs, index) ->
-				[A, B, droite] = that.init(inputs)
-				return "$#{droite.reduiteTex()}$"
+			if fixedSettings.affine
+				fct_item = (inputs, index) ->
+					[A, B, droite] = that.init(inputs)
+					name = "f_{#{index}}"
+					return "$#{droite.affineTex(name)}$"
+			else
+				if fixedSettings.point
+					fct_item = (inputs, index) ->
+						[A, B, droite] = that.init(inputs)
+						m = droite.m().simplify()
+						return "$m=#{m.tex()}$ et $#{A.texLine()}$"
+				else
+					fct_item = (inputs, index) ->
+						[A, B, droite] = that.init(inputs)
+						return "$#{droite.reduiteTex()}$"
 
 			if inputs_list.length is 1
 				return {
@@ -172,7 +200,12 @@ define ["utils/math"], (mM) ->
 						if fixedSettings.affine
 							"Tracez dans le repère la courbe de la fonction définie par : #{fct_item(inputs_list[0],0)}"
 						else
-							"Tracez dans le repère la droite d'équation : #{fct_item(inputs_list[0],0)}"
+							if fixedSettings.point
+								[A, B, droite] = that.init(inputs_list[0])
+								m = droite.m().simplify()
+								"Tracez dans le repère la droite de coefficient directeur $m=#{m.tex()}$ et passant par $#{A.texLine()}$."
+							else
+								"Tracez dans le repère la droite d'équation : #{fct_item(inputs_list[0],0)}"
 						{
 							type:"tikz"
 							left: -max
@@ -189,7 +222,10 @@ define ["utils/math"], (mM) ->
 						if fixedSettings.affine
 							"Tracez dans le repère les courbes des fonctions affines suivantes :"
 						else
-							"Tracez dans le repère les droites d'équations :"
+							if fixedSettings.point
+								"Tracez les droites dont on vous donne le coefficient directeur et un point :"
+							else
+								"Tracez dans le repère les droites d'équations :"
 						{
 							type: "enumerate"
 							enumi: "A"
