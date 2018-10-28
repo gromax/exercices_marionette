@@ -62,7 +62,12 @@ define ["utils/math","utils/help"], (mM, help) ->
 				}
 				{
 					type:"aide"
-					list: help.proba.binomiale.calculette
+					list: [
+						"Prenons un exemple : &nbsp; $\\mathcal{U}([11;25])$. On cherche &nbsp; $p(X<17)$."
+						"D'abord, rappelons que si on remplace &nbsp; $<$ &nbsp; par &nbsp; $\\leqslant$, ça ne change rien."
+						"Supposons que l'on ait un rectangle d'aire 100 %, allant de l'abscisse 11 à l'abscisse 25."
+						"Quelle est l'aire du rectangle allant de 11 à 17 ? C'est la réponse à la question."
+					]
 				}
 			]
 
