@@ -44,27 +44,30 @@ define ["utils/math","utils/help"], (mM, help) ->
 								type: "tableau"
 								entetes: false
 								lignes: [
-									["Valeurs"].concat (item.value for item in serie_stringArray)
+									["Valeurs"].concat (mM.misc.numToStr(item.value) for item in serie_stringArray)
 									["Effectifs"].concat (item.effectif for item in serie_stringArray)
 								]
 							}
 							{
 								type: "input"
-								name:"N"
-								tag:"N"
-								description: "Effectif total"
+								format: [
+									{ text:"N =", cols:3, class:"text-right" }
+									{ name:"N", cols:5, description: "Effectif total" }
+								]
 							}
 							{
 								type: "input"
-								name:"m"
-								tag:"$\\overline{x}$"
-								description: "Moyenne"
+								format: [
+									{ text:"$\\overline{x} =$", cols:3, class:"text-right" }
+									{ name:"m", cols:5, description: "Moyenne" }
+								]
 							}
 							{
 								type: "input"
-								name:"std"
-								tag:"$\\sigma$"
-								description: "Écart-type"
+								format: [
+									{ text:"$\\sigma =$", cols:3, class:"text-right" }
+									{ name:"std", cols:5, description: "Écart-type" }
+								]
 							}
 							{
 								type: "validation"
@@ -114,40 +117,43 @@ define ["utils/math","utils/help"], (mM, help) ->
 								ps:[
 									"On considère la série statistique donnée par le tableau suivant."
 									"Donnez l'effectif total, le premier quartile, la médiane et le troisième quartile de cette série."
-									"Vous arrondirez à 0,1 près."
 								]
 							}
 							{
 								type: "tableau"
 								entetes: false
 								lignes: [
-									["Valeurs"].concat (item.value for item in serie_stringArray)
+									["Valeurs"].concat (mM.misc.numToStr(item.value) for item in serie_stringArray)
 									["Effectifs"].concat (item.effectif for item in serie_stringArray)
 								]
 							}
 							{
 								type: "input"
-								name:"N"
-								tag:"N"
-								description: "Effectif total"
+								format: [
+									{ text:"N =", cols:3, class:"text-right" }
+									{ name:"N", cols:5, description: "Effectif total" }
+								]
 							}
 							{
 								type: "input"
-								name:"q1"
-								tag:"$Q_1$"
-								description: "Premier quartile"
+								format: [
+									{ text:"$Q_1 =$", cols:3, class:"text-right" }
+									{ name:"q1", cols:5, description: "Premier quartile" }
+								]
 							}
 							{
 								type: "input"
-								name:"mediane"
-								tag:"Médiane$"
-								description: "Médiane"
+								format: [
+									{ text:"Médiane =", cols:3, class:"text-right" }
+									{ name:"mediane", cols:5, description: "Médiane" }
+								]
 							}
 							{
 								type: "input"
-								name:"q2"
-								tag:"$Q_3$"
-								description: "Troisième quartile"
+								format: [
+									{ text:"$Q_3 =$", cols:3, class:"text-right" }
+									{ name:"q2", cols:5, description: "Troisième quartile" }
+								]
 							}
 							{
 								type: "validation"
@@ -160,8 +166,9 @@ define ["utils/math","utils/help"], (mM, help) ->
 						]
 						validations:{
 							N:"number"
-							m:"number"
-							std:"number"
+							q1:"number"
+							q2:"number"
+							mediane:"number"
 						}
 						verifications:[
 							{
@@ -172,25 +179,16 @@ define ["utils/math","utils/help"], (mM, help) ->
 								name:"q1"
 								tag:"$Q_1$"
 								good:serie.fractile(1,4)
-								parameters: {
-									arrondi:-1
-								}
 							}
 							{
 								name:"mediane"
 								tag:"Médiane"
 								good:serie.mediane()
-								parameters: {
-									arrondi:-1
-								}
 							}
 							{
 								name:"q2"
 								tag:"$Q_3$"
 								good:serie.fractile(3,4)
-								parameters: {
-									arrondi:-1
-								}
 							}
 						]
 					}
