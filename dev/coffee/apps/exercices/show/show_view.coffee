@@ -306,6 +306,8 @@ define [
 							when "infini" then $inp.val(currentText.substring(0,pos)+"∞"+currentText.substring(pos))
 							when "sqrt" then $inp.val(currentText.substring(0,pos)+"sqrt("+currentText.substring(pos, pEnd)+")"+currentText.substring(pEnd))
 							when "pow" then $inp.val(currentText.substring(0,pos)+"^("+currentText.substring(pos, pEnd)+")"+currentText.substring(pEnd))
+							when "sqr" then $inp.val(currentText.substring(0,pos)+"^2"+currentText.substring(pos))
+							when "cube" then $inp.val(currentText.substring(0,pos)+"^3"+currentText.substring(pos))
 					else
 						# Dans ce cas c'est un latex-input
 						id = $(@currentFocus.node).parent().parent().attr('id')
