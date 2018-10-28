@@ -80,15 +80,34 @@ define ["app", "jst","marionette"], (app, JST, Marionette)->
 
 		onSort: (view,e)->
 			name = $(e.currentTarget).attr("name")
-			if name
-				if @collection.comparator is name
+			if name is "id"
+				# Celui ci est numérique
+				if @collection.comparatorAttr is "id"
+					@collection.comparatorAttr = "inv_id"
 					@collection.comparator = (a,b)->
-						if a.get(name)>b.get(name)
+						if a.get("id")>b.get("id")
 							-1
 						else
 							1
 				else
-					@collection.comparator = name
+					@collection.comparatorAttr = "id"
+					@collection.comparator = "id"
+				@collection.sort()
+			else if name
+				if @collection.comparatorAttr is name
+					@collection.comparatorAttr = "inv"+name
+					@collection.comparator = (a,b)->
+						if a.get(name).toUpperCase()>b.get(name).toUpperCase()
+							-1
+						else
+							1
+				else
+					@collection.comparatorAttr = name
+					@collection.comparator = (a,b)->
+						if a.get(name).toUpperCase()>b.get(name).toUpperCase()
+							1
+						else
+							-1
 				@collection.sort()
 
 		onRender: ()->
