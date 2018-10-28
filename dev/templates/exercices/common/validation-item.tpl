@@ -12,7 +12,9 @@
 		<% break; case "pi": %>
 	<button class="btn btn-default js-clavier" type="button" title="Pi" name="pi">$\pi$</button>
 		<% break; case "sqr": %>
-	<button class="btn btn-default js-clavier" type="button" title="Carré" name="sqr">$\x^2$</button>
+	<button class="btn btn-default js-clavier" type="button" title="Carré" name="sqr">$x^2$</button>
+		<% break; case "cube": %>
+	<button class="btn btn-default js-clavier" type="button" title="Cube" name="cube">$x^3$</button>
 		<% break; case "empty": %>
 	<button class="btn btn-default js-clavier" type="button" title="Ensemble vide" name="empty">$\varnothing$</button>
 		<% break; case "union": %>
