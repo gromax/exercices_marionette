@@ -21,9 +21,10 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type:"input"
-							tag:"$a$"
-							name:"a"
-							description:"Valeur de a"
+							format: [
+								{ text:"$a =$", cols:3, class:"text-right" }
+								{ name:"a", cols:5, latex:true }
+							]
 						}
 						{
 							type:"validation"
@@ -58,15 +59,17 @@ define ["utils/math","utils/help"], (mM, help) ->
 						}
 						{
 							type:"input"
-							tag:"$m$"
-							name:"m"
-							description:"Valeur de m"
+							format: [
+								{ text:"$m =$", cols:3, class:"text-right" }
+								{ name:"m", cols:5, latex:true }
+							]
 						}
 						{
 							type:"input"
-							tag:"$p$"
-							name:"p"
-							description:"Valeur de p"
+							format: [
+								{ text:"$p =$", cols:3, class:"text-right" }
+								{ name:"p", cols:5, latex:true }
+							]
 						}
 						{
 							type:"validation"
