@@ -4,14 +4,17 @@ define ["utils/math","utils/help"], (mM, help) ->
 		init: (inputs, degMax=3) ->
 			if typeof inputs.fct is "undefined"
 				fct = mM.alea.poly { degre:{min:2, max:degMax }, coeffDom:[1,2,3], values:{ min:-10, max:10} }
+				inputs.fct = String fct
 			else
 				fct = mM.parse(inputs.fct)
 			if typeof inputs.a is "undefined"
 				a = mM.alea.real {min:-10, max:10}
+				inputs.a = String a
 			else
 				a = Number inputs.a
 			if typeof inputs.h is "undefined"
 				h = mM.alea.in [0.1, 0.5, 1, 2, 5]
+				inputs.h = String h
 			else
 				h = Number inputs.h
 			poly = mM.polynome.make fct
