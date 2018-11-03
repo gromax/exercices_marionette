@@ -91,6 +91,25 @@ define ["backbone.radio"], (Radio) ->
 		isOff: ->
 			@get("isOff")
 
+		sudo: (id) ->
+			that = @
+			defer = $.Deferred()
+			if not @isAdmin()
+				defer.reject({status:403})
+			else
+				request = $.ajax "api/session/sudo/#{id}", {
+					method: "POST"
+					dataType: "json"
+				}
+				request.done( (response)->
+					that.refresh(response)
+					Radio.channel('entities').request("data:purge")
+					defer.resolve()
+				).fail( (response)->
+					defer.reject(response)
+				)
+			return defer.promise()
+
 		mapItem: (itemsList) ->
 			itemsList = itemsList ? {}
 			rank = @get("rank")
