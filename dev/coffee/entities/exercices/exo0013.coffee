@@ -72,7 +72,12 @@ define ["utils/math"], (mM) ->
 								out
 							postVerificationRender: (view, data)->
 								for pt in view.graph.points
-									pt.setAttribute {fixed:true, x:data["x"+pt.name].processed, y: data["y"+pt.name].processed}
+									name = pt.name
+									ux = data["x#{name}"].processed
+									uy = data["y#{name}"].processed
+									view.graph.removeObject pt
+									view.graph.create("point", [ux,uy], {name:name, fixed:true, size:4, color:'blue'})
+								view.graph.create('line',["A","B"], {strokeColor:'#00ff00',strokeWidth:2})
 								view.graph.create('line',droite.float_2_points(max), {strokeColor:'blue',strokeWidth:2,fixed:true})
 						}
 						{
