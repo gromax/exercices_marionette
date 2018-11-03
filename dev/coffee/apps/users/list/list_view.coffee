@@ -17,6 +17,7 @@ define ["app", "jst","marionette"], (app, JST, Marionette)->
 			"click td a.js-editPwd": "item:editPwd"
 			"click button.js-delete": "item:delete"
 			"click button.js-forgotten": "item:forgotten"
+			"click button.js-sudo": "item:sudo"
 			"click": "item:show"
 		}
 
@@ -120,6 +121,7 @@ define ["app", "jst","marionette"], (app, JST, Marionette)->
 			@listenTo(@subCollectionView,"childview:item:editPwd", @editItemPwd)
 			@listenTo(@subCollectionView,"childview:item:delete", @deleteItem)
 			@listenTo(@subCollectionView,"childview:item:forgotten", @forgottenItem)
+			@listenTo(@subCollectionView,"childview:item:sudo", @sudoItem)
 			@showChildView('body', @subCollectionView)
 
 		showItem: (childView)->
@@ -136,6 +138,9 @@ define ["app", "jst","marionette"], (app, JST, Marionette)->
 
 		forgottenItem: (childView)->
 			@trigger("item:forgotten",childView)
+
+		sudoItem: (childView)->
+			@trigger("item:sudo",childView)
 
 		flash: (itemModel)->
 			newItemView = @subCollectionView.children.findByModel(itemModel)
