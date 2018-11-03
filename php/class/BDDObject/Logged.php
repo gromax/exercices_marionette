@@ -97,6 +97,11 @@ class Logged extends User
 		return null;
 	}
 
+	public static function setUser($user)
+	{
+		return (new Logged($user->toArray()))->updateTime()->setConnectedUser();
+	}
+
 	public static function tryConnexionOnInitMDP($key)
 	{
 		require_once BDD_CONFIG;
