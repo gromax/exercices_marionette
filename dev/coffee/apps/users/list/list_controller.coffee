@@ -189,6 +189,24 @@ define [
 								alert("Erreur inconnue. Essayez à nouveau ou prévenez l'administrateur [code #{response.status}/034]")
 							)
 
+					usersListView.on "item:sudo", (childView, e)->
+						model = childView.model
+						app.trigger("header:loading", true)
+						connecting = app.Auth.sudo model.get("id")
+						$.when(connecting).done( ()->
+							app.trigger("home:show")
+						).fail( (response)->
+							switch response.status
+								when 404
+									alert("Page inconnue !")
+								when 403
+									alert("Non autorisé !")
+								else
+									alert("Erreur inconnue.")
+						).always( ()->
+							app.trigger("header:loading", false)
+						)
+
 					app.regions.getRegion('main').show(usersListLayout)
 				).fail( (response)->
 					if response.status is 401
