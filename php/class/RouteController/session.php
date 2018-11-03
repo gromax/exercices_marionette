@@ -4,6 +4,7 @@ namespace RouteController;
 use ErrorController as EC;
 use SessionController as SC;
 use BDDObject\Classe;
+use BDDObject\User;
 use BDDObject\Logged;
 use BDDObject\Message;
 
@@ -62,6 +63,33 @@ class session
             );
             //return $logged->toArray();
         }
+    }
+
+    public function sudo()
+    {
+        $uLog = Logged::getConnectedUser();
+        if (!$uLog->isAdmin())
+        {
+            EC::set_error_code(404);
+            return false;
+        }
+        $id = $this->params["id"];
+        $userToConnect = User::getObject($id);
+        if ($userToConnect==null)
+        {
+            EC::set_error_code(404);
+            return false;
+        }
+        if (!$uLog->isStronger($userToConnect))
+        {
+            EC::set_error_code(403);
+            return false;
+        }
+        $logged = Logged::setUser($userToConnect);
+        return array_merge(
+            $logged->toArray(),
+            array("unread"=>Message::unReadNumber($logged->getId()) )
+        );
     }
 
     public function logged()
