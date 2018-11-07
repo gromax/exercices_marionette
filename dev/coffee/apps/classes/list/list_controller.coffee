@@ -32,6 +32,7 @@ define [
 				fetching = channel.request("custom:entities", ["classes", "users"])
 				$.when(fetching).done( (classesList, usersList)->
 					prof = usersList.get(id)
+
 					if prof isnt undefined
 						listItemsLayout = new Layout()
 						listItemsPanel = new Panel()
@@ -79,8 +80,16 @@ define [
 				showAddButton: prof isnt false or app.Auth.isProf()
 			}
 
+			if prof isnt false
+				idProf = prof.get("id")
+				filterFct = (child, index, collection) ->
+					return child.get("idOwner") is idProf
+			else
+				filterFct = false
+
 			listItemsView = new ListView {
 				collection: classesList
+				filterFct: filterFct
 				showFillClassButton: app.Auth.isAdmin()
 				showProfName: prof is false and app.Auth.isAdmin()
 			}
@@ -179,7 +188,19 @@ define [
 				app.regions.getRegion('dialog').show(view)
 
 			listItemsView.on "item:delete", (childView,e)->
-				childView.remove()
+				#childView.remove()
+				model = childView.model
+				idUser = model.get("id")
+				if confirm("Supprimer la classe « #{model.get('nom')} » ?")
+					destroyRequest = model.destroy()
+					app.trigger("header:loading", true)
+					$.when(destroyRequest).done( ()->
+						childView.remove()
+					).fail( (response)->
+						alert("Erreur. Essayez à nouveau !")
+					).always( ()->
+						app.trigger("header:loading", false)
+					)
 
 			app.regions.getRegion('main').show(listItemsLayout)
 	}
