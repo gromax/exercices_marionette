@@ -9,12 +9,12 @@ define [], () ->
 			description: ""
 			ouverte: false
 			pwd:""
-			date:"2000-01-01"
 		}
 
 		parse: (data) ->
 			if typeof data.ouverte is "string"
 				data.ouverte = (Number(data.ouverte)==1)
+			data.idOwner = Number data.idOwner
 			return data
 
 		fill: (liste) ->
