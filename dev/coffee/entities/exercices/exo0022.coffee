@@ -97,14 +97,14 @@
 
 							unfinished = false
 							switch ver.note
-								when 0 then list.push { type:"error", text:"La bonne réponse était &nbsp; $P(x) = #{polyDevTex}$."}
+								when 0 then list.push { type:"error", text:"La bonne réponse était &nbsp; $#{polyDevTex}$."}
 								when 2
 									# cela veut dire qu'il faut améliorer l'affichage
 									ver.note = 0
 									unfinished = true
 								when 1 then list.push { type:"success", text:"Bonne réponse." }
 								else
-									list.push { type:"error", text:"La bonne réponse était &nbsp; $P(x) = #{polyDevTex}$."}
+									list.push { type:"error", text:"La bonne réponse était &nbsp; $#{polyDevTex}$."}
 
 							out = {
 								note: ver.note
