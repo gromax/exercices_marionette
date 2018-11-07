@@ -121,7 +121,22 @@ class classes
             return false;
         }
         $data = json_decode(file_get_contents("php://input"),true);
-        $data["owner"] = $uLog;
+        if ($uLog->isAdmin() && isset($data["idOwner"]))
+        {
+            // Dans ce cas, l'utilisateur a la possibilité de créer une classe pour un autre
+            $idOwner = $data["idOwner"];
+            $owner =User::getObject($idOwner);
+            if (($owner == null) || !$owner->isProf())
+            {
+                EC::set_error_code(501);
+                return false;
+            }
+            $data["owner"] = $owner;
+        } else {
+            // Sinon le propriétaire est forcément celui qui est connecté
+            $data["owner"] = $uLog;
+        }
+
         $classe = new Classe($data);
         $validation = $classe->insertion_update_validation();
         if($validation === true)
