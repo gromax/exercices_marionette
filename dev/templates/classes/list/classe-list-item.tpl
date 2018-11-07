@@ -1,6 +1,6 @@
 <td><span class="badge badge-pill badge-primary"><%- id %></span></td>
 <td><%- nom %></td><% if (showProfName) {%>
-<td><%- nomOwner %></td><% } %>
+<td><%if (linkProf) {%><a href="#classes/prof:<%- idOwner%>" class="js-classe-prof"><%- nomOwner %></a><% } else { %><%- nomOwner %><% } %></td><% } %>
 <td><% if(ouverte) {%><span class="text-success">Ouverte</span><%} else {%><span class="text-danger">Fermée</span><%}%></td>
 <td><%- date %></td> <!-- à parser -->
 <td align="right">
