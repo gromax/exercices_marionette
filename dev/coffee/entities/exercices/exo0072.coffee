@@ -169,7 +169,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 						{
 							type:"text"
 							ps: [
-								"En utilisant le résultat précédent, dites vers quelle valeur s'approche &nbsp; m &nbsp; quand &nbsp; $h\\to 0$."
+								"En utilisant le résultat précédent, dites vers quelle valeur s'approche &nbsp; $m$ &nbsp; quand &nbsp; $h\\to 0$."
 							]
 						}
 						{
