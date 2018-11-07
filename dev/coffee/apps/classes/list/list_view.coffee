@@ -12,6 +12,7 @@ define ["app", "jst", "marionette"], (app, JST, Marionette) ->
 			"click td a.js-edit": "item:edit"
 			"click button.js-delete": "item:delete"
 			"click td a.js-fill": "item:fill"
+			"click td a.js-classe-prof": "item:classe-prof"
 			"click": "item:show"
 		}
 
@@ -26,6 +27,7 @@ define ["app", "jst", "marionette"], (app, JST, Marionette) ->
 		serializeData: ->
 			data = _.clone(@model.attributes)
 			data.showProfName = @options.showProfName
+			data.linkProf = @options.showProfName and (@model.attributes.idOwner isnt app.Auth.get("id"))
 			data.showFillClassButton = @options.showFillClassButton
 			data
 
@@ -63,15 +65,20 @@ define ["app", "jst", "marionette"], (app, JST, Marionette) ->
 			}
 
 		onRender: ->
-			@subCollection = new CollectionView {
+			params = {
 				collection:@collection
 				showProfName:@options.showProfName
 				showFillClassButton:@options.showFillClassButton
 			}
+			if @options.filterFct isnt false
+				params.filter = @options.filterFct
+
+			@subCollection = new CollectionView params
 			@listenTo(@subCollection,"childview:item:show", @showItem)
 			@listenTo(@subCollection,"childview:item:fill", @fillItem)
 			@listenTo(@subCollection,"childview:item:edit", @editItem)
 			@listenTo(@subCollection,"childview:item:delete", @deleteItem)
+			@listenTo(@subCollection,"childview:item:classe-prof", @classeProfItem)
 			@showChildView('body', @subCollection)
 
 		showItem: (childView)->
@@ -85,6 +92,9 @@ define ["app", "jst", "marionette"], (app, JST, Marionette) ->
 
 		deleteItem: (childView)->
 			@trigger("item:delete",childView)
+
+		classeProfItem:(childView)->
+			app.trigger("classes:prof",childView.model.get("idOwner"))
 
 		flash: (itemModel)->
 			newItemView = @subCollection.children.findByModel(itemModel)
