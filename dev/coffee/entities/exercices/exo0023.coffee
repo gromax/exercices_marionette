@@ -49,12 +49,13 @@ define ["utils/math", "utils/help"], (mM, help) ->
 							list: help.derivee.tangente
 						}
 					]
-					validations:{
+					validations: {
 						e:(user)->
 							pattern =/y\s*=([^=]+)/
-							result = pattern.exec(userValue)
+							result = pattern.exec(user)
 							if result
-								out =  mM.verification.numberValidation(result, {})
+								# result est un tableau ["y=expr", "expr"]
+								out =  mM.verification.numberValidation(result[1], {})
 								out.user = user
 							else
 								out = { processed:false, user:user, error:"L'équation doit être de la forme y=..." }
@@ -65,7 +66,7 @@ define ["utils/math", "utils/help"], (mM, help) ->
 							ver = mM.verification.isSame(data.e.processed, eqReduite, { developp:true, formes:"FRACTION"} )
 							if ver.note is 0 then ver.goodMessage = { type:"error", text:"La bonne réponse était &nbsp; $y = #{eqReduite.tex()}$."}
 							list = [
-								{ type:"normal", text:"<b>#{tag}</b> &nbsp; :</b>&emsp; Vous avez répondu &nbsp; $y = #{data.e.processed.tex}$" }
+								{ type:"normal", text:"Vous avez répondu &nbsp; $y = #{data.e.processed.tex}$" }
 								ver.goodMessage
 							]
 							out = {
