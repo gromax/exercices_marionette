@@ -50,7 +50,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 						{
 							name:"solutions"
 							type:"all"
-							good:goods
+							good:solutions
 							tag:"$\\mathcal{S}$"
 						}
 					]
