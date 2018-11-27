@@ -63,7 +63,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 							good:droite.m()
 						}
 						(data)->
-							if not(droite.m().isOne()) and mM.float(mM.exec([data["a"].processed.object, droite.m(), "*"])) is 1
+							if not(droite.m().isOne()) and not(droite.m().isOne(-1)) and mM.float(mM.exec([data["a"].processed.object, droite.m(), "*"])) is 1
 								{
 									add: {
 										type:"ul"
