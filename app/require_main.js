@@ -18,7 +18,8 @@ requirejs.config({
 		bootstrap:"../vendor/bootstrap/dist/js/bootstrap",
 		jst:"./templates.underscore",
 		//mathjax: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML",
-		mathjax: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_SVG",
+		//mathjax: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_SVG",
+		mathjax: "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_SVG",
 		jsxgraph: "https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.6/jsxgraphcore",
 		mathquill: "../vendor/mathquill-0.10.1/mathquill.min",
 		svg:"./utils/svg.min"
@@ -61,7 +62,10 @@ requirejs.config({
 				MathJax.Hub.Config({
 					jax:["output/SVG"],
 					tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
-					SVG:{ scale:120 }
+					SVG:{ scale:120 },
+					"fast-preview": {
+						disabled:true
+					}
 				});
 				MathJax.Hub.Startup.onload();
 				return MathJax;
