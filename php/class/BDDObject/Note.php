@@ -27,7 +27,12 @@ final class Note
 		if(isset($params['aEF'])) $this->aEF = $params['aEF'];
 		if(isset($params['aUF'])) $this->aUF = $params['aUF'];
 		if(isset($params['finished'])) $this->finished = (integer) $params['finished'];
-		if(isset($params['note'])) $this->note = (integer) $params['note'];
+		if(isset($params['note'])) {
+			$this->note = (integer) $params['note'];
+			if ($this->note>100) {
+				$this->note = 100;
+			}
+		}
 		if(isset($params['inputs'])) $this->inputs = (string) $params['inputs'];
 		if(isset($params['answers'])) $this->answers = (string) $params['answers'];
 		if(isset($params['date'])) $this->date=$params['date'];
@@ -149,7 +154,7 @@ final class Note
 		try {
 			// Ajout de la note
 			DB::insert(PREFIX_BDD.'assocUE', array(
-				'note' => $this->notePlafond(),
+				'note' => $this->note,
 				'inputs' => $this->inputs,
 				'answers'=>$this->answers,
 				'finished' => $this->finished,
@@ -169,22 +174,19 @@ final class Note
 		return $this->id;
 	}
 
-	private function notePlafond()
-	{
-		if ($this->note>100)
-		{
-			return 100;
-		}
-		return $this->note;
-	}
-
 	public function update($params=array(), $updateBDD=true)
 	{
 		$bddModif=false;
 		if(isset($params['finished'])) { $this->finished = (boolean) $params['finished']; $bddModif=true; }
 		if(isset($params['inputs'])) { $this->inputs = $params['inputs']; $bddModif=true; }
 		if(isset($params['answers'])) { $this->answers = $params['answers']; $bddModif=true; }
-		if(isset($params['note'])) { $this->note = (integer)$params['note']; $bddModif=true; }
+		if(isset($params['note'])) {
+			$this->note = (integer)$params['note'];
+			if ($this->note>100) {
+				$this->note = 100;
+			}
+			$bddModif=true;
+		}
 
 		if (!$bddModif) {
 			EC::add("Aucune modification.");
@@ -200,7 +202,7 @@ final class Note
 
 		require_once BDD_CONFIG;
 		try{
-			DB::update(PREFIX_BDD.'assocUE', array('note'=>$this->notePlafond(), 'finished'=>$this->finished, 'answers'=>$this->answers, 'inputs'=>$this->inputs, 'date'=>$this->date),"id=%i",$this->id);
+			DB::update(PREFIX_BDD.'assocUE', array('note'=>$this->note, 'finished'=>$this->finished, 'answers'=>$this->answers, 'inputs'=>$this->inputs, 'date'=>$this->date),"id=%i",$this->id);
 		} catch(MeekroDBException $e) {
 			EC::addBDDError($e->getMessage(), 'Note/update');
 			return false;
