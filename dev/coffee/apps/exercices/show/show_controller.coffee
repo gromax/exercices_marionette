@@ -184,8 +184,10 @@ define [
 						if validation_errors.length is 0
 							verifs = model.verification(model_validation)
 							# calcul de la note
+							# ici on arrondit par le haut. Bien sûr cela peut occasioner des points en trop par exemple avec
+							# des baremes coupés en 3. Mais sur l'ensemble l'effet reste faible.
+							note = Math.min(Math.ceil(verifs.note*model.get("bareme")*100/baremeTotal + note), 100)
 
-							note = verifs.note*model.get("bareme")*100/baremeTotal + note
 
 							answersData = _.extend(answersData, data)
 
@@ -262,7 +264,7 @@ define [
 								if validation_errors.length is 0
 									verifs = model.verification(model_validation)
 									# calcul de la note
-									note = verifs.note*model.get("bareme")*100/baremeTotal + note
+									note = Math.min(Math.ceil(verifs.note*model.get("bareme")*100/baremeTotal + note),100)
 									model = traitement_final(brique_view, model, verifs, note)
 									# Certains éléments sont présents avant et après correction
 									# avec une modification après correction
@@ -632,10 +634,26 @@ define [
 							return it.get("id") is idEF
 						)
 
+						list = faits.where({aEF:idEF, aUF:idUF})
+						i = list.indexOf(ue)
+						# Recherche du précédent
+						if i>0
+							itemPrev = list[i-1]
+							arianePrev = itemPrev.get("id")
+						else
+							arianePrev = false
+
+						# Recherche du suivant
+						if i<list.length-1
+							itemNext = list[i+1]
+							arianeNext = itemNext.get("id")
+						else
+							arianeNext = false
+
 						app.Ariane.add([
 							{ text:userfiche.get("nomFiche"), e:"devoir:show", data:idUF, link:"devoir:"+idUF},
 							{ text:"Exercice "+(index+1), e:"userfiche:exofiche:faits", data:[idUF,idEF], link:"devoir:"+idUF+"/exercice:"+idEF},
-							{ text:"Essai #"+idUE },
+							{ text:"Essai #"+idUE, e:"exercice-fait:run", data:idUE, link:"exercice-fait:"+idUE, prev: arianePrev, next:arianeNext },
 						])
 
 						idE = exofiche.get("idE")
