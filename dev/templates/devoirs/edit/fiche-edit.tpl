@@ -21,5 +21,13 @@
 		</label>
 	</div>
 
+	<div class="form-group">
+		<label for="devoir-notation" class="control-label">Type de notation :</label>
+		<select class="form-control" id="devoir-notation" name="notation">
+			<option value=0 <% if(0==notation) { %>selected<% } %> >Poids dégressif</option>
+			<option value=1 <% if(1==notation) { %>selected<% } %> >Valeur supérieure</option>
+		</select>
+	</div>
+
 	<button class="btn btn-success js-submit">Enregistrer</button>
 </form>
