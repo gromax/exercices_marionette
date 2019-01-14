@@ -96,9 +96,9 @@ if (el.misc) {%>
 \tkzTabInit[lgt=<%- el.lgt %>, espcl=<%- el.espcl %>, lw=<%- el.lw %>]{<%- el.entetes %>}{<%- el.x_list %>}<%
 					_.each(el.lines, function(itLigne){
 						if (itLigne.type=="sign") {%>
-\tkzTabLine{<%- itLigne.values.join(",")  %> }<%
+\tkzTabLine{<%- itLigne.values  %> }<%
 						} else {%>
-\tkzTabVar{<%- itLigne.values.join(",") %>}<%
+\tkzTabVar{<%- itLigne.values %>}<%
 						}
 					});%>
 \end{tikzpicture}\end{center}
