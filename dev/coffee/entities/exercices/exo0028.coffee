@@ -203,7 +203,7 @@
 								out = { processed:false, user:user, error:"L'équation doit être de la forme y=..." }
 							out
 					}
-					verifications:[
+					verifications: [
 						(data) ->
 							ver = mM.verification.isSame(data.e.processed, t, { developp:true, formes:"FRACTION"} )
 							if ver.note is 0 then ver.goodMessage = { type:"error", text:"La bonne réponse était &nbsp; $y = #{t.tex()}$."}
