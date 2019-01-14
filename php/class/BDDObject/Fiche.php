@@ -18,6 +18,8 @@ final class Fiche
 	private $description = "";			// Description
 	private $visible = false;			// visible
 	private $actif = false;				// actif
+	private $notation = 0;				// type de notation
+
 
 	##################################### METHODES STATIQUES #####################################
 
@@ -32,6 +34,7 @@ final class Fiche
 		if(isset($params['description'])) $this->description = $params['description'];
 		if(isset($params['visible'])) $this->visible = (boolean) $params['visible'];
 		if(isset($params['actif'])) $this->actif = (boolean) $params['actif'];
+		if(isset($params['notation'])) $this->notation = (integer) $params['notation'];
 	}
 
 	public static function getList($params= array())
@@ -39,12 +42,12 @@ final class Fiche
 		require_once BDD_CONFIG;
 		try {
 			if (isset($params["owner"])) {
-				$bdd_result=DB::query("SELECT id, idOwner, nom, date, description, visible, actif FROM ".PREFIX_BDD."fiches WHERE idOwner=%s ORDER BY date",$params["owner"]);
+				$bdd_result=DB::query("SELECT id, idOwner, nom, date, description, visible, actif, notation FROM ".PREFIX_BDD."fiches WHERE idOwner=%s ORDER BY date",$params["owner"]);
 			} elseif (isset($params["eleve"])) {
-				$bdd_result=DB::query("SELECT DISTINCT f.id, f.idOwner, f.nom, f.date, f.description, f.visible, f.actif FROM ".PREFIX_BDD."fiches f JOIN ".PREFIX_BDD."assocUF a ON f.id = a.idFiche WHERE a.idUser=%i AND f.visible=1 ORDER BY date",$params["eleve"]);
+				$bdd_result=DB::query("SELECT DISTINCT f.id, f.idOwner, f.nom, f.date, f.description, f.visible, f.actif, f.notation FROM ".PREFIX_BDD."fiches f JOIN ".PREFIX_BDD."assocUF a ON f.id = a.idFiche WHERE a.idUser=%i AND f.visible=1 ORDER BY date",$params["eleve"]);
 				// Un même élève pourrait être attaché plusieurs fois à une même fiche
 			} else {
-				$bdd_result=DB::query("SELECT f.id, f.idOwner, u.nom nomOwner, f.nom, f.date, f.description, f.visible, f.actif FROM (".PREFIX_BDD."fiches f JOIN ".PREFIX_BDD."users u ON f.idOwner = u.id) ORDER BY f.date");
+				$bdd_result=DB::query("SELECT f.id, f.idOwner, u.nom nomOwner, f.nom, f.date, f.description, f.visible, f.actif, f.notation FROM (".PREFIX_BDD."fiches f JOIN ".PREFIX_BDD."users u ON f.idOwner = u.id) ORDER BY f.date");
 			}
 		} catch(MeekroDBException $e) {
 			EC::addBDDError($e->getMessage(), "Fiche/getList");
@@ -149,6 +152,7 @@ final class Fiche
 		if(isset($params['description'])) { $this->description = $params['description']; $bddModif=true; }
 		if(isset($params['visible'])) { $this->visible = (boolean) $params['visible']; $bddModif=true; }
 		if(isset($params['actif'])) { $this->actif = (boolean) $params['actif']; $bddModif=true; }
+		if(isset($params['notation'])) { $this->notation = (integer) $params['notation']; $bddModif=true; }
 
 		if (!$bddModif) {
 			EC::add("Aucune modification.");
@@ -175,7 +179,7 @@ final class Fiche
 
 	public function toArray()
 	{
-		$answer=array("nom"=>$this->nom, "description"=>$this->description, "date"=>$this->date, "visible"=>$this->visible, "actif"=>$this->actif);
+		$answer=array("nom"=>$this->nom, "description"=>$this->description, "date"=>$this->date, "visible"=>$this->visible, "actif"=>$this->actif, "notation"=>$this->notation);
 		if ($this->id!=null) $answer['id']=$this->id;
 		if ($this->idOwner!=null) $answer['idOwner']=$this->idOwner;
 		return $answer;
