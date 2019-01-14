@@ -41,8 +41,8 @@ define [
 
 						layout = new Layout()
 						devoirPanel = new DevoirPanel({ model: fiche, profMode:true })
-						notePanel = new NotePanel({ model: userfiche, exofiches:exofiches, faits:faits })
-						view = new ExercicesListView({ collection: exofiches, userfiche:userfiche, faits:faits, profMode:true })
+						notePanel = new NotePanel({ model: userfiche, exofiches:exofiches, faits:faits, notation:fiche.get("notation") })
+						view = new ExercicesListView({ collection: exofiches, userfiche:userfiche, faits:faits, profMode:true, notation:fiche.get("notation") })
 
 						view.on "childview:exofiche:run", (childview) ->
 							model = childview.model
@@ -84,8 +84,8 @@ define [
 
 						layout = new Layout()
 						devoirPanel = new DevoirPanel({ model: userfiche })
-						notePanel = new NotePanel({ model: userfiche, exofiches:exofiches, faits:faits })
-						view = new ExercicesListView({ collection: exofiches, userfiche:userfiche, faits:faits, showFaitsButton:true })
+						notePanel = new NotePanel({ model: userfiche, exofiches:exofiches, faits:faits, notation: userfiche.get("notation") })
+						view = new ExercicesListView({ collection: exofiches, userfiche:userfiche, faits:faits, showFaitsButton:true, notation: userfiche.get("notation")})
 
 						view.on "childview:exofiche:run", (childview) ->
 							model = childview.model
