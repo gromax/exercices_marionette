@@ -269,7 +269,7 @@ define [
 				$.when(fetchingData).done( (fiches, userfiches, exofiches, faits) ->
 					fiche = fiches.get(id)
 					if fiche isnt undefined
-						view = new ElevesListView { collection: userfiches, idFiche:fiche.get("id"), exofiches:exofiches, faits:faits}
+						view = new ElevesListView { collection: userfiches, idFiche:fiche.get("id"), exofiches:exofiches, faits:faits, notation:fiche.get("notation") }
 						view.on "note:delete", (childview) ->
 							childview.remove()
 
