@@ -20,7 +20,7 @@ define ["jst","marionette", "mathjax"], (JST,Marionette, MathJax) ->
 		serializeData: ->
 			data = _.clone(@model.attributes)
 			data.actif = @options.actif
-			data.note = @model.calcNote(@faits)
+			data.note = @model.calcNote(@faits, @options.notation)
 			data.n_faits = @faits.length
 			data.numero = @options.numero
 			data.showFaitsButton = @options.showFaitsButton
@@ -56,6 +56,7 @@ define ["jst","marionette", "mathjax"], (JST,Marionette, MathJax) ->
 				numero: index+1
 				profMode: @options.profMode is true
 				showFaitsButton: @options.showFaitsButton is true # bouton élève pour accéder aux exercices faits
+				notation: @options.notation
 			}
 	}
 

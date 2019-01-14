@@ -15,7 +15,7 @@ define ["jst","marionette"], (JST,Marionette) ->
 
 		serializeData: () ->
 			data = _.clone(this.model.attributes)
-			note = @model.calcNote(@exofiches, @faits)
+			note = @model.calcNote(@exofiches, @faits, @options.notation)
 			@model.set("_note",note)
 			data.note = String(note)
 			if data.note.length is 1
@@ -52,6 +52,7 @@ define ["jst","marionette"], (JST,Marionette) ->
 			return {
 				exofiches: @options.exofiches
 				faits: @options.faits
+				notation: @options.notation
 			}
 
 		filter: (child, index, collection) ->
@@ -114,6 +115,7 @@ define ["jst","marionette"], (JST,Marionette) ->
 				collection: @collection
 				exofiches: @options.exofiches
 				faits: @options.faits.toJSON()
+				notation: @options.notation
 				idFiche: @options.idFiche
 			}
 
