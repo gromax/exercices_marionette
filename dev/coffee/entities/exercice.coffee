@@ -222,6 +222,23 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 									user: userValue
 									error:false
 								}
+						when val is "none"
+							{
+								processed: userValue
+								user: userValue
+								error:false
+							}
+						# when val instanceof RegExp
+						# 	result = val.exec(userValue)
+						# 	if result
+						# 		error = false
+						# 	else
+						# 		error = "L'expression ne convient pas"
+						# 	{
+						# 		processed: result
+						# 		user: userValue
+						# 		error: error
+						# 	}
 						when result=/radio:([0-9]+)/.exec(val)
 							result = Number(result[1])
 							p = Number userValue
@@ -402,6 +419,9 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 					when "exo0066" then require ["entities/exercices/exo0066"], successCB, failedCB
 					when "exo0067" then require ["entities/exercices/exo0067"], successCB, failedCB
 					when "exo0071" then require ["entities/exercices/exo0071"], successCB, failedCB
+					when "exo0072" then require ["entities/exercices/exo0072"], successCB, failedCB
+					when "exo0074" then require ["entities/exercices/exo0074"], successCB, failedCB
+					when "exo0075" then require ["entities/exercices/exo0075"], successCB, failedCB
 					when "exoTest" then require ["entities/exercices/exoTest"], successCB, failedCB
 					else require ["entities/exercices/#{filename}"], successCB, failedCB
 			else

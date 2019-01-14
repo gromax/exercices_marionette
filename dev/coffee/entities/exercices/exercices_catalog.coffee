@@ -615,6 +615,26 @@ define [], () ->
 				fixedSettings: { affine:false, point:true }
 			}
 			{
+				id:74
+				filename: "exo0074"
+				title:"Calcul de la limite d'une fonction"
+				description:"Vous devez calculer la limites d'une fonction et éventuellement proposer l'équation d'une asymptote."
+				keyWords:["Analyse", "fonction", "Limite", "TSTL", "Asymptote"]
+				options: {
+					a: {
+						tag:"Avec ln ou exp"
+						options:["Avec", "Sans"]
+					}
+				}
+			}
+			{
+				id:75
+				filename: "exo0075"
+				title:"Dérivée et tableau de variation"
+				description:"Une fonction de degré 3 étant donnée, vous devez déterminer sa dérivée, étudier le signe de celle-ci et en déduire les variations de la fonction"
+				keyWords:["Analyse", "fonction", "Dérivée", "1STL"]
+			}
+			{
 				id:9999
 				filename: "exoTest"
 				title: "Exercice de test"
