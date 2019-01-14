@@ -339,11 +339,14 @@ define [
 			data = Backbone.Syphon.serialize(@)
 			cv_datas = @itemsView.children.map( (childview)->
 				model = childview.model
-				if  (model.get("type") is "jsxgraph") and model.get("getData")
-					fct = model.get("getData")
-					return fct(childview.graph)
-				else
-					return null;
+				switch
+					when  (model.get("type") is "jsxgraph") and model.get("getData")
+						fct = model.get("getData")
+						return fct(childview.graph)
+					when fct = model.get("getData")
+						return fct(childview)
+					else
+						return null;
 			)
 
 			data = _.reduce(cv_datas, (memo, item)->
