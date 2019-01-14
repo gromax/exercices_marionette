@@ -20,7 +20,7 @@
 				when name is "ℝ" then (new Ensemble()).inverse()
 				when (name is "π") or (name is "pi") then @pi()
 				when name is "∅" then new Ensemble()
-				when (name is "∞") or (name is "infini") then new InftyNumber()
+				when (name is "∞") or (name is "infini") or (name is "infty") then new InftyNumber()
 				when name is "i" then new ComplexeNumber(0,1)
 				when name is "" then new RealNumber()
 				else new Monome(1, { name:name, power:1 })
