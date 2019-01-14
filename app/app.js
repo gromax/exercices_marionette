@@ -53,7 +53,7 @@ define(["marionette","jquery-ui","bootstrap"], function(Marionette){
 
 
 	Manager.on("start", function(){
-		Manager.version = "2.2.327";
+		Manager.version = "2.2.368";
 		var historyStart = function() {
 			require([
 				"apps/header/header_app",
