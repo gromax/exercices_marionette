@@ -16,6 +16,11 @@ define [], () ->
 			data.idFiche = Number data.idFiche
 			data.nomCompletUser = "#{data.nomUser} #{data.prenomUser}"
 			data.actif = (data.actif is "1") or (data.actif is 1) or (data.actif is true)
+			if data.notation
+				# notation est transmis pour un chargement élève
+				data.notation = Number data.notation
+			else
+				data.notation = 0
 			if data.ficheActive
 				data.ficheActive = (data.ficheActive is "1") or (data.ficheActive is 1) or (data.ficheActive is true)
 			return data
@@ -34,10 +39,11 @@ define [], () ->
 				exercices_coeff[item.get("id")] = { coeff:item.get("coeff"), num:item.get("num") } for item in models
 			return exercices_coeff
 
-		calcNote: (aEFs_models_array, notes_json_array) ->
+		calcNote: (aEFs_models_array, notes_json_array, notation=0) ->
+			# notation = système de notation
 			total = aEFs_models_array.reduce (memo, item) ->
 				notes_of_EF = _.where(notes_json_array, { aEF: item.get("id") })
-				return item.calcNote(notes_of_EF)*item.get("coeff")+ memo
+				return item.calcNote(notes_of_EF, notation)*item.get("coeff")+ memo
 			, 0
 
 			totalCoeff = aEFs_models_array.reduce (memo,item) ->
