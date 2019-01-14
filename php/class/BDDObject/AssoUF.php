@@ -75,8 +75,9 @@ final class AssoUF
 		else $idOwner = null;
 		require_once BDD_CONFIG;
 		try {
+			// pour un élève qui ne charge pas la fiche parente, je joint au chargement la valeur de notation permettant de calculer la note
 			if ($idUser!==null) {
-				$bdd_result=DB::query("SELECT a.id, a.idUser, a.idFiche, a.actif, f.actif as ficheActive, f.nom as nomFiche, f.description, a.date FROM (".PREFIX_BDD."assocUF a JOIN ".PREFIX_BDD."fiches f ON f.id = a.idFiche ) WHERE a.idUser=%i AND f.visible=1 ORDER BY date",$idUser);
+				$bdd_result=DB::query("SELECT a.id, a.idUser, a.idFiche, a.actif, f.actif as ficheActive, f.nom as nomFiche, f.description, f.notation, a.date FROM (".PREFIX_BDD."assocUF a JOIN ".PREFIX_BDD."fiches f ON f.id = a.idFiche ) WHERE a.idUser=%i AND f.visible=1 ORDER BY date",$idUser);
 			} elseif ($idOwner!==null){
 				$bdd_result=DB::query("SELECT a.id, a.idUser, u.nom as nomUser, u.prenom as prenomUser,  a.idFiche, a.actif, a.date FROM ((".PREFIX_BDD."assocUF a JOIN ".PREFIX_BDD."users u ON u.id = a.idUser) JOIN ".PREFIX_BDD."fiches f ON f.id = a.idFiche) WHERE f.idOwner=%i ORDER BY date",$idOwner);
 			} elseif ($idFiche!==null) {
