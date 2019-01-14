@@ -387,11 +387,15 @@
 			a = borne_inf
 			racines_derivee.push(borne_sup)
 			solutions = []
+			lastX = a-1; # utilisé pour éviter les doublons
 			for b in racines_derivee
 				if (b>a) and (b<=borne_sup)
 					x = @solve_dichotomy(a,b,decimals,offset)
-					if typeof x isnt "undefined" then solutions.push(x)
+					if (typeof x isnt "undefined") and (x isnt lastX)
+						lastX = x
+						solutions.push(x)
 					a = b
+			# les solutions tombent normalement dans l'ordre, c'est juste que borne_inf et borne_sup peuvent être après le premier et avant le dernier
 			solutions
 		solveExact: (value,imag) ->
 			# On résout poly = value
