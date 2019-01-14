@@ -26,23 +26,34 @@ define ["entities/exercices/exercices_catalog"], (catalog) ->
 			if not _.isEmpty(errors)
 				return errors
 
-		calcNote: (notesArray) ->
+		calcNote: (notesArray, notation=0) ->
+			#notation représente le système de notation
+			# 0 : système de poids dégressif, le défaut
+			# 1 : on prend les n meilleurs
+
+			notes = (Number(it.note) for it in notesArray)
 			num = Math.max(@get("num"), 1)
-			noteExo = 0
-			poidsExo = 0
-			l = notesArray.length
+
+			l = notes.length
 			# Il faut que l'élève ait fait au moins num fois l'exercice
-			# Sinon, on complète en considérant qu'il y a des 0
-
 			if l<num
-				poidsExo = poidsExo*.9 + 1 for i in [1..num-l]
+				notes = (0 for i in [1..num-l]).concat(notes)
 
-
-			for n in notesArray
-				note = Number n.note
-				noteExo = noteExo*.9 + note;
-				poidsExo = poidsExo*.9 + 1;
-			Math.ceil(noteExo/poidsExo);
+			if notation is 1
+				notes.sort()
+				noteExo = notes[-num..].reduce (x,y)-> x+y
+				Math.ceil(noteExo/num)
+			else
+				# Il faut tenir compte du cas où l'élève n'a pas fait tous les exos
+				# revient à ajouter les 0 nécessaires
+				#if l<num
+				#	poidsExo = poidsExo*.9 + 1 for i in [1..num-l]
+				noteExo = 0
+				poidsExo = 0
+				for n in notes
+					noteExo = noteExo*.9 + n
+					poidsExo = poidsExo*.9 + 1
+				Math.ceil(noteExo/poidsExo)
 
 		parse: (data) ->
 			if data.id
