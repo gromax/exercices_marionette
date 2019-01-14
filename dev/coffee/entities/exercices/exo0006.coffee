@@ -88,7 +88,7 @@ define ["utils/math"], (mM) ->
 							type: "validation"
 						}
 					]
-					validations:{
+					validations: {
 						xA: "real"
 						yA: "real"
 						xB: "real"
