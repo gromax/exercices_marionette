@@ -40,7 +40,8 @@ define ["entities/exercices/exercices_catalog"], (catalog) ->
 				notes = (0 for i in [1..num-l]).concat(notes)
 
 			if notation is 1
-				notes.sort()
+				# attention le sort est alphabétique par défaut...
+				notes.sort (a,b)-> if a>b then 1 else -1
 				noteExo = notes[-num..].reduce (x,y)-> x+y
 				Math.ceil(noteExo/num)
 			else
