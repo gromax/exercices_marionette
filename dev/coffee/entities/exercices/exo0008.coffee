@@ -20,9 +20,9 @@ define ["utils/math"], (mM) ->
 				poly = mM.polynome.make { points:points, variable:"x"}
 				inputs.p = String(poly)
 			# initialisation des images et antécédents à trouver
-			if typeof inputs.xi is "undefined" then xi = mM.alea.real { min: -max, max: max }
-			else xi = inputs.xi = Number inputs.xi
 
+			if typeof inputs.xi is "undefined" then xi = inputs.xi = mM.alea.real { min: -max, max: max }
+			else xi = Number inputs.xi
 
 			if typeof inputs.xa is "undefined" then xa = mM.alea.real { min: -max, max: max }
 			else xa = Number inputs.xa
