@@ -45,6 +45,9 @@
 				else new RealNumber()
 	class MObject
 		simplify: (infos=null) -> @
+		fixDecimals: (decimals) -> @ # fonction destinée à parcourir récurisvement les objets et à nettoyer dans les valeurs numériques d'évenutuels résultats d'un calcul
+		# comme 0.1 + 0.1 + 0.1 qui ne donne pas 0.3
+		# l'objet est modifié, on retourne l'objet pour permettre le chaînage
 		toString: -> "?"
 		tex: -> "?"
 		toClone: -> new MObject()
@@ -215,6 +218,9 @@
 			if options.tex then str = "\\left(#{str}\\right)"
 			else str = "(#{str})"
 			[str, false, false, false]
+		fixDecimals: (decimals) ->
+			item.fixDecimals(decimals) for item in @operands
+			@
 		simplify: (infos=null,developp=false,memeDeno=false)->
 			for operand, i in @operands
 				if not @_plus then operand.opposite()
@@ -408,6 +414,10 @@
 			else
 				if den[3] then den[0] = "(#{den[0]})"
 			["#{num[0]}/#{den[0]}", num[1] is den[1], false, true]
+		fixDecimals: (decimals) ->
+			op.fixDecimals(decimals) for op in @numerator
+			op.fixDecimals(decimals) for op in @denominator
+			@
 		simplify: (infos=null,developp=false, memeDeno=false) ->
 			@_signature = null
 			for operand, i in @numerator
@@ -740,6 +750,10 @@
 					if b[2] or b[3] or not b[1] or (@_base instanceof FunctionNumber) then b[0] = "(#{b[0]})"
 					if e[2] or e[3] then e[0] = "(#{e[0]})"
 				["#{b[0]}^#{e[0]}", @_plus, false, true]
+		fixDecimals: (decimals) ->
+			@_base.fixDecimals(decimals)
+			@_exposant.fixDecimals(decimals)
+			@
 		simplify: (infos=null, developp=false,memeDeno=false) ->
 			@_exposant = @_exposant.simplify(infos,developp,memeDeno)
 			@_base = @_base.simplify(infos,developp,memeDeno)
@@ -846,7 +860,7 @@
 			if cleanZero and (@symbols[name] is 0) then delete @symbols[name]
 			@
 		hasSymbols: -> Object.keys(@symbols).length>0
-		isSymbol: (name) -> (@symbols[name]? is 1) and (Object.keys(@symbols).length is 1) and (@coeff.isOne()) # Vérifie si ce monome est 1.symbol^1 (surtout pour e)
+		isSymbol: (name) -> (@symbols[name] is 1) and (Object.keys(@symbols).length is 1) and (@coeff.isOne()) # Vérifie si ce monome est 1.symbol^1 (surtout pour e)
 		# Fonctions de NumberObject
 		setPlus: (plus) ->
 			@coeff.setPlus(plus)
@@ -922,6 +936,9 @@
 						if options.tex then outString = csCoeff[0]+outString
 						else outString = csCoeff[0]+"*"+outString
 			[outString,coeffPositif,false,multObj]
+		fixDecimals: (decimals) ->
+			@coeff.fixDecimals(decimals)
+			@
 		simplify: (infos=null) ->
 			for key,power of @symbols
 				if power is 0
@@ -1129,6 +1146,9 @@
 					if @_plus then ["(#{@_function.alias}(#{@_operand}))^#{power}", true, false, false]
 					else ["(-#{@_function.alias}(#{@_operand}))^#{power}", true, false, false]
 				else ["#{@_function.alias}(#{@_operand})", @_plus, false, false]
+		fixDecimals: (decimals) ->
+			@_operand.fixDecimals(decimals)
+			@
 		simplify: (infos=null, developp=false,memeDeno=false) ->
 			# Debug : À améliorer
 			@_operand = @_operand.simplify(infos,developp,memeDeno)
@@ -1165,7 +1185,9 @@
 		getOperand: -> @_operand
 		getFunction: -> @_function.alias
 		# developp: (infos=null) -> identique au parent
-		signature: -> @order().compositeString({tex:false, floatNumber:true})[0]
+		signature: ->
+			@_operand.order()
+			@compositeString({tex:false, floatNumber:true})[0]
 		# L'option floatNumber fait qu'un simple number est évalué.
 		# L'intérêt est d'éviter d'avoir plusieurs écriture équivalentes comme 2/5 et 0,4
 		# extractFactor: -> identique au parent
@@ -1314,6 +1336,10 @@
 				out[0] = out[0]+" "+complement
 				out[3] = true
 			out
+		fixDecimals: (decimals) ->
+			@numerator.fixDecimals(decimals)
+			@denominator.fixDecimals(decimals)
+			@
 		simplify: (infos=null) ->
 			if @isNaN() then return new RealNumber()
 			if @isNul() then return new RealNumber(0)
@@ -1429,6 +1455,9 @@
 				strs.push(cs[0])
 			n = strs.length
 			[strs[1..n-1].join(""), strs[0] is "+", strs.length>2, false]
+		fixDecimals: (decimals) ->
+			op.value.fixDecimals(decimals) for op in @factors
+			@
 		simplify: (infos=null) ->
 			#infos?.setContext("IN_RADICAL")
 			for factor, i in @factors
@@ -1703,6 +1732,9 @@
 					else str_value = v+" "+complement
 				else str_value = String v
 			return [ str_value.replace('.', ","), @_value >= 0, false, multGroup ]
+		fixDecimals: (decimals) ->
+			if not isNaN(@_value) then @_value = Number(@_value.toFixed(decimals))
+			@
 		simplify: (infos=null) ->
 			if isInfty(@_value) then return new InftyNumber(@_value > 0)
 			@
@@ -1887,6 +1919,10 @@
 			if im[1] then re[0] = "#{re[0]}+#{im[0]}"
 			else re[0] = "#{re[0]}-#{im[0]}"
 			[re[0], re[1], true, false]
+		fixDecimals: (decimals) ->
+			@_reel.fixDecimals(decimals)
+			@_imaginaire.fixDecimals(decimals)
+			@
 		simplify: (infos=null) ->
 			@_reel = @_reel.simplify(infos);
 			@_imaginaire = @_imaginaire.simplify(infos)
