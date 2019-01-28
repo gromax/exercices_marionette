@@ -119,6 +119,25 @@
 			if out>config.max then return config.max
 			if config.delta isnt 0 then out = Math.round(out/config.delta)*config.delta
 			out
+		@poisson_density: (l,k) ->
+			if l<0 then return NaN
+			if k<0 then return 0
+			k = Math.floor k
+			if k== 0 then return Math.exp(-l)
+			if k== 1 then return Math.exp(-l)*l
+
+			out = Math.exp(-l)
+			out *= l/j for j in [1..k]
+			out
+		@poisson_rep: (l,k) ->
+			if l<0 then return NaN
+			if k<0 then return 0
+			k = Math.floor k
+			out = 1
+			for j in [0..k-1]
+				m = k-j
+				out = out*l/m + 1
+			return out*Math.exp(-l)
 		@binomial_density: (n,p,k) ->
 			if (p<0) or (p>1) then return NaN
 			if (k>n) or (k<0) then return 0
