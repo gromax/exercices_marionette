@@ -635,6 +635,13 @@ define [], () ->
 				keyWords:["Analyse", "fonction", "Dérivée", "1STL"]
 			}
 			{
+				id:76
+				filename: "exo0076"
+				title:"Loi de Poisson"
+				description:"Calculer des probabilités avec la loi de Poisson."
+				keyWords:["probabilités","Poisson","BTS"]
+			}
+			{
 				id:9999
 				filename: "exoTest"
 				title: "Exercice de test"
