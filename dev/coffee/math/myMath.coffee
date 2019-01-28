@@ -107,6 +107,7 @@
 				config = mergeObj { moy:0, std:1 }, params
 				Proba.gaussianDistribution (x - config.moy)/config.std
 			binomial: (n,p,k) -> Proba.binomial_density(n, p, k)
+			poisson: (l,k) -> Proba.poisson_density(l,k)
 		}
 		repartition: {
 			gaussian: (x,params) ->
@@ -122,6 +123,12 @@
 					if k.min? then out = out - Proba.binomial_rep(n, p, k.min)
 					out
 				else Proba.binomial_rep(n, p, k)
+			poisson: (l,k) ->
+				if (typeof k is "object")
+					if k.max? then out = Proba.poisson_rep(l, k.max) else out = 1
+					if k.min? then out = out - Proba.poisson_rep(l, k.min-1)
+					out
+				else Proba.poisson_rep(l, k)
 		}
 		intervalle_fluctuation:{
 			binomial:(n,p,seuil=.95)-> Proba.binomial_IF(n,p,seuil)
@@ -163,11 +170,15 @@
 		exec: (arr,params) ->
 			# execute le tableau comme une pile inversée
 			config = mergeObj {
+				fixDecimals:false
 				simplify: false
 				developp: false
 				clone:true
 			}, params
 
+			# Lors de calcul comme 0.1+0.1+0.1 javascript ne produira pas 0.3
+			# fixDecimals se charge, en situation où on sait qu'on peut le faire, d'arrondir l'apparition d'éventuels calculs faux dus à la précision de calcul limité
+			# ce problème se pose pour + et -
 			arr.reverse()
 			pile=[]
 			if not isArray(arr) then return new RealNumber()
@@ -179,16 +190,27 @@
 						else pile.push arg
 					when arg is "+"
 						op2 = pile.pop()
-						pile.push(new PlusNumber(pile.pop(),op2))
+						op1 = pile.pop()
+						if config.simplify and config.fixDecimals isnt false and (op1 instanceof RealNumber) and (op2 instanceof RealNumber)
+							op = (op1.float() + op2.float())
+							pile.push new RealNumber( Number(op.toFixed(config.fixDecimals)), true )
+						else
+							pile.push(new PlusNumber(op1,op2))
 					when arg is "-"
 						op2 = pile.pop()?.opposite?()
-						pile.push(new PlusNumber(pile.pop(),op2))
+						op1 = pile.pop()
+						if config.simplify and config.fixDecimals isnt false and (op1 instanceof RealNumber) and (op2 instanceof RealNumber)
+							op = (op1.float() - op2.float())
+							pile.push new RealNumber( Number(op.toFixed(config.fixDecimals)), true )
+						else
+							pile.push(new PlusNumber(op1,op2))
 					when arg is "*"
 						op2 = pile.pop()
 						pile.push(new MultiplyNumber(pile.pop(),op2))
 					when arg is "/"
 						op2 = pile.pop()
-						pile.push(MultiplyNumber.makeDiv(pile.pop(),op2))
+						op1 = pile.pop()
+						pile.push(MultiplyNumber.makeDiv(op1,op2))
 					when arg is "^"
 						op2 = pile.pop()
 						pile.push(new PowerNumber(pile.pop(),op2))
@@ -399,6 +421,7 @@
 				v2 = mM.toNumber val2
 				(new Ensemble()).init((ouvrant is "[") or (ouvrant is true), v1, (fermant is "]") or (fermant is true), v2)
 		}
+
 		factorisation:(obj,regex, params)->
 			# Bug ici, besoin de trop simplifier
 			if (f=obj.facto?(regex))?
@@ -458,6 +481,7 @@
 				config = _.extend default_config, filtered_parameters
 
 				erreur = erreurManager.main(goodObject,processedAnswer.object,config.symbols)
+
 				# erreur = objet produit par la fonction mM.erreur et contenant les infos :
 				# - exact = true/false : valeur exacte
 				# - float = true/false : valeur décimale
