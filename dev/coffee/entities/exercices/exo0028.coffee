@@ -19,12 +19,30 @@
 			# debug ancienne version
 			if inputs.poly then inputs.fct = inputs.poly
 			if (typeof inputs.fct is "undefined")
-				if (optD is 0) then operands = [
-					mM.alea.number { denominator:[1,2,3], numerator:{ min:-10, max:10} }
-				]
-				else operands = [
-					mM.alea.poly { degre:{min:1, max:optD }, coeffDom:[1,2,3], denominators:[1,2,3], values:{ min:-10, max:10} }
-				]
+				switch optA
+					when 0
+						# Dans ce cas on force toujours au degré max
+						if (optD is 0) then operands = [
+							mM.alea.number { denominator:[1,2,3], numerator:{ min:-10, max:10} }
+						]
+						else operands = [
+							mM.alea.poly { degre:optD, coeffDom:[1,2,3], denominators:[1,2,3], values:{ min:-10, max:10} }
+						]
+					when 4
+						# On ne s'embarasse pas de coeff de polynome avec dénominateurs vu que le exp a un exp décimal
+						if (optD is 0) then operands = [
+							mM.alea.number { numerator:{ min:-10, max:10} }
+						]
+						else operands = [
+							mM.alea.poly { degre:{min:1, max:optD }, coeffDom:[1,2,3], values:{ min:-10, max:10} }
+						]
+					else
+						if (optD is 0) then operands = [
+							mM.alea.number { denominator:[1,2,3], numerator:{ min:-10, max:10} }
+						]
+						else operands = [
+							mM.alea.poly { degre:{min:1, max:optD }, coeffDom:[1,2,3], denominators:[1,2,3], values:{ min:-10, max:10} }
+						]
 				if (optA is 1) or (optA is 2)
 					# Il y aura un ln que l'on va multiplier par :
 					# Soit du a, soit du ax, soit du ax^2+bx,au pire par du degré 2
@@ -59,7 +77,8 @@
 			else fct = mM.parse(inputs.fct)
 
 			derivee = fct.derivate("x").simplify(null,true)
-			# On produit une version factorisée pour avoir une version idéale du tex
+			derivee.fixDecimals(3) # en javascript le codage peut conduire à faire que 0.1 + 0.1 + 0.1 != 0.3
+			# fixDecimals :3 forcera donc les calculs de réels à être approximés à 3 chiffres ce qui est suffisant ici (c'est l'exposant de exp qui pourrait poser problème)
 			deriveeForTex = mM.factorisation derivee, /// exp\(([x*+-\d]+)\)$ ///i, { simplify:true, developp:true }
 
 			if optE is 1
@@ -70,7 +89,6 @@
 				fa = mM.float fct, { x:x, decimals:2 }
 				f2a = mM.float derivee, { x:x, decimals:2 }
 				p = mM.misc.toPrecision(-mM.float(derivee, { x:x })*x+mM.float(fct, { x:x }),2)
-				console.log p
 				t = mM.exec [f2a, "x", "*", p, "+"], {simplify:true}
 			else
 				x = false
@@ -195,9 +213,9 @@
 					validations:{
 						e:(user)->
 							pattern =/y\s*=([^=]+)/
-							result = pattern.exec(userValue)
+							result = pattern.exec(user)
 							if result
-								out =  mM.verification.numberValidation(result, {})
+								out =  mM.verification.numberValidation(result[1], {})
 								out.user = user
 							else
 								out = { processed:false, user:user, error:"L'équation doit être de la forme y=..." }
@@ -208,7 +226,7 @@
 							ver = mM.verification.isSame(data.e.processed, t, { developp:true, formes:"FRACTION"} )
 							if ver.note is 0 then ver.goodMessage = { type:"error", text:"La bonne réponse était &nbsp; $y = #{t.tex()}$."}
 							list = [
-								{ type:"normal", text:"<b>#{tag}</b> &nbsp; :</b>&emsp; Vous avez répondu &nbsp; $y = #{data.e.processed.tex}$" }
+								{ type:"normal", text:"Vous avez répondu &nbsp; $y = #{data.e.processed.tex}$" }
 								ver.goodMessage
 							]
 							out = {
