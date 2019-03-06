@@ -42,7 +42,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 
 			[Xmin, Xmax, a, b, ens] = @init(inputs)
 
-			items = [
+			itemsDeb = [
 				{
 					type: "text"
 					ps:[
@@ -56,6 +56,8 @@ define ["utils/math","utils/help"], (mM, help) ->
 					name: "pX"
 					description: "Valeur à 0,01 près"
 				}
+			]
+			itemsFin = [
 				{
 					type: "validation"
 					clavier: ["aide"]
@@ -77,7 +79,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 
 			verifications = [
 				{
-					name:"pX"
+					name: "pX"
 					tag: "$p(#{ens})$"
 					good:(b-a)/(Xmax-Xmin)
 					parameters: {
@@ -87,12 +89,12 @@ define ["utils/math","utils/help"], (mM, help) ->
 			]
 
 			if calcE
-				items.push {
+				itemE = [{
 					type: "input"
 					tag: "$E(X)$"
 					name: "E"
 					description: "Espérance à 0,01 près"
-				}
+				}]
 				validations.E = "number"
 				verifications.push {
 					name:"E"
@@ -102,15 +104,16 @@ define ["utils/math","utils/help"], (mM, help) ->
 						arrondi: -2
 					}
 				}
+			else itemE = []
 
 			if calcStd
-				items.push {
+				itemStd = [{
 					type: "input"
 					tag: "$\\sigma(X)$"
 					name: "sig"
 					description: "Ecart-type à 0,01 près"
-				}
-				validations.E = "number"
+				}]
+				validations.sig = "number"
 				verifications.push {
 					name:"sig"
 					tag: "$\\sigma(X)$"
@@ -119,12 +122,13 @@ define ["utils/math","utils/help"], (mM, help) ->
 						arrondi: -2
 					}
 				}
+			else itemStd = []
 
 
 			[
 				{
 					bareme:100
-					items: items
+					items: itemsDeb.concat(itemE, itemStd, itemsFin)
 					validations: validations
 					verifications: verifications
 				}
