@@ -17,11 +17,11 @@ define ["jst","marionette"], (JST,Marionette) ->
 
 		initialize: (options)->
 			@faits = _.where(options.faits, {aUF: options.model.get("id")});
-			@exofiches = options.exofiches.where({idFiche: options.model.get("idFiche")});
+			@exofiches = options.exofiches.where({idFiche: options.model.get("idFiche")})
 
 		serializeData: ->
 			data = _.clone(this.model.attributes)
-			data.note = @model.calcNote(@exofiches, @faits);
+			data.note = @model.calcNote(@exofiches, @faits)
 			if (_.has(data,"ficheActive"))
 				data.actif = data.actif && data.ficheActive
 			return data
