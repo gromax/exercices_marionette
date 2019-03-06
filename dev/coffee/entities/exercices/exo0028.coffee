@@ -88,19 +88,22 @@
 					inputs.x = String x
 				fa = mM.float fct, { x:x, decimals:2 }
 				f2a = mM.float derivee, { x:x, decimals:2 }
-				p = mM.misc.toPrecision(-mM.float(derivee, { x:x })*x+mM.float(fct, { x:x }),2)
+				p = mM.misc.toPrecision(-f2a*x + fa,2)
+				p2 = mM.misc.toPrecision(-mM.float(derivee, { x:x })*x+mM.float(fct, { x:x }),2) # p2 tenant compte de la précision
 				t = mM.exec [f2a, "x", "*", p, "+"], {simplify:true}
+				t2 = mM.exec [f2a, "x", "*", p2, "+"], {simplify:true}
 			else
 				x = false
 				fa = false
 				f2a = false
 				t = false
+				t2 = false
 
-			[fct, derivee, deriveeForTex, x, fa, f2a, t]
+			[fct, derivee, deriveeForTex, x, fa, f2a, t, t2]
 
 		getBriques: (inputs, options) ->
 			optE = Number(options.e.value ? 0)
-			[fct, derivee, deriveeForTex, x, fa, f2a, t] = @init(inputs,options)
+			[fct, derivee, deriveeForTex, x, fa, f2a, t, t2] = @init(inputs,options)
 
 			briques = [
 				{
@@ -223,7 +226,7 @@
 					}
 					verifications: [
 						(data) ->
-							ver = mM.verification.isSame(data.e.processed, t, { developp:true, formes:"FRACTION"} )
+							ver = mM.verification.areSome([data.e.processed], [t, t2], { developp:true, formes:"FRACTION"} )
 							if ver.note is 0 then ver.goodMessage = { type:"error", text:"La bonne réponse était &nbsp; $y = #{t.tex()}$."}
 							list = [
 								{ type:"normal", text:"Vous avez répondu &nbsp; $y = #{data.e.processed.tex}$" }
@@ -246,7 +249,7 @@
 			optE = Number(options.e.value ? 0)
 			that = @
 			fct_item = (inputs, index) ->
-				[fct, derivee, deriveeForTex, x, fa, f2a, t] = that.init(inputs,options)
+				[fct, derivee, deriveeForTex, x, fa, f2a, t, t2] = that.init(inputs,options)
 				if optE is 1
 					return "$f(x) = #{fct.tex()}$ et $a=#{x}$"
 				else
@@ -291,7 +294,7 @@
 			optE = Number(options.e.value ? 0)
 			that = @
 			fct_item = (inputs, index) ->
-				[fct, derivee, deriveeForTex, x, fa, f2a, t] = that.init(inputs,options)
+				[fct, derivee, deriveeForTex, x, fa, f2a, t, t2] = that.init(inputs,options)
 				if optE is 1
 					return "$f(x) = #{fct.tex()}$ et $a=#{x}$"
 				else
