@@ -279,8 +279,7 @@ final class Classe
 
 	private function toBDDArray()
 	{
-		return array(
-			'id'=>$this->id,
+		$out = array(
 			'nom'=>$this->nom,
 			'description'=>$this->description,
 			'pwd'=>$this->pwd,
@@ -288,6 +287,10 @@ final class Classe
 			'ouverte'=>$this->ouverte,
 			'date'=>$this->date
 		);
+		if ($this->id !== '') {
+			$out['id'] = $this->id;
+		}
+		return $out;
 	}
 
 	public function getId()
