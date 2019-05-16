@@ -32,11 +32,11 @@
 					break;
 				case "2cols":
 %><div class="row"><div class="col-6">
-<%					fct_recursive(el.col1,index); %>
+<%				fct_recursive(el.col1,index); %>
 </div><div class="col-6">
-<%					fct_recursive(el.col2,index); %>
+<%				fct_recursive(el.col2,index); %>
 </div></div>
-<%					break;
+<%				break;
 				case "text":
 %><div class="card-body">
 <% _.each(el.children,function(p){ %><p class="card-text"><%= p %></p><% }); %>
@@ -81,7 +81,7 @@
 <%
 					break;
 				default:
-%><div <% if (el.divId) { %>id="<%- el.divId %>"<% } %> <% if(el.class) { %>class="<%- el.class %>" <% } %>></div>
+%><div <% if (el.divId) { %>id="<%- el.divId %>"<% } %> <% if(el.class) { %>class="<%- el.class %>" <% } %> > <% if (el.children){ _.each(el.children, fct_recursive)}%></div>
 <%
 			}
 		}
