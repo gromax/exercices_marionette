@@ -15,75 +15,130 @@
 				B.toClone("\\overrightarrow{AB}").am(A, true).simplify()
 			]
 
-		getBriques: (inputs, options) ->
+		getBriques: (inputs, options, fixedSettings) ->
+			complexe = fixedSettings.c
 			[A, B, gAB] = @init(inputs)
 
-			[
-				{
-					bareme: 100
-					items: [
-						{
-							type: "text"
-							ps: [
-								"On se place dans un repère &nbsp; $(O;I,J)$."
-								"On donne deux points &nbsp; $#{A.texLine()}$ &nbsp; et &nbsp; $#{B.texLine()}$."
-								"Il faut déterminer les coordonnées de &nbsp; $\\overrightarrow{AB}$."
-							]
+			if complexe
+				[
+					{
+						bareme: 100
+						items: [
+							{
+								type: "text"
+								ps: [
+									"On se place dans le plan complexe."
+									"Soit les points A et B d'affixes &nbsp; $z_A = #{A.affixe().tex()}$ &nbsp; et &nbsp; $z_B = #{B.affixe().tex()}$."
+									"Il faut déterminer l'affixe de &nbsp; $\\overrightarrow{AB}$."
+								]
+							}
+							{
+								type: "input"
+								format: [
+									{ text: "$z_{\\overrightarrow{AB}} = $", cols:3, class:"text-right" }
+									{ latex: false, cols:9, name:"z", description: "Affixe du vecteur" }
+								]
+							}
+							{
+								type: "validation"
+								clavier: ["aide"]
+							}
+							{
+								type: "aide"
+								list: [ "La méthode est la même qu'en géométrie analytique ordinaire : &nbsp;$z_{\\overrightarrow{AB}}=z_B-z_A$." ]
+							}
+						]
+						validations:{
+							z:"number"
 						}
-						{
-							type: "input"
-							name: "x"
-							description: "Abscisse du vecteur"
-							tag:"Abscisse"
-						}
-						{
-							type: "input"
-							name: "y"
-							description: "Ordonnée du vecteur"
-							tag:"Ordonnée"
-						}
-						{
-							type: "validation"
-							clavier: ["aide"]
-						}
-						{
-							type: "aide"
-							list: help.vecteur.coordonnes
-						}
-					]
-					validations:{
-						x:"number"
-						y:"number"
+						verifications:[
+							{
+								name:"z"
+								tag:"$z_{\\overrightarrow{AB}}$"
+								good:gAB.affixe()
+							}
+						]
 					}
-					verifications:[
-						{
-							name:"x"
-							tag:"Abscisse"
-							good:gAB.x
+				]
+			else
+				[
+					{
+						bareme: 100
+						items: [
+							{
+								type: "text"
+								ps: [
+									"On se place dans un repère &nbsp; $(O;I,J)$."
+									"On donne deux points &nbsp; $#{A.texLine()}$ &nbsp; et &nbsp; $#{B.texLine()}$."
+									"Il faut déterminer les coordonnées de &nbsp; $\\overrightarrow{AB}$."
+								]
+							}
+							{
+								type: "input"
+								format: [
+									{ text: "$x_{\\overrightarrow{AB}} = $", cols:3, class:"text-right" }
+									{ latex: false, cols:9, name:"x", description: "Abscisse du vecteur" }
+								]
+							}
+							{
+								type: "input"
+								format: [
+									{ text: "$y_{\\overrightarrow{AB}} = $", cols:3, class:"text-right" }
+									{ latex: false, cols:9, name:"y", description: "Ordonnée du vecteur" }
+								]
+							}
+							{
+								type: "validation"
+								clavier: ["aide"]
+							}
+							{
+								type: "aide"
+								list: help.vecteur.coordonnes
+							}
+						]
+						validations:{
+							x:"number"
+							y:"number"
 						}
-						{
-							name:"y"
-							tag:"Ordonnée"
-							good:gAB.x
-						}
-					]
-				}
-			]
+						verifications:[
+							{
+								name:"x"
+								tag:"Abscisse"
+								good:gAB.x
+							}
+							{
+								name:"y"
+								tag:"Ordonnée"
+								good:gAB.x
+							}
+						]
+					}
+				]
 
-		getExamBriques: (inputs_list,options) ->
+		getExamBriques: (inputs_list,options, fixedSettings) ->
+			complexe = fixedSettings.c
 			that = @
 			fct_item = (inputs, index) ->
 				[A, B, gAB] = that.init(inputs,options)
-				return "$#{A.texLine()}$ &nbsp; et &nbsp; $#{B.texLine()}$"
+				if complexe
+					return "$z_A=#{A.affixe().tex()}$ &nbsp; et &nbsp; $z_B=#{B.affixe().tex()}$"
+				else
+					return "$#{A.texLine()}$ &nbsp; et &nbsp; $#{B.texLine()}$"
 
 			return {
 				children: [
 					{
 						type: "text",
-						children: [
-							"On donne les coordonnées de deux points &nbsp; $A$ &nbsp; et &nbsp; $B$."
-							"Donnez les coordonnées du vecteur &nbsp; $\\overrightarrow{AB}$."
-						]
+						children: if complexe
+							[
+								"Dans le plan complexe, on donne les affixes de deux points &nbsp; $A$ &nbsp; et &nbsp; $B$."
+								"Donnez l'affixe du vecteur &nbsp; $\\overrightarrow{AB}$."
+							]
+						else
+							[
+								"On donne les coordonnées de deux points &nbsp; $A$ &nbsp; et &nbsp; $B$."
+								"Donnez les coordonnées du vecteur &nbsp; $\\overrightarrow{AB}$."
+							]
 					}
 					{
 						type: "enumerate",
@@ -94,21 +149,35 @@
 				]
 			}
 
-		getTex: (inputs_list, options) ->
+		getTex: (inputs_list, options, fixedSettings) ->
+			complexe = fixedSettings.c
 			that = @
 			fct_item = (inputs, index) ->
 				[A, B, gAB] = that.init(inputs,options)
-				return "$#{A.texLine()}$ et $#{B.texLine()}$"
+				if complexe
+					return "$z_A=#{A.affixe().tex()}$ et $z_B=#{B.affixe().tex()}$"
+				else
+					return "$#{A.texLine()}$ et $#{B.texLine()}$"
 
 			return {
-				children: [
-					"On donne les coordonnées de deux points $A$ et $B$."
-					"Donnez les coordonnées du vecteur $\\overrightarrow{AB}$."
-					{
-						type: "enumerate",
-						children: _.map(inputs_list, fct_item)
-					}
-				]
+				children: if complexe
+						[
+							"Dans le plan complexe, on donne les affixes de deux points $A$ et $B$."
+							"Donnez l'affixe du vecteur $\\overrightarrow{AB}$."
+							{
+								type: "enumerate",
+								children: _.map(inputs_list, fct_item)
+							}
+						]
+					else
+						[
+							"On donne les coordonnées de deux points $A$ et $B$."
+							"Donnez les coordonnées du vecteur $\\overrightarrow{AB}$."
+							{
+								type: "enumerate",
+								children: _.map(inputs_list, fct_item)
+							}
+						]
 			}
 
 
