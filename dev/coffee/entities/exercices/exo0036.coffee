@@ -68,9 +68,9 @@ define ["utils/math"], (mM) ->
 					}
 					verifications:[
 						(data) ->
-							user = Number answers_data.a
+							user = Number data.a.processed
 							radU = user*Math.PI/180
-							ecart = Math.abs(deg-user)
+							ecart = Math.abs(mM.float(deg)-user)
 							ecart-=360 while ecart>180
 							if Math.abs(ecart)<=5
 								{
@@ -136,8 +136,9 @@ define ["utils/math"], (mM) ->
 					}
 					{
 						type:"tikz"
-						left: -1.2
-						bottom: -1.2
+						scale:3
+						left: -1.201
+						bottom: -1.201
 						right: 1.2
 						top: 1.2
 						axes:[1,1]
