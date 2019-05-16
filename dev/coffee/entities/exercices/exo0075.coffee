@@ -305,9 +305,8 @@ define ["utils/math","utils/help", "utils/tab"], (mM, help, tab) ->
 
 		getExamBriques: (inputs_list,options, fixedSettings) ->
 			that = @
-			complexes = fixedSettings.complexe
 			fct_item = (inputs, index) ->
-				[ fct, fder, racinesInDef, xs, texXs, centresSignes, tabSignLine, tabVarPos] = @init(inputs)
+				[ fct, fder, racinesInDef, xs, texXs, centresSignes, tabSignLine, tabVarPos] = that.init(inputs)
 				return "$f(x) = #{fct.tex()}$"
 
 			return {
@@ -330,9 +329,8 @@ define ["utils/math","utils/help", "utils/tab"], (mM, help, tab) ->
 
 		getTex: (inputs_list, options, fixedSettings) ->
 			that = @
-
 			fct_item = (inputs, index) ->
-				[ fct, fder, racinesInDef, xs, texXs, centresSignes, tabSignLine, tabVarPos] = @init(inputs)
+				[ fct, fder, racinesInDef, xs, texXs, centresSignes, tabSignLine, tabVarPos] = that.init(inputs)
 				return "$f(x) = #{fct.tex()}$"
 
 			if inputs_list.length is 1
