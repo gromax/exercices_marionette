@@ -144,10 +144,10 @@
 				return {
 					type:"text",
 					children:[
-						"$f(x) = #{normalTex}"
-						"$f(x) = #{canoniqueTex}"
+						"$f(x) = #{normalTex}$"
+						"$f(x) = #{canoniqueTex}$"
 						"$f(x) = #{factoTex}$"
-						"$A=yA.tex()$."
+						"$A=#{yA.tex()}$."
 					]
 				}
 
@@ -186,8 +186,8 @@
 				return {
 					children: [
 						"On propose la fonction $f$ définie de trois façons différentes. :"
-						"$f(x) = #{normalTex}"
-						"$f(x) = #{canoniqueTex}"
+						"$f(x) = #{normalTex}$"
+						"$f(x) = #{canoniqueTex}$"
 						"$f(x) = #{factoTex}$"
 						"En utilisant bien ces différentes formes, répondez aux questions avec le moins de calcul possible."
 						{
@@ -211,10 +211,10 @@
 						type:"enumerate",
 						enumi: "a)"
 						children:[
-							"$f(x) = #{normalTex}"
-							"$f(x) = #{canoniqueTex}"
+							"$f(x) = #{normalTex}$"
+							"$f(x) = #{canoniqueTex}$"
 							"$f(x) = #{factoTex}$"
-							"$A=yA.tex()$."
+							"$A=#{yA.tex()}$."
 						]
 					}
 
