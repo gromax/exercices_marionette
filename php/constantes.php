@@ -14,14 +14,7 @@
 	define("NOMCLASSE_MAX_SIZE", 20);
 
 	// mails
-	define("PSEUDO_FROM","Exercices de maths");
-	define("EMAIL_FROM","exercices@goupill.fr");
-	define("PATH_TO_SITE","http://exercices.goupill.fr");
-	define("NOM_SITE","Exercices de maths sur goupill.fr");
-	define("SMTP_PASSWORD","zwdHpjudYfv3CbEbt8Aa");
-	define("SMTP_USER","exercices@goupill.fr");
-	define("SMTP_HOST","mail.goupill.fr");
-	define("SMTP_PORT",465);
+	define("MAIL_CONFIG","./config/mailConfig.php");
 
 	// cas
 	define("PATH_TO_AUTH", "http://exercices.goupill.fr/api/auth");
