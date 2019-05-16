@@ -1,24 +1,28 @@
 define ["utils/math","utils/help"], (mM, help) ->
-#	id:29
-#	title:"Équation du premier degré"
-#	description:"Résoudre une équation du premier degré."
-#	keyWords:["Affine","Algèbre","Équation","Seconde"]
-
 	return {
-		init: (inputs) ->
-			A = mM.alea.vector({ name:"A", def:inputs, values:[ { values:{min:-30, max:30}, denominator:{min:1, max:5} } ] }).save(inputs)
-			B = mM.alea.vector({ name:"B", def:inputs, forbidden:[A] }).save(inputs)
-			mg = mM.exec(["x", A.x, "*", A.y, "+"], {simplify:true}).tex()
-			md = mM.exec(["x", B.x, "*", B.y, "+"], {simplify:true}).tex()
-			solutions = [ mM.exec([B.y, A.y, "-", A.x, B.x, "-", "/"], {simplify:true}) ]
+		init: (inputs, complexe) ->
+			if complexe
+				A = mM.alea.vector({ name:"A", def:inputs, values:[ { values:{min:-30, max:30}, denominator:{min:1, max:5} } ] }).save(inputs)
+				B = mM.alea.vector({ name:"B", def:inputs, forbidden:[A] }).save(inputs)
+				C = mM.alea.vector({ name:"C", def:inputs, values:[ { values:{min:-30, max:30}, denominator:{min:1, max:5} } ] }).save(inputs)
+				D = mM.alea.vector({ name:"D", def:inputs }).save(inputs)
+				mg = mM.exec(["symbol:z", A.affixe(), "*", C.affixe(), "+"], {simplify:true, developp:true}).tex()
+				md = mM.exec(["symbol:z", B.affixe(), "*", D.affixe(), "+"], {simplify:true, developp:true}).tex()
+				solutions = [ mM.exec([D.affixe(), C.affixe(), "-", A.affixe(), B.affixe(), "-", "/"], {simplify:true}) ]
+			else
+				A = mM.alea.vector({ name:"A", def:inputs, values:[ { values:{min:-30, max:30}, denominator:{min:1, max:5} } ] }).save(inputs)
+				B = mM.alea.vector({ name:"B", def:inputs, forbidden:[{coords:A, axe:"x"}] }).save(inputs)
+				mg = mM.exec(["x", A.x, "*", A.y, "+"], {simplify:true}).tex()
+				md = mM.exec(["x", B.x, "*", B.y, "+"], {simplify:true}).tex()
+				solutions = [ mM.exec([B.y, A.y, "-", A.x, B.x, "-", "/"], {simplify:true}) ]
 			[
-				"$#{mg} = #{md}$"
+				"#{mg} = #{md}"
 				solutions
 			]
 
-		getBriques: (inputs, options) ->
-			[eqTex, solutions] = @init(inputs)
-
+		getBriques: (inputs, options, fixedSettings) ->
+			complexe = fixedSettings.c
+			[eqTex, solutions] = @init(inputs, complexe)
 			[
 				{
 					bareme:100
@@ -57,10 +61,11 @@ define ["utils/math","utils/help"], (mM, help) ->
 				}
 			]
 
-		getExamBriques: (inputs_list,options) ->
+		getExamBriques: (inputs_list,options, fixedSettings) ->
+			complexe = fixedSettings.c
 			that = @
 			fct_item = (inputs, index) ->
-				[eqTex, solutions] = that.init(inputs,options)
+				[eqTex, solutions] = that.init(inputs,complexe)
 				return "$#{ eqTex }$"
 
 			return {
@@ -81,10 +86,11 @@ define ["utils/math","utils/help"], (mM, help) ->
 				]
 			}
 
-		getTex: (inputs_list, options) ->
+		getTex: (inputs_list, options, fixedSettings) ->
+			complexe = fixedSettings.c
 			that = @
 			fct_item = (inputs, index) ->
-				[eqTex, solutions] = that.init(inputs,options)
+				[eqTex, solutions] = that.init(inputs,complexe)
 				return "$#{ eqTex }$"
 
 			return {
