@@ -1,0 +1,10 @@
+<?php
+  require_once PATH_TO_MEEKRODB;
+  define("PREFIX_BDD", "exo_"); // Prefixe de la BDD
+  DB::$host="clustermysql04.hosteur.com";
+  DB::$dbName="goupill";
+  DB::$user="goupill_root";
+  DB::$password="M_5VNjhWB*";
+  DB::$error_handler = false;
+  DB::$throw_exception_on_error = true;
+?>
