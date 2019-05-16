@@ -13,3 +13,4 @@ app/templates.underscore.js
 *.gz
 *.old
 index.html
+*Hosteur
