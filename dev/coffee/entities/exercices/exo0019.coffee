@@ -244,22 +244,21 @@ define ["utils/math","utils/help", "utils/colors", "utils/tab"], (mM, help, colo
 			that = @
 			fct_item = (inputs, index) ->
 				[ineqTex, polyTex, poly, racines, ensemble_interieur, ensemble_exterieur, sol_is_ext, tabs, goodTab] = that.init(inputs,options)
-				return {
-					type: "enumerate"
-					enumi: "1"
-					children: [
-						"Donnez les racines de &nbsp; $polyTex$"
-						"Faites le tableau de signe de &nbsp; $polyTex$"
-						"Déduisez-en l'ensemble solution de &nbsp; $ineqTex$."
-					]
-				}
+				return "$#{ineqTex}$"
 
 			return {
 				children: [
 					{
-						type: "subtitles"
-						enumi: "A"
-						refresh: true
+						type: "text",
+						children: [
+							"Dans tous les cas, on donne une inéquation portant sur un trinôme."
+							"Donnez les racines du trinôme, faites son tableau de signe et déduisez-en l'ensemble solution de l'inéquation."
+						]
+					}
+					{
+						type: "enumerate",
+						refresh:true
+						enumi:"1",
 						children: _.map(inputs_list, fct_item)
 					}
 				]
@@ -269,24 +268,25 @@ define ["utils/math","utils/help", "utils/colors", "utils/tab"], (mM, help, colo
 			that = @
 			fct_item = (inputs, index) ->
 				[ineqTex, polyTex, poly, racines, ensemble_interieur, ensemble_exterieur, sol_is_ext, tabs, goodTab] = that.init(inputs,options)
+				return "$#{ineqTex}$"
+
+			if inputs_list.length is 1
+				ineq = fct_item(inputs_list[0], 0)
 				return {
-					type: "enumerate"
-					enumi: "1"
 					children: [
-						"Donnez les racines de $polyTex$"
-						"Faites le tableau de signe de $polyTex$"
-						"Déduisez-en l'ensemble solution de $ineqTex$."
+						"On considère l'inéquation $#{ineq}$."
+						"Donnez les racines du trinôme, faites son tableau de signe et déduisez-en l'ensemble solution de l'inéquation."
 					]
 				}
-
-			return {
-				children: [
-					{
-						type: "enumerate"
-						enumi: "A"
-						children: _.map(inputs_list, fct_item)
-					}
-				]
-			}
-
+			else
+				return {
+					children: [
+						"Dans tous les cas, on donne une inéquation portant sur un trinôme."
+						"Donnez les racines du trinôme, faites son tableau de signe et déduisez-en l'ensemble solution de l'inéquation."
+						{
+							type: "enumerate",
+							children: _.map(inputs_list, fct_item)
+						}
+					]
+				}
 	}
