@@ -1,0 +1,6 @@
+﻿AddDefaultCharset UTF-8
+Options +FollowSymlinks
+RewriteEngine On
+#RewriteBase /var/www/vhosts/FilerWeb08/goupill.fr/subdomains/exercices/httpdocs
+#RewriteBase /var/www/sites/goupill.fr/subdomains/exercices/httpdocs
+RewriteRule ^api/ /api.php [L]
