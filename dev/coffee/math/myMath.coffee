@@ -235,7 +235,7 @@
 						pile.push (new Ensemble()).init(m[1] is "[", op1, m[2] is "]", op2)
 			if pile.length is 0 then return new RealNumber()
 			out = pile.pop()
-			if config.developp then out.developp()
+			if config.developp then out = out.developp()
 			if config.simplify then out = out.simplify(null,config.developp)
 			out
 		parse: (expression,params) -> (new ParseInfo expression,params).object
