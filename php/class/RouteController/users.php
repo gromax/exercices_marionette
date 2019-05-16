@@ -306,7 +306,7 @@ class users
         $key = $user->initKey();
         if ($key!==null)
         {
-            //send_html_mail($user->identifiant(),"Mot de passe oublié","<b>".NOM_SITE.".</b> Vous avez oublié votre mot de passe. Suivez ce lien pour pour modifier votre mot de passe : <a href='".PATH_TO_SITE."/#forgotten:$key'>Réinitialisation du mot de passe</a>.");
+            require_once MAIL_CONFIG;
             $mail = new PHPMailer(true);                              // Passing `true` enables exceptions
             try{
                 //Server settings
