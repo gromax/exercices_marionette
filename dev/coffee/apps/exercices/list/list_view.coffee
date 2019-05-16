@@ -36,7 +36,7 @@ define [
 				@setFilterCriterion(@options.filterCriterion)
 
 		setFilterCriterion: (filterCriterion, options) ->
-			@filterCriterion = filterCriterion.toLowerCase()
+			@filterCriterion = filterCriterion.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase()
 			return @
 
 		onSetFilterCriterion: (filterCriterion,options) ->
@@ -47,7 +47,7 @@ define [
 
 		filter: (child, index, collection) ->
 			criterion = @filterCriterion
-			if (criterion is "") or criterion is null or child.get("title").toLowerCase().indexOf(criterion) isnt -1 or child.get("description").toLowerCase().indexOf(criterion) isnt -1 or child.get("keyWords").join(";").toLowerCase().indexOf(criterion) isnt -1
+			if (criterion is "") or criterion is null or child.get("title").toLowerCase().indexOf(criterion) isnt -1 or child.get("description").toLowerCase().indexOf(criterion) isnt -1 or child.get("keyWords").join(";").indexOf(criterion) isnt -1
 				return true
 			return false
 	}
