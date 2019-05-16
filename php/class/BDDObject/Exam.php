@@ -39,7 +39,7 @@ final class Exam
 				$bdd_result=DB::query("SELECT id, idFiche, nom, date, data, locked FROM ".PREFIX_BDD."exams WHERE idFiche=%i ORDER BY date",$params["idFiche"]);
 			} elseif (isset($params['idOwner'])) {
 				$idOwner = (integer) $params['idOwner'];
-				$bdd_result=DB::query("SELECT e.id, e.idFiche, e.nom, e.date, e.data, e.locked FROM (".PREFIX_BDD."exams e JOIN ".PREFIX_BDD."fiche f ON e.idFiche = f.id) ORDER BY date WHERE f.idOwner = %i", $idOwner);
+				$bdd_result=DB::query("SELECT e.id, e.idFiche, e.nom, e.date, e.data, e.locked FROM (".PREFIX_BDD."exams e JOIN ".PREFIX_BDD."fiches f ON e.idFiche = f.id) WHERE f.idOwner = %i ORDER BY date", $idOwner);
 			} else {
 				$bdd_result=DB::query("SELECT id, idFiche, nom, date, data, locked FROM ".PREFIX_BDD."exams ORDER BY date");
 			}
