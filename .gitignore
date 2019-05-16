@@ -1,6 +1,7 @@
 node_modules
 dist
 config/bddConfig.php
+config/mailConfig.php
 vendor
 php/meekrodb
 php/class/PHPMailer
