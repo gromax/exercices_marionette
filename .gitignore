@@ -13,5 +13,5 @@ app/templates.underscore.js
 *.gz
 *.old
 index.html
-*Hosteur
+*Hosteur*
 *exoTest.coffee
