@@ -61,7 +61,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 								developp:true
 								formes:"FRACTION"
 							}
-							ver = mM.verification.isSame(data[verifItem.name].processed, poly.toNumberObject(), params)
+							ver = mM.verification.isSame(data.poly.processed, poly.toNumberObject(), params)
 							list = [
 								{ type:"normal", text:"<b>Équation</b> &nbsp; :</b>&emsp; Vous avez répondu &nbsp; $#{data.poly.processed.tex} = 0$" }
 								ver.goodMessage
@@ -120,7 +120,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 		getExamBriques: (inputs_list,options) ->
 			that = @
 			fct_item = (inputs, index) ->
-				[S, P, poly, polyTex, racines] = @init(inputs)
+				[S, P, poly, polyTex, racines] = that.init(inputs)
 				return "$x+y = #{S.tex()}$ &nbsp; et &nbsp; $x\\cdot y = #{P.tex()}$"
 
 			return {
@@ -144,7 +144,7 @@ define ["utils/math","utils/help"], (mM, help) ->
 		getTex: (inputs_list, options) ->
 			that = @
 			fct_item = (inputs, index) ->
-				[S, P, poly, polyTex, racines] = @init(inputs)
+				[S, P, poly, polyTex, racines] = that.init(inputs)
 				return "$x+y = #{S.tex()}$ et $x\\cdot y = #{P.tex()}$"
 
 			return {
