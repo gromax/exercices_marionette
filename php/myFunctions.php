@@ -26,10 +26,10 @@
 	function send_html_mail($email,$subject,$texte) {
 		$boundary = "-----=".md5(rand());
 		//=====Création du header de l'e-mail
-		$header = "From: \"".PSEUDO_FROM."\"<".EMAIL_FROM.">\n";
-		$header .= "Reply-to: \"".PSEUDO_FROM."\" <".EMAIL_FROM.">\n";
-		$header .= "MIME-Version: 1.0\n";
-		$header .= "Content-Type: multipart/alternative;\n boundary=\"$boundary\"\n";
+		$header = "From:\"".PSEUDO_FROM."\"<".EMAIL_FROM.">\n";
+		$header .= "Reply-to:\"".PSEUDO_FROM."\"<".EMAIL_FROM.">\n";
+		$header .= "MIME-Version:1.0\n";
+		$header .= "Content-Type:multipart/alternative;\n boundary=\"$boundary\"\n";
 		//=====Création du message.au format texte
 		//$message = "\n--$boundary\n";
 		//$message.= "Content-Type: text/plain; charset=\"ISO-8859-1\"\n";
