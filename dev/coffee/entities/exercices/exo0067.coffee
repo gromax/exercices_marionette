@@ -196,8 +196,8 @@
 							name:"a"
 							good:CAparams[2]
 							tag:"$\\hat{A}$"
-							paramaters:{
-								arrondi:-1
+							parameters:{
+								arrondi:0
 							}
 						}
 					]
@@ -210,16 +210,17 @@
 			that = @
 
 			fct_item = (inputs, index) ->
-				[ coords, scal, CAparams] = that.init(inputs,options)
+				[ coords, scal, CAparams ] = that.init(inputs,options)
 				[A, B, C, vAB, vAC] = coords
 				return "$#{A.texLine()}$ ; $#{B.texLine()}$ et $#{C.texLine()}$"
+			calcul_angle = Number(options.a?.value) is 1
 			return {
 				children: [
 					{
 						type: "text",
 						children: [
 							"Dans les différents cas, on donne :"
-							if CAparams is false then "Les coordonnées de trois points A, B et C. Il faut alors calculer $\\overrightarrow{AB}\\cdot\\overrightarrow{AC}$."
+							if calcul_angle is false then "Les coordonnées de trois points A, B et C. Il faut alors calculer $\\overrightarrow{AB}\\cdot\\overrightarrow{AC}$."
 							else "Les coordonnées de trois points A, B et C. Il faut alors calculer $\\overrightarrow{AB}\\cdot\\overrightarrow{AC}$, les distances $AB$ et $AC$ et en déduire l'angle $\\hat{A}$."
 
 						]
@@ -239,10 +240,11 @@
 				[ coords, scal, CAparams] = that.init(inputs,options)
 				[A, B, C, u, v] = coords
 				return "$#{A.texLine()}$ ; $#{B.texLine()}$ et $#{C.texLine()}$"
+			calcul_angle = Number(options.a?.value) is 1
 			return {
 				children: [
 					"Dans les différents cas, on donne :"
-					if CAparams is false then "Les coordonnées de trois points A, B et C. Il faut alors calculer $\\overrightarrow{AB}\\cdot\\overrightarrow{AC}$."
+					if calcul_angle is false then "Les coordonnées de trois points A, B et C. Il faut alors calculer $\\overrightarrow{AB}\\cdot\\overrightarrow{AC}$."
 					else "Les coordonnées de trois points A, B et C. Il faut alors calculer $\\overrightarrow{AB}\\cdot\\overrightarrow{AC}$, les distances $AB$ et $AC$ et en déduire l'angle $\\hat{A}$."
 					{
 						type: "enumerate",
