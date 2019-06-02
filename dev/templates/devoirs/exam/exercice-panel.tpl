@@ -81,9 +81,8 @@
 <%
 					break;
 				default:
-%><div <% if (el.divId) { %>id="<%- el.divId %>"<% } %> <% if(el.class) { %>class="<%- el.class %>" <% } %> > <% if (el.children){ _.each(el.children, fct_recursive)}%></div>
-<%
-			}
+					%><div <% if (el.divId) { %>id="<%- el.divId %>"<% } %> <% if(el.class) { %>class="<%- el.class %>" <% } %> > <% if (el.children){ _.each(el.children, fct_recursive)}%></div>
+<%		}
 		}
 	}
 
