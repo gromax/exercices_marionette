@@ -14,7 +14,7 @@
 	define("NOMCLASSE_MAX_SIZE", 20);
 
 	// mails
-	define("MAIL_CONFIG","./config/mailConfig.php");
+	require_once "./config/mailConfig.php";
 
 	// cas
 	define("PATH_TO_AUTH", "http://exercices.goupill.fr/api/auth");

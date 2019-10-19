@@ -306,7 +306,6 @@ class users
         $key = $user->initKey();
         if ($key!==null)
         {
-            require_once MAIL_CONFIG;
             $mail = new PHPMailer(true);                              // Passing `true` enables exceptions
             try{
                 //Server settings
