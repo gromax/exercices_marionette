@@ -41,7 +41,6 @@ class cas
         //     }
         // }
         // return array("debugcas"=>$matches);
-
         if (isset($_GET['ticket'])) {
             $ticket = $_GET['ticket'];
             // Get cURL resource
