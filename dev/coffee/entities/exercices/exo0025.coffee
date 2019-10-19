@@ -6,107 +6,68 @@ define ["utils/math","utils/help"], (mM, help) ->
 
   return {
     init: (inputs,options) ->
-      if (typeof inputs.n is "undefined") then n = inputs.n = mM.alea.real {min:20, max:100}
+      optIF = Number(options.IF.value ? 0)
+      if (typeof inputs.n is "undefined")
+        if optIF is 0
+          n = inputs.n = mM.alea.real {min:20, max:100}
+        else
+          n = inputs.n = (mM.alea.real {min:5, max:15})*20
       else n = Number inputs.n
-      if (typeof inputs.p is "undefined") then p = inputs.p = mM.alea.real({min:1, max:19})
+      if (typeof inputs.p is "undefined")
+        if optIF is 0
+          p = inputs.p = mM.alea.real({min:1, max:19})
+        else
+          p = inputs.p = mM.alea.real({min:4, max:25})
       else p = Number inputs.p
       {Xlow,Xhigh} = mM.intervalle_fluctuation.binomial(n,p/100)
       if (typeof inputs.nf is "undefined") then nf = inputs.nf = Math.min Xhigh+mM.alea.real({min:-2, max:2}), n
       else nf = Number inputs.nf
-      # Tableau pour l'étape 2
-      Xdeb = Math.max(Xlow-mM.alea.real({min:1, max:3}),0)
-      Xfin = Math.min(Xlow+mM.alea.real({min:1, max:3}),Xhigh)
-      Xdeb2 = Math.max(Xhigh-mM.alea.real({min:1, max:3}),Xlow)
-      Xfin2 = Math.min(Xhigh+mM.alea.real({min:1, max:3}),n)
-      if Xdeb2<=Xfin then k_values = [Xdeb..Xfin2]
-      else k_values = [Xdeb..Xfin].concat [Xdeb2..Xfin2]
-      p_values = ( mM.misc.numToStr( mM.repartition.binomial(n,p/100,k),3 ) for k in k_values)
-      flow=Xlow/n
-      fhigh=Xhigh/n
-      IF = {
-        low: mM.misc.toPrecision(Xlow/n,3)
-        high: mM.misc.toPrecision(Xhigh/n,3)
-      }
-
-      [
-        p
-        n
-        nf
-        Xlow
-        Xhigh
-        k_values
-        p_values
-        IF
-      ]
+      if optIF is 0
+        # Si calcul exact
+        # Tableau pour l'étape 2
+        Xdeb = Math.max(Xlow-mM.alea.real({min:1, max:3}),0)
+        Xfin = Math.min(Xlow+mM.alea.real({min:1, max:3}),Xhigh)
+        Xdeb2 = Math.max(Xhigh-mM.alea.real({min:1, max:3}),Xlow)
+        Xfin2 = Math.min(Xhigh+mM.alea.real({min:1, max:3}),n)
+        if Xdeb2<=Xfin then k_values = [Xdeb..Xfin2]
+        else k_values = [Xdeb..Xfin].concat [Xdeb2..Xfin2]
+        p_values = ( mM.misc.numToStr( mM.repartition.binomial(n,p/100,k),3 ) for k in k_values)
+        flow=Xlow/n
+        fhigh=Xhigh/n
+        IF = {
+          low: mM.misc.toPrecision(Xlow/n,3)
+          high: mM.misc.toPrecision(Xhigh/n,3)
+        }
+        [
+          p
+          n
+          nf
+          Xlow
+          Xhigh
+          k_values
+          p_values
+          IF
+        ]
+      else
+        # calcul en gros à +-2sigma
+        E = n*p/100
+        s = Math.sqrt(n*p*(100-p))/100
+        IF = {
+          low: mM.misc.toPrecision((E-2*s)/n,2)
+          high: mM.misc.toPrecision((E+2*s)/n,2)
+        }
+        [
+          p
+          n
+          nf
+          IF
+        ]
 
     getBriques: (inputs, options) ->
-      [p, n, nf, Xlow, Xhigh, k_values, p_values, IF] = @init(inputs,options)
-
-      [
-        {
-          bareme:30
-          items:[
-            {
-              type:"text"
-              ps:[
-                "Une usine fabrique des tuyaux en caoutchouc."
-                "Le fabriquant affirme que #{p} % des tuyaux sont poreux."
-                "On prélève #{n} tuyaux dans la production."
-                "Donnez les résultats des calculs suivants :"
-              ]
-            }
-            {
-              type:"input"
-              format:[
-                { text:"$E(X)=$", cols:3, class:"text-right" }
-                { name:"esp", cols:4, description:"Espérance à 0,01 près"}
-              ]
-            }
-            {
-              type:"input"
-              format:[
-                { text:"$\\sigma(X)=$", cols:3, class:"text-right" }
-                { name:"std", cols:4, description:"Écart-type à 0,01 près"}
-              ]
-            }
-            {
-              type: "validation"
-              clavier: ["aide"]
-            }
-            {
-              type:"aide"
-              list: [
-                "Épreuve élémentaire : Prélever un tuyau ; succès : Le tuyau est poreux ; probabilité du succès : &nbsp; $p=#{p}\\,\\%$"
-                "L'expérience est répétée &nbsp; $n=#{n}$ &nbsp; fois de façon indépendante (production assez importante)."
-                "$X$ &nbsp; est le nombre de succès (tuyaux poreux). On peut donc dire que &nbsp; $X$ &nbsp; suit une loi binomiale &nbsp; $\\mathcal{B}(#{n} ; #{p}\\,\\%)$."
-                "L'espérance est la valeur attendue. Si on a un fréquence &nbsp; $p\\,\\%$ &nbsp; de tuyaux poreux dans la production, si on prélève &nbsp; $n$ &nbsp; tuyaux, on s'attend à obtenir &nbsp; $E(X)=n\\times p$ &nbsp; tuyaux poreux en moyenne."
-              ]
-            }
-          ]
-          validations: {
-            esp:"number"
-            std:"number"
-          }
-          verifications: [
-            {
-              name:"esp"
-              tag:"$E(X)$"
-              good:n*p/100
-              parameters:{
-                arrondi:-2
-              }
-            }
-            {
-              name:"std"
-              tag:"$\\sigma(X)$"
-              good:Math.sqrt(n*p*(100-p))/100
-              parameters:{
-                arrondi:-2
-              }
-            }
-          ]
-        }
-        {
+      optIF = Number(options.IF.value ? 0)
+      if optIF is 0
+        [p, n, nf, Xlow, Xhigh, k_values, p_values, IF] = @init(inputs,options)
+        questionIF = {
           bareme:40
           title:"Intervalle de fluctuation"
           items:[
@@ -193,8 +154,130 @@ define ["utils/math","utils/help"], (mM, help) ->
               }
           ]
         }
+
+      else
+        [p, n, nf, IF] = @init(inputs,options)
+
+        questionIF = {
+          bareme:40
+          title:"Intervalle de fluctuation"
+          items:[
+            {
+              type:"text"
+              ps:[
+                "On cherche les bornes de l'intervalle de fluctuation."
+                "Pour cela on va utiliser l'approximation consistant à choisir $E(X) \\pm 2\\sigma(X)$."
+                "N'oubliez pas que l'intervalle de fluctuation doit être donné en fréquence."
+                "On arrondira à 0,01 près (c'est à dire à 1 % près)."
+              ]
+            }
+            {
+              type:"input"
+              format:[
+                { text: "$I_F \\simeq$", cols:3, class:"text-right" }
+                { text:"[", cols:1, class:"text-right h3"}
+                { name:"l", cols:3, description:"à 0,01 près" }
+                { text:";", cols:1, class:"text-center h3"}
+                { name:"h", cols:3, description:"à 0,01 près" }
+                { text:"]", cols:1, class:"h3"}
+              ]
+            }
+            {
+              type:"validation"
+            }
+          ]
+          validations:{
+            l: "number"
+            h: "number"
+          }
+          verifications:[
+            (pData)->
+              verLow = mM.verification.isSame(pData.l.processed, IF.low, { arrondi: -2 })
+              verHigh = mM.verification.isSame(pData.h.processed, IF.high, { arrondi: -2 })
+              verLow.goodMessage.text = "Borne gauche : "+verLow.goodMessage.text
+              verHigh.goodMessage.text = "Borne droite : "+verHigh.goodMessage.text
+              {
+                note: (verLow.note+verHigh.note)/2
+                add: {
+                  type: "ul"
+                  list: [{
+                    type:"normal"
+                    text: "Vous avez répondu &nbsp; $I_F=\\left[#{pData.l.processed.tex} ; #{pData.h.processed.tex}\\right]$"
+                  }].concat(verLow.errors, [verLow.goodMessage], verHigh.errors, [verHigh.goodMessage])
+                }
+              }
+          ]
+        }
+
+
+      [
         {
           bareme: 30
+          items:[
+            {
+              type: "text"
+              ps: [
+                "Une usine fabrique des tuyaux en caoutchouc."
+                "Le fabriquant affirme que #{p} % des tuyaux sont poreux."
+                "On prélève #{n} tuyaux dans la production."
+                "Donnez les résultats des calculs suivants :"
+              ]
+            }
+            {
+              type:"input"
+              format:[
+                { text: "$E(X)=$", cols: 3, class: "text-right" }
+                { name: "esp", cols: 4, description: "Espérance à 0,01 près"}
+              ]
+            }
+            {
+              type: "input"
+              format: [
+                { text:"$\\sigma(X)=$", cols:3, class:"text-right" }
+                { name:"std", cols:4, description:"Écart-type à 0,01 près"}
+              ]
+            }
+            {
+              type: "validation"
+              clavier: ["aide"]
+            }
+            {
+              type: "aide"
+              list: [
+                "Épreuve élémentaire : Prélever un tuyau ; succès : Le tuyau est poreux ; probabilité du succès : &nbsp; $p=#{p}\\,\\%$"
+                "L'expérience est répétée &nbsp; $n=#{n}$ &nbsp; fois de façon indépendante (production assez importante)."
+                "$X$ &nbsp; est le nombre de succès (tuyaux poreux). On peut donc dire que &nbsp; $X$ &nbsp; suit une loi binomiale &nbsp; $\\mathcal{B}(#{n} ; #{p}\\,\\%)$."
+                "L'espérance est la valeur attendue. Si on a un fréquence &nbsp; $p\\,\\%$ &nbsp; de tuyaux poreux dans la production, si on prélève &nbsp; $n$ &nbsp; tuyaux, on s'attend à obtenir &nbsp; $E(X)=n\\times p$ &nbsp; tuyaux poreux en moyenne."
+              ]
+            }
+          ]
+          validations: {
+            esp: "number"
+            std: "number"
+          }
+          verifications: [
+            {
+              name: "esp"
+              tag: "$E(X)$"
+              good: n*p/100
+              parameters: {
+                arrondi: -2
+              }
+            }
+            {
+              name: "std"
+              tag: "$\\sigma(X)$"
+              good: Math.sqrt(n*p*(100-p))/100
+              parameters: {
+                arrondi: -2
+              }
+            }
+          ]
+        }
+        questionIF
+        {
+          bareme: 30
+          title:"Décision"
           items: [
             {
               type:"text"
@@ -239,22 +322,27 @@ define ["utils/math","utils/help"], (mM, help) ->
       ]
 
     getExamBriques: (inputs_list,options) ->
+      optIF = Number(options.IF.value ? 0)
       that = @
       fct_item = (inputs, index) ->
-        [p, n, nf, Xlow, Xhigh, k_values, p_values, IF] = that.init(inputs, options)
-        return {
-          children: [
-            "$p=#{p}$ &nbsp; (en %), &nbsp; $n=#{n}$ &nbsp; et &nbsp; $k=#{nf}$."
-            "Pour vous aider, on donne les résultats suivants :"
-            {
-              type:"tableau"
-              lignes: [
-                _.flatten(["$k$", k_values])
-                _.flatten(["$p(X\\leqslant k)$", p_values])
-              ]
-            }
-          ]
-        }
+        if optIF is 0
+          [p, n, nf, Xlow, Xhigh, k_values, p_values, IF] = that.init(inputs, options)
+          return {
+            children: [
+              "$p=#{p}$ &nbsp; (en %), &nbsp; $n=#{n}$ &nbsp; et &nbsp; $k=#{nf}$."
+              "Pour vous aider, on donne les résultats suivants :"
+              {
+                type:"tableau"
+                lignes: [
+                  _.flatten(["$k$", k_values])
+                  _.flatten(["$p(X\\leqslant k)$", p_values])
+                ]
+              }
+            ]
+          }
+        else
+          [p, n, nf, IF] = that.init(inputs, options)
+          return "$p=#{p}$ &nbsp; (en %), &nbsp; $n=#{n}$ &nbsp; et &nbsp; $k=#{nf}$."
 
       return {
         children: [
@@ -269,19 +357,30 @@ define ["utils/math","utils/help"], (mM, help) ->
               "Pour les différentes valeurs de &nbsp; $p$, &nbsp; $n$ &nbsp; et &nbsp; $k$, déterminez :"
             ]
           }
-          {
-            type: "enumerate"
-            enumi: "a"
-            children: [
-              "L'espérance &nbsp; $E(X)$ &nbsp; et l'écart-type &nbsp; $\\sigma(X)$"
-              "L'intervalle de fluctuation au seuil de 95 \\%"
-              "Considérant la valeur de &nbsp; $k$, l'affirmation doit-elle être acceptée/rejetée ?"
-            ]
-          }
+          if optIF is 0
+            {
+              type: "enumerate"
+              enumi: "a"
+              children: [
+                "L'espérance &nbsp; $E(X)$ &nbsp; et l'écart-type &nbsp; $\\sigma(X)$"
+                "L'intervalle de fluctuation au seuil de 95 \\%"
+                "Considérant la valeur de &nbsp; $k$, l'affirmation doit-elle être acceptée/rejetée ?"
+              ]
+            }
+          else
+            {
+              type: "enumerate"
+              enumi: "a"
+              children: [
+                "L'espérance &nbsp; $E(X)$ &nbsp; et l'écart-type &nbsp; $\\sigma(X)$"
+                "Un intervalle de fluctuation approximatif utilisant &nbsp; $E(X)\\pm 2\\sigma(X)$."
+                "Considérant la valeur de &nbsp; $k$, l'affirmation doit-elle être acceptée/rejetée ?"
+              ]
+            }
 
           {
             type: "enumerate"
-            enumi: "1)"
+            enumi: "1"
             refresh:true
             children: _.map(inputs_list, fct_item)
           }
@@ -289,74 +388,129 @@ define ["utils/math","utils/help"], (mM, help) ->
       }
 
     getTex: (inputs_list,options) ->
+      optIF = Number(options.IF.value ? 0)
       if inputs_list.length is 1
-        [p, n, nf, Xlow, Xhigh, k_values, p_values, IF] = @init(inputs_list[0], options)
-        return {
-          children: [
-            "Une usine fabrique des tuyaux en caoutchouc."
-            "Le fabriquant affirme que #{p} \\% des tuyaux sont poreux."
-            "On prélève #{n} tuyaux dans la production."
-            "Soit $X$ le nombre de tuyau poreux dans un tel échantillon."
-            {
-              type:"tableau"
-              lignes: [
-                _.flatten(["$k$", k_values])
-                _.flatten(["$p(X\\leqslant k)$", p_values])
-              ]
-            }
-            {
-              type: "enumerate"
-              enumi: "1"
-              children: [
-                "Calculez l'espérance $E(X)$ et l'écart-type $\\sigma(X)$"
-                "Déterminez l'intervalle de fluctuation au seuil de 95 \\%. Aidez-vous du tableau ci-dessus."
-                "On a prélevé un échantillon et on a trouvé #{nf} tuyaux poreux. L'affirmation doit-elle être acceptée/rejetée ?"
-              ]
-            }
-          ]
-        }
+        if optIF is 0
+          [p, n, nf, Xlow, Xhigh, k_values, p_values, IF] = @init(inputs_list[0], options)
+          return {
+            children: [
+              "Une usine fabrique des tuyaux en caoutchouc."
+              "Le fabriquant affirme que #{p}\\,\\% des tuyaux sont poreux."
+              "On prélève #{n} tuyaux dans la production."
+              "Soit $X$ le nombre de tuyau poreux dans un tel échantillon."
+              {
+                type:"tableau"
+                lignes: [
+                  _.flatten(["$k$", k_values])
+                  _.flatten(["$p(X\\leqslant k)$", p_values])
+                ]
+              }
+              {
+                type: "enumerate"
+                enumi: "1"
+                children: [
+                  "Calculez l'espérance $E(X)$ et l'écart-type $\\sigma(X)$"
+                  "Déterminez l'intervalle de fluctuation au seuil de 95\\,\\%. Aidez-vous du tableau ci-dessus."
+                  "On a prélevé un échantillon et on a trouvé #{nf} tuyaux poreux. L'affirmation doit-elle être acceptée/rejetée ?"
+                ]
+              }
+            ]
+          }
+        else
+          [p, n, nf, IF] = @init(inputs_list[0], options)
+          return {
+            children: [
+              "Une usine fabrique des tuyaux en caoutchouc."
+              "Le fabriquant affirme que #{p}\\,\\% des tuyaux sont poreux."
+              "On prélève #{n} tuyaux dans la production."
+              "Soit $X$ le nombre de tuyau poreux dans un tel échantillon."
+              {
+                type: "enumerate"
+                enumi: "1"
+                children: [
+                  "Calculez l'espérance $E(X)$ et l'écart-type $\\sigma(X)$"
+                  "Déterminez un intervalle de fluctuation approximatif en utilisant $E(X)\\pm 2\\sigma(X)$."
+                  "On a prélevé un échantillon et on a trouvé #{nf} tuyaux poreux. L'affirmation doit-elle être acceptée/rejetée ?"
+                ]
+              }
+            ]
+          }
+
 
       else
         that = @
-        fct_item = (inputs, index) ->
-          [p, n, nf, Xlow, Xhigh, k_values, p_values, IF] = that.init(inputs, options)
-          return [
-            "$p=#{p}$ (en \\%), $n=#{n}$ et $k=#{nf}$."
-            "Pour vous aider, on donne les résultats suivants :"
-            {
-              type:"tableau"
-              setup: "|*{#{k_values.length+1}}{c|}"
-              lignes: [
-                _.flatten(["$k$", k_values])
-                _.flatten(["$p(X\\leqslant k)$", p_values])
-              ]
-            }
-          ]
+        if optIF is 0
+          fct_item = (inputs, index) ->
+            [p, n, nf, Xlow, Xhigh, k_values, p_values, IF] = that.init(inputs, options)
+            return [
+              "$p=#{p}$ (en \\%), $n=#{n}$ et $k=#{nf}$."
+              "Pour vous aider, on donne les résultats suivants :"
+              {
+                type:"tableau"
+                setup: "|*{#{k_values.length+1}}{c|}"
+                lignes: [
+                  _.flatten(["$k$", k_values])
+                  _.flatten(["$p(X\\leqslant k)$", p_values])
+                ]
+              }
+            ]
 
-        return {
-          children: [
-            "Une usine fabrique des tuyaux en caoutchouc."
-            "Le fabriquant affirme que $p\\,\\%$ des tuyaux sont poreux."
-            "On prélève $n$ tuyaux dans la production."
-            "On obtient $k$ tuyaux poreux."
-            "Soit $X$ le nombre de tuyau poreux dans un tel échantillon."
-            "Pour les différentes valeurs de $p$, $n$ et $k$, déterminez :"
-            {
-              type: "enumerate"
-              enumi: "a)"
-              children: [
-                "L'espérance $E(X)$ et l'écart-type $\\sigma(X)$"
-                "L'intervalle de fluctuation au seuil de 95 \\%"
-                "Considérant la valeur de $k$, l'affirmation doit-elle être acceptée/rejetée ?"
-              ]
-            }
+          return {
+            children: [
+              "Une usine fabrique des tuyaux en caoutchouc."
+              "Le fabriquant affirme que $p\\,\\%$ des tuyaux sont poreux."
+              "On prélève $n$ tuyaux dans la production."
+              "On obtient $k$ tuyaux poreux."
+              "Soit $X$ le nombre de tuyau poreux dans un tel échantillon."
+              "Pour les différentes valeurs de $p$, $n$ et $k$, déterminez :"
+              {
+                type: "enumerate"
+                enumi: "a)"
+                children: [
+                  "L'espérance $E(X)$ et l'écart-type $\\sigma(X)$"
+                  "L'intervalle de fluctuation au seuil de 95 \\%"
+                  "Considérant la valeur de $k$, l'affirmation doit-elle être acceptée/rejetée ?"
+                ]
+              }
 
-            {
-              type: "enumerate"
-              enumi: "1)"
-              children: _.map(inputs_list, fct_item)
-            }
-          ]
-        }
+              {
+                type: "enumerate"
+                enumi: "1)"
+                children: _.map(inputs_list, fct_item)
+              }
+            ]
+          }
+        else
+          fct_item = (inputs, index) ->
+            [p, n, nf, IF] = that.init(inputs, options)
+            return [
+              "$p=#{p}$ (en \\%), $n=#{n}$ et $k=#{nf}$."
+            ]
+
+          return {
+            children: [
+              "Une usine fabrique des tuyaux en caoutchouc."
+              "Le fabriquant affirme que $p\\,\\%$ des tuyaux sont poreux."
+              "On prélève $n$ tuyaux dans la production."
+              "On obtient $k$ tuyaux poreux."
+              "Soit $X$ le nombre de tuyau poreux dans un tel échantillon."
+              "Pour les différentes valeurs de $p$, $n$ et $k$, déterminez :"
+              {
+                type: "enumerate"
+                enumi: "a)"
+                children: [
+                  "L'espérance $E(X)$ et l'écart-type $\\sigma(X)$"
+                  "Un intervalle de fluctuation approximatif en utilisant $E(X)\\pm 2\\sigma(X)$."
+                  "Considérant la valeur de $k$, l'affirmation doit-elle être acceptée/rejetée ?"
+                ]
+              }
+
+              {
+                type: "enumerate"
+                enumi: "1)"
+                children: _.map(inputs_list, fct_item)
+              }
+            ]
+          }
 
   }

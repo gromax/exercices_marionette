@@ -11,7 +11,7 @@ define ["utils/math", "utils/help"], (mM, help) ->
 				values = []
 				N=2
 				while values.length<N
-					values.push mM.alea.number({ values: {min:1, max:30, sign:true}, denominator:{min:2, max:7}})
+					values.push mM.alea.number({ numerator: {min:1, max:30, sign:true}, denominator:{min:2, max:7}})
 					if values.length>1 then values.push "+"
 				expression = mM.exec values
 				inputs.e = String expression

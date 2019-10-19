@@ -2,7 +2,7 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 	# id:48
 	# title: "Reconnaître les courbes d'une fonction et de sa dérivée (ou d'une fonction et et de sa primitive)"
 	# description: "On donne la courbe d'une fonction $f$ et la courbe de sa dérivée $f'$ (ou de sa primitive $F$), il faut reconnaître quelle courbe correspond à $f$ et quelle courbe correspond à $f'$ (ou $F$)."
-	# keyWords:["Analyse", "Déerivation", "Première", "Primitive", "Terminale"]
+	# keyWords:["Analyse", "Dérivation", "Première", "Primitive", "Terminale"]
 	# options: {
 	#	a:{ tag:"Dérivée ou Primitive" , options:["Dérivée", "Primitive"] }
 	#}
@@ -189,7 +189,7 @@ define ["utils/math","utils/help", "utils/colors"], (mM, help, colors) ->
 						top: max
 						index: index+1
 						axes:[1,1]
-						courbes: ( { color:colors.tex(ranks[i]), expression:String(p).replace /x/g, '(/x)' } for p,i in polys)
+						courbes: ( { color:colors.tex(ranks[i]), expression: String(p).replace(/x/g,'(\\x)').replace(/,/g,'.') } for p,i in polys)
 					}
 				]
 
