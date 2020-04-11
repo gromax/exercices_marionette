@@ -171,8 +171,11 @@
       # Attention, les tableaux doivent être triés pour l'utilisation de array_intersect
       if _.intersection(@simplificationList, ["ADD_SIMPLE", "DIVISION_EXACTE", "MULT_SIMPLE"]).length>0 then return false
       # S'il y a développement d'un exposant alors automatiquement il y aura des regroupement
-      if not authorized?.distribution and (authorized isnt "DISTRIBUTION") and _.intersection(@simplificationList, ["DISTRIBUTION", "ADD_REGROUPEMENT", "EXPOSANT_DEVELOPP", "PUISSANCE"]).length>0 then return false
-      if not authorized?.racine and (authorized isnt "RACINE") and ("RACINE" in @simplificationList) then return false
-      if not authorized?.fraction and (authorized isnt "FRACTION") and ("RATIO_REDUCTION" in @simplificationList) then return false
+      if not authorized?.distribution and (authorized isnt "DISTRIBUTION") and _.intersection(@simplificationList, ["DISTRIBUTION", "ADD_REGROUPEMENT", "EXPOSANT_DEVELOPP", "PUISSANCE"]).length>0
+        return false
+      if not authorized?.racine and (authorized isnt "RACINE") and ("RACINE" in @simplificationList)
+        return false
+      if not authorized?.fraction and (authorized isnt "FRACTION") and ("RATIO_REDUCTION" in @simplificationList)
+        return false
       true
 
