@@ -1183,6 +1183,8 @@
     floatify: (symbols) ->
       x = @_operand.floatify(symbols).float()
       y = @_function.calc?(x)
+      if not @_plus
+        y = -y
       new RealNumber y
     isFunctionOf: (symbol) -> @_operand.isFunctionOf(symbol)
     degre: (variable) -> if @isFunctionOf(variable) then Infinity else 0
