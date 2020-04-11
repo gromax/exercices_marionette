@@ -468,8 +468,11 @@ define [], () ->
         id:55
         filename: "exo0055"
         title:"Calculer une intégrale"
+        options: {
+          a: { tag:"Forme", options:["polynome", "K.exp(at)", "a/t"]}
+        }
         description:"Calculer l'intégrale d'une fonction polynôme."
-        keyWords:["analyse", "fonction", "primitive", "integrale", "tstl"]
+        keyWords:["analyse", "fonction", "primitive", "integrale", "intégration", "tstl"]
       }
       {
         id:56
