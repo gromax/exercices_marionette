@@ -32,7 +32,7 @@ Dans css, j'ai déplacé :
 ## Commandes grunt
 
 * grunt jst : pour compiler les templates
-* grunt coffee:entities / apps / utils / maths : compilation des différents
+* grunt coffee:entities / apps / utils / maths : compilation des différentes appli
 * grunt prod : production d'une version production
 * grunt patch : même chose avec changement de numéro et maj du numéro dans index.html
 * grunt minor : même chose mais changement du 2e chiffre du numéro
