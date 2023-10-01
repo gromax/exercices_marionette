@@ -31,7 +31,7 @@ Dans css, j'ai déplacé :
 
 ## Commandes grunt
 
-* grunt jst : pour compiler les templates
+* grunt jst : pour compiler les templates. **Attention !** Firefox garde `templates.underscore.js` dans le cache et empêche de voir les modifications. Il faut penser à désactiver le cache.
 * grunt coffee:entities / apps / utils / maths : compilation des différentes appli
 * grunt prod : production d'une version production
 * grunt patch : même chose avec changement de numéro et maj du numéro dans index.html
