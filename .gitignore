@@ -16,3 +16,4 @@ app/templates.underscore.js
 index.html
 *Hosteur*
 *exoTest.coffee
+package-lock.json
