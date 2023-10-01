@@ -1,7 +1,6 @@
-exercices - version de développement avec Marionette.js
-==
-Installation (Ubuntu)
--
+# exercices - version de développement avec Marionette.js
+
+## Installation (Ubuntu)
 
 * Télécharger la base de données
 * Modifier le fichier de config
@@ -11,8 +10,8 @@ Installation (Ubuntu)
 * "npm install" pour installer les dépendances indiquées dans package.json
 * compiler avec "grunt coffee" et "grunt jst"
 
-Dépendances pas gérées
--
+## Dépendances pas gérées
+
 Le dossier app/utils contient des dépendances que je n'ai pas su mettre avec bower.json :
 * spin.jquery.js
 * spin.js
@@ -26,25 +25,12 @@ Dans css, j'ai déplacé :
 * animate.css
 
 
+## Problème
 
-Problème
--
 * Dans bootstrap.js, il y a un require popper.js qui ne passe pas car je ne peux pas mettre popper.js dans le require_main, le js ne passe pas. Donc il faut modifier le bootstrap.js et mettre popper au lieu de popper.js
 
-Exercices à faire
--
-* Calculs d'intégrale
-* Calculs de X tels qu'on a une proba (6,7 page 288 du livre)
-* Graphiquement std et moyenne sur un graphique en batons / id avec une loi normale
-* somme termes suite géométrique
-* produit scalaire avec normes et angle
-* produit scalaire, déterminer un angle
-* produit scalaire dans un rectangle
-* produit scalaire : côté dans un quadrilatère en utilisant sin A/a
-* produit scalaire : coordonnées à déterminer pour avoir u.v = 0
+## Commandes grunt
 
-Commandes grunt
--
 * grunt jst : pour compiler les templates
 * grunt coffee:entities / apps / utils / maths : compilation des différents
 * grunt prod : production d'une version production
