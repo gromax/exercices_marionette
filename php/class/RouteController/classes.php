@@ -318,11 +318,19 @@ class classes
                         $arr_item[] = "";
                     }
                     if (count($arr_item)<4) {
-                        $messages[] = "$item => mal formatté";
+                        $messages[] = "$item => mal formaté";
                     } else if (($arr_item[2]=="")&&($arr_item[3]=="")){
                         $messages[] = "$item => cas et email vides";
                     } else {
-                        $itData = array("nom"=>$arr_item[0], "prenom"=>$arr_item[1], "cas"=>$arr_item[2], "email"=>$arr_item[3], "pwd"=>"dfge_sx".rand(1000,9999), "idClasse"=>$idClasse, "rank"=>User::RANK_ELEVE);
+                        if (count($arr_item == 5)) {
+                            // Le champ mdp est fourni
+                            $mdp = $arr_item[4];
+                        } else {
+                            // mdp généré aléatoirement
+                            $mdp = "dfge_sx".rand(1000,9999);
+                        }
+
+                        $itData = array("nom"=>$arr_item[0], "prenom"=>$arr_item[1], "cas"=>$arr_item[2], "email"=>$arr_item[3], "pwd"=>$mdp, "idClasse"=>$idClasse, "rank"=>User::RANK_ELEVE);
                         $user=new User($itData);
                         $user->casToEmail(); // crée un email sur le cas si c'est possible et l'email n'est pas défini
                         $validation = $user->insertion_validation();

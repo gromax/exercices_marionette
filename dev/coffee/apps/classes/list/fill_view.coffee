@@ -1,17 +1,17 @@
 define ["jst","marionette", "backbone.syphon"], (JST,Marionette) ->
-	View = Marionette.View.extend {
-		template: window.JST["classes/list/classe-fill-form"]
-		events: {
-			"click button.js-submit": "submitClicked"
-		}
+  View = Marionette.View.extend {
+    template: window.JST["classes/list/classe-fill-form"]
+    events: {
+      "click button.js-submit": "submitClicked"
+    }
 
-		initialize: ->
-			@title = "Nouvelle classe pour #{@options.nomProf}";
+    initialize: ->
+      @title = "Nouvelle classe pour #{@options.nomProf}";
 
-		submitClicked: (e)->
-			e.preventDefault()
-			data = Backbone.Syphon.serialize(this)
-			@trigger("form:submit", data)
-	}
+    submitClicked: (e)->
+      e.preventDefault()
+      data = Backbone.Syphon.serialize(this)
+      @trigger("form:submit", data)
+  }
 
-	return View
+  return View
