@@ -6,20 +6,20 @@
     "url": "https://github.com/gromax/exercices_marionette"
   },
   "dependencies": {
-    "jquery": "latest",
+    "jquery": "^2.2.4",
     "json2": "latest",
-    "jquery-validation": "latest",
-    "jquery-ui": "latest",
-    "underscore": "latest",
+    "jquery-validation": "^1.16.0",
+    "jquery-ui": "^1.12.1",
+    "underscore": "^1.8.3",
     "backbone": "^1.3.3",
     "backbone.marionette": "latest",
-    "backbone.syphon": "latest",
-    "backbone.radio": "latest",
-    "popper.js":"latest",
-    "bootstrap": "latest",
-    "jsxgraph": "latest",
-    "requirejs":"latest",
-    "requirejs-text":"latest",
+    "backbone.syphon": "^0.6.3",
+    "backbone.radio": "^2.0.0",
+    "popper.js":"^1.12.9",
+    "bootstrap": "^4.0.0",
+    "jsxgraph": "^0.99.5",
+    "requirejs":"^2.3.5",
+    "requirejs-text":"^2.0.15",
     "requirejs-underscore-tpl":"latest"
   }
 }
