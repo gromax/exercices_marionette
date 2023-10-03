@@ -314,25 +314,21 @@ class classes
                 if ($item!=="")
                 {
                     $arr_item = explode(";",$item);
-                    if (count($arr_item)==3) {
-                        $arr_item[] = "";
-                    }
-                    if (count($arr_item)<4) {
+                    if (count($arr_item)<3) {
                         $messages[] = "$item => mal formaté";
-                    } else if (($arr_item[2]=="")&&($arr_item[3]=="")){
-                        $messages[] = "$item => cas et email vides";
+                    } else if ($arr_item[2]==""){
+                        $messages[] = "$item => email vide";
                     } else {
-                        if (count($arr_item == 5)) {
+                        if (count($arr_item == 4)) {
                             // Le champ mdp est fourni
-                            $mdp = $arr_item[4];
+                            $mdp = $arr_item[3];
                         } else {
                             // mdp généré aléatoirement
                             $mdp = "dfge_sx".rand(1000,9999);
                         }
 
-                        $itData = array("nom"=>$arr_item[0], "prenom"=>$arr_item[1], "cas"=>$arr_item[2], "email"=>$arr_item[3], "pwd"=>$mdp, "idClasse"=>$idClasse, "rank"=>User::RANK_ELEVE);
+                        $itData = array("nom"=>$arr_item[0], "prenom"=>$arr_item[1], "email"=>$arr_item[2], "pwd"=>$mdp, "idClasse"=>$idClasse, "rank"=>User::RANK_ELEVE);
                         $user=new User($itData);
-                        $user->casToEmail(); // crée un email sur le cas si c'est possible et l'email n'est pas défini
                         $validation = $user->insertion_validation();
                         if ($validation === true)
                         {

@@ -13,13 +13,6 @@
 		<label for="user-email" class="control-label">@ :</label>
 		<input class="form-control" id="user-email" name="email" type="text" value="<%- email %>" placeHolder="email"/>
 	</div>
-
-		<% if (editorIsAdmin) { %>
-	<div class="form-group">
-		<label for="user-cas" class="control-label">id cas :</label>
-		<input class="form-control" id="user-cas" name="cas" type="text" value="<%- cas %>" placeHolder="identifiant cas"/>
-	</div>
-		<% } %>
 	<% } else {%>
 	<div class="alert alert-warning" role="alert">
 		Root ne peut pas modifier son nom, son prénom ou son email.

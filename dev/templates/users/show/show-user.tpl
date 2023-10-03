@@ -1,7 +1,6 @@
 <h1><%- prenom %> <%- nom %></h1>
 
 <p><strong>email :</strong> <%- email %></p>
-<% if (cas!=""){ %><p><strong>id cas :</strong> <%- cas %></p><% } %>
 <p><strong>Classe :</strong> <%- nomClasse %></p>
 <p><strong>Rang :</strong> <%- rank %></p>
 

@@ -16,12 +16,6 @@
 	// mails
 	require_once "./config/mailConfig.php";
 
-	// cas
-	define("PATH_TO_AUTH", "http://exercices.goupill.fr/api/auth");
-	define("PATH_TO_ENT_CAS","https://ent.iledefrance.fr/cas/login?service=http://exercices.goupill.fr/api/auth");
-	define("PATH_TO_ENT_CAS_VALIDATE","https://ent.iledefrance.fr/cas/serviceValidate");
-	define("CAS_MAIL_DOMAIN","ent.iledefrance.fr");
-
 	// Calcul de notes
 	//define("POIDS_GEO", 0.8);
 	define("N_EXO_SUP", 5); // Nombre d'exercices encore pris en compte au-delà de la quantité à faire
