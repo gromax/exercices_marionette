@@ -319,7 +319,7 @@ class classes
                     } else if ($arr_item[2]==""){
                         $messages[] = "$item => email vide";
                     } else {
-                        if (count($arr_item == 4)) {
+                        if (count($arr_item) == 4) {
                             // Le champ mdp est fourni
                             $mdp = $arr_item[3];
                         } else {
