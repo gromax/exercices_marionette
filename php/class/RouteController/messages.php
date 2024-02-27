@@ -6,6 +6,8 @@ use BDDObject\Message;
 use BDDObject\User;
 use BDDObject\Logged;
 use BDDObject\Note;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 class messages
 {
@@ -121,6 +123,13 @@ class messages
             $output["destName"] = $destName;
             $output["lu"] = true;
             $output["ownerName"] = "Moi";
+
+            if ($destName == "Prof") {
+                // envoie d'un message au prof
+                $prof = $message->getDest();
+                $this->mail($prof);
+            }
+
             return $output;
         }
         // Si on en arrive là, erreur
@@ -152,6 +161,47 @@ class messages
         }
         EC::set_error_code(501);
         return false;
+    }
+
+    private function mail($user)
+    {
+        $mail = new PHPMailer(true);                     // Passing `true` enables exceptions
+        try{
+            //Server settings
+            $mail->CharSet = 'UTF-8';
+            //$mail->SMTPDebug = 2;                      // Enable verbose debug output
+            $mail->isSMTP();                             // Set mailer to use SMTP
+            $mail->Host = SMTP_HOST;                     // Specify main and backup SMTP servers
+            $mail->SMTPAuth = true;                      // Enable SMTP authentication
+            $mail->Username = SMTP_USER;                 // SMTP username
+            $mail->Password = SMTP_PASSWORD;             // SMTP password
+            $mail->SMTPSecure = 'ssl';                   // Enable TLS encryption, `ssl` also accepted
+            $mail->Port = SMTP_PORT;                     // TCP port to connect to
+
+            //Recipients
+            $mail->setFrom(EMAIL_FROM, PSEUDO_FROM);
+            $arrUser = $user->toArray();
+            $mail->addAddress($user->identifiant(), $arrUser['prenom']." ".$arrUser['nom']);     // Add a recipient
+
+            //Content
+            $mail->isHTML(true);                                  // Set email format to HTML
+            $mail->Subject = "Message sur exercices.goupill.fr";
+            $mail->Body    = "<b>".NOM_SITE.".</b> Un élève vous a déposé un message sur <a href='".PATH_TO_SITE."'>".NOM_SITE."</a>.";
+            $mail->AltBody = NOM_SITE." Un élève vous a déposé un message.";
+
+            $mail->send();
+        }   catch (Exception $e) {
+            EC::addError("Le message n'a pu être envoyé. Erreur :".$mail->ErrorInfo);
+            EC::set_error_code(501);
+            return false;
+        }
+        $uLog=Logged::getConnectedUser();
+        if ($uLog->isAdmin() || $user->isMyTeacher($uLog)){
+            return array("message"=>"Email envoyé.", "key"=>$key);
+        } else {
+            return array("message"=>"Email envoyé.");
+        }
+
     }
 }
 ?>
