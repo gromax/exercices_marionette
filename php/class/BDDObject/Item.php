@@ -77,7 +77,7 @@ abstract class Item
 		// Pas trouvé dans la session, il faut chercher en bdd
 		require_once BDD_CONFIG;
 		try {
-			$bdd_result=DB::queryFirstRow("SELECT ".join(self::keys(),",")." FROM ".PREFIX_BDD.static::$BDDName." WHERE id=%i", $id);
+			$bdd_result=DB::queryFirstRow("SELECT ".implode(",", self::keys())." FROM ".PREFIX_BDD.static::$BDDName." WHERE id=%i", $id);
 			if ($bdd_result === null) return null;
 
 			$item = new static($bdd_result);
