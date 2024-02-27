@@ -6,6 +6,7 @@ use DB;
 use ErrorController as EC;
 use SessionController as SC;
 use MeekroDBException;
+use BDDObject\User;
 
 final class Message extends Item
 {
@@ -68,6 +69,11 @@ final class Message extends Item
 	public function isDestTo($user)
 	{
 		return $this->values['idDest'] == $user->getId();
+	}
+
+	public function getDest()
+	{
+		return User::getObject($this->values['idDest']);
 	}
 
 	public function setLu()
