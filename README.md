@@ -36,3 +36,14 @@ Dans css, j'ai déplacé :
 * grunt prod : production d'une version production
 * grunt patch : même chose avec changement de numéro et maj du numéro dans index.html
 * grunt minor : même chose mais changement du 2e chiffre du numéro
+
+## Ajout d'un exercice
+
+Chaque fois que l'on ajoute un fichier concernant un exercice, il faut penser à
+
+* le référencer dans exercices_catalog.coffee
+* le référencer dans exercice.coffee
+
+## pour le test
+
+utiliser index.dev.html
