@@ -137,6 +137,7 @@
       clone.setPlus(@_plus)
     isNul: (symbols) -> @floatify(symbols).isNul()
     isPositive: (symbols) -> @floatify(symbols).isPositive()
+    isDecimal: (symbols) -> false
     isNegative: (symbols) -> @floatify(symbols).isNegative()
     isOne:(facto=1) -> @float() is facto
     isNaN: -> true
@@ -1374,6 +1375,13 @@
     floatify: -> new RealNumber @numerator.float()/@denominator.float()
     isNul: () -> @numerator.isNul()
     isPositive: () -> @numerator.isPositive()
+    isDecimal: () ->
+      d = @denominator._value
+      while d % 5 == 0
+          d = d/5
+      while d % 2 == 0
+          d = d/2
+      d == 1
     isNegative: () -> @numerator.isNegative()
     signe: () -> @numerator.signe()
     isNaN: () -> @numerator.isNaN()
@@ -1783,6 +1791,7 @@
     toClone: -> new RealNumber(@_value, @_float)
     isNul: -> @_value is 0
     isPositive: -> @_value > 0
+    isDecimal: -> true
     isNegative: -> @_value < 0
     isNaN: -> isNaN(@_value)
     isInteger: -> isInteger(@_value)
