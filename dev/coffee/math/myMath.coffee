@@ -214,6 +214,10 @@
           when arg is "^"
             op2 = pile.pop()
             pile.push(new PowerNumber(pile.pop(),op2))
+          when arg is "sqrt"
+            op = pile.pop()
+            r = (new RadicalNumber()).insertFactor(op._value, new RealNumber(1),false)
+            pile.push(r)
           when arg is "*-" then pile.push(pile.pop()?.opposite?())
           when arg is "conjugue" then pile.push(pile.pop()?.conjugue?())
           when arg is "^-1" then pile.push(pile.pop()?.inverse?())
