@@ -677,6 +677,13 @@ define [], () ->
         }
       }
       {
+        id:79
+        filename: "exo0077"
+        title:"Ensemble de nombre"
+        description:"Choisir l'ensemble le plus petit contenant un nombre."
+        keyWords:["nombre", "ensembl","seconde"]
+      }
+      {
         id:9999
         filename: "exoTest"
         title: "Exercice de test"
