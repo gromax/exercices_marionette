@@ -157,7 +157,7 @@ define [], () ->
         filename: "exo0019"
         title:"Inéquation du second degré"
         description:"Il faut résoudre une inéquation du second degré."
-        keyWords:["analyse","trinome","equation","racines","1stl"]
+        keyWords:["analyse","trinome","inequation","racines","1stl"]
         options: {}
       }
       {
@@ -183,7 +183,7 @@ define [], () ->
         filename: "exo0022"
         title:"Développer une expression"
         description:"Une expression est donnée, il faut la développer."
-        keyWords:["algebre", "fonction"]
+        keyWords:["algebre", "fonction", "developplement", "expression"]
         options: {
           a:{
             tag:"Difficulté",
@@ -599,21 +599,21 @@ define [], () ->
         filename:"exo0070"
         title: "Calcul d'angle"
         description: "On donne les coordonnées de trois poins A, B et C. Via le calcul de produit scalaire ou le théorème de Pythagore généralisé, on cherche à déterminer l'angle $\\widehat{BAC}$."
-        keyWords : ["geometrie", "trigonometrie", "scalaire", "1stl"]
+        keyWords : ["geometrie", "trigonometrie", "angle", "scalaire", "1stl"]
       }
       {
         id:71
         filename:"exo0071"
         title: "Somme d'une suite géométrique"
         description: "Déterminez la somme des termes d'une suite géométrique."
-        keyWords : ["suites", "série", "tstl"]
+        keyWords : ["suites", "série", "somme", "géométrique", "tstl"]
       }
       {
         id:72
         filename:"exo0072"
         title: "Taux d'accroissement"
         description: "Déterminez le taux d'accroissement d'une fonction entre deux points."
-        keyWords : ["analyse", "derivation", "derivee", "1stl"]
+        keyWords : ["analyse", "derivation","taux","accroissement","derivee", "1stl"]
         options: {
           d: {
             tag:"Calcul avec h quelconque"
@@ -626,7 +626,7 @@ define [], () ->
         filename:"exo0013"
         title: "Tracer une droite avec point et m"
         description: "On donne le coefficient d'une droite et un de ses points. Il faut tracer cette droite."
-        keyWords : ["geometrie","droite","equation","seconde"]
+        keyWords : ["geometrie","droite","equation","tracer","seconde"]
         fixedSettings: { affine:false, point:true }
       }
       {
@@ -681,7 +681,14 @@ define [], () ->
         filename: "exo0077"
         title:"Ensemble de nombre"
         description:"Choisir l'ensemble le plus petit contenant un nombre."
-        keyWords:["nombre", "ensembl","seconde"]
+        keyWords:["nombre", "ensemble","seconde"]
+      }
+      {
+        id:80
+        filename: "exo0078"
+        title:"De l'inégalité à l'intervalle"
+        description:"Une inéquation simple étant donnée, choisir l'intervalle correspondant."
+        keyWords:["intervalle", "ensemble", "inequation", "seconde"]
       }
       {
         id:9999

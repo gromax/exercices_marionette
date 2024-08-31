@@ -424,6 +424,7 @@ define ["backbone.radio","entities/exercices/exercices_catalog", "utils/math"], 
 					when "exo0075" then require ["entities/exercices/exo0075"], successCB, failedCB
 					when "exo0076" then require ["entities/exercices/exo0076"], successCB, failedCB
 					when "exo0077" then require ["entities/exercices/exo0077"], successCB, failedCB
+					when "exo0078" then require ["entities/exercices/exo0078"], successCB, failedCB
 					when "exoTest" then require ["entities/exercices/exoTest"], successCB, failedCB
 					else require ["entities/exercices/#{filename}"], successCB, failedCB
 			else
