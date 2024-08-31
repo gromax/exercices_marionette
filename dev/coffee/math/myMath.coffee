@@ -8,6 +8,15 @@
       toPrecision: (num, decimals) ->
         if decimals? then Number(num.toFixed decimals)
         else num
+      ineqSymbolStrToTex: (symbol) ->
+        switch symbol
+          when "<=" then "\\leq"
+          when "<" then "<"
+          when "!=" then "\\neq"
+          when "=" then "="
+          when ">=" then "\\geq"
+          when ">" then ">"
+          else ""
     }
     alea: {
       # Ensemble des objets produits aléatoirement
