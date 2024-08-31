@@ -1,9 +1,4 @@
 define ["utils/math","utils/help"], (mM, help) ->
-    #id:1
-    #title:"Équation de droite"
-    #description:"Déterminer l'équation d'une droite passant par deux points."
-    #keyWords:["Géométrie", "Droite", "Équation", "Seconde"]
-
     return {
         getBriques: (inputs, options) ->
             expression = @init(inputs)
@@ -71,6 +66,8 @@ define ["utils/math","utils/help"], (mM, help) ->
                     numerator:{min:1, max:10000, sign:sign}
                     denominator:denominator
                 })
+                if Math.random() > 0.9
+                    n = n.floatify()
                 npi = [n]
                 alearacine = Math.random()
                 x = mM.alea.real {min:2, max:10}
@@ -93,7 +90,7 @@ define ["utils/math","utils/help"], (mM, help) ->
             that = @
             fct_item = (inputs, index) ->
                 expression = that.init(inputs,options)
-                return "$#{nexpression.tex()}$$"
+                return "$#{expression.tex()}$$"
 
             return {
                 children: [
