@@ -58,10 +58,14 @@
         # Il faut chercher les dénominateurs et tout mettre sur un même dénominateur
         dens = new RealNumber 1
         for i in [0..@operands.length-1]
-          [num, den] = @operands.shift().getNumDen()
-          @operands = ( op.md(den,false).simplify() for op in @operands )
-          @operands.push num
-          dens = dens.md(den,false)
+          s = @operands.shift()
+          if s.getNumDen
+            [num, den] = s.getNumDen()
+            @operands = ( op.md(den,false).simplify() for op in @operands )
+            @operands.push num
+            dens = dens.md(den,false)
+          else
+            @operands.push s
         dens = dens.simplify()
         out = @developp().simplify(null,false,false)
         if (dens instanceof RealNumber) and (dens.isOne()) then return out
@@ -78,8 +82,8 @@
       @
     order: (normal=true) ->
       op.order(normal) for op in @operands
-      if normal then @operands.sort (a,b) -> signatures_comparaison(a,b,1)
-      else @operands.sort (a,b) -> signatures_comparaison(a,b,-1)
+      if normal then @operands.sort (a,b) -> misc.signatures_comparaison(a,b,1)
+      else @operands.sort (a,b) -> misc.signatures_comparaison(a,b,-1)
       @
     # md: (operand, divide, infos=null) -> identique au parent
     floatify : (symbols) ->
@@ -97,7 +101,7 @@
         out = []
         for operand in @operands
           sym = operand.isFunctionOf()
-          out = union_arrays out, sym
+          out = misc.union_arrays out, sym
         out
     degre: (variable) -> Math.max (operand.degre(variable) for operand in @operands)...
     toClone: ->
@@ -176,3 +180,5 @@
         if (operand instanceof PlusNumber) and operand._plus
           @operands[i..i]=operand.operands
       @
+
+  NumberObject.makePlus = (a,b) -> new PlusNumber(a, b)
