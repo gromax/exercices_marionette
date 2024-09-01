@@ -86,6 +86,18 @@ module.exports = function(grunt) {
         ]
       },
 
+      math_dev: {
+        options: {
+          bare: false
+        },
+        files: {
+          'app/maths/constants.js':'dev/coffee/math/constants.coffee',
+          'app/maths/misc.js':'dev/coffee/math/misc.coffee',
+          'app/maths/numbers/mathobject.js':'dev/coffee/math/numbers/mathobject.coffee',
+          'app/maths/numbers/numberobject.js':'dev/coffee/math/numbers/numberobject.coffee',
+        }
+      },
+
       math: {
         options: {
           bare:false,
@@ -94,10 +106,7 @@ module.exports = function(grunt) {
         files: {
           'app/utils/math.js': [
             'dev/coffee/math/header.coffee',
-            'dev/coffee/math/functions.coffee',
             'dev/coffee/math/numbers/symbolmanager.coffee',
-            'dev/coffee/math/numbers/mathobject.coffee',
-            'dev/coffee/math/numbers/numberobject.coffee',
             'dev/coffee/math/numbers/plusnumber.coffee',
             'dev/coffee/math/numbers/multiplynumber.coffee',
             'dev/coffee/math/numbers/powernumber.coffee',
@@ -151,7 +160,7 @@ module.exports = function(grunt) {
         },
         math: {
             files: [ 'dev/coffee/math/**/*.coffee'],
-            tasks: [ 'coffee:math' ],
+            tasks: [ 'coffee:math', 'coffee:math_dev' ],
             // Reloads the browser
             options: {
               livereload: true
