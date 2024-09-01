@@ -9,20 +9,8 @@
     execute: (stack) -> new MObject()
   class TokenNumber extends TokenObject
     constructor: (str) ->
-      switch
-        when typeof str is "string"
-          # Pour le suivi, on doit savoir la précision donnée par l'utilisateur :
-          # 3,5 n'est pas la même chose que 3,50
-          # @p représentera le nombre de chiffres après la virgule
-          str = str.replace /\,/, "."
-          if (i = str.indexOf("%"))>0
-            val = Number str.substring(0,i)
-            val = val/100
-            @percent = true
-            @value = Number(val.toFixed(CST.DECIMAL_MAX_PRECISION))
-          else @value = Number(Number(str).toFixed(CST.DECIMAL_MAX_PRECISION))
-        when typeof str is "number" then @value = str
-        else @value = NaN
+      @value = Number(misc.toNumber(str).toFixed(CST.DECIMAL_MAX_PRECISION))
+      @percent = "%" in str
     toString: -> @value
     @getRegex: -> '\\d+[.,]?\\d*(E-?\\d+)?%?'
     acceptOperOnLeft: -> true
