@@ -77,11 +77,11 @@
       num.order(normal) for num in @numerator
       den.order(normal) for den in @denominator
       if normal
-        @numerator.sort (a,b) -> signatures_comparaison(a,b,1)
-        @denominator.sort (a,b) -> signatures_comparaison(a,b,1)
+        @numerator.sort (a,b) -> misc.signatures_comparaison(a,b,1)
+        @denominator.sort (a,b) -> misc.signatures_comparaison(a,b,1)
       else
-        @numerator.sort (a,b) -> signatures_comparaison(a,b,-1)
-        @denominator.sort (a,b) -> signatures_comparaison(a,b,-1)
+        @numerator.sort (a,b) -> misc.signatures_comparaison(a,b,-1)
+        @denominator.sort (a,b) -> misc.signatures_comparaison(a,b,-1)
       @
     md: (operand, div, infos=null) ->
       # Debug : Il faudrait vérifier qu'on insère pas un multiply
@@ -116,10 +116,10 @@
         out = []
         for operand in @numerator
           sym = operand.isFunctionOf()
-          out = union_arrays out, sym
+          out = misc.union_arrays out, sym
         for operand in @denominator
           sym = operand.isFunctionOf()
-          out = union_arrays out, sym
+          out = misc.union_arrays out, sym
         out
     degre:(variable) ->
       out = 0
@@ -354,3 +354,5 @@
         if options.tex then str = "#{str}\\cdot #{cs[0]}"
         else str = "#{str}*#{cs[0]}"
       [str, cs0[1], false, true]
+
+  NumberObject.makeMult = (a,b) -> new MultiplyNumber(a, b)
