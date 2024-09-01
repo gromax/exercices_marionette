@@ -21,6 +21,21 @@ define [], () ->
             if a_s >= b_s then return order
             -order
 
+        toNumber: (value) ->
+            if typeof value is "number"
+                return value
+            if typeof value isnt "string"
+                return NaN
+            value = value.replace /\,/, "."
+            if (i = str.indexOf("%"))>0
+                prefix = value.substring(0,i)
+                if isNaN(prefix)
+                    return NaN
+                return (Number prefix) / 100
+            if isNaN(value)
+                return NaN
+            return Number(value)
+
         isArray: Array.isArray || ( value ) -> return {}.toString.call( value ) is '[object Array]'
 
         mergeObj: (objectA, objectB) ->
