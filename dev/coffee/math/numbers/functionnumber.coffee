@@ -14,7 +14,7 @@
         powerNearName: false
         calc: (x) -> Math.sqrt x
       }
-      racine: { alias: "sqrt" }
+      racine: { alias: "sqrt" }
       cos: {
         tex:"\\cos"
         alias: "cos"
@@ -65,7 +65,7 @@
       if options.tex
         opCS = @_operand.compositeString options
         if opCS[1] then opTex = opCS[0] else opTex = "-#{opCS[0]}"
-        if isArray(options.altFunctionTex) and (@_function.alt?) and (@_function.alias in options.altFunctionTex) then f_tex = @_function.alt
+        if misc.isArray(options.altFunctionTex) and (@_function.alt?) and (@_function.alias in options.altFunctionTex) then f_tex = @_function.alt
         else f_tex = @_function
         switch
           when power? and @_plus and f_tex.powerNearName
