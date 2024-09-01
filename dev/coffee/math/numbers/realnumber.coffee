@@ -6,7 +6,7 @@
         token = new TokenNumber(value)
         @_value = token.value
       else if typeof value is "number" then @_value = value
-      @_float = not (isInteger(@_value)) or (fl is true)
+      @_float = not (misc.isInteger(@_value)) or (fl is true)
     # méthodes héritées de Number Object
     setPlus: (plus) ->
       if plus then @_value = Math.abs(@_value)
@@ -17,7 +17,7 @@
       if @isNaN() then return ["(?)", true, false, false]
       # En javascript, un Number peut être infini
       multGroup = (complement isnt "")
-      if isInfty(@_value)
+      if misc.isInfty(@_value)
         if options.tex then return ["\\infty"+complement, @_value > 0, false, multGroup]
         else return ["∞"+complement, @_value > 0, false, multGroup]
       v = Math.abs(@_value)
@@ -35,7 +35,7 @@
       if not isNaN(@_value) then @_value = Number(@_value.toFixed(decimals))
       @
     simplify: (infos=null) ->
-      if isInfty(@_value) then return new InftyNumber(@_value > 0)
+      if misc.isInfty(@_value) then return new InftyNumber(@_value > 0)
       @
     opposite: ->
       @_value *= -1
@@ -60,7 +60,7 @@
         else exp = NaN
       if (@_value is 0) and (exp<0) then @_value = NaN
       else @_value = Math.pow(@_value, exp)
-      if not isInteger(@_value) then @_float = true
+      if not misc.isInteger(@_value) then @_float = true
       @
     floatify: -> @toClone().setFloat()
     approx: (decimals) ->
@@ -75,7 +75,7 @@
     isDecimal: -> true
     isNegative: -> @_value < 0
     isNaN: -> isNaN(@_value)
-    isInteger: -> isInteger(@_value)
+    isInteger: -> misc.isInteger(@_value)
     isFloat: -> @_float
     # isReal: -> true # identique à SimpleNumber
     # getReal: -> @ # identique à SimpleNumber
@@ -126,7 +126,7 @@
         if @isPositive() then @_value = Math.sqrt(@_value)
         else @_value = NaN
         return @
-      extract = extractSquarePart(@_value)
+      extract = misc.extractSquarePart(@_value)
       if extract isnt 1 then infos?.set("RACINE")
       rad = @_value / (extract*extract)
       if rad != 1 then return (new RadicalNumber()).addFactor(rad,new RealNumber(extract))
@@ -163,7 +163,7 @@
       @_value = Math.abs(@_value)
       switch
         when diviseur is 0 then @_value = NaN
-        when isInteger(diviseur) then @_value = (@_value - @_value % diviseur) / diviseur * signe
+        when misc.isInteger(diviseur) then @_value = (@_value - @_value % diviseur) / diviseur * signe
         else
           i=0
           while i*diviseur <= @_value
@@ -198,3 +198,5 @@
       val = Math.round(@_value/resolution)*resolution
       if puissance>=0 then return String(val)
       else return val.toFixed(-puissance).replace(".", ",")
+
+  NumberObject.makeReal = (value) -> new RealNumber(value)
