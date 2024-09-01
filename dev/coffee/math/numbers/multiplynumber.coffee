@@ -354,5 +354,3 @@
         if options.tex then str = "#{str}\\cdot #{cs[0]}"
         else str = "#{str}*#{cs[0]}"
       [str, cs0[1], false, true]
-
-  NumberObject.makeMult = (a,b) -> new MultiplyNumber(a, b)

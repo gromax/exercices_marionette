@@ -198,5 +198,3 @@
       val = Math.round(@_value/resolution)*resolution
       if puissance>=0 then return String(val)
       else return val.toFixed(-puissance).replace(".", ",")
-
-  NumberObject.makeReal = (value) -> new RealNumber(value)

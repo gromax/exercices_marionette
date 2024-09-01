@@ -180,5 +180,3 @@
         if (operand instanceof PlusNumber) and operand._plus
           @operands[i..i]=operand.operands
       @
-
-  NumberObject.makePlus = (a,b) -> new PlusNumber(a, b)

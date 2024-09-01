@@ -1,13 +1,9 @@
-define [
-    'maths/constants',
-    'maths/misc',
-    'maths/numbers/mathobject'
-], (CST, misc, MObject) ->
-    class NumberObject extends MObject
+  class NumberObject extends MObject
         _plus: true
-        @makeReal: (value) -> throw new Error('<makeReal> non implémenté. Importez RealNumber.')
-        @makePlus: (a, b) -> throw new Error('<makePlus> non implémenté. Importez PlusNumber.')
-        @makeMult: (a, b) -> throw new Error('<makeMult> non implémenté. Importez MultiplyNumber.')
+        @makeReal: (value) ->  new RealNumber(value)
+        @makePlus: (a, b) -> new PlusNumber(a, b)
+        @makeMult: (a, b) -> new MultiplyNumber(a, b)
+
         setPlus: (plus) ->
             @_plus = plus
             @
@@ -72,7 +68,7 @@ define [
             if (exposant instanceof NumberObject) then exposant = exposant.floatify().float()
             if not misc.isInteger(exposant) then return NumberObject.makeReal()
             if exposant is 0 then return NumberObject.makeReal(1) # Suppose que 0^0 = 1
-            if exposant > 10 then return NumberObject.makeReal() # Pour éviter un calcul trop long
+            if Math.abs(exposant) > 10 then return NumberObject.makeReal() # Pour éviter un calcul trop long
             output = NumberObject.makeReal(1)
             for i in [1..Math.abs(exposant)]
               output = output.md(@, false)
@@ -144,5 +140,4 @@ define [
         replace: (replacement,needle) ->
             # Remplaces les symboles needle par replacement
             @toClone()
-
-    return NumberObject
+  
