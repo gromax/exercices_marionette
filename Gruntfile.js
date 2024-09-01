@@ -94,7 +94,6 @@ module.exports = function(grunt) {
           'app/maths/constants.js':'dev/coffee/math/constants.coffee',
           'app/maths/misc.js':'dev/coffee/math/misc.coffee',
           'app/maths/numbers/mathobject.js':'dev/coffee/math/numbers/mathobject.coffee',
-          'app/maths/numbers/numberobject.js':'dev/coffee/math/numbers/numberobject.coffee',
         }
       },
 
@@ -107,6 +106,7 @@ module.exports = function(grunt) {
           'app/utils/math.js': [
             'dev/coffee/math/header.coffee',
             'dev/coffee/math/numbers/symbolmanager.coffee',
+            'dev/coffee/math/numbers/numberobject.coffee',
             'dev/coffee/math/numbers/plusnumber.coffee',
             'dev/coffee/math/numbers/multiplynumber.coffee',
             'dev/coffee/math/numbers/powernumber.coffee',
