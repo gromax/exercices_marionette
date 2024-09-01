@@ -23,7 +23,7 @@
         when name is "i" then new ComplexeNumber(0,1)
         when name is "" then new RealNumber()
         else new Monome(1, { name:name, power:1 })
-    @pi: -> new Monome(1, { name:"pi", power:1 })
+    @pi: -> new Monome(1, { name:"pi", power:1 })
     @setSymbolsValue: (symbols) ->
       # Liste de symbols { key:value }
       for key, value of symbols
