@@ -14,6 +14,11 @@
     isImag: -> false
     getReal: -> @
     getImag: -> new RealNumber(0)
+    isOne: (fact = 1) -> false
+    # developp: (infos=null) -> identique au parent
+    signature: -> "1"
+    # extractFactor: () -> identique au parent
+
     # méthodes spécifiques de la classe
     applyNumericFunction: (name) ->
       if not FunctionNumber.exists(name) then new RealNumber()
@@ -24,12 +29,9 @@
     multiplySimple: (operand, infos=null) -> @mdSimple(operand, false, infos)
     divideSimple: (operand, infos=null) -> @mdSimple(operand, true, infos)
     mdSimple: (operand, divide, infos=null) -> new RealNumber()
-    isOne: (fact = 1) -> false
+
     sqrt: (infos=null) -> new RealNumber()
     modulecarreToNumber: () -> @floatify().modulecarreToNumber()
-    # developp: (infos=null) -> identique au parent
-    signature: -> "1"
-    # extractFactor: () -> identique au parent
     getPolynomeFactors: (variable) -> @
     toMonome: -> new Monome(@)
     derivate: -> new RealNumber 0
