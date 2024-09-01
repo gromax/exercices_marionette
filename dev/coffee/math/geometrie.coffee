@@ -104,7 +104,7 @@
   class Droite2D
     constructor: ( param ) ->
       if param?
-        if isArray(param)
+        if misc.isArray(param)
           @a = param[0]
           @b = param[1]
           @c = param[2]

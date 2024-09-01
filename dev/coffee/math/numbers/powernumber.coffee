@@ -72,7 +72,7 @@
       base.puissance(exposant)
     isFunctionOf: (symbol) ->
       if typeof symbol is "string" then @_base.isFunctionOf(symbol) or @_exposant.isFunctionOf(symbol)
-      else union_arrays @_base.isFunctionOf(), @_exposant.isFunctionOf()
+      else misc.union_arrays @_base.isFunctionOf(), @_exposant.isFunctionOf()
     degre: (variable) -> if @isFunctionOf(variable) then Infinity else 0
     toClone: -> PowerNumber.make(@_base, @_exposant).setPlus(@_plus)
     _childAssignValueToSymbol: (liste) ->

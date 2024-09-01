@@ -19,8 +19,8 @@
             val = Number str.substring(0,i)
             val = val/100
             @percent = true
-            @value = Number(val.toFixed(DECIMAL_MAX_PRECISION))
-          else @value = Number(Number(str).toFixed(DECIMAL_MAX_PRECISION))
+            @value = Number(val.toFixed(CST.DECIMAL_MAX_PRECISION))
+          else @value = Number(Number(str).toFixed(CST.DECIMAL_MAX_PRECISION))
         when typeof str is "number" then @value = str
         else @value = NaN
     toString: -> @value

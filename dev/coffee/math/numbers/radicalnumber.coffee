@@ -190,7 +190,7 @@
         i=0
         while i<@factors.length
           factor = @factors[i]
-          extract = extractSquarePart(factor.base)
+          extract = misc.extractSquarePart(factor.base)
           if extract isnt 1
             infos?.set("RACINE")
             factor.base /= extract * extract
@@ -212,7 +212,7 @@
       @_floatValue = null
       if base is 0 then return @
       if autoExtract
-        extract = extractSquarePart(base)
+        extract = misc.extractSquarePart(base)
         if extract isnt 1
           base /= extract * extract
           factor.mdSimple(new RealNumber(extract), false)

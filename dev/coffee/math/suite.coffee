@@ -7,7 +7,7 @@
     nom:"u"
     constructor: (@nom,nMin,u_nMin,expl,recur)->
       if nMin? then @nMin = nMin
-      if isArray(u_nMin) then @u_nMin = u_nMin else @u_nMin = []
+      if misc.isArray(u_nMin) then @u_nMin = u_nMin else @u_nMin = []
       if typeof expl is "function" then @explicite_def = expl
       if typeof recur is "function" then @recurence_def = recur
     set:(name,value)->
@@ -32,7 +32,7 @@
     recurence: (args) ->
       if @recurence_def isnt null
         k = @recurence_def.length
-        if (not isArray(args)) or (args.length<k) then args = ( @un(i) for i in [0..k-1] )
+        if (not misc.isArray(args)) or (args.length<k) then args = ( @un(i) for i in [0..k-1] )
         @recurence_def(args...).simplify()
       else new NumberObject()
     explicite: (x) ->

@@ -19,7 +19,7 @@
             power = Number power
             if Number.isNaN(power) then power=1
             @pushSymbol name,power
-        when isArray(symbols)
+        when misc.isArray(symbols)
           @pushSymbol symbolItem.name,symbolItem.power for symbolItem in symbols
         when (typeof symbols is "object") and (symbols isnt null) then @pushSymbol symbols.name, symbols.power
     pushSymbol:(name,power,cleanZero=false,infos=null)->
@@ -46,7 +46,7 @@
       for key in keys
         power = @symbols[key]
         switch
-          when options.tex and (key in grecques) then name = "\\#{key}"
+          when options.tex and (key in CST.GREEKS) then name = "\\#{key}"
           when key is "pi" then name = "π"
           else name = key
         multObj=true
@@ -151,7 +151,7 @@
     puissance: (exposant) ->
       # Utilisé dans la simplification de power mais n'est qu'une réécriture
       if exposant instanceof NumberObject then exposant = exposant.floatify().float()
-      if not(isInteger(exposant)) then return new RealNumber()
+      if not(misc.isInteger(exposant)) then return new RealNumber()
       if exposant is 0 then return new RealNumber(1)
       @symbols[key] *= exposant for key,power of @symbols
       @coeff = @coeff.puissance(exposant)

@@ -10,22 +10,26 @@
         a = answer.toClone().simplify(null,true)
         # Cette façon de faire plus lourde est là pour permettre la gestion d'expression plus complexe comme (3t+2)exp(4t)
         ecart = g.am(a,true).simplify(null,false,true).floatify(symbols).abs().float()
-      if ecart<ERROR_MIN then ecart = 0
+      if ecart<CST.ERROR_MIN then ecart = 0
       if answer instanceof RealNumber
-        # Dans ce cas, l'utilisateur donne une valeur numérique
-        # Cette valeur peut donc être exacte, ou approximative
-        # On cherche l'ordre de grandeur de la justesse de la réponse.
-        # On souhaite aussi savoir s'il s'agit d'une troncature au lieu d'une approx
-        # On souhaite aussi connaître le nombre de décimales de la réponse de l'utilisateur (p_user)
+        ###
+          Dans ce cas, l'utilisateur donne une valeur numérique
+          Cette valeur peut donc être exacte, ou approximative
+          On cherche l'ordre de grandeur de la justesse de la réponse.
+          On souhaite aussi savoir s'il s'agit d'une troncature au lieu d'une approx
+          On souhaite aussi connaître le nombre de décimales de la réponse de l'utilisateur (p_user)
+        ###
         if ecart is 0 then return { exact:true, float:true, p_user:answer.precision(), ordre:null }
         else
           ordre = Math.ceil(Math.log(ecart)/Math.log(10))
           p_user = answer.precision()
           marge = Math.pow(10,p_user) - 2*ecart
-          # Il faut marge >=0
-          # Malheureusement, js fait des calculs avec des erreurs dans les faibles décimales
-          # Dans le cas limite ou sa tombe par exemple sur 0,125 avec une précision à 0,01, ça peut créer un problème
-          if (marge>=-ERROR_MIN)
+          ###
+            Il faut marge >=0
+            Malheureusement, js fait des calculs avec des erreurs dans les faibles décimales
+            Dans le cas limite ou sa tombe par exemple sur 0,125 avec une précision à 0,01, ça peut créer un problème
+          ###
+          if (marge>=-CST.ERROR_MIN)
             # L'erreur est plus petite que le degré de précision donné par l'utilisateur
             # C'est ici qu'éventuellement on parlera de troncature
             return { exact:false, float:true, approx_ok:true, ecart:ecart, p_user:p_user, ordre:ordre }

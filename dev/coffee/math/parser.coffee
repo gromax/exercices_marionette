@@ -167,7 +167,7 @@
     forme: (authorized) ->
       # Si certaine simplification sont présentes, ont refuse directement
       # Si l'argument est un tableau, on peut renvoyer un tableau avec les réponses adaptées
-      if isArray(authorized) then return (@forme author for author in authorized)
+      if misc.isArray(authorized) then return (@forme author for author in authorized)
       # Attention, les tableaux doivent être triés pour l'utilisation de array_intersect
       if _.intersection(@simplificationList, ["ADD_SIMPLE", "DIVISION_EXACTE", "MULT_SIMPLE"]).length>0 then return false
       # S'il y a développement d'un exposant alors automatiquement il y aura des regroupement

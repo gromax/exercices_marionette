@@ -22,7 +22,7 @@
           @gaussianAlea g
         when (mn=input.min)? and (mx=input.max)?
           sign = if input.sign and (Math.random()<0.5) then -1 else 1
-          if isArray(input.no) and (input.no.length>0) # C'est un tableau de valeurs interdites
+          if misc.isArray(input.no) and (input.no.length>0) # C'est un tableau de valeurs interdites
             out = input.no[0]
             j = 0 # compteur pour éviter un bug (si les conditions sont impossibles à remplir)
             while (out in input.no) and (j<10)
@@ -32,11 +32,11 @@
           else
             switch
               when input.real is true then  out = sign*( (Math.random() * (mx-mn)) + mn )
-              when typeof input.real is "number" then out = fixNumber(sign*( Math.random() * (mx-mn) + mn ), input.real)
+              when typeof input.real is "number" then out = misc.fixNumber(sign*( Math.random() * (mx-mn) + mn ), input.real)
               else out = sign* Math.floor((Math.random() * (mx+1-mn)) + mn)
           if input.coeff? then out *= @alea(input.coeff)
           out
-        when isArray(input) then input[ Math.floor((Math.random() * input.length) ) ]
+        when misc.isArray(input) then input[ Math.floor((Math.random() * input.length) ) ]
         else 1
     @aleaEntreBornes: (a,b,sign=false) ->
       if sign then Math.floor((Math.random() * (b+1-a)) + a)*(Math.floor(Math.random()*2)-.5)*2
@@ -111,7 +111,7 @@
       scaled_R
     @phiinv: (y) -> Proba.erfinv(2*y-1)*Math.sqrt(2)
     @gaussianAlea: (params) ->
-      config = mergeObj { moy:0, std:1, min:Number.NEGATIVE_INFINITY, max:Number.POSITIVE_INFINITY, delta:0},params
+      config = misc.mergeObj { moy:0, std:1, min:Number.NEGATIVE_INFINITY, max:Number.POSITIVE_INFINITY, delta:0},params
       rd = Math.random()
       if rd is 0 then return config.min
       out = Proba.phiinv(rd)*config.std+config.moy

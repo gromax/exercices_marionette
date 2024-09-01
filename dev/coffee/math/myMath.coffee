@@ -82,7 +82,7 @@
           [source[index], source[randomIndex]] = [source[randomIndex], source[index]]
         source
       vector: (params) ->
-        config = mergeObj { axes:["x", "y"], def:{}, name:"?", values:[{min:-10, max:10}] }, params
+        config = misc.mergeObj { axes:["x", "y"], def:{}, name:"?", values:[{min:-10, max:10}] }, params
         coords = { x:null, y:null, z:null }
         # on crée le point avant de s'assurer qu'il vérifie bien les conditions
         # tryLeft limite le nombre de boucles pour éviter d'entrer dans une boucle infinie
@@ -102,25 +102,25 @@
               coords[axe] = mM.toNumber config.def[axe+config.name]
           # On va tester pour voir si les coordonnées obtenues répondent bien aux conditions
           ok = true
-          if isArray(config.forbidden)
+          if misc.isArray(config.forbidden)
             for item in config.forbidden
               switch
                 when item instanceof Vector then ok = ok and not(item.sameAs coords)
                 when item?.axe? then ok = ok and not(item.coords.sameAs coords, item.axe)
-                when isArray(item?.aligned) and (item.aligned.length is 2) then ok = ok and not(item.aligned[0].aligned?(item.aligned[1], coords))
+                when misc.isArray(item?.aligned) and (item.aligned.length is 2) then ok = ok and not(item.aligned[0].aligned?(item.aligned[1], coords))
           force = true
         return new Vector config.name, coords
     }
     distribution: {
       gaussian: (x,params) ->
-        config = mergeObj { moy:0, std:1 }, params
+        config = misc.mergeObj { moy:0, std:1 }, params
         Proba.gaussianDistribution (x - config.moy)/config.std
       binomial: (n,p,k) -> Proba.binomial_density(n, p, k)
       poisson: (l,k) -> Proba.poisson_density(l,k)
     }
     repartition: {
       gaussian: (x,params) ->
-        config = mergeObj { moy:0, std:1 }, params
+        config = misc.mergeObj { moy:0, std:1 }, params
         if (typeof x is "object")
           if x.max? then out = Proba.gaussianRepartition (x.max - config.moy)/config.std else out = 1
           if x.min? then out = out - Proba.gaussianRepartition (x.min - config.moy)/config.std
@@ -153,13 +153,13 @@
     trigo:{
       degToRad: (value) ->
         switch
-          when isArray(value) then return @degToRad mM.exec value
+          when misc.isArray(value) then return @degToRad mM.exec value
           when value instanceof NumberObject then return value.toClone().md(new RealNumber(180),true).md(SymbolManager.makeSymbol("pi"),false).simplify()
           when typeof value is "number" then return value * Math.PI() / 180
           else return NaN
       radToDeg: (value) ->
         switch
-          when isArray(value) then return @radToDeg mM.exec value
+          when misc.isArray(value) then return @radToDeg mM.exec value
           when value instanceof NumberObject then return value.toClone().md(new RealNumber(180),false).md(SymbolManager.makeSymbol("pi"),true).simplify()
           when typeof value is "number" then return value / Math.PI() * 180
           else return NaN
@@ -178,7 +178,7 @@
     }
     exec: (arr,params) ->
       # execute le tableau comme une pile inversée
-      config = mergeObj {
+      config = misc.mergeObj {
         fixDecimals:false
         simplify: false
         developp: false
@@ -190,7 +190,7 @@
       # ce problème se pose pour + et -
       arr.reverse()
       pile=[]
-      if not isArray(arr) then return new RealNumber()
+      if not misc.isArray(arr) then return new RealNumber()
       while arr.length>0
         arg = arr.pop()
         switch
@@ -256,14 +256,14 @@
       if not a instanceof NumberObject then a = @toNumber(a)
       if not b instanceof NumberObject then b = @toNumber(b)
       dif = Math.abs a.toClone().minus(b).floatify().float()
-      dif<ERROR_MIN
+      dif < CST.ERROR_MIN
 
     toNumber: (value) ->
       switch
         when value instanceof NumberObject then return value
         when $.isNumeric( value ) then return new RealNumber(Number value)
         when (value is null) or (typeof value is "undefined") then return new RealNumber()
-        when isArray value then return @exec value
+        when misc.isArray value then return @exec value
         when typeof value is "object"
           if typeof value.numerator is "number"
             out = new RationalNumber(value.numerator, value.denominator)
@@ -282,8 +282,8 @@
       # params.decimals donne la precision
       decimals = params?.decimals
       switch
-        when isArray value then (@float(item,params) for item in value)
-        when isArray params then (@float(value,item) for item in params)
+        when misc.isArray value then (@float(item,params) for item in value)
+        when misc.isArray params then (@float(value,item) for item in params)
         when typeof value is "number" then value
         when value instanceof FloatNumber then value.float(decimals)
         when value instanceof NumberObject then value.floatify(params).float(decimals)
@@ -320,12 +320,12 @@
         switch
           when typeof params is "string" then params = { expression:params }
           when params instanceof NumberObject then params = { number:params }
-        config = mergeObj {
+        config = misc.mergeObj {
           variable: "x"
           type: "polynome" # indique le type de sortie. L'alternative est number
         }, params
         switch
-          when isArray(config.points)
+          when misc.isArray(config.points)
             # Méthode lagrangian
             # points : liste de points de forme [{x:, y:}]
             # On vérifie que le tableau a bien le bon format
@@ -338,14 +338,14 @@
                 indice++
             if config.type is "number" then PolynomeMaker.lagrangian(config.points,config.variable).toNumberObject().simplify()
             else PolynomeMaker.lagrangian(config.points,config.variable)
-          when isArray(config.roots)
+          when misc.isArray(config.roots)
             # on donne les racines
             if config.a? then a = mM.toNumber(a) else a = new RealNumber(1)
             indice = 0
             roots = ( mM.toNumber x for x in config.roots )
             if config.type is "number" then PolynomeMaker.width_roots(a,roots,config.variable).toNumberObject().simplify()
             else PolynomeMaker.width_roots(a,roots,config.variable)
-          when isArray(config.coeffs)
+          when misc.isArray(config.coeffs)
             # On donne les coeffs
             coeffs = ( mM.toNumber x for x in config.coeffs )
             if config.type is "number" then PolynomeMaker.widthCoeffs(coeffs,config.variable).toNumberObject().simplify()
@@ -356,14 +356,14 @@
           else PolynomeMaker.invalid(config.variable)
       solve: {
         numeric: (poly,params) ->
-          config = mergeObj {
+          config = misc.mergeObj {
             bornes: null  # {min: ,max:} sinon pris à l'infini
             decimals: 1
             y:0        # P(x) = y
           }, params
           poly.solve_numeric(config.bornes?.min, config.bornes?.max, config.decimals, config.y)
         exact: (poly,params) ->
-          config = mergeObj {
+          config = misc.mergeObj {
             y:0        # P(x) = y
             imaginaire:false
           }, params
@@ -373,7 +373,7 @@
     }
     suite: {
       geometrique: (params) ->
-        config = mergeObj {
+        config = misc.mergeObj {
           nom: "u"
           raison: 1
           premierTerme: { valeur:1, rang:0 }
@@ -386,7 +386,7 @@
           (x) -> @raison.toClone().md(x,false)
         )).set("raison", mM.toNumber(config.raison))
       arithmetique: (params) ->
-        config = mergeObj {
+        config = misc.mergeObj {
           nom: "u"
           raison: 0
           premierTerme: { valeur:0, rang:0 }
@@ -399,7 +399,7 @@
           (x) -> x.toClone().am(@raison,false)
         )).set("raison",mM.toNumber(config.raison))
       arithmeticogeometrique: (params) ->
-        config = mergeObj {
+        config = misc.mergeObj {
           nom: "u"
           q: 1
           r:0
@@ -438,7 +438,7 @@
     factorisation:(obj,regex, params)->
       # Bug ici, besoin de trop simplifier
       if (f=obj.facto?(regex))?
-        config = mergeObj { simplify:false, developp:false }, params
+        config = misc.mergeObj { simplify:false, developp:false }, params
         if config.simplify then f[0] = f[0].simplify(null,config.developp).simplify() # bug : pourquoi faut-il deux simplify() ?
         MultiplyNumber.makeMult f
       else obj.toClone()
@@ -530,7 +530,7 @@
             else
               if not erreur.float
                 errors.push { type:"warning", text:"Approximation sous forme décimale attendue." }
-              goodMessage = { type:"error", text:"La bonne réponse était &nbsp; $#{ numToStr(mM.float(goodObject), -config.arrondi)}$" }
+              goodMessage = { type:"error", text:"La bonne réponse était &nbsp; $#{ misc.numToStr(mM.float(goodObject), -config.arrondi)}$" }
           when erreur.exact or erreur.float and (erreur.ecart<=config.tolerance)
             # Résultat exact ou dans la tolérance
             note = 1
@@ -616,7 +616,7 @@
         note = 0
         errors = []
         goodMessage = false
-        if not isArray(processedAnswerList)
+        if not misc.isArray(processedAnswerList)
           processedAnswerList = _.compact([processedAnswerList])
         if processedAnswerList.length is 0
           # L'utilisateur a répondu ensemble vide

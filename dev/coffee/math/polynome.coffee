@@ -140,7 +140,7 @@
       output_arr = ( new Monome(monome.coeff.toClone(), { name:@_variable, power:monome.power}) for monome in @_monomes )
       PlusNumber.makePlus output_arr
     tex: (config) ->
-      options = mergeObj { tex:true, canonique:false }, config
+      options = misc.mergeObj { tex:true, canonique:false }, config
       canonique = (options.canonique is true) and (@degre() is 2)
       variable = options.variable or @_variable
       switch
@@ -289,12 +289,12 @@
         if not monome.power < output then output = monome.power
       output
     getCoeff: (power) ->
-      if isInteger(power) and (power>=0)
+      if misc.isInteger(power) and (power>=0)
         for monome in @_monomes
           if monome.power is power then return monome.coeff
       new RealNumber(0)
     getRank: (power) ->
-      if isInteger(power) and (power>=0)
+      if misc.isInteger(power) and (power>=0)
         for monome, rank in @_monomes
           if monome.power is power then return rank
       undefined
@@ -306,7 +306,7 @@
       clone
     addMonome: (power, coeff, minus = false) ->
       if not @isValid() then return @
-      if not isInteger(power) or (power<0) then return @
+      if not misc.isInteger(power) or (power<0) then return @
       unless coeff.isFunctionOf(@_variable) # On ne peut pas insérrer un coeff dépendant de "x"
         rank = @getRank(power)
         if typeof rank isnt "undefined"
@@ -337,8 +337,8 @@
       if A is 0 then return a
       if B is 0 then return b
       if A*B > 0 then return undefined
-      if not isInteger(decimals) or (decimals<1) then decimals = 1
-      if decimals > SOLVE_MAX_PRECISION then decimals = SOLVE_MAX_PRECISION
+      if not misc.isInteger(decimals) or (decimals<1) then decimals = 1
+      if decimals > CST.SOLVE_MAX_PRECISION then decimals = CST.SOLVE_MAX_PRECISION
       precision = Math.pow(10,-decimals)
       while Math.abs(A-B) > precision
         m = (a+b)/2

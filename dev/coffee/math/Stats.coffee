@@ -9,14 +9,14 @@
     _S2:null
     constructor: (liste) ->
       @serie = []
-      if isArray(liste)
+      if misc.isArray(liste)
         for item in liste
           if typeof item is "number" then @serie.push { value:item, effectif:1 }
           else @serie.push item
       else if typeof liste is "object"
         values = liste.values
         effectifs = liste.effectifs
-        if isArray(values) and isArray(effectifs)
+        if misc.isArray(values) and misc.isArray(effectifs)
           ne = effectifs.length
           for value,i in values
             if (i<ne) then @serie.push { value:value, effectif:effectifs[i] }
@@ -52,7 +52,7 @@
         @sorted = true
       @
     ECC: ->
-      if @ECC_counted then return @
+      if @ECC_counted then return @
       @sort()
       ECC = 0
       for item in @serie
@@ -111,7 +111,7 @@
       a = cov / v
       b = sy.moyenne() - a*@moyenne()
       r = cov / (@std()*sy.std())
-      if decimals? then { a:fixNumber(a,decimals), b:fixNumber(b,decimals), r:r }
+      if decimals? then { a:misc.fixNumber(a,decimals), b:misc.fixNumber(b,decimals), r:r }
       else {a:a, b:b, r:r}
     getRank: (rank) ->
       N = @N()

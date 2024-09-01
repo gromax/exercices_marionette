@@ -4,7 +4,7 @@
   class Collection extends MObject
     constructor: (@type, ops)->
       @_operands = []
-      if isArray(ops) then @_operands.push item for item in ops
+      if misc.isArray(ops) then @_operands.push item for item in ops
     push: ->
       for item in arguments
         if (item instanceof Collection) and (item.type is @type) then @_operands.push item._operands...
