@@ -1,8 +1,4 @@
-# mathobject.coffee
-# objet mathématique de base
-
-define [], () ->
-    class MObject
+  class MObject
         simplify: (infos=null) -> @
         fixDecimals: (decimals) -> @ # fonction destinée à parcourir récurisvement les objets et à nettoyer dans les valeurs numériques d'évenutuels résultats d'un calcul
         # comme 0.1 + 0.1 + 0.1 qui ne donne pas 0.3
@@ -13,4 +9,3 @@ define [], () ->
         getPolynomeFactors: (variable) -> null
         developp: (infos=null) -> @
         derivate: (variable) -> new MObject()
-    return MObject
