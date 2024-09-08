@@ -118,7 +118,7 @@ define ["utils/math","utils/help"], (mM, help) ->
             ]
         init: (inputs) ->
             if inputs.e?
-                [strnumbergauche, ineqgauche, ineqdroite, strnumberdoite] = inputs.e.split(';')
+                [strnumbergauche, ineqgauche, ineqdroite, strnumberdroite] = inputs.e.split(';')
                 gauche = if strnumbergauche == "" then null else mM.toNumber(strnumbergauche)
                 droite = if strnumberdroite == "" then null else mM.toNumber(strnumberdroite)
             else
