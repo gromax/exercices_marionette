@@ -27,7 +27,7 @@ define [], () ->
             if typeof value isnt "string"
                 return NaN
             value = value.replace /\,/, "."
-            if (i = str.indexOf("%"))>0
+            if (i = value.indexOf("%"))>0
                 prefix = value.substring(0,i)
                 if isNaN(prefix)
                     return NaN
@@ -60,7 +60,7 @@ define [], () ->
                         i++
                 return objectA
         extractSquarePart: (value) ->
-            if value instanceof NumberObject then value = value.floatify().float()
+            if ((typeof value is "object") and (value.floatify)) then value = value.floatify().float()
             if not misc.isInteger(value) then return 1
             if value is 0 then return 0
             value = Math.abs(value)
