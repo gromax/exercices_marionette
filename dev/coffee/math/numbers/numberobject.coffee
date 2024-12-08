@@ -76,7 +76,7 @@
             else output
         floatify: (symbols) -> NumberObject.makeReal()
             #  Renvoie soit un RealNumber soit un ComplexeNumber
-        float: () -> NaN
+        float: () -> @floatify().float()
         isFunctionOf: (symbol) ->
             # Si on précise le string symbol, on cherche si l'objet est fonction de ce symbol
             # sinon on donne un tableau contenant tous les symbols donc le number est fonction
