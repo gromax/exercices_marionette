@@ -17,16 +17,18 @@ define ["utils/math","utils/help"], (mM, help) ->
                 else 0
             crochetGauche = if goodCrochets <= 1 then "]" else "["
             crochetDroite = if goodCrochets % 2 == 0 then "[" else "]"
-
+            order = (ineqgauche == "<") or (ineqgauche == "<=")
             goodGauche = switch
-                when gauche is null and ineqgauche == "<" then mM.exec ["infini", '*-']
-                when gauche is null then droite
-                else gauche
+                when order and gauche is null then mM.exec ["infini", '*-']
+                when (not order) and droite is null then mM.exec ["infini", '*-']
+                when order then gauche
+                else droite
             
             goodDroite = switch
-                when droite is null and ineqdroite == "<" then mM.exec ["infini"]
-                when droite is null then gauche
-                else droite
+                when order and droite is null then mM.exec ["infini"]
+                when (not order) and gauche is null then mM.exec ["infini"]
+                when order then droite
+                else gauche
 
             [
                 {
@@ -90,7 +92,7 @@ define ["utils/math","utils/help"], (mM, help) ->
                         }
                         {
                             type:"validation"
-                            clavier:["infini"]
+                            clavier:["infini", "sqrt"]
                         }
                     ]
                     validations:{
@@ -109,7 +111,7 @@ define ["utils/math","utils/help"], (mM, help) ->
                                     type: "ul"
                                     list: [{
                                         type:"normal"
-                                        text: "Vous avez répondu &nbsp; $I_F=\\left#{crochetGauche}#{pData.low.processed.tex} ; #{pData.high.processed.tex}\\right#{crochetDroite}$"
+                                        text: "Vous avez répondu &nbsp; $\\left#{crochetGauche}#{pData.low.processed.tex} ; #{pData.high.processed.tex}\\right#{crochetDroite}$"
                                     }].concat(verLow.errors, [verLow.goodMessage], verHigh.errors, [verHigh.goodMessage])
                                 }
                             }
@@ -147,12 +149,12 @@ define ["utils/math","utils/help"], (mM, help) ->
                 ineqgauche = switch
                     when order and eqlower then "<="
                     when order then "<"
-                    when not order and eqgreater then ">="
+                    when (not order) and eqgreater then ">="
                     else ">"
                 ineqdroite = switch
                     when order and eqgreater then "<="
                     when order then "<"
-                    when not order and eqlower then ">="
+                    when (not order) and eqlower then ">="
                     else ">"
                 [gauche, droite] = if order then [lower, greater] else [greater, lower]
                 
@@ -161,13 +163,14 @@ define ["utils/math","utils/help"], (mM, help) ->
                     if Math.random() > 0.5
                         droite = null
                         ineqdroite = if order then "<" else ">"
-                        inputs.e = [String gauche, ineqgauche, "", ""].join(';')
+                        inputs.e = [(String gauche), ineqgauche, ineqdroite, ""].join(';')
                     else
                         gauche = null
                         ineqgauche = if order then "<" else ">"
-                        inputs.e = ["", "", ineqdroite, String droite].join(';')
+                        inputs.e = ["", ineqgauche, ineqdroite, (String droite)].join(';')
                 else
-                    inputs.e = [String gauche, ineqgauche, ineqdroite, String droite].join(';')
+                    inputs.e = [(String gauche), ineqgauche, ineqdroite, (String droite)].join(';')
+
             [gauche, ineqgauche, ineqdroite, droite]
 
         getExamBriques: (inputs_list,options) ->
