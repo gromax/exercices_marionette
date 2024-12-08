@@ -49,7 +49,7 @@ define [], () ->
         description:"Connaissant leurs coordonnées, placer des points dans un repère."
         keyWords : ["geometrie", "repere", "seconde"]
         fixedSettings: {
-          complexe: true
+          complexe: false
         }
       }
       {
