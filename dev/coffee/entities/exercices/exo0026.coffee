@@ -109,7 +109,7 @@
 							{
 								name:"y"
 								tag:"Ordonnée"
-								good:gAB.x
+								good:gAB.y
 							}
 						]
 					}
