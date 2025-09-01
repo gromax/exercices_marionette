@@ -49,8 +49,8 @@ final class Message extends Item
 	{
 		require_once BDD_CONFIG;
 		try{
-			DB::query("SELECT id FROM ".PREFIX_BDD.static::$BDDName." WHERE idDest = %i AND lu = 0", $idUser);
-			return DB::count();
+			$count = DB::queryFirstField("SELECT COUNT(*) FROM ".PREFIX_BDD.static::$BDDName." WHERE idDest = %i AND lu = 0", $idUser);
+			return $count;
 		} catch(MeekroDBException $e) {
 			EC::addBDDError($e->getMessage(), 'Messages/unReadNumber');
 		}
