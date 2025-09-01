@@ -128,7 +128,7 @@ class User
 		try {
 			// Vérification que l'email
 			$results = DB::query("SELECT id FROM ".PREFIX_BDD."users WHERE email=%s",$email);
-			if (DB::count()>0) return $results[0]["id"];
+			if (count($results)>0) return $results[0]["id"];
 		} catch(MeekroDBException $e) {
 			EC::addBDDError($e->getMessage());
 		}
